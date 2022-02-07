@@ -1,0 +1,946 @@
+#LyX 2.1 created this file. For more info see http://www.lyx.org/
+\lyxformat 474
+\begin_document
+\begin_header
+\textclass article
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_math auto
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref true
+\pdf_bookmarks true
+\pdf_bookmarksnumbered false
+\pdf_bookmarksopen false
+\pdf_bookmarksopenlevel 1
+\pdf_breaklinks true
+\pdf_pdfborder true
+\pdf_colorlinks true
+\pdf_backref false
+\pdf_pdfusetitle true
+\papersize default
+\use_geometry true
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine basic
+\cite_engine_type default
+\biblio_style plain
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 1
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\leftmargin 2.5cm
+\topmargin 2.5cm
+\rightmargin 2.5cm
+\bottommargin 2.5cm
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation skip
+\defskip smallskip
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+Improved estimator: detailed derivation
+\end_layout
+
+\begin_layout Author
+Thomas Ayral
+\end_layout
+
+\begin_layout Abstract
+In these notes, I give a detailed derivation of the improved estimator for
+ the self-energy 
+\begin_inset Formula $\Sigma$
+\end_inset
+
+ as implemented in precompute_fprefactor and measure_gt/measure_gw.
+ This derivation applies to an Anderson impurity problem with static and
+ dynamical charge-charge and (vector) spin-spin interactions.
+ 
+\end_layout
+
+\begin_layout Standard
+The action under consideration is:
+\begin_inset Formula 
+\begin{equation}
+S=\iint\mathrm{d}\tau\mathrm{d}\tau'\sum_{\sigma,ab}\bar{c}_{a}^{\sigma}(\tau)\left[(\partial_{\tau}-\mu_{\sigma a})\delta_{ab}\delta_{\tau-\tau'}+\Delta_{ab}^{\sigma}(\tau-\tau')\right]c_{b}^{\sigma}(\tau')+S_{\mathrm{loc}}\label{eq:action}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+with 
+\begin_inset Formula 
+\[
+S_{\mathrm{loc}}=\frac{1}{2}\sum_{I=0,x,y,z}\sum_{ab}\iint\mathrm{d}\tau\mathrm{d}\tau'n_{a}^{I}(\tau)\mathcal{U}_{ab}^{I}(\tau-\tau')n_{b}^{I}(\tau')
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Simplification of the formula for 
+\begin_inset Formula $F$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The full formula for the improved estimate (defined as 
+\begin_inset Formula $F=\Sigma G$
+\end_inset
+
+) is (see Eq 11.38 in Appendix F.3.3 of 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Ayral2015b"
+
+\end_inset
+
+):
+\begin_inset Formula 
+\[
+F_{ip}=-\sum_{v\alpha\beta}\lambda_{iv\alpha}\mathcal{U}_{\alpha\beta}\langle c_{v}\bar{c}_{p}n_{\beta}\rangle
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+where Latin indices denote 
+\begin_inset Formula $(\tau,\sigma,a)$
+\end_inset
+
+ (imaginary time, spin, orbital) and Greek indices 
+\begin_inset Formula $(\tau,I,a)$
+\end_inset
+
+ (imaginary time, Pauli index, 
+\begin_inset Quotes eld
+\end_inset
+
+orbital
+\begin_inset Quotes erd
+\end_inset
+
+).
+ Thus, expanding the compound indices:
+\begin_inset Formula 
+\begin{eqnarray*}
+F_{a_{i}a_{p}}^{\sigma_{i}}(\tau_{i}-\tau_{p}) & = & -\int_{\tau_{v}\tau_{\alpha}\tau_{\beta}}\sum_{a_{v}a_{\alpha}a_{\beta}}\sum_{\sigma_{v}I_{\alpha}I_{\beta}}\sigma_{\sigma_{i}\sigma_{v}}^{I_{\alpha}}\delta_{\tau_{i}-\tau_{v}}\delta_{\tau_{v}-\tau_{\alpha}}\delta_{a_{i}a_{v}}\delta_{a_{v}a_{\alpha}}\mathcal{U}_{a_{\alpha}a_{\beta}}^{I_{\alpha}}\delta_{I_{\alpha}I_{\beta}}(\tau_{\alpha}-\tau_{\beta})\langle c_{a_{v}}^{\sigma_{v}}(\tau_{v})\bar{c}_{a_{p}}^{\sigma_{i}}(\tau_{p})n_{a_{\beta}}^{I_{\beta}}(\tau_{\beta})\rangle\\
+ & = & -\int_{\tau_{\beta}}\sum_{a_{\beta}}\sum_{\sigma_{v}I_{\alpha}}\sigma_{\sigma_{i}\sigma_{v}}^{I_{\alpha}}\mathcal{U}_{a_{i}a_{\beta}}^{I_{\alpha}}(\tau_{i}-\tau_{\beta})\langle c_{a_{i}}^{\sigma_{v}}(\tau_{i})\bar{c}_{a_{p}}^{\sigma_{i}}(\tau_{p})n_{a_{\beta}}^{I_{\alpha}}(\tau_{\beta})\rangle
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Setting 
+\begin_inset Formula $\tau_{p}=0$
+\end_inset
+
+, this simplifies to:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+F_{ab}^{\sigma}(\tau)=-\int_{\bar{\tau}}\sum_{\substack{I=0,x,y,z\\
+c\sigma'
+}
+}\sigma_{\sigma\sigma'}^{I}\mathcal{U}_{ac}^{I}(\tau-\bar{\tau})\langle c_{a}^{\sigma'}(\tau)\bar{c}_{b}^{\sigma}(0)n_{c}^{I}(\bar{\tau})\rangle
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Let us now look at the contribution from the spin-perpendicular part (
+\begin_inset Formula $I=x,y$
+\end_inset
+
+):
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{eqnarray*}
+F_{ab}^{\sigma,\perp}(\tau) & = & -\int_{\bar{\tau}}\sum_{c\sigma'}\mathcal{U}_{ac}^{x}(\tau-\bar{\tau})\sigma_{\sigma\sigma'}^{x}\langle c_{a}^{\sigma'}(\tau)\bar{c}_{b}^{\sigma}(0)n_{c}^{x}(\bar{\tau})\rangle\\
+ &  & -\int_{\bar{\tau}}\sum_{c\sigma'}\mathcal{U}_{ac}^{y}(\tau-\bar{\tau})\sigma_{\sigma\sigma'}^{y}\langle c_{a}^{\sigma'}(\tau)\bar{c}_{b}^{\sigma}(0)n_{c}^{y}(\bar{\tau})\rangle
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+We have: 
+\begin_inset Formula $\mathcal{U}^{x}=\mathcal{U}^{y}=\mathcal{U}^{\perp}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Furthermore, in the rotation-invariant case (
+\begin_inset Formula $\mathcal{U}^{\perp}=\mathcal{U}^{z}$
+\end_inset
+
+), we have: (TO BE JUSTIFIED)
+\begin_inset Formula 
+\[
+\sum_{\sigma'}\sigma_{\sigma\sigma'}^{x}\langle c_{a}^{\sigma'}(\tau)\bar{c}_{b}^{\sigma}(0)n_{c}^{x}(\bar{\tau})\rangle=\sum_{\sigma'}\sigma_{\sigma\sigma'}^{z}\langle c_{a}^{\sigma'}(\tau)\bar{c}_{b}^{\sigma}(0)n_{c}^{z}(\bar{\tau})\rangle=\sum_{\sigma'}\sigma_{\sigma\sigma'}^{z}\langle c_{a}^{\sigma'}(\tau)\bar{c}_{b}^{\sigma}(0)n_{c}^{z}(\bar{\tau})\rangle
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Thus:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{eqnarray*}
+F_{ab}^{\sigma,\perp}(\tau) & = & -\int_{\bar{\tau}}\sum_{c}2\mathcal{U}_{ac}^{\perp}(\tau-\bar{\tau})\sum_{\sigma'}\sigma_{\sigma\sigma'}^{z}\langle c_{a}^{\sigma'}(\tau)\bar{c}_{b}^{\sigma}(0)n_{c}^{z}(\bar{\tau})\rangle
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Thus, the full 
+\begin_inset Formula $F$
+\end_inset
+
+ is given by:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+F_{ab}^{\sigma}(\tau)=-\int_{\bar{\tau}}\sum_{\substack{I=0,z\\
+c\sigma'
+}
+}\sigma_{\sigma\sigma'}^{I}\hat{\mathcal{U}}_{ac}^{I}(\tau-\bar{\tau})\langle c_{a}^{\sigma'}(\tau)\bar{c}_{b}^{\sigma}(0)n_{c}^{I}(\bar{\tau})\rangle
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+with hatted interactions defined as:
+\begin_inset Formula 
+\begin{eqnarray}
+\hat{\mathcal{U}}^{0} & \equiv & \mathcal{U}^{0}\label{eq:U_hat_0_def}\\
+\hat{\mathcal{U}}^{z} & \equiv & \mathcal{U}^{z}+2\mathcal{U}^{\perp}\label{eq:U_hat_z_def}
+\end{eqnarray}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+We can further simplify this expression by replacing (
+\begin_inset Formula $I=0,z$
+\end_inset
+
+):
+\begin_inset Formula 
+\[
+n_{c}^{I}=\sum_{\bar{\sigma}}n_{c}^{\bar{\sigma}}\sigma_{\bar{\sigma}\bar{\sigma}}^{I}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+(for 
+\begin_inset Formula $I=0$
+\end_inset
+
+ and 
+\begin_inset Formula $z$
+\end_inset
+
+, the Pauli matrix is diagonal, hence the notation).
+ Thus 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+F_{ab}^{\sigma}(\tau)=-\int_{\bar{\tau}}\sum_{c}\sum_{\sigma'}\sum_{\substack{I=0,z}
+}\sigma_{\sigma\sigma}^{I}\sigma_{\sigma'\sigma'}^{I}\hat{\mathcal{U}}_{ac}^{I}(\tau-\bar{\tau})\langle c_{a}^{\sigma}(\tau)\bar{c}_{b}^{\sigma}(0)n_{c}^{\sigma'}(\bar{\tau})\rangle
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+We define:
+\begin_inset Formula 
+\begin{equation}
+\hat{\mathcal{U}}_{ac}^{\sigma\sigma'}(\tau)\equiv\sum_{\substack{I=0,z}
+}\sigma_{\sigma\sigma}^{I}\sigma_{\sigma'\sigma'}^{I}\hat{\mathcal{U}}_{ac}^{I}(\tau)\label{eq:U_sigma_sigma_prime_def}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Thus:
+\begin_inset Formula 
+\begin{equation}
+F_{ab}^{\sigma}(\tau)=-\int_{\bar{\tau}}\sum_{c}\sum_{\sigma'}\hat{\mathcal{U}}_{ac}^{\sigma\sigma'}(\tau-\bar{\tau})\langle c_{a}^{\sigma}(\tau)\bar{c}_{b}^{\sigma}(0)n_{c}^{\sigma'}(\bar{\tau})\rangle\label{eq:F_final}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Measurement of 
+\begin_inset Formula $F$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In this section I show how to measure 
+\begin_inset Formula $F$
+\end_inset
+
+ as given by expression (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:F_final"
+
+\end_inset
+
+).
+\end_layout
+
+\begin_layout Subsection
+Reminder: measurement of 
+\begin_inset Formula $G$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Using (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:action"
+
+\end_inset
+
+), we have:
+\begin_inset Formula 
+\[
+\frac{1}{Z}\frac{\delta Z}{\delta\Delta_{ba}^{\sigma}(\tau',\tau)}=-\langle\bar{c}_{b}^{\sigma}(\tau')c_{a}^{\sigma}(\tau)\rangle=\langle c_{a}^{\sigma}(\tau)\bar{c}_{b}^{\sigma}(\tau')\rangle=-G_{ab}^{\sigma}(\tau-\tau')
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Moreover, in the hybridization expansion:
+\begin_inset Formula 
+\[
+Z=\sum_{\mathscr{C}}\det\bm{\Delta}(\mathscr{C})w_{\perp}(\mathscr{C})w_{\mathrm{loc}}(\mathscr{C})
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+where 
+\begin_inset Formula $\mathscr{C}$
+\end_inset
+
+ is a Monte-Carlo configuration, and the matrix 
+\begin_inset Formula $\bm{\Delta}$
+\end_inset
+
+ is defined as:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\left[\bm{\Delta}(\mathscr{C})\right]_{ij}=\Delta_{a_{i}b_{j}}^{\sigma_{i}}(\tau_{i},\tau'_{j})
+\]
+
+\end_inset
+
+ Thus:
+\begin_inset Formula 
+\[
+\frac{\delta Z}{\delta\Delta_{ba}^{\sigma}(\tau',\tau)}=\sum_{c}w_{\perp}(\mathscr{C})w_{\mathrm{loc}}(\mathscr{C})\frac{\delta\det\bm{\Delta}(\mathscr{C})}{\delta\Delta_{ba}^{\sigma}(\tau',\tau)}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Furthermore, for any matrix 
+\begin_inset Formula $\bm{\Delta}$
+\end_inset
+
+,
+\begin_inset Formula 
+\[
+\frac{\delta\det\bm{\Delta}}{\delta\bm{\Delta}_{ji}}=\det\bm{\Delta}\left[\bm{\Delta}^{-1}\right]_{ij}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Thus:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\frac{\delta Z}{\delta\Delta_{ba}^{\sigma}(\tau',\tau)}=\sum_{c}w_{\perp}(\mathscr{C})w_{\mathrm{loc}}(\mathscr{C})\det\bm{\Delta}(\mathscr{C})\sum_{\substack{i\in\mathrm{cr.\,ops}\\
+j\in\mathrm{an.\,ops}
+}
+}M_{ij}\delta(\tau_{i}-\tau)\delta(\tau_{j}'-\tau')\delta_{ia}\delta_{jb}\delta_{\sigma_{i}\sigma}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+where we have defined: 
+\begin_inset Formula $M=\Delta^{-1}$
+\end_inset
+
+.
+ Thus
+\begin_inset Formula 
+\[
+\frac{\delta Z}{\delta\Delta_{ba}^{\sigma}(\tau',\tau)}=\Bigg\langle\sum_{\substack{i\in\mathrm{cr.\,ops}\\
+j\in\mathrm{an.\,ops}
+}
+}M_{ij}\delta(\tau_{i}-\tau)\delta(\tau_{j}'-\tau')\delta_{ia}\delta_{jb}\delta_{\sigma_{i}\sigma}\Bigg\rangle_{\mathrm{MC}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+i.e.
+ 
+\begin_inset Formula 
+\[
+G_{ab}^{\sigma}(\tau,\tau')=-\Bigg\langle\sum_{\substack{i\in\mathrm{cr.\,ops}\\
+j\in\mathrm{an.\,ops}
+}
+}M_{ij}\delta(\tau_{i}-\tau)\delta(\tau_{j}'-\tau')\delta_{ia}\delta_{jb}\delta_{\sigma_{i}\sigma}\Bigg\rangle_{\mathrm{MC}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+More details can be found in 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Boehnke2011"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsection
+Measurement of 
+\begin_inset Formula $F$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+We want to measure:
+\begin_inset Formula 
+\[
+F_{ab}^{\sigma}(\tau)=-\langle c_{a}^{\sigma}(\tau)\bar{c}_{b}^{\sigma}(0)I_{a}^{\sigma}(\tau)\rangle
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+with 
+\begin_inset Formula 
+\begin{equation}
+I_{a}^{\sigma}(\tau)\equiv\int_{\bar{\tau}}\sum_{c}\sum_{\sigma'}\hat{\mathcal{U}}_{ac}^{\sigma\sigma'}(\tau-\bar{\tau})n_{c}^{\sigma'}(\bar{\tau})\label{eq:I_def}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Note that
+\begin_inset Formula $\tau$
+\end_inset
+
+ is the time of the annihilation operator.
+ 
+\begin_inset Formula $I_{a}^{\sigma}(\tau)$
+\end_inset
+
+ must be computed for each annihilation operator.
+\end_layout
+
+\begin_layout Standard
+Decomposing 
+\begin_inset Formula $\hat{\mathcal{U}}$
+\end_inset
+
+ into its static and dynamical part:
+\begin_inset Formula 
+\[
+\hat{\mathcal{U}}(\tau)=\hat{U}\delta_{\tau}+\mathcal{D}(\tau)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+we get:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+I_{a}^{\sigma}(\tau)\equiv\sum_{c}\sum_{\sigma'}\hat{U}_{ac}^{\sigma\sigma'}n_{c}^{\sigma'}(\tau)+\int_{\bar{\tau}}\sum_{c}\sum_{\sigma'}\hat{\mathcal{D}}_{ac}^{\sigma\sigma'}(\tau-\bar{\tau})n_{c}^{\sigma'}(\bar{\tau})
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The second term is:
+\begin_inset Formula 
+\begin{eqnarray*}
+\int_{\bar{\tau}}\hat{\mathcal{D}}_{ac}^{\sigma\sigma'}(\tau-\bar{\tau})n_{c}^{\sigma'}(\bar{\tau}) & = & \sum_{p_{c\sigma'}=1}^{N_{c\sigma'}}\int_{\tau_{p_{c\sigma'}}}^{\tau'_{p_{c\sigma'}}}\mathrm{d}\bar{\tau}\mathcal{D}_{ac}^{\sigma\sigma'}(\tau-\bar{\tau})\\
+ & = & \sum_{p_{c\sigma'}=1}^{N_{c\sigma'}}-2\partial_{\tau}\hat{K}{}_{ac}^{\sigma\sigma'}(0^{+})\left\{ \theta(\tau-\tau_{p_{c\sigma'}})-\theta(\bar{\tau}-\tau'_{p_{c\sigma'}})\right\} +\partial_{\tau}\hat{K}{}_{ac}^{\sigma\sigma'}(\tau-\tau_{p_{c\sigma'}})-\partial_{\tau}\hat{K}{}_{ac}^{\sigma\sigma'}(\tau-\tau'_{p_{c\sigma'}})
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Thus:
+\begin_inset Formula 
+\begin{eqnarray*}
+I_{a}^{\sigma}(\tau) & \equiv & \sum_{c}\sum_{\sigma'}\Bigg\{\hat{U}_{ac}^{\sigma\sigma'}n_{c}^{\sigma'}(\tau)\\
+ &  & -2\partial_{\tau}\hat{K}{}_{ac}^{\sigma\sigma'}(0^{+})n_{c}^{\sigma'}(\tau)+\sum_{p_{c\sigma'}=1}^{N_{c\sigma'}}\partial_{\tau}\hat{K}{}_{ac}^{\sigma\sigma'}(\tau-\tau_{p_{c\sigma'}})-\sum_{p_{c\sigma'}=1}^{N_{c\sigma'}}\partial_{\tau}\hat{K}{}_{ac}^{\sigma\sigma'}(\tau-\tau'_{p_{c\sigma'}})\Bigg\}
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The last two terms can be simplified as:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{eqnarray*}
+I_{a}^{\sigma}(\tau) & \equiv & \sum_{c}\sum_{\sigma'}\left(\hat{U}_{ac}^{\sigma\sigma'}-2\partial_{\tau}\hat{K}{}_{ac}^{\sigma\sigma'}(0^{+})\right)n_{c}^{\sigma'}(\tau)\\
+ &  & +\sum_{\mathrm{ops}\,\alpha}s_{\alpha}\partial_{\tau}\hat{K}{}_{ac(\alpha)}^{\sigma\sigma'(\alpha)}(\tau-t_{\alpha})
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+with 
+\begin_inset Formula $s_{\alpha}=1$
+\end_inset
+
+ for creation operators and 
+\begin_inset Formula $=-1$
+\end_inset
+
+ for annihilation operators, and 
+\begin_inset Formula $t_{\alpha}=\tau_{\alpha}$
+\end_inset
+
+ for creation (
+\begin_inset Formula $=\tau'_{\alpha}$
+\end_inset
+
+ for annihilation) operators.
+ Using the antisymmetry of 
+\begin_inset Formula $\partial_{\tau}\hat{K}(\tau)$
+\end_inset
+
+, we rewrite this as:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{eqnarray}
+I_{a}^{\sigma}(\tau) & \equiv & \sum_{c}\sum_{\sigma'}\left(\hat{U}_{ac}^{\sigma\sigma'}-2\partial_{\tau}\hat{K}{}_{ac}^{\sigma\sigma'}(0^{+})\right)n_{c}^{\sigma'}(\tau)-\sum_{\mathrm{ops}\,\alpha}s_{\alpha}\partial_{\tau}\hat{K}{}_{ac(\alpha)}^{\sigma\sigma'(\alpha)}(t_{\alpha}-\tau)\label{eq:I_final}
+\end{eqnarray}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Let us write this expression in terms of the inputs of the solver only,
+ namely 
+\begin_inset Formula $U_{ac}^{\sigma\sigma'}$
+\end_inset
+
+, 
+\begin_inset Formula $\partial_{\tau}K{}_{ac}^{\sigma\sigma'}(\tau)$
+\end_inset
+
+ and 
+\begin_inset Formula $\partial_{\tau}K_{ac}^{\perp}(\tau)$
+\end_inset
+
+.
+ We recall that 
+\begin_inset Formula $K$
+\end_inset
+
+ and 
+\begin_inset Formula $K^{\perp}$
+\end_inset
+
+ are defined as:
+\begin_inset Formula 
+\begin{eqnarray*}
+\partial_{\tau}^{2}K_{ab}^{\sigma\sigma'}(\tau) & = & \mathcal{D}_{ab}^{\sigma\sigma'}(\tau)\\
+\partial_{\tau}^{2}K_{ab}^{\perp}(\tau) & = & \frac{1}{4}\mathcal{J}_{ab}^{\perp}(\tau)\equiv\mathcal{D}_{ab}^{\perp}(\tau)
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+and 
+\begin_inset Formula $K(\tau=0^{+})=K(\tau=\beta^{-})=0$
+\end_inset
+
+.
+ We first use (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:U_sigma_sigma_prime_def"
+
+\end_inset
+
+) to write explicitly:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{eqnarray}
+\hat{\mathcal{U}}_{ac}^{\uparrow\uparrow}(\tau) & = & \hat{\mathcal{U}}_{ac}^{0}(\tau)+\mathcal{\hat{U}}_{ac}^{z}(\tau)\label{eq:U_sigma_sigma_prime_def-1}\\
+\hat{\mathcal{U}}_{ac}^{\uparrow\downarrow}(\tau) & = & \hat{\mathcal{U}}_{ac}^{0}(\tau)-\mathcal{\hat{U}}_{ac}^{z}(\tau)\\
+\hat{\mathcal{U}}_{ac}^{\downarrow\uparrow}(\tau) & = & \hat{\mathcal{U}}_{ac}^{0}(\tau)-\mathcal{\hat{U}}_{ac}^{z}(\tau)\\
+\hat{\mathcal{U}}_{ac}^{\downarrow\downarrow}(\tau) & = & \hat{\mathcal{U}}_{ac}^{0}(\tau)+\mathcal{\hat{U}}_{ac}^{z}(\tau)
+\end{eqnarray}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+thus:
+\begin_inset Formula 
+\[
+\hat{\mathcal{U}}_{ac}^{\sigma\sigma'}(\tau)=\hat{\mathcal{U}}_{ac}^{0}(\tau)+(-)^{\sigma\sigma'}\mathcal{\hat{U}}_{ac}^{z}(\tau)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Now, using (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:U_hat_0_def"
+
+\end_inset
+
+-
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:U_hat_z_def"
+
+\end_inset
+
+):
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{eqnarray*}
+\hat{\mathcal{U}}_{ac}^{\sigma\sigma'}(\tau) & = & \mathcal{U}_{ac}^{0}(\tau)+(-)^{\sigma\sigma'}\mathcal{U}_{ac}^{z}(\tau)+(-)^{\sigma\sigma'}2\mathcal{U}_{ac}^{\perp}(\tau)\\
+ & = & \mathcal{U}_{ac}^{\sigma\sigma'}(\tau)+(-)^{\sigma\sigma'}2\mathcal{U}_{ac}^{\perp}(\tau)
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Finally:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\hat{\mathcal{U}}_{ac}^{\sigma\sigma'}(\tau)=U_{ac}^{\sigma\sigma'}\delta(\tau)+\mathcal{D}_{ac}^{\sigma\sigma'}(\tau)+(-)^{\sigma\sigma'}2\mathcal{D}_{ac}^{\perp}(\tau)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Thus:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+\partial_{\tau}\hat{K}_{ac}^{\sigma\sigma'}(\tau)=\partial_{\tau}K_{ac}^{\sigma\sigma'}(\tau)+(-)^{\sigma\sigma'}2\partial_{\tau}K_{ac}^{\perp}(\tau)\label{eq:Kprime_final}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The final expression thus reads:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{eqnarray}
+I_{a}^{\sigma}(\tau) & \equiv & \sum_{c}\sum_{\sigma'}\left(\hat{U}_{ac}^{\sigma\sigma'}-2\partial_{\tau}K{}_{ac}^{\sigma\sigma'}(0^{+})-4(-)^{\sigma\sigma'}\partial_{\tau}K_{ac}^{\perp}(0^{+})\right)n_{c}^{\sigma'}(\tau)\label{eq:I_final-1}\\
+ &  & -\sum_{\mathrm{ops}\,\alpha}\left\{ s_{\alpha}\partial_{\tau}K{}_{ac(\alpha)}^{\sigma\sigma'(\alpha)}(t_{\alpha}-\tau)+s_{\alpha}(-)^{\sigma\sigma'(\alpha)}2\partial_{\tau}K{}_{ac(\alpha)}^{\perp}(t_{\alpha}-\tau)\right\} 
+\end{eqnarray}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Summary
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $F$
+\end_inset
+
+ is computed as:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+F_{ab}^{\sigma}(\tau,\tau')=-\Bigg\langle\sum_{\substack{i\in\mathrm{cr.\,ops}\\
+j\in\mathrm{an.\,ops}
+}
+}M_{ij}\delta(\tau_{i}-\tau)\delta(\tau_{j}'-\tau')\delta_{ia}\delta_{jb}\delta_{\sigma_{i}\sigma}I_{a_{i}}^{\sigma_{i}}(\tau)\Bigg\rangle_{\mathrm{MC}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+with:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{eqnarray}
+I_{a}^{\sigma}(\tau) & \equiv & \sum_{c}\sum_{\sigma'}\left(\hat{U}_{ac}^{\sigma\sigma'}-2\partial_{\tau}K{}_{ac}^{\sigma\sigma'}(0^{+})-4(-)^{\sigma\sigma'}\partial_{\tau}K_{ac}^{\perp}(0^{+})\right)n_{c}^{\sigma'}(\tau)\label{eq:I_final-1-1}\\
+ &  & -\sum_{\mathrm{ops}\,\alpha}\left\{ s_{\alpha}\partial_{\tau}K{}_{ac(\alpha)}^{\sigma\sigma'(\alpha)}(t_{\alpha}-\tau)+s_{\alpha}(-)^{\sigma\sigma'(\alpha)}2\partial_{\tau}K{}_{ac(\alpha)}^{\perp}(t_{\alpha}-\tau)\right\} 
+\end{eqnarray}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+with 
+\begin_inset Formula $s_{\alpha}=1$
+\end_inset
+
+ for creation operators and 
+\begin_inset Formula $=-1$
+\end_inset
+
+ for annihilation operators
+\end_layout
+
+\begin_layout Standard
+If I denote by 
+\begin_inset Formula $o=(a,\sigma)$
+\end_inset
+
+ a 
+\begin_inset Quotes eld
+\end_inset
+
+line
+\begin_inset Quotes erd
+\end_inset
+
+ in the segment picture:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{eqnarray}
+I_{o_{1}}(\tau) & \equiv & \sum_{o_{2}}\Bigg[\left(\hat{U}_{o_{1}o_{2}}-2\partial_{\tau}K{}_{o_{1}o_{2}}(0^{+})-4(-)^{\sigma(o_{1})\sigma(o_{2})}\partial_{\tau}K_{a(o_{1})a(o_{2})}^{\perp}(0^{+})\right)n_{o_{2}}(\tau)\label{eq:I_final-1-1-1}\\
+ &  & -\sum_{\mathrm{ops}\,\alpha_{2}\in o_{2}}\left\{ s_{\alpha_{2}}\partial_{\tau}K{}_{o_{1}o_{2}}(t_{\alpha_{2}}-\tau)+s_{\alpha_{2}}(-)^{\sigma(o_{1})\sigma(o_{2})}2\partial_{\tau}K{}_{a(o_{1})a(o_{2})}^{\perp}(t_{\alpha_{2}}-\tau)\right\} \Bigg]
+\end{eqnarray}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset bibtex
+LatexCommand bibtex
+bibfiles "/home/tayral/Documents/library"
+options "plain"
+
+\end_inset
+
+
+\end_layout
+
+\end_body
+\end_document
