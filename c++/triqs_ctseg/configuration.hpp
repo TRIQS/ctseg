@@ -1,6 +1,3 @@
-/*******************************************************************************
- * CTSEG: TRIQS hybridization-expansion segment solver
- ******************************************************************************/
 #pragma once
 #include <vector>
 
@@ -10,7 +7,11 @@ struct segment_t {
   bool J_at_start = false, J_at_end = false;
 };
 
-// segment can be cyclic : tau_cdag > tau_c : must be the last one ... FIXME : check invariant ...
+// segment can be cyclic : tau_cdag > t_c : must be the last one ... FIXME : check invariant ...
+
+// We order the segments by decreasing tau of the c operator
+inline bool operator<(segment_t const &s1, segment_t const &s2) { return s1.tau_c > s2.tau_c; };
+
 
 struct jperp_line_t {
   qmc_time_t tau_Splus, tau_Sminus; // times of the S+, S-
