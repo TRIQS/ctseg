@@ -77,7 +77,7 @@ namespace moves {
     // insert the segment in an ordered list
     auto &V   = config.seglists[color];
     auto comp = [](segment_t const &s1, segment_t const &s2) { return s1.tau_c > s2.tau_c; };
-    auto pos  = std::upper_bound(V.begin(), V.end(), comp);
+     
     V.insert(pos, proposed_segment);
 
     // FIXME ??? SIGNE ???

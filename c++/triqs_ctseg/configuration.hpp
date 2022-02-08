@@ -1,37 +1,16 @@
 /*******************************************************************************
  * CTSEG: TRIQS hybridization-expansion segment solver
- *
- * Copyright (C) 2013-2018 by T. Ayral, H. Hafermann, P. Delange, M. Ferrero, O.
- *Parcollet
- *
- * CTSEG is free software: you can redistribute it and/or modify it under the
- * terms of the GNU General Public License as published by the Free Software
- * Foundation, either version 3 of the License, or (at your option) any later
- * version.
- *
- * CTSEG is distributed in the hope that it will be useful, but WITHOUT ANY
- * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
- * details.
- *
- * You should have received a copy of the GNU General Public License along with
- * CTSEG. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 #pragma once
-
 #include <vector>
 
-/// Segment
-/// (c, c^dagger)
-/// tau : time of c
-/// len : length of the segment
+/// Segment: (time of c, time of c^dagger)
 struct segment_t {
   qmc_time_t tau_c, tau_cdag; // time of c and cdag
   bool J_at_start = false, J_at_end = false;
 };
 
-// segment can be cyclic : tau_cdag > t_c : must be the last one ... FIXME : check invariant ...
-
+// segment can be cyclic : tau_cdag > tau_c : must be the last one ... FIXME : check invariant ...
 
 struct jperp_line_t {
   qmc_time_t tau_Splus, tau_Sminus; // times of the S+, S-
@@ -45,27 +24,30 @@ struct configuration_t {
 
 // --- functions to manipulate config ---
 
-//
-inline auto find_segment_left(std::vector<segment_t> const &seglist, qmc_time_t tau) {}
+inline bool operator<(segment_t const &s1, segment_t const &s2) { return s1.tau_c > s2.tau_c; }; // returns 1 if s1 is left of s2 
 
+// returns index of first segment to the left of tau
+inline auto find_segment_left(std::vector<segment_t> const &seglist, segment_t const &seg) {
+  auto seg_index = std::upper_bound(seglist.begin(), seglist.end(), seg);
+  return seg_index--; 
+};
 
-
-
-double overlap(segment const &seg, std::vector<segment_t> const &seglist) {
-  //double overlap(std::vector<segment_t> const & seglist, qmc_time_t tau1, qmc_time_t tau2) {
-
-  auto segl = find_segment_left(seglist, seg.tau1);
-  auto segr = find_segment_left(seglist, seg.tau2);
-
+inline double overlap(std::vector<segment_t> const &seglist, segment_t const &seg) {
+  auto ind = find_segment_left(seglist, seg);
   double result = 0;
-  for (auto it = segl; it != segr; ++it) return result;
-}
+  while (seglist[ind].tau_c < seg.tau_cdag) {
+    
+
+  }
+  
+  return result;
+};
 
 
 // --------- DEBUG code --------------
 // print config + h5 config
 
-void check_invariant(std::vector<segment_t> const &seglist) {
+inline void check_invariant(std::vector<segment_t> const &seglist) {
   // debug mode : check ordered.
 
   // position of J, etc...
