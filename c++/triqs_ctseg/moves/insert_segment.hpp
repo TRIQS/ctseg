@@ -20,8 +20,8 @@ namespace moves {
 
     public:
     // Constructor
-    insert_segment(const qmc_data *data_, configuration *config_, triqs::mc_tools::random_generator &rng_)
-      : data(data_), config(config_), rng(rng_){};
+    insert_segment(const &params_, const qmc_data &data_, configuration &config_, triqs::mc_tools::random_generator &rng_)
+      : params(params_), data(data_), config(config_), rng(rng_){};
     // ------------------
     double attempt();
     double accept();

@@ -58,8 +58,9 @@ namespace moves {
 
     // ------------  Proposition ratio ------------
 
-    double current_number_segments = sl.size();
-    double prop_ratio              = (current_number_segments + 1) / (current_number_segments * l * l);
+    double current_number_segments = std::max(sl.size(),1);
+    double future_number_segments = sl.size() + 1; 
+    double prop_ratio              = future_number_segments / (current_number_segments * l * l);
 
     SPDLOG_LOGGER_TRACE("trace_ratio  = {}, prop_ratio = {}, det_ratio = {}", trace_ratio, prop_ratio, det_ratio);
 
