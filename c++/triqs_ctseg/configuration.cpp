@@ -31,7 +31,7 @@ double overlap(std::vector<segment_t> const &seglist, segment_t const &seg) {
   else result+= overlap_seg(seg,last_seg);
   // Compute overlap of seg with the remainder of seglist
   auto ind = find_segment_left(seglist, seg);
-  while (seglist[ind].tau_c < seg.tau_cdag && ind != seglist.end()) {
+  while (seglist[ind].tau_c < seg.tau_cdag && ind != --seglist.end()) {
     result += overlap_seg(seglist[ind],seg);
     ++ind;
   };
