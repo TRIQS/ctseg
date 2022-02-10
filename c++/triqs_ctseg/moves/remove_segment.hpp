@@ -6,7 +6,7 @@
 
 namespace moves {
   // FIXME : LIGNE PLEINE ?? dans overlap ???
-  class insert_segment {
+  class remove_segment {
     param_t const &params;
     qmc_data const &data;
     configuration &config;

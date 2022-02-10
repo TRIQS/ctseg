@@ -1,4 +1,4 @@
-#include "remove_segment.hpp"
+#include "split_segment.hpp"
 
 namespace moves {
 
@@ -43,7 +43,7 @@ namespace moves {
     // ------------  Proposition ratio ------------
 
     double current_number_segments = sl.size();
-    double future_number_pairs = (sl.size() + 1 == 2) ? 1 : sl.size + 1; 
+    double future_number_pairs = (sl.size() + 1 == 2) ? 1 : sl.size() + 1; 
     double prop_ratio = (future_number_pairs) / (current_number_segments * l * l);
 
     SPDLOG_LOGGER_TRACE("trace_ratio  = {}, prop_ratio = {}, det_ratio = {}", trace_ratio, prop_ratio, det_ratio);
