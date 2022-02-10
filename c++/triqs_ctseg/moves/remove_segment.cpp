@@ -11,8 +11,8 @@ namespace moves {
 
     // Select removal color
     color = rng(data.n_color);
-    auto &sl       = config.seglist[color];
-    SPDLOG_LOGGER_TRACE("Removing at color {}", n_color);
+    auto &sl       = config.seglists[color];
+    SPDLOG_LOGGER_TRACE("Removing at color {}", color);
 
     // If color is empty, nothing to remove
     if sl.empty() return 0; 
@@ -26,7 +26,7 @@ namespace moves {
     // ------------  Trace ratio  -------------
         // FIXME : here we will need the K function integral 
     double ln_trace_ratio = 0;
-    for (int c : seglists) {
+    for (int c : config.seglists) {
       if (c != color) ln_trace_ratio -= overlap(proposed_segment, config.seglists[c]);
     }
     double trace_ratio = std::exp(ln_trace_ratio);

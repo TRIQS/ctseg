@@ -4,13 +4,13 @@ namespace moves {
 
   double regroup_segment::attempt() {
 
-    SPDLOG_LOGGER_TRACE("\n =================== ATTEMPT SPLIT ================ \n");
+    SPDLOG_LOGGER_TRACE("\n =================== ATTEMPT REGROUP ================ \n");
 
     // ------------ Choice of segment --------------
     // Select color
     color = rng(data.n_color);
-    auto &sl       = config.seglist[color];
-    SPDLOG_LOGGER_TRACE("Regrouping at color {}", n_color);
+    auto &sl       = config.seglists[color];
+    SPDLOG_LOGGER_TRACE("Regrouping at color {}", color);
 
     // If color has 0 or 1 segment; nothing to regroup
     if (sl.empty() || sl.size() == 1) return 0; 
@@ -26,7 +26,7 @@ namespace moves {
     // ------------  Trace ratio  -------------
         // FIXME : here we will need the K function integral 
     double ln_trace_ratio = 0;
-    for (int c : seglists) {
+    for (int c : config.seglists) {
       // Subtract the overlap with the antisegment we are removing 
       if (c != color) ln_trace_ratio = overlap(segment_t{right_segment.tau_c,left_segment.tau_cdag}, config.seglists[c]);
     }

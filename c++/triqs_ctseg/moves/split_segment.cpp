@@ -9,8 +9,8 @@ namespace moves {
     // ------------ Choice of segment --------------
     // Select color
     color = rng(data.n_color);
-    auto &sl       = config.seglist[color];
-    SPDLOG_LOGGER_TRACE("Splitting at color {}", n_color);
+    auto &sl       = config.seglists[color];
+    SPDLOG_LOGGER_TRACE("Splitting at color {}", color);
 
     // If color is empty, nothing to split
     if sl.empty() return 0; 
@@ -31,7 +31,7 @@ namespace moves {
     // ------------  Trace ratio  -------------
         // FIXME : here we will need the K function integral 
     double ln_trace_ratio = 0;
-    for (int c : seglists) {
+    for (int c : conifg.seglists) {
       if (c != color) ln_trace_ratio -= overlap(segment_t{tau_left,tau_right}, config.seglists[c]);
     }
     double trace_ratio = std::exp(ln_trace_ratio);

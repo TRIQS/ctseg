@@ -28,7 +28,7 @@ inline bool operator<(segment_t const &s1, segment_t const &s2) { return s1.tau_
 // Overlap between two non-cyclic segments. 
 double overlap_seg(segment_t const &seg1, segment_t const &seg2);
 
-// Find index of first segment to the left of seg.
+// Find index of first segment starting left of seg.tau_c.
 auto find_segment_left(std::vector<segment_t> const &seglist, segment_t const &seg);
 
 // Overlap between segment and a list of segments. 

@@ -11,8 +11,8 @@ namespace moves {
 
     // Select insertion color
     color = rng(data.n_color);
-    auto &sl       = config.seglist[color];
-    SPDLOG_LOGGER_TRACE("Inserting at color {}", n_color);
+    auto &sl       = config.seglists[color];
+    SPDLOG_LOGGER_TRACE("Inserting at color {}", color);
 
     // Select insertion window [tau1,tau2] (defaults to [beta,0])
     qmc_time_t tau1 = time_point_factory.get_upper_pt();
@@ -41,7 +41,7 @@ namespace moves {
     // ------------  Trace ratio  -------------
         // FIXME : here we will need the K function integral 
     double ln_trace_ratio = 0;
-    for (int c : seglists) {
+    for (int c : config.seglists) {
       if (c != color) ln_trace_ratio += overlap(proposed_segment, config.seglists[c]);
     }
     double trace_ratio = std::exp(ln_trace_ratio);
