@@ -19,7 +19,7 @@ namespace moves {
 
     // Select segment to remove 
     proposed_segment_index = rng(sl.size());
-    proposed_segment = *proposed_segment_index;
+    proposed_segment = sl[proposed_segment_index];
 
     SPDLOG_LOGGER_TRACE("Removing c at{}, cdag at {}", proposed_segment.tau_c, proposed_segment.tau_cdag);
 
