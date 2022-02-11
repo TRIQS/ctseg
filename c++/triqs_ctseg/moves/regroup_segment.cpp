@@ -12,12 +12,20 @@ namespace moves {
     auto &sl       = config.seglists[color];
     SPDLOG_LOGGER_TRACE("Regrouping at color {}", color);
 
-    // If color has 0 or 1 segment; nothing to regroup
-    if (sl.empty() || sl.size() == 1) return 0; 
+    // If no segments nothing to regroup
+    if sl.empty() return 0; 
 
-    // Select pair of segments to regroup 
-    left_segment_index = rng(sl.size());
-    right_segment_index = (left_segment_index == sl.size() - 1) ? 0 : left_segment_index + 1; 
+    // Select pair of segments (or cyclic segment) to regroup 
+    making_full_line = sl.size() == 1; 
+    if making_full_line {
+      if (sl[0].tau_c == params.beta && sl[0].tau_cdag == 0) return 0; // If segment is full line nothing to regroup
+      left_segment_index = 0;
+      right_segment_index = 0; 
+    }
+    else{
+      left_segment_index = rng(sl.size());
+      right_segment_index = (left_segment_index == sl.size() - 1) ? 0 : left_segment_index + 1; 
+    }
     left_segment = sl[left_segment_index];
     right_segment = sl[right_segment_index];
 
@@ -38,10 +46,12 @@ namespace moves {
 
     // ------------  Proposition ratio ------------
 
-    double future_number_segments = sl.size() - 1;
-    double current_number_pairs = (sl.size() == 2) ? 1 : sl.size(); 
-    qmc_time_t l = left_segment.tau_c - right_segment.tau_cdag; // Length of future segment 
-    double prop_ratio = (future_number_segments * l * l) / current_number_pairs;
+    double future_number_segments = making_full_line ? 1 : sl.size() - 1;
+    double current_number_intervals = sl.size(); 
+    // Length of future segment 
+    if (making_full_line) qmc_time_t l = time_point_factory.get_upper_pt(); 
+    else qmc_time_t l = left_segment.tau_c - right_segment.tau_cdag; 
+    double prop_ratio = (future_number_segments * l * l) / current_number_intervals;
 
     SPDLOG_LOGGER_TRACE("trace_ratio  = {}, prop_ratio = {}, det_ratio = {}", trace_ratio, prop_ratio, det_ratio);
 
@@ -57,10 +67,15 @@ namespace moves {
     data.dets[color].complete_operation();
     // Regroup segments 
     auto &sl = config.seglists[color];
-    segment_t new_segment = segment_t{proposed_segment.tau_c,right_segment.tau_cdag}; 
-    sl[left_segment_index] = new_segment; 
-    sl.erase(right_segment_index);
-    
+    if (making_full_line) {
+      segment_t new_segment = segment_t{params.beta,0}; // FIXME: qmctimes?? 
+      sl[left_segment_index] = new_segment; 
+    }
+    else {
+      segment_t new_segment = segment_t{proposed_segment.tau_c,right_segment.tau_cdag}; 
+      sl[left_segment_index] = new_segment; 
+      sl.erase(right_segment_index);
+    }
 
     // FIXME ??? SIGNE ???
     double sign_ratio = 1; 

@@ -17,6 +17,7 @@ namespace moves {
     segment_t right_segment;
     std::vector<segment_t>>::iterator left_segment_index;
     std::vector<segment_t>>::iterator right_segment_index;
+    time_point_factory_t time_point_factory = time_point_factory_t{params.beta};
 
     public:
     // Constructor

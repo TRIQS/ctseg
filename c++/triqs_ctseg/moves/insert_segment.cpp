@@ -24,6 +24,7 @@ namespace moves {
       tau1                 = sl[ind_segment].tau_cdag; // tau1 : pos of cdag
       bool is_last_segment = ind_segment == sl.size() - 1;
       tau2                 = sl[is_last_segment ? 0 : ind_segment + 1].tau_c; // tau2 : pos of next c, possibly cyclic
+      if (tau2 - tau1 == params.beta) return 0; // If segment is a full line, cannot insert 
     }
 
     // Choose new segment within insertion window

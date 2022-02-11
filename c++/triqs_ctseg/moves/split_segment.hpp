@@ -14,6 +14,7 @@ namespace moves {
     // Internal data
     int color = 0;
     segment_t proposed_segment;
+    bool is_full_line;
     qmc_time_t tau_left; 
     qmc_time_t tau_right; 
     std::vector<segment_t>>::iterator proposed_segment_index;
