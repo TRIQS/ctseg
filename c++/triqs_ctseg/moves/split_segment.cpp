@@ -25,7 +25,7 @@ namespace moves {
     qmc_time_t dt2 = time_point_factory.get_random_pt(l);
     if (dt1 == dt2) return 0; 
     if (dt1 == 0 || dt2 == 0 || dt1 == l || dt2 == l) return 0; 
-    if (dt1 > dt2) std::swap(dt1,dt2);
+    if (dt1 > dt2 && !is_full_line) std::swap(dt1,dt2); // If splitting a full line, the order of tau_left and tau_right is not fixed
     tau_left = proposed_segment.tau_c - dt1; 
     tau_right = proposed_segment.tau_c - dt2; 
 
@@ -45,7 +45,7 @@ namespace moves {
 
     // ------------  Proposition ratio ------------
 
-    double current_number_segments = sl.size();
+    double current_number_segments = is_full_line ? 2 : sl.size(); // Account for the two ways of splitting a full line 
     double future_number_intervals = is_full_line ? 1 : sl.size() + 1; 
     double prop_ratio = (future_number_intervals) / (current_number_segments * l * l);
 
