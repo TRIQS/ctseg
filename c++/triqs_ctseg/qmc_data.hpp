@@ -27,7 +27,16 @@ namespace triqs_ctseg {
   using time_point_factory_t = triqs::utility::time_segment;
 
   /// Parameters for QMC
-  struct qmc_data {
+  struct qmc_data_t {
+
+    int const n_color;
+    double const beta;
+    nda::matrix<double> const U;
+    nda::vector<double> const mu;
+
+    bool const dynamical_U, jperp_interactions, full_spin_rot_inv;
+
+    gf<imtime> const K, Kprime, Kperpprime;
 
     // FIXME off diagonal delta ??
     block_gf<imtime, delta_target_t> delta; // Hybridization function
@@ -44,6 +53,11 @@ namespace triqs_ctseg {
     };
 
     std::vector<det_manip::det_manip<delta_block_adaptor>> dets; // The determinants
+
+};
+
+
+
 
     // Construction
     qmc_data(params_t const &p, block_gf_const_view<imtime> delta) delta(map([](gf_const_view<imtime> d) { return real(d); }, delta)) {
