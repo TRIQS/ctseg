@@ -1,6 +1,6 @@
 #pragma once
 #include "../params.hpp"
-#include "../qmc_data.hpp"
+#include "../work_data.hpp"
 #include "../configuration.hpp"
 
 

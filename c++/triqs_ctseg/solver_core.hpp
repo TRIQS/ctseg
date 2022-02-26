@@ -19,20 +19,25 @@
  ******************************************************************************/
 #pragma once
 
+#include <optional>
+#include "types.hpp"
 #include "params.hpp"
-#include "qmc_data.hpp"
-#include "inputs_t.hpp"
-#include <triqs/gfs.hpp>
+#include "work_data.hpp"
+#include "containers.hpp"
 
-//#include "types.hpp"
+
 //#include "block_matrix.hpp"
 //#include <triqs/mesh.hpp>
 
-#include <optional>
+
+
+
+namespace triqs_ctseg {
 
 /// Main solver class
 class solver_core {
 
+  double beta;
 
   // Keep the construction parameter
   constr_params_t constr_params;
@@ -44,7 +49,7 @@ class solver_core {
   inputs_t inputs;
   
   // The set of results. Will be passed to measure and init by them
-  result_set_t results;
+  results_t results;
 
   mpi::communicator c;
   // FIXME  Why here ??
@@ -73,3 +78,4 @@ class solver_core {
   /// Monte Carlo sign
   //double average_sign() { return average_sign_; }
 };
+} // namespace triqs_ctseg

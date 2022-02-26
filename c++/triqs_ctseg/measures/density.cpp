@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU General Public License along with
  * CTSEG. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-#include "./measure_nnt.hpp"
+#include "density.hpp"
 
 namespace density {
 

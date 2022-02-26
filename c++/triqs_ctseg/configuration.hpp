@@ -1,10 +1,7 @@
 #pragma once
 #include <vector>
 #include "params.hpp"
-#include <triqs/utility/time_pt.hpp>
-
-using qmc_time_t = triqs::utility::time_pt;
-using qmc_time_factory_t = triqs::utility::time_segment;
+#include "types.hpp"
 
 // Segment: (time of c, time of c^dagger)
 struct segment_t {

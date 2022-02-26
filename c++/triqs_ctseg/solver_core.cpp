@@ -34,14 +34,14 @@ solver_core::solver_core(constr_params_t const &p) : constr_params(p) {
 
   beta = p.beta;
 
-   inputs.delta = block_gf<imtime>(triqs::mesh::imtime{beta, Fermion, p.n_tau}, p.gf_struct);
+  inputs.delta = block_gf<imtime>(triqs::mesh::imtime{beta, Fermion, p.n_tau}, p.gf_struct);
   inputs.d0t = gf<imtime>({beta, Boson, p.n_tau_jperp}, {1, 1});
   inputs.jperpt = gf<imtime>({beta, Boson, p.n_tau_jperp}, {1, 1});
   
   inputs.delta() = 0;
   inputs.d0t = 0;
   inputs.jperpt = 0;
-}
+};
 
 // ---------------------------------------------------------------------------
 
@@ -160,6 +160,6 @@ void solver_core::solve(solve_params_t const &solve_params) {
                                   triqs::utility::clock_callback(p.max_time));
   CTQMC.collect_results(c);
 
-} // solve
-
+}; // solve
 } // namespace triqs_ctseg
+

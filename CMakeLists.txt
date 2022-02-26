@@ -131,7 +131,7 @@ target_compile_options(${PROJECT_NAME}_warnings
 # Build Project
 
 # Find / Build dependencies
-add_subdirectory(deps)
+# add_subdirectory(deps)
 
 # Build and install the library
 add_subdirectory(c++/${PROJECT_NAME})
