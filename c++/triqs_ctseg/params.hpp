@@ -133,7 +133,7 @@ struct solve_params_t {
   bool measure_nnw = false;
   
   /// Hartree shift of the chem pot
-  std::vector<double> hartree_shift = std::vector<double>{};
+  nda::vector<double> hartree_shift = nda::vector<double>{};
 
   //solve_params_t(){};
 };

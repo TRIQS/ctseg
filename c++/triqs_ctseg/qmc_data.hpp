@@ -18,41 +18,43 @@
  * CTSEG. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 #pragma once
-#include "./params.hpp"
-//#include "./util.hpp"
-#include <triqs/utility/time_pt.hpp>
+#include "types.hpp"
+#include "params.hpp"
+#include "inputs_t.hpp"
 
 namespace triqs_ctseg {
 
   using time_point_factory_t = triqs::utility::time_segment;
 
-  /// Parameters for QMC
-  struct qmc_data_t {
+  /// A lambda to adapt the Delta function for the call of the det.
+  struct delta_block_adaptor {
+    gf<imtime, matrix_real_valued> delta; // make a copy. Needed in the real case anyway.
 
-    int const n_color;
-    double const beta;
-    nda::matrix<double> const U;
-    nda::vector<double> const mu;
+    double operator()(std::pair<qmc_time_pt, int> const &x, std::pair<qmc_time_pt, int> const &y) const {
+      //det_scalar_t res = delta[closest_mesh_pt(double(x.first - y.first))](x.second, y.second);
+      double res = delta(double(x.first - y.first))(x.second, y.second);
+      return (x.first >= y.first ? res : -res); // x,y first are time_pt, wrapping is automatic in the - operation, but need to
+                                                // compute the sign
+    }
+  };
 
-    bool const dynamical_U, jperp_interactions, full_spin_rot_inv; // FIXME: optional Jperp? 
+  // ---------------------------------------------------
+  /// Working data
+  struct work_data_t {
+    work_data_t(param_t const &params, inputs_t const &inputs);
 
-    gf<imtime> const K, Kprime;
+    int n_color;
+    double beta;
+    nda::vector<double> mu;
+    nda::matrix<double> U;
+
+    bool has_Dt, has_jperp;
+    gf<imtime> K, Kprime;
 
     // FIXME off diagonal delta ??
     block_gf<imtime, delta_target_t> delta; // Hybridization function
+    using det_t = det_manip::det_manip<delta_block_adaptor>;
+    std::vector<det_t> dets; // The determinants
+  };
 
-    /// A lambda to adapt the Delta function for the call of the det.
-    struct delta_block_adaptor {
-      gf<imtime, delta_target_t> delta_block; // make a copy. Needed in the real case anyway.
-
-      det_scalar_t operator()(std::pair<qmc_time_pt, int> const &x, std::pair<qmc_time_pt, int> const &y) const {
-        det_scalar_t res = delta_block[closest_mesh_pt(double(x.first - y.first))](x.second, y.second);
-        return (x.first >= y.first ? res : -res); // x,y first are time_pt, wrapping is automatic in the - operation, but need to
-                                                  // compute the sign
-      }
-    };
-
-    std::vector<det_manip::det_manip<delta_block_adaptor>> dets; // The determinants
-
-};
 } // namespace triqs_ctseg

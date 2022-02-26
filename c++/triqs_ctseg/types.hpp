@@ -27,12 +27,30 @@
 #include <triqs/operators/util/extractors.hpp>
 #include <triqs/stat.hpp>
 
-namespace triqs_ctseg {
+// spdlog
+#ifdef EXT_DEBUG
+#define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_TRACE
+#else
+#define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_OFF
+#endif
+#include "spdlog/spdlog.h"
+#include "spdlog/fmt/ostr.h" 
+
+#define LOG(...) SPDLOG_TRACE(__VA_ARGS__)
+
+  // checked always, even in production
+#define ALWAYS_EXPECTS(Condition, ErrorMessage, ...)                                                                                                        \
+  if (not (Condition)) {                                                                                                                               \
+    SPDLOG_CRITICAL(ErrorMessage, __VA_ARGS__);                                                                                                 \
+    throw std::runtime_error("Assertion Error, cf log");                                                                                                 \
+  }
+
+
+// FIXME 
 
 using namespace triqs::gfs;
 using namespace triqs::mesh;
 using namespace triqs::stat;
-using namespace nda;
 using namespace triqs::utility;
 using namespace h5;
 using std::cos;
@@ -40,23 +58,9 @@ using std::cout;
 using std::endl;
 using std::sin;
 
-// Legendre Green function type
-using g_l_t = block_gf<triqs::gfs::legendre, matrix_valued>;
-using g_l_vt = block_gf_view<triqs::gfs::legendre, matrix_valued>;
-
-// two-frequency container class
-using block_f_om_nu_tv_t = block_gf<prod<imfreq, imfreq>, tensor_valued<3>>;
-using block_f_om_nu_tv_vt =
-    block_gf_view<prod<imfreq, imfreq>, tensor_valued<3>>;
-
-// four-leg, three-frequency container class
-using gf_3w_container_t =
-    block_gf<prod<imfreq, imfreq, imfreq>, tensor_valued<4>>;
-
 using namespace triqs::utility;
 using namespace triqs::operators;
 using namespace triqs::hilbert_space;
 using Op = many_body_operator;
-using gf_struct_t = triqs::hilbert_space::gf_struct_t;
 
-} // namespace triqs_ctseg
+

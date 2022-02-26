@@ -18,30 +18,32 @@ auto find_segment_left(std::vector<segment_t> const &seglist, segment_t const &s
 };
 
 // Overlap between segment and a list of segments.
-double overlap(std::vector<segment_t> const &seglist, segment_t const &seg) {
+double overlap(std::vector<segment_t> const &seglist, segment_t const &seg, qmc_time_factory_t const &fac) {
   if (seglist.empty()) return 0;
+
+  auto zero = fac.get_lower_pt();
+  auto beta = fac.get_upper_pt();
+
   // If seg is cyclic, split it
-  if (seg.tau_c < seg.tau_cdag) return overlap(seglist, segment_t{params.beta, tau_cdag}) + overlap(seglist, segment_t{tau_c, 0});
+  if (seg.tau_c < seg.tau_cdag) return overlap(seglist, segment_t{beta, seg.tau_cdag}, fac) + overlap(seglist, segment_t{seg.tau_c, zero}, fac);
   double result = 0;
   // Isolate last segment
   auto last_seg = seglist.back();
   // In case last segment is cyclic, split it and compute its overlap with seg
-  if (last_seg.tau_c < last_seg.tau_cdag) {
-    result += overlap_seg(seg, segment_t{params.beta, last_seg.tau_cdag}) + overlap_seg(seg, segment_t{last_seg.tau_c, 0});
-  } else
+  if (last_seg.tau_c < last_seg.tau_cdag)
+    result += overlap_seg(seg, segment_t{beta, last_seg.tau_cdag}) + overlap_seg(seg, segment_t{last_seg.tau_c, zero});
+  else
     result += overlap_seg(seg, last_seg);
+
   // Compute overlap of seg with the remainder of seglist
-  auto ind = find_segment_left(seglist, seg);
-  while (seglist[ind].tau_c < seg.tau_cdag && ind != --seglist.end()) {
-    result += overlap_seg(seglist[ind], seg);
-    ++ind;
-  };
+  for (auto it = find_segment_left(seglist, seg); it->tau_c < seg.tau_cdag && it != --seglist.end(); ++it) //
+    result += overlap_seg(*it, seg);
   return result;
 };
 
 // Length occupied by all segments for a given color
 double density(std::vector<segment_t> const &seglist) {
   double result = 0;
-  for (int i : seglist) { result += seglist[i].tau_c - seglist[i].tau_cdag; };
+  for (auto const &seg : seglist) result += double(seg.tau_c - seg.tau_cdag);
   return result;
 };

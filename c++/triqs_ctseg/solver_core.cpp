@@ -19,144 +19,33 @@
  ******************************************************************************/
 #include "solver_core.hpp"
 
-#include "configuration.hpp"
-#include "evaluate_vertex.hpp"
-#include "precompute_Mw.hpp"
-#include "precompute_fprefactor.hpp"
-#include "precompute_nw.hpp"
-#include "measures.hpp"
-#include "moves.hpp"
-
 #include <itertools/itertools.hpp>
 #include <triqs/mc_tools/mc_generic.hpp>
 #include <triqs/utility/callbacks.hpp>
 
+#include "work_data.hpp"
+#include "configuration.hpp"
+//#include "measures.hpp"
+//#include "moves.hpp"
+
 namespace triqs_ctseg {
 
-solver_core::solver_core(constr_params_t const &p) {
+solver_core::solver_core(constr_params_t const &p) : constr_params(p) {
 
   beta = p.beta;
-  gf_struct = p.gf_struct;
 
-  delta = block_gf<imtime>(triqs::mesh::imtime{beta, Fermion, p.n_tau}, p.gf_struct);
-
-
-
-
-
-
-  n_color = 0;
-  std::vector<std::string> block_names;
-  for (auto const &[bl_name, bl_size] : gf_struct) {
-    block_names.push_back(bl_name);
-    n_color += bl_size;
-  }
-
-
-
-  // FIXME BlockGf
-
-  // prepare frequency-dependent Green's functions
-  auto gf_imfreq_vec = [&](int n_mat) {
-    std::vector<gf<imfreq>> green_v;
-    for (auto const &[bl_name, bl_size] : gf_struct)
-      green_v.emplace_back(
-          gf<imfreq>{{beta, Fermion, n_mat}, make_shape(bl_size, bl_size)});
-    return green_v;
-  };
-  auto gf_imtime_vec = [&](int n_tau) {
-    std::vector<gf<imtime>> green_v;
-    for (auto const &[bl_name, bl_size] : gf_struct)
-      green_v.emplace_back(
-          gf<imtime>{{beta, Fermion, n_tau}, make_shape(bl_size, bl_size)});
-    return green_v;
-  };
-  auto gf_legendre_vec = [&](size_t n_l) {
-    std::vector<gf<triqs::gfs::legendre>> green_v;
-    for (auto const &[bl_name, bl_size] : gf_struct)
-      green_v.emplace_back(gf<triqs::gfs::legendre>{
-          {beta, Fermion, n_l}, make_shape(bl_size, bl_size)});
-    return green_v;
-  };
-
-  // the order of combined blocks is, e.g. 11 12 21 22
-  auto bosonic_block_names = std::vector<std::string>{};
-  for (auto const &str1 : block_names)
-    for (auto const &str2 : block_names)
-      bosonic_block_names.push_back(str1 + "|" + str2);
-
-  // if the blocks are not of the same size, pay attention:
-  // the "off-diagonal" blocks will not be square
-  //------------ freq
-  auto D_imfreq_vec = [&](int n_iw) {
-    std::vector<gf<imfreq>> green_v;
-    for (auto const &[bl1_name, bl1_size] : gf_struct)
-      for (auto const &[bl2_name, bl2_size] : gf_struct)
-        green_v.emplace_back(
-            gf<imfreq>{{beta, Boson, n_iw}, make_shape(bl1_size, bl2_size)});
-    return green_v;
-  };
-  //------------ time
-  auto D_imtime_vec = [&](int n_tau) {
-    std::vector<gf<imtime>> green_v;
-    for (auto const &[bl1_name, bl1_size] : gf_struct)
-      for (auto const &[bl2_name, bl2_size] : gf_struct)
-        green_v.emplace_back(
-            gf<imtime>{{beta, Boson, n_tau}, make_shape(bl1_size, bl2_size)});
-    return green_v;
-  };
-
-  // input containers
-  delta_raw = make_block_gf<imtime>(block_names, gf_imtime_vec(p.n_tau));
-  g0w = make_block_gf<imfreq>(block_names, gf_imfreq_vec(p.n_iw));
-
-  d0w = make_block_gf<imfreq>(bosonic_block_names, D_imfreq_vec(p.n_w_b_nn));
-  kt = make_block_gf<imtime>(bosonic_block_names, D_imtime_vec(p.n_tau_k));
-  kprimet = make_block_gf<imtime>(bosonic_block_names, D_imtime_vec(p.n_tau_k));
-
-  // FIXME : scalar function 
-  jperpt = gf<imtime>({beta, Boson, p.n_tau_jperp}, {1, 1});
-  jperpw = gf<imfreq>({beta, Boson, p.n_w_b_nn}, {1, 1});
-  chipmt = gf<imtime>({beta, Boson, p.n_tau_jperp}, {1, 1});
-
-  // imaginary-time Green's functions
-  gt = make_block_gf<imtime>(block_names, gf_imtime_vec(p.n_tau));
-  ft = make_block_gf<imtime>(block_names, gf_imtime_vec(p.n_tau));
-  nnt = make_block_gf<imtime>(bosonic_block_names, D_imtime_vec(p.n_tau_nn));
-
-  // Matsubara Green's functions
-  gw = make_block_gf<imfreq>(block_names, gf_imfreq_vec(p.n_iw));
-  fw = make_block_gf<imfreq>(block_names, gf_imfreq_vec(p.n_iw));
-  sw = make_block_gf<imfreq>(block_names, gf_imfreq_vec(p.n_iw));
-  nnw = make_block_gf<imfreq>(bosonic_block_names, D_imfreq_vec(p.n_w_b_nn));
-
-
-  // Prepare output containers
-// FIXME : measure
-
-
-  std::vector<matrix<double>> nn_v;
-  for (auto const &[bl1_name, bl1_size] : gf_struct)
-    for (auto const &[bl2_name, bl2_size] : gf_struct)
-      nn_v.push_back(matrix<double>(make_shape(bl1_size, bl2_size)));
-  nn_matrix = block_matrix<double>{bosonic_block_names, nn_v};
-
-
-  // HIsto gram 
-  int Nmax = 500;
-  hist.resize(n_color, Nmax);
-  hist() = 0;
-  hist_composite.resize(n_color, Nmax);
-  hist_composite() = 0;
-  state_hist.resize(ipow(2, n_color));
-  state_hist() = 0.0;
+   inputs.delta = block_gf<imtime>(triqs::mesh::imtime{beta, Fermion, p.n_tau}, p.gf_struct);
+  inputs.d0t = gf<imtime>({beta, Boson, p.n_tau_jperp}, {1, 1});
+  inputs.jperpt = gf<imtime>({beta, Boson, p.n_tau_jperp}, {1, 1});
+  
+  inputs.delta() = 0;
+  inputs.d0t = 0;
+  inputs.jperpt = 0;
 }
 
 // ---------------------------------------------------------------------------
 
 void solver_core::solve(solve_params_t const &solve_params) {
-
-  last_solve_params = solve_params;
 
   // http://patorjk.com/software/taag/#p=display&f=Calvin%20S&t=TRIQS%20ctint
   if (c.rank() == 0)
@@ -165,138 +54,23 @@ void solver_core::solve(solve_params_t const &solve_params) {
                  " ║ ╠╦╝║║═╬╗╚═╗  │   │ └─┐├┤ │ ┬\n"
                  " ╩ ╩╚═╩╚═╝╚╚═╝  └─┘ ┴ └─┘└─┘└─┘\n";
 
+  // parameters
+  last_solve_params = solve_params;
+  // FIXME ? keep it ? 
   // Merge constr_params and solve_params
   params_t p(constr_params, solve_params);
 
-  vector<double> mu(n_color);
-  mu() = 0.;
+  // ................   wdata & config  ...................
 
-  if (p.hartree_shift.size() > 0) {
-    if (p.hartree_shift.size() != mu.size())
-      TRIQS_RUNTIME_ERROR
-          << "Mismatch in the size of the Hartree shift and mu array";
-    for (int i : range(mu.size()))
-      mu[i] = p.hartree_shift[i];
-  }
-
-  bool dynamical_U = !is_zero(d0w) or !is_zero(jperpw);
-  bool full_spin_rot_inv = false;
-  bool jperp_interactions = !is_zero(jperpw);
-
-  if (dynamical_U) {
-    // extract kt and kprimet from d0w
-    for (int bl = 0; bl < kt.size(); bl++) {
-      for (auto const &t : kt[bl].mesh()) {
-        for (auto i = 0; i < kt[bl].target_shape()[0]; i++) {
-          for (auto j = 0; j < kt[bl].target_shape()[1]; j++) {
-            kt[bl][t](i, j) = 0.0;
-            kprimet[bl][t](i, j) = 0.0;
-
-            for (auto const &w : d0w[bl].mesh()) {
-              if (w.n > 0) {
-                double mats = dcomplex(w).imag();
-                kt[bl][t](i, j) += real(d0w[bl](w)(i, j)) / (mats * mats) *
-                                   (1 - cos(mats * t));
-
-                kprimet[bl][t](i, j) +=
-                    real(d0w[bl](w)(i, j)) / mats * sin(mats * t);
-              }
-            }
-            kt[bl][t](i, j) *= 2. / beta;
-            kprimet[bl][t](i, j) *= 2. / beta;
-            kt[bl][t](i, j) +=
-                0.5 * real(d0w[bl](0)(i, j)) * t * (t / beta - 1.);
-            kprimet[bl][t](i, j) += real(d0w[bl](0)(i, j)) * (t / beta - .5);
-          }
-        }
-      }
-    }
-    // extract kt and kprimet from d0w
-    for (auto &t : kperpprimet.mesh()) {
-      kperpprimet[t] = 0.0;
-      for (auto &w : jperpw.mesh()) {
-        double mats = dcomplex(w).imag();
-        if (w.n > 0)
-          kperpprimet[t] += real(jperpw(w)) / mats * sin(mats * t);
-      }
-      kperpprimet[t] *= 2. / beta;
-      kperpprimet[t] += real(jperpw(0)) * (t / beta - .5);
-      kperpprimet[t] *= 0.25; // D^z = J_z/4.; K pertains to D, not J
-    }
-
-    // FIXME CHECK 
-    gf<imfreq> D_sp_minus_one_fourth_Jperp(jperpw.mesh(), {1, 1});
-    auto ind_UV = [&](std::string const &s) {
-      return get_index(d0w.block_names(), s);
-    };
-    for (auto const &iom : D_sp_minus_one_fourth_Jperp.mesh())
-      D_sp_minus_one_fourth_Jperp[iom] =
-          0.5 *
-              (d0w[ind_UV(block_names[0] + "|" + block_names[0])](iom)(0, 0) -
-               d0w[ind_UV(block_names[0] + "|" + block_names[1])](iom)(0, 0)) -
-          0.25 * jperpw(iom)(0, 0);
-    full_spin_rot_inv =
-        is_zero(D_sp_minus_one_fourth_Jperp) and jperp_interactions;
-  } // end if dynamical_U
-
-  // Extract the U from the operator
-  auto U_full = triqs::operators::utils::dict_to_matrix(
-      triqs::operators::utils::extract_U_dict2(p.h_int), gf_struct);
-  matrix<double> U(U_full.shape());
-  U() = real(U_full);
-
-  // KEEP 
-  // Get the new values for mu and Umatrix from Kprime
-  if (dynamical_U) {
-    for (size_t i = 0; i < U.shape()[0]; ++i) {
-      auto bl_ind_i = color_to_block_and_inner_index_impl(i, gf_struct);
-      auto bl_ii = bl_ind_i.first * gf_struct.size() +
-                   bl_ind_i.first; // double index (e.g. up|up)
-      mu(i) +=
-          kprimet[bl_ii][closest_mesh_pt(0.0)](bl_ind_i.second, bl_ind_i.second)
-              .real();
-      for (size_t j = 0; j < U.shape()[1]; ++j) {
-        auto bl_ind_j = color_to_block_and_inner_index_impl(j, gf_struct);
-        auto bl_ij = bl_ind_i.first * gf_struct.size() + bl_ind_j.first;
-        if (i != j)
-          U(i, j) -= 2. * kprimet[bl_ij][closest_mesh_pt(0.0)](bl_ind_i.second,
-                                                               bl_ind_j.second)
-                              .real();
-      }
-    }
-  }
-
-  // FIXME Gather the checks
-  if (jperp_interactions and g0w.size() != 2)
-    TRIQS_RUNTIME_ERROR << "Jperp interactions implemented only for case with "
-                           "one orbital with two spins";
+  work_data_t wdata{p, inputs};
+  configuration_t config{wdata.n_color};
 
   // ................   QMC  ...................
 
   auto CTQMC = triqs::mc_tools::mc_generic<double>(p.random_name, p.random_seed,
                                                    p.verbosity);
-  // FIXME spdlog ...
-  if (c.rank() == 0) {
-    std::cout << "mu = " << mu << std::endl;
-    std::cout << "U = " << U << std::endl;
-    if (dynamical_U)
-      std::cout << "dynamical_U" << endl;
-    if (jperp_interactions)
-      std::cout << "jperp_interactions";
-    if (full_spin_rot_inv)
-      cout << " with full spin rotational invariance";
-    cout << endl;
-  }
-
-  // FIXME : params --> data qmc_data ...
-  //
-  qmc_parameters params(n_color, beta, U, mu, kt, kprimet, kperpprimet,
-                        gf_struct, dynamical_U, jperp_interactions,
-                        full_spin_rot_inv, p);
   
-  // FIXME : constructire new config
-  configuration config(&params, gf_struct, delta_raw, jperpt,
-                       p.keep_Jperp_negative);
+#if 0
   // initialize moves
   if (p.move_insert_segment)
     CTQMC.add_move(move_insert_segment(&params, &config, CTQMC.get_rng()),
@@ -377,6 +151,8 @@ void solver_core::solve(solve_params_t const &solve_params) {
   if (p.measure_statehist)
     CTQMC.add_measure(measure_statehist(&params, &config, &state_hist),
                       "impurity state histogram measurement");
+
+#endif
 
   // Run and collect results
   auto _solve_status =

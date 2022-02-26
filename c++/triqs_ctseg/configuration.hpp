@@ -1,6 +1,10 @@
 #pragma once
 #include <vector>
 #include "params.hpp"
+#include <triqs/utility/time_pt.hpp>
+
+using qmc_time_t = triqs::utility::time_pt;
+using qmc_time_factory_t = triqs::utility::time_segment;
 
 // Segment: (time of c, time of c^dagger)
 struct segment_t {
@@ -15,35 +19,37 @@ struct jperp_line_t {
   //bool Splus_at_left;               /// USEFUL ???
 };
 
+// ----------
+
 struct configuration_t {
   std::vector<std::vector<segment_t>> seglists; // list of segment per color : seglist[color] is ORDERED on tau, with decreasing order.
   std::vector<jperp_line_t> Jperp_list;
+
+  configuration_t(int n_color): seglists(n_color) {}
 };
 
 // ------------------- Functions to manipulate config --------------------------
 
-// Comparison of segments. Returns 1 if s1 is left of s2 (we order segments by decreasing time). 
-inline bool operator<(segment_t const &s1, segment_t const &s2) { return s1.tau_c > s2.tau_c; }; 
+// Comparison of segments. Returns 1 if s1 is left of s2 (we order segments by decreasing time).
+inline bool operator<(segment_t const &s1, segment_t const &s2) { return s1.tau_c > s2.tau_c; };
 
-// Overlap between two non-cyclic segments. 
+// Overlap between two non-cyclic segments.
 double overlap_seg(segment_t const &seg1, segment_t const &seg2);
 
 // Find index of first segment starting left of seg.tau_c.
 auto find_segment_left(std::vector<segment_t> const &seglist, segment_t const &seg);
 
-// Overlap between segment and a list of segments. 
-double overlap(std::vector<segment_t> const &seglist, segment_t const &seg);
+// Overlap between segment and a list of segments.
+double overlap(std::vector<segment_t> const &seglist, segment_t const &seg, qmc_time_factory_t const & fac);
 
 // Length occupied by all segments for a given color
 double density(std::vector<segment_t> const &seglist);
-  
+
 // --------- DEBUG code --------------
 // print config + h5 config
 
-inline void check_invariant(std::vector<segment_t> const &seglist) {
-  // debug mode : check ordered.
+inline void check_invariant(std::vector<segment_t> const &seglist){
+   // debug mode : check ordered.
 
-  // position of J, etc...
+   // position of J, etc...
 };
-
-
