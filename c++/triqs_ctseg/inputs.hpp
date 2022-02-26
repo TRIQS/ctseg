@@ -4,7 +4,7 @@
 #include <triqs/gfs.hpp>
 
 // Group the inputs of the solvers.
-/
+
 struct inputs_t { 
 
   block_gf<imtime> delta;

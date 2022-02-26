@@ -1,7 +1,7 @@
 #include "work_data.hpp"
 #include <triqs/operators/util/extractors.hpp>
 
-work_data_t::work_data_t(param_t const &p, inputs_t const &inputs) {
+work_data_t::work_data_t(params_t const &p, inputs_t const &inputs) {
 
   beta = p.beta;
 
@@ -14,8 +14,7 @@ work_data_t::work_data_t(param_t const &p, inputs_t const &inputs) {
   }
 
   // color dependent chemical potential
-  nda::vector<double> mu(n_color);
-  mu = 0;
+  mu = nda::zeros<double>(n_color);
 
   if (p.hartree_shift.size() > 0) {
     ALWAYS_EXPECTS((p.hartree_shift.size() == n_color), "Hartree shift size is not {}", n_color);
@@ -24,21 +23,16 @@ work_data_t::work_data_t(param_t const &p, inputs_t const &inputs) {
 
   // ......... U .................
   // Extract the U from the operator
-  auto U_full           = triqs::operators::utils::dict_to_matrix(triqs::operators::utils::extract_U_dict2(p.h_int), gf_struct);
-  nda::matrix<double> U = real(U_full);
-
-  // report
-  if (c.rank() == 0) {
-    spdlog::info("mu = {}\n U = {}", mu, U);
-    spdlog::info("dynamical_U = {}\n jperp_interactions = {}\n ", has_Dt, has_jperp);
-  }
-
-  // Check
-  ALWAYS_EXPECTS((jperp_interactions and deltaw.size() != 2), "Error : jperp interactions is true and we have {} blocks instead of 2", deltaw.size());
+  auto U_full = triqs::operators::utils::dict_to_matrix(triqs::operators::utils::extract_U_dict2(p.h_int), p.gf_struct);
+  U           = nda::matrix<double>{real(U_full)};
 
   // .........  Do we have dynamical interactions ?
-  has_Dt    = !is_zero(d0t);
-  has_jperp = !is_zero(jperpt);
+  // yes, unless the data is 0 
+  has_Dt    = max_element(abs(inputs.d0t.data())) < 1.e-13;
+  has_jperp = max_element(abs(inputs.jperpt.data())) < 1.e-13;
+
+  // Check
+  ALWAYS_EXPECTS((has_jperp and delta.size() != 2), "Error : jperp interactions is true and we have {} blocks instead of 2", delta.size());
 
   // FIXME : K, Kprime .. + adjust.
 
@@ -53,14 +47,13 @@ work_data_t::work_data_t(param_t const &p, inputs_t const &inputs) {
       std::cerr << "WARNING: max(Im[Delta(tau)]) = " << max_element(abs(imag(delta[bl].data()))) << "\n";
       std::cerr << "WARNING: Dissregarding the imaginary component in the calculation.\n";
     }
-    dets.emplace_back(delta_block_adaptor(real(delta[bl])), p.det_init_size);
+    dets.emplace_back(delta_block_adaptor{real(delta[bl])}, p.det_init_size);
     dets.back().set_singular_threshold(p.det_singular_threshold);
     dets.back().set_n_operations_before_check(p.det_n_operations_before_check);
     dets.back().set_precision_warning(p.det_precision_warning);
     dets.back().set_precision_error(p.det_precision_error);
   }
 }
-
 
 #if 0 
      K      = gf<imtime>{K_[0].mesh(), make_shape(n_color, n_color)};

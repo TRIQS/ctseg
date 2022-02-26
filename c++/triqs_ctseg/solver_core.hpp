@@ -30,10 +30,6 @@
 //#include <triqs/mesh.hpp>
 
 
-
-
-namespace triqs_ctseg {
-
 /// Main solver class
 class solver_core {
 
@@ -78,4 +74,3 @@ class solver_core {
   /// Monte Carlo sign
   //double average_sign() { return average_sign_; }
 };
-} // namespace triqs_ctseg

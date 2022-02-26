@@ -27,19 +27,17 @@
 //#include "measures.hpp"
 //#include "moves.hpp"
 
-namespace triqs_ctseg {
-
 solver_core::solver_core(constr_params_t const &p) : constr_params(p) {
 
   beta = p.beta;
 
-  inputs.delta = block_gf<imtime>(triqs::mesh::imtime{beta, Fermion, p.n_tau}, p.gf_struct);
-  inputs.d0t = gf<imtime>({beta, Boson, p.n_tau_jperp}, {1, 1});
+  inputs.delta  = block_gf<imtime>(triqs::mesh::imtime{beta, Fermion, p.n_tau}, p.gf_struct);
+  inputs.d0t    = gf<imtime>({beta, Boson, p.n_tau_jperp}, {1, 1});
   inputs.jperpt = gf<imtime>({beta, Boson, p.n_tau_jperp}, {1, 1});
-  
-  inputs.delta() = 0;
-  inputs.d0t = 0;
-  inputs.jperpt = 0;
+
+  inputs.delta()  = 0;
+  inputs.d0t()    = 0;
+  inputs.jperpt() = 0;
 };
 
 // ---------------------------------------------------------------------------
@@ -55,7 +53,7 @@ void solver_core::solve(solve_params_t const &solve_params) {
 
   // parameters
   last_solve_params = solve_params;
-  // FIXME ? keep it ? 
+  // FIXME ? keep it ?
   // Merge constr_params and solve_params
   params_t p(constr_params, solve_params);
 
@@ -64,11 +62,16 @@ void solver_core::solve(solve_params_t const &solve_params) {
   work_data_t wdata{p, inputs};
   configuration_t config{wdata.n_color};
 
+  // report (the wdata does not report, does not have communicator)
+  if (c.rank() == 0) {
+    spdlog::info("mu = {}\n U = {}", wdata.mu, wdata.U);
+    spdlog::info("dynamical_U = {}\n jperp_interactions = {}\n ", wdata.has_Dt, wdata.has_jperp);
+  }
+
   // ................   QMC  ...................
 
-  auto CTQMC = triqs::mc_tools::mc_generic<double>(p.random_name, p.random_seed,
-                                                   p.verbosity);
-  
+  auto CTQMC = triqs::mc_tools::mc_generic<double>(p.random_name, p.random_seed, p.verbosity);
+
 #if 0
   // initialize moves
   if (p.move_insert_segment)
@@ -154,11 +157,7 @@ void solver_core::solve(solve_params_t const &solve_params) {
 #endif
 
   // Run and collect results
-  auto _solve_status =
-      CTQMC.warmup_and_accumulate(p.n_warmup_cycles, p.n_cycles, p.length_cycle,
-                                  triqs::utility::clock_callback(p.max_time));
+  auto _solve_status = CTQMC.warmup_and_accumulate(p.n_warmup_cycles, p.n_cycles, p.length_cycle, triqs::utility::clock_callback(p.max_time));
   CTQMC.collect_results(c);
 
 }; // solve
-} // namespace triqs_ctseg
-
