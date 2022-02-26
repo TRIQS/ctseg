@@ -19,18 +19,18 @@
  ******************************************************************************/
 #pragma once
 #include "../configuration.hpp"
+#include "../results.hpp"
 
 namespace measures {
 
   struct density {
 
-    //param_t const &params;
-    configuration const &config;
-
-    nda::array<double, 1> &n_per_color;
+    configuration_t const &config;
+    nda::array<double, 1> &densities;
+    
     double Z;
 
-    density(configuration const &config, nda::array<double, 1> &n_per_color);
+    density(configuration_t const &config, results_t & results);
 
     void accumulate(double s);
     void collect_results(mpi::communicator const &c);

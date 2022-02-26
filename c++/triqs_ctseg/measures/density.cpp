@@ -18,10 +18,13 @@
  * CTSEG. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 #include "density.hpp"
+#include <itertools/itertools.hpp>
 
-namespace density {
+namespace measures {
 
-  density::density(configuration const &config, nda::array<double, 1> &n_per_color) : config{config}, n_per_color{n_per_color} { n_per_color = 0; }
+  density::density(configuration_t const &config, results_t &results) : config{config}, densities{results.densities} {
+    densities = nda::array<double, 1>(config.n_color());
+  }
 
   // -------------------------------------
 
@@ -31,15 +34,15 @@ namespace density {
     for (auto const &[c, seglist] : itertools::enumerate(config.seglists)) {
       double sum = 0;
       for (auto &seg : seglist) sum += double(seg.tau_c - seg.tau_cdag); // NB : take the cyclic - and cast to double
-      n_per_color[c] += s * sum;
+      densities[c] += s * sum;
     }
   }
 
   // -------------------------------------
 
   void density::collect_results(mpi::communicator const &c) {
-    Z              = mpi::all_reduce(Z, c);
-    n_per_color    = mpi::all_reduce(n_per_color, c);
-    nnn_per_colort = n_per_color / Z;
+    Z         = mpi::all_reduce(Z, c);
+    densities = mpi::all_reduce(densities, c);
+    densities /= Z;
   }
-} // namespace density
+} // namespace measures

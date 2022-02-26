@@ -1,4 +1,4 @@
-file(GLOB_RECURSE sources *.cpp)
+file(GLOB sources *.cpp measures/*.cpp) # FIXME GLOB_RECURSE
 add_library(${PROJECT_NAME}_c ${sources})
 add_library(${PROJECT_NAME}::${PROJECT_NAME}_c ALIAS ${PROJECT_NAME}_c)
 

@@ -1,10 +1,9 @@
 #pragma once
 #include "types.hpp"
 #include "params.hpp"
-#include "containers.hpp"
+#include "inputs.hpp"
 
-namespace triqs_ctseg {
-
+  using time_point_factory_t = triqs::utility::time_segment;
 
   /// A lambda to adapt the Delta function for the call of the det.
   struct delta_block_adaptor {
@@ -38,4 +37,3 @@ namespace triqs_ctseg {
     std::vector<det_t> dets; // The determinants
   };
 
-} // namespace triqs_ctseg

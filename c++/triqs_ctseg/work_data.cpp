@@ -61,22 +61,22 @@ work_data_t::work_data_t(param_t const &p, inputs_t const &inputs) {
   }
 }
 
-/*     K      = gf<imtime>{K_[0].mesh(), make_shape(n_color, n_color)};
+
+#if 0 
+     K      = gf<imtime>{K_[0].mesh(), make_shape(n_color, n_color)};
     Kprime = gf<imtime>{K_[0].mesh(), make_shape(n_color, n_color)};
     for (auto const &t : K.mesh()) {
       for (int i = 0; i < n_color; i++) {
-        auto bl_ind_i = color_to_block_and_inner_index_impl(i, gf_struct);
-        for (int j = 0; j < n_color; j++) {
-          auto bl_ind_j   = color_to_block_and_inner_index_impl(j, gf_struct);
-          int bl_ij       = bl_ind_i.first * gf_struct.size() + bl_ind_j.first;
-          K[t](i, j)      = K_[bl_ij](t)(bl_ind_i.second, bl_ind_j.second);
-          Kprime[t](i, j) = Kprime_[bl_ij](t)(bl_ind_i.second, bl_ind_j.second); 
-        } // j
-      }   // i
-    }     // t */
-}
+	auto bl_ind_i = color_to_block_and_inner_index_impl(i, gf_struct);
+	for (int j = 0; j < n_color; j++) {
+	  auto bl_ind_j   = color_to_block_and_inner_index_impl(j, gf_struct);
+	  int bl_ij       = bl_ind_i.first * gf_struct.size() + bl_ind_j.first;
+	  K[t](i, j)      = K_[bl_ij](t)(bl_ind_i.second, bl_ind_j.second);
+	  Kprime[t](i, j) = Kprime_[bl_ij](t)(bl_ind_i.second, bl_ind_j.second); 
+	}  j
+      }    i
+    }      t */
 
-#if 0 
   if (dynamical_U) {
     // extract kt and kprimet from d0w
     for (int bl = 0; bl < kt.size(); bl++) {

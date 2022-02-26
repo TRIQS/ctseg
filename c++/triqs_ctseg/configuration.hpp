@@ -23,6 +23,9 @@ struct configuration_t {
   std::vector<jperp_line_t> Jperp_list;
 
   configuration_t(int n_color): seglists(n_color) {}
+
+  int n_color() const { return seglists.size();}
+
 };
 
 // ------------------- Functions to manipulate config --------------------------
