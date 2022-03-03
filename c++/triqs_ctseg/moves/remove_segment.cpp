@@ -3,7 +3,7 @@ namespace moves {
 
   double remove_segment::attempt() {
 
-    SPDLOG_LOGGER_TRACE("\n =================== ATTEMPT REMOVE ================ \n");
+    SPDLOG_LOGGER_TRACE("\n =================== ATTEMPT REMOVE ================ \n",void);
 
     // ------------ Choice of segment --------------
 
@@ -67,7 +67,7 @@ namespace moves {
 
   double remove_segment::accept() {
 
-    SPDLOG_LOGGER_TRACE("\n - - - - - ====> ACCEPT - - - - - - - - - - -\n");
+    SPDLOG_LOGGER_TRACE("\n - - - - - ====> ACCEPT - - - - - - - - - - -\n",void);
 
     //data.dets[color].complete_operation();
     // Remove the segment
@@ -82,7 +82,7 @@ namespace moves {
 
   //--------------------------------------------------
   void remove_segment::reject() {
-    SPDLOG_LOGGER_TRACE("\n - - - - - ====> REJECT - - - - - - - - - - -\n");
+    SPDLOG_LOGGER_TRACE("\n - - - - - ====> REJECT - - - - - - - - - - -\n",void);
     //data.dets[color].reject_last_try();
   }
 } // namespace moves

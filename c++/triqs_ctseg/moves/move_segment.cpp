@@ -33,7 +33,7 @@ namespace moves {
 
   double move_segment::attempt() {
 
-    SPDLOG_LOGGER_TRACE("\n =================== ATTEMPT MOVE ================ \n");
+    SPDLOG_LOGGER_TRACE("\n =================== ATTEMPT MOVE ================ \n",void);
 
     // ------------ Choice of segment and colors --------------
     // Select origin color
@@ -81,7 +81,7 @@ namespace moves {
 
   double move_segment::accept() {
 
-    SPDLOG_LOGGER_TRACE("\n - - - - - ====> ACCEPT - - - - - - - - - - -\n");
+    SPDLOG_LOGGER_TRACE("\n - - - - - ====> ACCEPT - - - - - - - - - - -\n",void);
 
     //wdata.dets[color].complete_operation();
     // Regroup segments 
@@ -99,7 +99,7 @@ namespace moves {
 
   //--------------------------------------------------
   void move_segment::reject() {
-    SPDLOG_LOGGER_TRACE("\n - - - - - ====> REJECT - - - - - - - - - - -\n");
+    SPDLOG_LOGGER_TRACE("\n - - - - - ====> REJECT - - - - - - - - - - -\n",void);
     //data.dets[color].reject_last_try();
   }
 }; // namespace moves

@@ -1,5 +1,5 @@
 #pragma once
-#include <triqs/gfs/gf/gf_const_view.hpp>
+//#include <triqs/gfs/gf/gf_const_view.hpp>
 #include <vector>
 #include "params.hpp"
 #include "types.hpp"
@@ -62,8 +62,10 @@ inline bool is_full_line(segment_t const &seg, qmc_time_factory_t const &fac) {
 // --------- DEBUG code --------------
 // print config + h5 config
 
+#if 0
 inline void check_invariant(std::vector<segment_t> const &seglist){
    // debug mode : check ordered.
 
    // position of J, etc...
 };
+#endif

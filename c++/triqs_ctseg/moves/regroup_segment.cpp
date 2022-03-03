@@ -4,7 +4,7 @@ namespace moves {
 
   double regroup_segment::attempt() {
 
-    SPDLOG_LOGGER_TRACE("\n =================== ATTEMPT REGROUP ================ \n");
+    SPDLOG_LOGGER_TRACE("\n =================== ATTEMPT REGROUP ================ \n",void);
 
     // ------------ Choice of segment --------------
     // Select color
@@ -69,7 +69,7 @@ namespace moves {
 
   double regroup_segment::accept() {
 
-    SPDLOG_LOGGER_TRACE("\n - - - - - ====> ACCEPT - - - - - - - - - - -\n");
+    SPDLOG_LOGGER_TRACE("\n - - - - - ====> ACCEPT - - - - - - - - - - -\n",void);
 
     //data.dets[color].complete_operation();
     // Regroup segments 
@@ -94,7 +94,7 @@ namespace moves {
 
   //--------------------------------------------------
   void regroup_segment::reject() {
-    SPDLOG_LOGGER_TRACE("\n - - - - - ====> REJECT - - - - - - - - - - -\n");
+    SPDLOG_LOGGER_TRACE("\n - - - - - ====> REJECT - - - - - - - - - - -\n",void);
     //data.dets[color].reject_last_try();
   }
 } // namespace moves

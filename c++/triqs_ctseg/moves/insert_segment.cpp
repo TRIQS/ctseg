@@ -1,10 +1,10 @@
 #include "insert_segment.hpp"
-#include <triqs/gfs/functions/functions2.hpp>
+//#include <triqs/gfs/functions/functions2.hpp>
 namespace moves {
 
   double insert_segment::attempt() {
 
-    SPDLOG_LOGGER_TRACE("\n =================== ATTEMPT INSERT ================ \n");
+    SPDLOG_LOGGER_TRACE("\n =================== ATTEMPT INSERT ================ \n",void);
 
     // ------------ Choice of segment --------------
 
@@ -29,9 +29,9 @@ namespace moves {
     }
 
     // Choose new segment within insertion window
-    auto l   = tau1 - tau2;
-    auto dt1 = time_point_factory.get_random_pt(l);
-    auto dt2 = time_point_factory.get_random_pt(l);
+    qmc_time_t l   = tau1 - tau2;
+    auto dt1 = time_point_factory.get_random_pt(rng,qmc_zero,l);
+    auto dt2 = time_point_factory.get_random_pt(rng,qmc_zero,l);
     if (dt1 == dt2) return 0;
     if (dt1 > dt2) std::swap(dt1, dt2);
     proposed_segment = segment_t{tau1 - dt1, tau1 - dt2};
@@ -78,7 +78,7 @@ namespace moves {
 
   double insert_segment::accept() {
 
-    SPDLOG_LOGGER_TRACE("\n - - - - - ====> ACCEPT - - - - - - - - - - -\n");
+    SPDLOG_LOGGER_TRACE("\n - - - - - ====> ACCEPT - - - - - - - - - - -\n",void);
 
     //data.dets[color].complete_operation();
     // Insert the segment in an ordered list
@@ -96,7 +96,7 @@ namespace moves {
 
   //--------------------------------------------------
   void insert_segment::reject() {
-    SPDLOG_LOGGER_TRACE("\n - - - - - ====> REJECT - - - - - - - - - - -\n");
+    SPDLOG_LOGGER_TRACE("\n - - - - - ====> REJECT - - - - - - - - - - -\n",void);
     //data.dets[color].reject_last_try();
 
     // SPDLOG_LOGGER_TRACE("Configuration {}", config);
