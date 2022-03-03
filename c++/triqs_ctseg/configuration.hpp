@@ -24,7 +24,7 @@ struct configuration_t {
 
   configuration_t(int n_color): seglists(n_color) {}
 
-  int n_color() const { return seglists.size();}
+  [[nodiscard]] int n_color() const { return seglists.size();}
 
 };
 
@@ -41,6 +41,9 @@ auto find_segment_left(std::vector<segment_t> const &seglist, segment_t const &s
 
 // Overlap between segment and a list of segments.
 double overlap(std::vector<segment_t> const &seglist, segment_t const &seg, qmc_time_factory_t const & fac);
+
+// Contribution of the dynamical interaction kernel K to the overlap between a segment and a list of segments.
+double K_overlap(std::vector<segment_t> const &seglist, segment_t const &seg, gf<imtime,scalar_valued> const &K);
 
 // Length occupied by all segments for a given color
 double density(std::vector<segment_t> const &seglist);

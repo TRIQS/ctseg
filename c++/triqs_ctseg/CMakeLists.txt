@@ -5,6 +5,9 @@ add_library(${PROJECT_NAME}::${PROJECT_NAME}_c ALIAS ${PROJECT_NAME}_c)
 # Link against triqs and enable warnings
 target_link_libraries(${PROJECT_NAME}_c PUBLIC triqs PRIVATE $<BUILD_INTERFACE:${PROJECT_NAME}_warnings>)
 
+# link against spdlog
+target_link_libraries(${PROJECT_NAME}_c PRIVATE spdlog)
+
 # Configure target and compilation
 set_target_properties(${PROJECT_NAME}_c PROPERTIES
   POSITION_INDEPENDENT_CODE ON
@@ -23,7 +26,7 @@ target_compile_definitions(${PROJECT_NAME}_c PUBLIC
 			  )
 
 # Install library and headers
-install(TARGETS ${PROJECT_NAME}_c EXPORT ${PROJECT_NAME}-targets DESTINATION lib)
+install(TARGETS ${PROJECT_NAME}_c spdlog EXPORT ${PROJECT_NAME}-targets DESTINATION lib)
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} DESTINATION include FILES_MATCHING PATTERN "*.hpp" PATTERN "*.h")
 
 # ========= Additional Dependencies ==========

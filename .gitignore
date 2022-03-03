@@ -2,4 +2,6 @@ compile_commands.json
 doc/reference
 .*.swo
 .*.swp
+build
+.cache
 
