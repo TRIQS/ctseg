@@ -5,7 +5,7 @@
 
 #include <triqs/det_manip.hpp>
 
-using time_point_factory_t = triqs::utility::time_segment;
+using qmc_time_factory_t = triqs::utility::time_segment;
 
 /// A lambda to adapt the Delta function for the call of the det.
 struct delta_block_adaptor {

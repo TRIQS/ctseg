@@ -24,12 +24,13 @@ namespace moves {
     qmc_time_t dt2 = time_point_factory.get_random_pt(l);
     if (dt1 == dt2) return 0; 
     auto qmc_zero = time_point_factory.get_lower_pt();
-    auto qmc_beta = time_point_factory.get_upper_pt();
     if (dt1 == qmc_zero || dt2 == qmc_zero || dt1 == l || dt2 == l) return 0; 
     full_line = is_full_line(proposed_segment,time_point_factory);
     if (dt1 > dt2 && !full_line) std::swap(dt1,dt2); // If splitting a full line, the order of tau_left and tau_right is not fixed
     tau_left = proposed_segment.tau_c - dt1; 
     tau_right = proposed_segment.tau_c - dt2; 
+    auto removed_segment = segment_t{tau_left,tau_right};
+    auto removed_segment_length = double(tau_left - tau_right);
 
     SPDLOG_LOGGER_TRACE("Split: adding c at {}, cdag at {}", tau_right, tau_left);
 
@@ -37,8 +38,9 @@ namespace moves {
     double ln_trace_ratio = 0;
     for (auto c : range(wdata.n_color)) {
       if (c != color) {
-        ln_trace_ratio -= wdata.U(color,c)*overlap(config.seglists[c],segment_t{tau_left,tau_right},time_point_factory);
-        if (wdata.has_Dt) ln_trace_ratio -= K_overlap(config.seglists[c],segment_t{tau_left,tau_right},slice_target_to_scalar(wdata.K,color,c)); // FIXME. Is the syntax right for slice????
+        ln_trace_ratio -= -wdata.U(color,c)*overlap(config.seglists[c],removed_segment,time_point_factory);
+        ln_trace_ratio -= wdata.mu(c)*removed_segment_length; 
+        if (wdata.has_Dt) ln_trace_ratio -= K_overlap(config.seglists[c],removed_segment,slice_target_to_scalar(wdata.K,color,c)); // FIXME. Is the syntax right for slice????
       }
     }
     double trace_ratio = std::exp(ln_trace_ratio);
@@ -46,6 +48,7 @@ namespace moves {
     // ------------  Det ratio  ---------------
 
     // FIXME
+    double det_ratio = 0;
 
     // ------------  Proposition ratio ------------
 
@@ -64,7 +67,7 @@ namespace moves {
 
     SPDLOG_LOGGER_TRACE("\n - - - - - ====> ACCEPT - - - - - - - - - - -\n");
 
-    data.dets[color].complete_operation();
+    //data.dets[color].complete_operation();
     // Split the segment
     auto &sl = config.seglists[color];
     if (is_full_line(proposed_segment,time_point_factory)) {
@@ -87,7 +90,6 @@ namespace moves {
   //--------------------------------------------------
   void split_segment::reject() {
     SPDLOG_LOGGER_TRACE("\n - - - - - ====> REJECT - - - - - - - - - - -\n");
-    data.dets[color].reject_last_try();
+    //data.dets[color].reject_last_try();
   }
-};
-} // namespace moves
+}; // namespace moves

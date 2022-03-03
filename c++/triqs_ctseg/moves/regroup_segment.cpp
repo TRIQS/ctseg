@@ -28,16 +28,18 @@ namespace moves {
     }
     left_segment = sl[left_segment_index];
     right_segment = sl[right_segment_index];
+    auto inserted_segment = segment_t{right_segment.tau_c,left_segment.tau_cdag};
+    auto inserted_segment_length = double(inserted_segment.tau_c - inserted_segment.tau_cdag);
 
     SPDLOG_LOGGER_TRACE("Regroup: removing c at {}, cdag at {}", right_segment.tau_c, left_segment.tau_cdag);
 
     // ------------  Trace ratio  -------------
-        // FIXME : here we will need the K function integral 
     double ln_trace_ratio = 0;
     for (auto c : range(wdata.n_color)) {
       if (c != color) {
-        ln_trace_ratio += wdata.U(color,c)*overlap(config.seglists[c],segment_t{right_segment.tau_c,left_segment.tau_cdag},time_point_factory);
-        if (wdata.has_Dt) ln_trace_ratio += K_overlap(config.seglists[c],segment_t{right_segment.tau_c,left_segment.tau_cdag},slice_target_to_scalar(wdata.K,color,c)); // FIXME. Is the syntax right for slice????
+        ln_trace_ratio += -wdata.U(color,c)*overlap(config.seglists[c],inserted_segment,time_point_factory);
+        ln_trace_ratio += wdata.mu(c)*inserted_segment_length;
+        if (wdata.has_Dt) ln_trace_ratio += K_overlap(config.seglists[c],inserted_segment,slice_target_to_scalar(wdata.K,color,c)); // FIXME. Is the syntax right for slice????
       }
     }
     double trace_ratio = std::exp(ln_trace_ratio);
@@ -45,6 +47,7 @@ namespace moves {
     // ------------  Det ratio  ---------------
 
     // FIXME
+    double det_ratio = 0;
 
     // ------------  Proposition ratio ------------
 
@@ -68,7 +71,7 @@ namespace moves {
 
     SPDLOG_LOGGER_TRACE("\n - - - - - ====> ACCEPT - - - - - - - - - - -\n");
 
-    data.dets[color].complete_operation();
+    //data.dets[color].complete_operation();
     // Regroup segments 
     auto &sl = config.seglists[color];
     if (making_full_line) {
@@ -92,6 +95,6 @@ namespace moves {
   //--------------------------------------------------
   void regroup_segment::reject() {
     SPDLOG_LOGGER_TRACE("\n - - - - - ====> REJECT - - - - - - - - - - -\n");
-    data.dets[color].reject_last_try();
+    //data.dets[color].reject_last_try();
   }
 } // namespace moves

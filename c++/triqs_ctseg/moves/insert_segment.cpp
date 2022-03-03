@@ -35,6 +35,7 @@ namespace moves {
     if (dt1 == dt2) return 0;
     if (dt1 > dt2) std::swap(dt1, dt2);
     proposed_segment = segment_t{tau1 - dt1, tau1 - dt2};
+    auto proposed_segment_length = double(proposed_segment.tau_c-proposed_segment.tau_cdag);
     // The index of the segment if it is inserted in the list of segments.
     proposed_segment_insert_pos = std::upper_bound(sl.begin(), sl.end(), proposed_segment);
 
@@ -44,7 +45,8 @@ namespace moves {
     double ln_trace_ratio = 0;
     for (auto c : range(wdata.n_color)) {
       if (c != color) {
-        ln_trace_ratio += wdata.U(color,c)*overlap(config.seglists[c],proposed_segment,time_point_factory);
+        ln_trace_ratio += -wdata.U(color,c)*overlap(config.seglists[c],proposed_segment,time_point_factory);
+        ln_trace_ratio += wdata.mu(c)*proposed_segment_length;
         if (wdata.has_Dt) ln_trace_ratio += K_overlap(config.seglists[c],proposed_segment,slice_target_to_scalar(wdata.K,color,c)); // FIXME. Is the syntax right for slice????
       }
     }
@@ -57,8 +59,9 @@ namespace moves {
     // pos is the index of the new segment, if inserted in the list.
     // FIXME : std::distance of an empoty?
     //long pos  = (config_is_empty ? 0 : std::distance(proposed_segment_insert_pos, V.begin()));
-    long pos  = std::distance(proposed_segment_insert_pos, sl.begin());
-    auto det_ratio = dets[color].try_insert(pos, pos, {proposed_segment.tau_c, 0}, {proposed_segment.tau_cdag, 0});
+    //long pos  = std::distance(proposed_segment_insert_pos, sl.begin());
+    double det_ratio = 0;
+    //auto det_ratio = dets[color].try_insert(pos, pos, {proposed_segment.tau_c, 0}, {proposed_segment.tau_cdag, 0});
 
     // ------------  Proposition ratio ------------
 
@@ -77,7 +80,7 @@ namespace moves {
 
     SPDLOG_LOGGER_TRACE("\n - - - - - ====> ACCEPT - - - - - - - - - - -\n");
 
-    data.dets[color].complete_operation();
+    //data.dets[color].complete_operation();
     // Insert the segment in an ordered list
     config.seglists[color].insert(proposed_segment_insert_pos, proposed_segment);
 
@@ -94,7 +97,7 @@ namespace moves {
   //--------------------------------------------------
   void insert_segment::reject() {
     SPDLOG_LOGGER_TRACE("\n - - - - - ====> REJECT - - - - - - - - - - -\n");
-    data.dets[color].reject_last_try();
+    //data.dets[color].reject_last_try();
 
     // SPDLOG_LOGGER_TRACE("Configuration {}", config);
     // Check invariant ??

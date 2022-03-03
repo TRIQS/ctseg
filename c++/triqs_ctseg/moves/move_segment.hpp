@@ -15,10 +15,10 @@ namespace moves {
     segment_t origin_segment;
     int origin_index{};
     std::vector<segment_t>::const_iterator destination_it;
-    time_point_factory_t time_point_factory = time_point_factory_t{wdata.beta};
+    qmc_time_factory_t time_point_factory = qmc_time_factory_t{wdata.beta};
     // Internal methods
     bool no_overlap(segment_t seg1, segment_t seg2);
-    bool is_movable(std::vector<segment_t> const &seglist,segment_t const &seg,time_point_factory_t fac);
+    bool is_movable(std::vector<segment_t> const &seglist,segment_t const &seg,qmc_time_factory_t fac);
 
     public:
     // Constructor

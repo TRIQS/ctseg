@@ -13,7 +13,7 @@ namespace moves {
     int color = 0;
     segment_t proposed_segment;
     int proposed_segment_index{};
-    time_point_factory_t time_point_factory = time_point_factory_t{wdata.beta};
+    qmc_time_factory_t time_point_factory = qmc_time_factory_t{wdata.beta};
 
     public:
     // Constructor

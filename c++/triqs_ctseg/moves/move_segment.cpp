@@ -10,7 +10,7 @@ namespace moves {
   }
 
   // Checks if a segment is movable to a color
-  bool move_segment::is_movable(std::vector<segment_t> const &seglist,segment_t const &seg,time_point_factory_t fac) {
+  bool move_segment::is_movable(std::vector<segment_t> const &seglist,segment_t const &seg,qmc_time_factory_t fac) {
     bool result = true; 
     if (seglist.empty()) return result;
     // If seg is cyclic, split it
@@ -47,6 +47,7 @@ namespace moves {
     // Select segment to move 
     origin_index = rng(sl.size());
     origin_segment = sl[origin_index];
+    auto proposed_segment_length = double(origin_segment.tau_c - origin_segment.tau_cdag);
 
     SPDLOG_LOGGER_TRACE("Moving c at {}, cdag at {}", origin_segment.tau_c, origin_segment.tau_cdag);
 
@@ -61,12 +62,12 @@ namespace moves {
 
     // ------------  Trace ratio  -------------
         // FIXME : here we will need chemical potential, field, etc
-    double ln_trace_ratio = 0;
+    double ln_trace_ratio = (wdata.mu(destination_color)-wdata.mu(origin_color))*proposed_segment_length;
     double trace_ratio = std::exp(ln_trace_ratio);
 
     // ------------  Det ratio  ---------------
 
-    // FIXME
+    double det_ratio = 0;
 
     // ------------  Proposition ratio ------------
     double prop_ratio = (int(dsl.size()) + 1) / int(sl.size());
@@ -82,7 +83,7 @@ namespace moves {
 
     SPDLOG_LOGGER_TRACE("\n - - - - - ====> ACCEPT - - - - - - - - - - -\n");
 
-    data.dets[color].complete_operation();
+    //wdata.dets[color].complete_operation();
     // Regroup segments 
     auto &sl = config.seglists[origin_color];
     auto &dsl = config.seglists[destination_color];
@@ -99,6 +100,6 @@ namespace moves {
   //--------------------------------------------------
   void move_segment::reject() {
     SPDLOG_LOGGER_TRACE("\n - - - - - ====> REJECT - - - - - - - - - - -\n");
-    data.dets[color].reject_last_try();
+    //data.dets[color].reject_last_try();
   }
 }; // namespace moves

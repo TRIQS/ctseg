@@ -21,6 +21,7 @@ namespace moves {
     auto qmc_beta = time_point_factory.get_upper_pt();
     auto qmc_zero = time_point_factory.get_lower_pt();
     if (proposed_segment.tau_c == qmc_beta && proposed_segment.tau_cdag == qmc_zero) return 0; // If segment is a full line do not remove 
+    auto proposed_segment_length = double(proposed_segment.tau_c-proposed_segment.tau_cdag);
 
     SPDLOG_LOGGER_TRACE("Removing c at{}, cdag at {}", proposed_segment.tau_c, proposed_segment.tau_cdag);
 
@@ -28,7 +29,8 @@ namespace moves {
     double ln_trace_ratio = 0;
     for (auto c : range(wdata.n_color)) {
       if (c != color) {
-        ln_trace_ratio -= wdata.U(color,c)*overlap(config.seglists[c],proposed_segment,time_point_factory);
+        ln_trace_ratio -= -wdata.U(color,c)*overlap(config.seglists[c],proposed_segment,time_point_factory);
+        ln_trace_ratio -= wdata.mu(c)*proposed_segment_length;
         if (wdata.has_Dt) ln_trace_ratio -= K_overlap(config.seglists[c],proposed_segment,slice_target_to_scalar(wdata.K,color,c)); // FIXME. Is the syntax right for slice????
       }
     }
@@ -37,6 +39,7 @@ namespace moves {
     // ------------  Det ratio  ---------------
 
     // FIXME
+    double det_ratio = 0;
 
     // ------------  Proposition ratio ------------
 
@@ -66,7 +69,7 @@ namespace moves {
 
     SPDLOG_LOGGER_TRACE("\n - - - - - ====> ACCEPT - - - - - - - - - - -\n");
 
-    data.dets[color].complete_operation();
+    //data.dets[color].complete_operation();
     // Remove the segment
     auto &sl = config.seglists[color];
     auto proposed_segment_it = std::next(sl.begin(),proposed_segment_index);
@@ -80,7 +83,6 @@ namespace moves {
   //--------------------------------------------------
   void remove_segment::reject() {
     SPDLOG_LOGGER_TRACE("\n - - - - - ====> REJECT - - - - - - - - - - -\n");
-    data.dets[color].reject_last_try();
+    //data.dets[color].reject_last_try();
   }
-};
 } // namespace moves

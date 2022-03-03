@@ -45,6 +45,5 @@ using std::sin;
 // One-particle Green's function types
 using G_tau_t              = block_gf<imtime, matrix_valued>;
 using G_iw_t               = block_gf<imfreq, matrix_valued>;
-using time_point_factory_t = triqs::utility::time_segment;
 using qmc_time_t           = triqs::utility::time_pt;
 using qmc_time_factory_t   = triqs::utility::time_segment;
