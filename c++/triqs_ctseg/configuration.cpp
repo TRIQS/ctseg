@@ -11,12 +11,6 @@ double overlap_seg(segment_t const &seg1, segment_t const &seg2) {
   };
 };
 
-// Find index of first segment to the left of seg.
-auto find_segment_left(std::vector<segment_t> const &seglist, segment_t const &seg) {
-  auto seg_index = std::upper_bound(seglist.begin(), seglist.end(), seg);
-  return seg_index--;
-};
-
 // Overlap between segment and a list of segments.
 double overlap(std::vector<segment_t> const &seglist, segment_t const &seg, qmc_time_factory_t const &fac) {
   if (seglist.empty()) return 0;
@@ -57,6 +51,6 @@ double density(std::vector<segment_t> const &seglist) {
   double result = 0;
   for (auto const &seg : seglist) result += double(seg.tau_c - seg.tau_cdag);
   return result;
-};
+}
 
 

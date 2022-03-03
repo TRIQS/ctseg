@@ -56,7 +56,7 @@ work_data_t::work_data_t(params_t const &p, inputs_t const &inputs) {
 
     // Renormalize U and mu
     U -= 2*Kprime(0);
-    mu += Kprime.data()(0,1,0); // FIXME: true? 
+    mu += Kprime(0)(0,1); // FIXME: true? 
   }
 
   // .............  Determinants .....................

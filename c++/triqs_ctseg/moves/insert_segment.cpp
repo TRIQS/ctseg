@@ -1,7 +1,6 @@
 #include "insert_segment.hpp"
+#include <triqs/gfs/functions/functions2.hpp>
 namespace moves {
-
-  // FIXME : LIGNE PLEINE ?? dans overlap ???
 
   double insert_segment::attempt() {
 
@@ -10,21 +9,23 @@ namespace moves {
     // ------------ Choice of segment --------------
 
     // Select insertion color
-    color = rng(data.n_color);
+    color = rng(wdata.n_color);
     auto &sl       = config.seglists[color];
     SPDLOG_LOGGER_TRACE("Inserting at color {}", color);
 
     // Select insertion window [tau1,tau2] (defaults to [beta,0])
-    qmc_time_t tau1 = time_point_factory.get_upper_pt();
-    qmc_time_t tau2 = time_point_factory.get_lower_pt();
-    bool config_is_empty = sl.empty()
+    auto qmc_beta = time_point_factory.get_upper_pt();
+    auto qmc_zero = time_point_factory.get_lower_pt();
+    qmc_time_t tau1 = qmc_beta;
+    qmc_time_t tau2 = qmc_zero;
+    bool config_is_empty = sl.empty();
     if (not config_is_empty) {
       // Randomly choose one existing segment
       long ind_segment = rng(sl.size());
-      tau1                 = sl[ind_segment].tau_cdag; // tau1 : pos of cdag
+      tau1                 = sl[ind_segment].tau_cdag; // tau1 is cdag of this segment
       bool is_last_segment = ind_segment == sl.size() - 1;
-      tau2                 = sl[is_last_segment ? 0 : ind_segment + 1].tau_c; // tau2 : pos of next c, possibly cyclic
-      if (tau2 - tau1 == params.beta) return 0; // If segment is a full line, cannot insert 
+      tau2                 = sl[is_last_segment ? 0 : ind_segment + 1].tau_c; // tau2 is c of next segment, possibly cyclic
+      if (tau2 - tau1 == qmc_beta) return 0; // If segment is a full line, cannot insert 
     }
 
     // Choose new segment within insertion window
@@ -40,10 +41,12 @@ namespace moves {
     SPDLOG_LOGGER_TRACE("Inserting c at{}, cdag at {}", proposed_segment.tau_c, proposed_segment.tau_cdag);
 
     // ------------  Trace ratio  -------------
-        // FIXME : here we will need the K function integral 
     double ln_trace_ratio = 0;
-    for (int c : config.seglists) {
-      if (c != color) ln_trace_ratio += overlap(proposed_segment, config.seglists[c]);
+    for (auto c : range(wdata.n_color)) {
+      if (c != color) {
+        ln_trace_ratio += wdata.U(color,c)*overlap(config.seglists[c],proposed_segment,time_point_factory);
+        if (wdata.has_Dt) ln_trace_ratio += K_overlap(config.seglists[c],proposed_segment,slice_target_to_scalar(wdata.K,color,c)); // FIXME. Is the syntax right for slice????
+      }
     }
     double trace_ratio = std::exp(ln_trace_ratio);
 
@@ -59,8 +62,8 @@ namespace moves {
 
     // ------------  Proposition ratio ------------
 
-    double current_number_segments = std::max(sl.size(),1);
-    double future_number_segments = sl.size() + 1; 
+    double current_number_segments = std::max(int(sl.size()),1);
+    double future_number_segments = double(sl.size()) + 1; 
     double prop_ratio              = future_number_segments / (current_number_segments * l * l);
 
     SPDLOG_LOGGER_TRACE("trace_ratio  = {}, prop_ratio = {}, det_ratio = {}", trace_ratio, prop_ratio, det_ratio);
@@ -97,5 +100,4 @@ namespace moves {
     // Check invariant ??
     // config->trace.check_overlap_matrix_from_scratch();
   }
-};
-} // namespace moves
+}; // namespace moves

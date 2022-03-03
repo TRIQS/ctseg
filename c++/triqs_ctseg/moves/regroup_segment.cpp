@@ -8,17 +8,17 @@ namespace moves {
 
     // ------------ Choice of segment --------------
     // Select color
-    color = rng(data.n_color);
+    color = rng(wdata.n_color);
     auto &sl       = config.seglists[color];
     SPDLOG_LOGGER_TRACE("Regrouping at color {}", color);
 
     // If no segments nothing to regroup
-    if sl.empty() return 0; 
+    if (sl.empty()) return 0; 
 
     // Select pair of segments (or cyclic segment) to regroup 
     making_full_line = sl.size() == 1; 
-    if making_full_line {
-      if (sl[0].tau_c == params.beta && sl[0].tau_cdag == 0) return 0; // If segment is full line nothing to regroup
+    if (making_full_line) {
+      if (is_full_line(sl[0],time_point_factory)) return 0; // If segment is full line nothing to regroup
       left_segment_index = 0;
       right_segment_index = 0; 
     }
@@ -34,9 +34,11 @@ namespace moves {
     // ------------  Trace ratio  -------------
         // FIXME : here we will need the K function integral 
     double ln_trace_ratio = 0;
-    for (int c : config.seglists) {
-      // Subtract the overlap with the antisegment we are removing 
-      if (c != color) ln_trace_ratio = overlap(segment_t{right_segment.tau_c,left_segment.tau_cdag}, config.seglists[c]);
+    for (auto c : range(wdata.n_color)) {
+      if (c != color) {
+        ln_trace_ratio += wdata.U(color,c)*overlap(config.seglists[c],segment_t{right_segment.tau_c,left_segment.tau_cdag},time_point_factory);
+        if (wdata.has_Dt) ln_trace_ratio += K_overlap(config.seglists[c],segment_t{right_segment.tau_c,left_segment.tau_cdag},slice_target_to_scalar(wdata.K,color,c)); // FIXME. Is the syntax right for slice????
+      }
     }
     double trace_ratio = std::exp(ln_trace_ratio);
 
@@ -46,11 +48,13 @@ namespace moves {
 
     // ------------  Proposition ratio ------------
 
-    double future_number_segments = making_full_line ? 1 : sl.size() - 1;
+    double future_number_segments = making_full_line ? 1 : int(sl.size()) - 1;
     double current_number_intervals = sl.size(); 
     // Length of future segment 
-    if (making_full_line) qmc_time_t l = time_point_factory.get_upper_pt(); 
-    else qmc_time_t l = left_segment.tau_c - right_segment.tau_cdag; 
+    qmc_time_t l = time_point_factory.get_upper_pt(); 
+    if (not making_full_line) {
+      l = left_segment.tau_c - right_segment.tau_cdag; 
+    }
     double prop_ratio = (future_number_segments * l * l) / current_number_intervals;
 
     SPDLOG_LOGGER_TRACE("trace_ratio  = {}, prop_ratio = {}, det_ratio = {}", trace_ratio, prop_ratio, det_ratio);
@@ -68,13 +72,16 @@ namespace moves {
     // Regroup segments 
     auto &sl = config.seglists[color];
     if (making_full_line) {
-      segment_t new_segment = segment_t{params.beta,0}; // FIXME: qmctimes?? 
+      auto qmc_beta = time_point_factory.get_upper_pt();
+      auto qmc_zero = time_point_factory.get_lower_pt();
+      auto new_segment = segment_t{qmc_beta,qmc_zero}; 
       sl[left_segment_index] = new_segment; 
     }
     else {
-      segment_t new_segment = segment_t{proposed_segment.tau_c,right_segment.tau_cdag}; 
+      auto new_segment = segment_t{left_segment.tau_c,right_segment.tau_cdag}; 
       sl[left_segment_index] = new_segment; 
-      sl.erase(right_segment_index);
+      auto right_segment_it = std::next(sl.begin(),right_segment_index);
+      sl.erase(right_segment_it);
     }
 
     // FIXME ??? SIGNE ???
@@ -87,5 +94,4 @@ namespace moves {
     SPDLOG_LOGGER_TRACE("\n - - - - - ====> REJECT - - - - - - - - - - -\n");
     data.dets[color].reject_last_try();
   }
-};
 } // namespace moves

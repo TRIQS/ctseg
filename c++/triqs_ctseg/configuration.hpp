@@ -1,4 +1,5 @@
 #pragma once
+#include <triqs/gfs/gf/gf_const_view.hpp>
 #include <vector>
 #include "params.hpp"
 #include "types.hpp"
@@ -37,16 +38,26 @@ inline bool operator<(segment_t const &s1, segment_t const &s2) { return s1.tau_
 double overlap_seg(segment_t const &seg1, segment_t const &seg2);
 
 // Find index of first segment starting left of seg.tau_c.
-auto find_segment_left(std::vector<segment_t> const &seglist, segment_t const &seg);
+inline auto find_segment_left(std::vector<segment_t> const &seglist, segment_t const &seg) {
+  auto seg_iter = std::upper_bound(seglist.begin(), seglist.end(), seg);
+  return seg_iter--;
+};
 
 // Overlap between segment and a list of segments.
 double overlap(std::vector<segment_t> const &seglist, segment_t const &seg, qmc_time_factory_t const & fac);
 
 // Contribution of the dynamical interaction kernel K to the overlap between a segment and a list of segments.
-double K_overlap(std::vector<segment_t> const &seglist, segment_t const &seg, gf<imtime,scalar_valued> const &K);
+double K_overlap(std::vector<segment_t> const &seglist, segment_t const &seg, gf_const_view<imtime,scalar_valued> const &K);
 
 // Length occupied by all segments for a given color
 double density(std::vector<segment_t> const &seglist);
+
+// Check whether segment is a full line. 
+inline bool is_full_line(segment_t const &seg, qmc_time_factory_t const &fac) {
+  auto qmc_zero = fac.get_lower_pt();
+  auto qmc_beta = fac.get_upper_pt();
+  return seg.tau_cdag == qmc_zero && seg.tau_c == qmc_beta; 
+}
 
 // --------- DEBUG code --------------
 // print config + h5 config
