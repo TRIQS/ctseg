@@ -5,4 +5,3 @@
 #include "./moves/split_segment.hpp"
 #include "./moves/regroup_segment.hpp"
 #include "./moves/move_segment.hpp"
-

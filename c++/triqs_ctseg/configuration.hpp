@@ -23,10 +23,9 @@ struct configuration_t {
   std::vector<std::vector<segment_t>> seglists; // list of segment per color : seglist[color] is ORDERED on tau, with decreasing order.
   std::vector<jperp_line_t> Jperp_list;
 
-  configuration_t(int n_color): seglists(n_color) {}
+  configuration_t(int n_color) : seglists(n_color) {}
 
-  [[nodiscard]] int n_color() const { return seglists.size();}
-
+  [[nodiscard]] int n_color() const { return seglists.size(); }
 };
 
 // ------------------- Functions to manipulate config --------------------------
@@ -44,19 +43,19 @@ inline auto find_segment_left(std::vector<segment_t> const &seglist, segment_t c
 };
 
 // Overlap between segment and a list of segments.
-double overlap(std::vector<segment_t> const &seglist, segment_t const &seg, qmc_time_factory_t const & fac);
+double overlap(std::vector<segment_t> const &seglist, segment_t const &seg, qmc_time_factory_t const &fac);
 
 // Contribution of the dynamical interaction kernel K to the overlap between a segment and a list of segments.
-double K_overlap(std::vector<segment_t> const &seglist, segment_t const &seg, gf_const_view<imtime,scalar_valued> const &K);
+double K_overlap(std::vector<segment_t> const &seglist, segment_t const &seg, gf_const_view<imtime, scalar_valued> const &K);
 
 // Length occupied by all segments for a given color
 double density(std::vector<segment_t> const &seglist);
 
-// Check whether segment is a full line. 
+// Check whether segment is a full line.
 inline bool is_full_line(segment_t const &seg, qmc_time_factory_t const &fac) {
   auto qmc_zero = fac.get_lower_pt();
   auto qmc_beta = fac.get_upper_pt();
-  return seg.tau_cdag == qmc_zero && seg.tau_c == qmc_beta; 
+  return seg.tau_cdag == qmc_zero && seg.tau_c == qmc_beta;
 }
 
 // --------- DEBUG code --------------

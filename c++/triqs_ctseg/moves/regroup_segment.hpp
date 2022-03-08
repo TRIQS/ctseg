@@ -9,7 +9,7 @@ namespace moves {
     configuration_t &config;
     triqs::mc_tools::random_generator &rng;
 
-    // Internal data 
+    // Internal data
     int color{};
     segment_t left_segment;
     segment_t right_segment;
@@ -21,7 +21,7 @@ namespace moves {
     public:
     // Constructor
     regroup_segment(const work_data_t &data_, configuration_t &config_, triqs::mc_tools::random_generator &rng_)
-      : wdata(data_), config(config_), rng(rng_){};
+       : wdata(data_), config(config_), rng(rng_){};
     // ------------------
     double attempt();
     double accept();

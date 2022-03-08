@@ -9,9 +9,7 @@ work_data_t::work_data_t(params_t const &p, inputs_t const &inputs) {
 
   // Number of colors from Green's function structure
   n_color = 0;
-  for (auto const &[bl_name, bl_size] : p.gf_struct) {
-    n_color += bl_size;
-  }
+  for (auto const &[bl_name, bl_size] : p.gf_struct) { n_color += bl_size; }
 
   // Color dependent chemical potential
   mu = nda::zeros<double>(n_color);
@@ -26,7 +24,7 @@ work_data_t::work_data_t(params_t const &p, inputs_t const &inputs) {
   auto U_full = triqs::operators::utils::dict_to_matrix(triqs::operators::utils::extract_U_dict2(p.h_int), p.gf_struct);
   U           = nda::matrix<double>{real(U_full)};
 
-  // Do we have D(tau) and J_perp(tau)? Yes, unless the data is 0 
+  // Do we have D(tau) and J_perp(tau)? Yes, unless the data is 0
   has_Dt    = max_element(abs(inputs.d0t.data())) > 1.e-13;
   has_jperp = max_element(abs(inputs.jperpt.data())) > 1.e-13;
 
@@ -36,27 +34,25 @@ work_data_t::work_data_t(params_t const &p, inputs_t const &inputs) {
 
   if (has_Dt) {
     // Compute interaction kernels K(tau), K'(tau) by integrating D(tau)
-    K = gf<imtime>({beta, Boson, p.n_tau_k}, {n_color, n_color});
-    Kprime = gf<imtime>({beta, Boson, p.n_tau_k}, {n_color, n_color});
-    auto D_data = inputs.d0t.data()(0,0,range());
-    auto first_integral = nda::zeros<dcomplex>(p.n_tau_k);
+    K                    = gf<imtime>({beta, Boson, p.n_tau_k}, {n_color, n_color});
+    Kprime               = gf<imtime>({beta, Boson, p.n_tau_k}, {n_color, n_color});
+    auto D_data          = inputs.d0t.data()(0, 0, range());
+    auto first_integral  = nda::zeros<dcomplex>(p.n_tau_k);
     auto second_integral = nda::zeros<dcomplex>(p.n_tau_k);
-    std::partial_sum(D_data.begin(),D_data.end(),first_integral.begin());
-    std::partial_sum(first_integral.begin(),first_integral.end(),second_integral.begin());
-    first_integral *= beta/(p.n_tau_k-1);
-    second_integral *= (beta/(p.n_tau_k-1))*(beta/(p.n_tau_k-1));
-    Kprime.data()(0,1,range()) = first_integral - second_integral(p.n_tau_k-1)/beta;
-    Kprime.data()(1,0,range()) =  Kprime.data()(0,1,range());
-    auto ramp = nda::zeros<double>(p.n_tau_k); 
-    for (auto n : range(p.n_tau_k)) {
-      ramp(n) = n*beta/(p.n_tau_k-1);
-    }
-    K.data()(0,1,range()) = second_integral - second_integral(0) - ramp*second_integral(p.n_tau_k-1)/beta; 
-    K.data()(1,0,range()) = K.data()(0,1,range());
+    std::partial_sum(D_data.begin(), D_data.end(), first_integral.begin());
+    std::partial_sum(first_integral.begin(), first_integral.end(), second_integral.begin());
+    first_integral *= beta / (p.n_tau_k - 1);
+    second_integral *= (beta / (p.n_tau_k - 1)) * (beta / (p.n_tau_k - 1));
+    Kprime.data()(0, 1, range()) = first_integral - second_integral(p.n_tau_k - 1) / beta;
+    Kprime.data()(1, 0, range()) = Kprime.data()(0, 1, range());
+    auto ramp                    = nda::zeros<double>(p.n_tau_k);
+    for (auto n : range(p.n_tau_k)) { ramp(n) = n * beta / (p.n_tau_k - 1); }
+    K.data()(0, 1, range()) = second_integral - second_integral(0) - ramp * second_integral(p.n_tau_k - 1) / beta;
+    K.data()(1, 0, range()) = K.data()(0, 1, range());
 
     // Renormalize U and mu
-    U -= real(2*Kprime(0));
-    mu += real(Kprime.data()(0,1,0)); // FIXME: true? 
+    U -= real(2 * Kprime(0));
+    mu += real(Kprime.data()(0, 1, 0)); // FIXME: true?
   }
 
   // .............  Determinants .....................
@@ -64,7 +60,7 @@ work_data_t::work_data_t(params_t const &p, inputs_t const &inputs) {
   delta = map([](gf_const_view<imtime> d) { return real(d); }, inputs.delta);
 
   for (auto const &bl : range(delta.size())) {
-    // FIXME : spdlog. Needs communicator? 
+    // FIXME : spdlog. Needs communicator?
     if (!is_gf_real(delta[bl], 1e-10)) {
       std::cerr << "WARNING: The Delta(tau) block number " << bl << " is not real in tau space\n";
       std::cerr << "WARNING: max(Im[Delta(tau)]) = " << max_element(abs(imag(delta[bl].data()))) << "\n";

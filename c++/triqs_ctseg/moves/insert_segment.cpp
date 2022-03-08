@@ -4,38 +4,38 @@ namespace moves {
 
   double insert_segment::attempt() {
 
-    SPDLOG_LOGGER_TRACE("\n =================== ATTEMPT INSERT ================ \n",void);
+    SPDLOG_LOGGER_TRACE("\n =================== ATTEMPT INSERT ================ \n", void);
 
     // ------------ Choice of segment --------------
 
     // Select insertion color
-    color = rng(wdata.n_color);
-    auto &sl       = config.seglists[color];
+    color    = rng(wdata.n_color);
+    auto &sl = config.seglists[color];
     SPDLOG_LOGGER_TRACE("Inserting at color {}", color);
 
     // Select insertion window [tau1,tau2] (defaults to [beta,0])
-    auto qmc_beta = time_point_factory.get_upper_pt();
-    auto qmc_zero = time_point_factory.get_lower_pt();
-    qmc_time_t tau1 = qmc_beta;
-    qmc_time_t tau2 = qmc_zero;
+    auto qmc_beta        = time_point_factory.get_upper_pt();
+    auto qmc_zero        = time_point_factory.get_lower_pt();
+    qmc_time_t tau1      = qmc_beta;
+    qmc_time_t tau2      = qmc_zero;
     bool config_is_empty = sl.empty();
     if (not config_is_empty) {
       // Randomly choose one existing segment
-      long ind_segment = rng(sl.size());
+      long ind_segment     = rng(sl.size());
       tau1                 = sl[ind_segment].tau_cdag; // tau1 is cdag of this segment
       bool is_last_segment = ind_segment == sl.size() - 1;
       tau2                 = sl[is_last_segment ? 0 : ind_segment + 1].tau_c; // tau2 is c of next segment, possibly cyclic
-      if (tau2 - tau1 == qmc_beta) return 0; // If segment is a full line, cannot insert 
+      if (tau2 - tau1 == qmc_beta) return 0;                                  // If segment is a full line, cannot insert
     }
 
     // Choose new segment within insertion window
-    qmc_time_t l   = tau1 - tau2;
-    auto dt1 = time_point_factory.get_random_pt(rng,qmc_zero,l);
-    auto dt2 = time_point_factory.get_random_pt(rng,qmc_zero,l);
+    qmc_time_t l = tau1 - tau2;
+    auto dt1     = time_point_factory.get_random_pt(rng, qmc_zero, l);
+    auto dt2     = time_point_factory.get_random_pt(rng, qmc_zero, l);
     if (dt1 == dt2) return 0;
     if (dt1 > dt2) std::swap(dt1, dt2);
-    proposed_segment = segment_t{tau1 - dt1, tau1 - dt2};
-    auto proposed_segment_length = double(proposed_segment.tau_c-proposed_segment.tau_cdag);
+    proposed_segment             = segment_t{tau1 - dt1, tau1 - dt2};
+    auto proposed_segment_length = double(proposed_segment.tau_c - proposed_segment.tau_cdag);
     // The index of the segment if it is inserted in the list of segments.
     proposed_segment_insert_pos = std::upper_bound(sl.begin(), sl.end(), proposed_segment);
 
@@ -45,9 +45,11 @@ namespace moves {
     double ln_trace_ratio = 0;
     for (auto c : range(wdata.n_color)) {
       if (c != color) {
-        ln_trace_ratio += -wdata.U(color,c)*overlap(config.seglists[c],proposed_segment,time_point_factory);
-        ln_trace_ratio += wdata.mu(c)*proposed_segment_length;
-        if (wdata.has_Dt) ln_trace_ratio += K_overlap(config.seglists[c],proposed_segment,slice_target_to_scalar(wdata.K,color,c)); // FIXME. Is the syntax right for slice????
+        ln_trace_ratio += -wdata.U(color, c) * overlap(config.seglists[c], proposed_segment, time_point_factory);
+        ln_trace_ratio += wdata.mu(c) * proposed_segment_length;
+        if (wdata.has_Dt)
+          ln_trace_ratio +=
+             K_overlap(config.seglists[c], proposed_segment, slice_target_to_scalar(wdata.K, color, c)); // FIXME. Is the syntax right for slice????
       }
     }
     double trace_ratio = std::exp(ln_trace_ratio);
@@ -65,8 +67,8 @@ namespace moves {
 
     // ------------  Proposition ratio ------------
 
-    double current_number_segments = std::max(int(sl.size()),1);
-    double future_number_segments = double(sl.size()) + 1; 
+    double current_number_segments = std::max(int(sl.size()), 1);
+    double future_number_segments  = double(sl.size()) + 1;
     double prop_ratio              = future_number_segments / (current_number_segments * l * l);
 
     SPDLOG_LOGGER_TRACE("trace_ratio  = {}, prop_ratio = {}, det_ratio = {}", trace_ratio, prop_ratio, det_ratio);
@@ -78,7 +80,7 @@ namespace moves {
 
   double insert_segment::accept() {
 
-    SPDLOG_LOGGER_TRACE("\n - - - - - ====> ACCEPT - - - - - - - - - - -\n",void);
+    SPDLOG_LOGGER_TRACE("\n - - - - - ====> ACCEPT - - - - - - - - - - -\n", void);
 
     //data.dets[color].complete_operation();
     // Insert the segment in an ordered list
@@ -96,7 +98,7 @@ namespace moves {
 
   //--------------------------------------------------
   void insert_segment::reject() {
-    SPDLOG_LOGGER_TRACE("\n - - - - - ====> REJECT - - - - - - - - - - -\n",void);
+    SPDLOG_LOGGER_TRACE("\n - - - - - ====> REJECT - - - - - - - - - - -\n", void);
     //data.dets[color].reject_last_try();
 
     // SPDLOG_LOGGER_TRACE("Configuration {}", config);

@@ -27,10 +27,10 @@ namespace measures {
 
     configuration_t const &config;
     nda::array<double, 1> &densities;
-    
+
     double Z;
 
-    density(configuration_t const &config, results_t & results);
+    density(configuration_t const &config, results_t &results);
 
     void accumulate(double s);
     void collect_results(mpi::communicator const &c);

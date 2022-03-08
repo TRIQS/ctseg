@@ -29,7 +29,6 @@
 //#include "block_matrix.hpp"
 //#include <triqs/mesh.hpp>
 
-
 /// Main solver class
 class solver_core {
 
@@ -43,7 +42,7 @@ class solver_core {
 
   //
   inputs_t inputs;
-  
+
   // The set of results. Will be passed to measure and init by them
   results_t results;
 
