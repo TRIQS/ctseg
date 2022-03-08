@@ -6,6 +6,9 @@ namespace moves {
 
     SPDLOG_LOGGER_TRACE("\n =================== ATTEMPT INSERT ================ \n", void);
 
+    auto qmc_beta        = time_point_factory.get_upper_pt();
+    auto qmc_zero        = time_point_factory.get_lower_pt();
+    
     // ------------ Choice of segment --------------
 
     // Select insertion color
@@ -14,8 +17,6 @@ namespace moves {
     SPDLOG_LOGGER_TRACE("Inserting at color {}", color);
 
     // Select insertion window [tau1,tau2] (defaults to [beta,0])
-    auto qmc_beta        = time_point_factory.get_upper_pt();
-    auto qmc_zero        = time_point_factory.get_lower_pt();
     qmc_time_t tau1      = qmc_beta;
     qmc_time_t tau2      = qmc_zero;
     bool config_is_empty = sl.empty();
@@ -35,9 +36,9 @@ namespace moves {
     if (dt1 == dt2) return 0;
     if (dt1 > dt2) std::swap(dt1, dt2);
     proposed_segment             = segment_t{tau1 - dt1, tau1 - dt2};
-    auto proposed_segment_length = double(proposed_segment.tau_c - proposed_segment.tau_cdag);
+    auto proposed_segment_length = double(proposed_segment.tau_c - proposed_segment.tau_cdag); // can be cyclic.
     // The index of the segment if it is inserted in the list of segments.
-    proposed_segment_insert_pos = std::upper_bound(sl.begin(), sl.end(), proposed_segment);
+    proposed_segment_insert_it = std::upper_bound(sl.begin(), sl.end(), proposed_segment);
 
     SPDLOG_LOGGER_TRACE("Inserting c at{}, cdag at {}", proposed_segment.tau_c, proposed_segment.tau_cdag);
 
@@ -60,10 +61,9 @@ namespace moves {
     // Returns the ratio of dets (Cf det_manip doc).
     // pos is the index of the new segment, if inserted in the list.
     // FIXME : std::distance of an empoty?
-    //long pos  = (config_is_empty ? 0 : std::distance(proposed_segment_insert_pos, V.begin()));
-    //long pos  = std::distance(proposed_segment_insert_pos, sl.begin());
-    double det_ratio = 0;
-    //auto det_ratio = dets[color].try_insert(pos, pos, {proposed_segment.tau_c, 0}, {proposed_segment.tau_cdag, 0});
+    //long pos  = (config_is_empty ? 0 : std::distance(proposed_segment_insert_it, V.begin()));
+    long pos  = std::distance(proposed_segment_insert_it, sl.begin());
+    auto det_ratio = wdata.dets[color].try_insert(pos, pos, {proposed_segment.tau_cdag, 0}, {proposed_segment.tau_c, 0});
 
     // ------------  Proposition ratio ------------
 
@@ -82,9 +82,9 @@ namespace moves {
 
     SPDLOG_LOGGER_TRACE("\n - - - - - ====> ACCEPT - - - - - - - - - - -\n", void);
 
-    //data.dets[color].complete_operation();
+    wdata.dets[color].complete_operation();
     // Insert the segment in an ordered list
-    config.seglists[color].insert(proposed_segment_insert_pos, proposed_segment);
+    config.seglists[color].insert(proposed_segment_insert_it, proposed_segment);
 
     // FIXME ??? SIGNE ???
     double sign_ratio = 1; // ???config->trace.complete_insert_segment();
@@ -99,7 +99,7 @@ namespace moves {
   //--------------------------------------------------
   void insert_segment::reject() {
     SPDLOG_LOGGER_TRACE("\n - - - - - ====> REJECT - - - - - - - - - - -\n", void);
-    //data.dets[color].reject_last_try();
+    wdata.dets[color].reject_last_try();
 
     // SPDLOG_LOGGER_TRACE("Configuration {}", config);
     // Check invariant ??

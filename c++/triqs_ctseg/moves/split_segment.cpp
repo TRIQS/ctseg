@@ -16,8 +16,8 @@ namespace moves {
     if (sl.empty()) return 0;
 
     // Select segment to split
-    proposed_segment_index = rng(sl.size());
-    proposed_segment       = sl[proposed_segment_index];
+    proposed_segment_idx = rng(sl.size());
+    proposed_segment     = sl[proposed_segment_idx];
     // Select splitting points (tau_left,tau_right)
     auto qmc_zero  = time_point_factory.get_lower_pt();
     qmc_time_t l   = proposed_segment.tau_c - proposed_segment.tau_cdag;
@@ -49,8 +49,10 @@ namespace moves {
 
     // ------------  Det ratio  ---------------
 
-    // FIXME
-    double det_ratio = 0;
+    // FIXME EXPLAIN
+    // FIXME Full line ... 
+    auto det_ratio =
+       wdata.dets[color].try_insert(proposed_segment_idx, proposed_segment_idx + 1, {tau_left, 0}, {tau_right, 0});
 
     // ------------  Proposition ratio ------------
 
@@ -69,18 +71,18 @@ namespace moves {
 
     SPDLOG_LOGGER_TRACE("\n - - - - - ====> ACCEPT - - - - - - - - - - -\n", void);
 
-    //data.dets[color].complete_operation();
+    data.dets[color].complete_operation();
     // Split the segment
     auto &sl = config.seglists[color];
     if (is_full_line(proposed_segment, time_point_factory)) {
-      auto new_segment           = segment_t{tau_right, tau_left};
-      sl[proposed_segment_index] = new_segment;
+      auto new_segment         = segment_t{tau_right, tau_left};
+      sl[proposed_segment_idx] = new_segment;
     } else {
       auto new_segment_left    = segment_t{proposed_segment.tau_c, tau_left};
       auto new_segment_right   = segment_t{tau_right, proposed_segment.tau_cdag};
-      auto proposed_segment_it = std::next(sl.begin(), proposed_segment_index);
+      auto proposed_segment_it = std::next(sl.begin(), proposed_segment_idx);
       sl.insert(proposed_segment_it, new_segment_left);
-      sl[proposed_segment_index + 1] = new_segment_right;
+      sl[proposed_segment_idx + 1] = new_segment_right;
     }
 
     // FIXME ??? SIGNE ???
@@ -91,6 +93,6 @@ namespace moves {
   //--------------------------------------------------
   void split_segment::reject() {
     SPDLOG_LOGGER_TRACE("\n - - - - - ====> REJECT - - - - - - - - - - -\n", void);
-    //data.dets[color].reject_last_try();
+    data.dets[color].reject_last_try();
   }
 }; // namespace moves

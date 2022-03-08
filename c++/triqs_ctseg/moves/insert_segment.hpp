@@ -11,11 +11,10 @@ namespace moves {
     // Internal data
     int color = 0;
     segment_t proposed_segment;
-    std::vector<segment_t>::iterator proposed_segment_insert_pos;
+    std::vector<segment_t>::iterator proposed_segment_insert_it;
     qmc_time_factory_t time_point_factory = qmc_time_factory_t{wdata.beta};
 
     public:
-    // Constructor
     insert_segment(const work_data_t &data_, configuration_t &config_, triqs::mc_tools::random_generator &rng_)
        : wdata(data_), config(config_), rng(rng_){};
     // ------------------

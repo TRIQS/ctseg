@@ -4,6 +4,8 @@ namespace moves {
   double remove_segment::attempt() {
 
     SPDLOG_LOGGER_TRACE("\n =================== ATTEMPT REMOVE ================ \n", void);
+    auto const qmc_beta          = time_point_factory.get_upper_pt();
+    auto const qmc_zero          = time_point_factory.get_lower_pt();
 
     // ------------ Choice of segment --------------
 
@@ -18,9 +20,7 @@ namespace moves {
     // Select segment to remove
     proposed_segment_index = rng(sl.size());
     proposed_segment       = sl[proposed_segment_index];
-    auto qmc_beta          = time_point_factory.get_upper_pt();
-    auto qmc_zero          = time_point_factory.get_lower_pt();
-    if (proposed_segment.tau_c == qmc_beta && proposed_segment.tau_cdag == qmc_zero) return 0; // If segment is a full line do not remove
+    if (proposed_segment.tau_c == qmc_beta and proposed_segment.tau_cdag == qmc_zero) return 0; // If segment is a full line do not remove
     auto proposed_segment_length = double(proposed_segment.tau_c - proposed_segment.tau_cdag);
 
     SPDLOG_LOGGER_TRACE("Removing c at{}, cdag at {}", proposed_segment.tau_c, proposed_segment.tau_cdag);
@@ -40,9 +40,8 @@ namespace moves {
 
     // ------------  Det ratio  ---------------
 
-    // FIXME
-    double det_ratio = 0;
-
+    auto det_ratio = wdata.dets[color].try_remove(proposed_segment_index, proposed_segment_index);
+    
     // ------------  Proposition ratio ------------
 
     double current_number_segments = sl.size();
@@ -71,7 +70,7 @@ namespace moves {
 
     SPDLOG_LOGGER_TRACE("\n - - - - - ====> ACCEPT - - - - - - - - - - -\n", void);
 
-    //data.dets[color].complete_operation();
+    wdata.dets[color].complete_operation();
     // Remove the segment
     auto &sl                 = config.seglists[color];
     auto proposed_segment_it = std::next(sl.begin(), proposed_segment_index);
@@ -85,6 +84,6 @@ namespace moves {
   //--------------------------------------------------
   void remove_segment::reject() {
     SPDLOG_LOGGER_TRACE("\n - - - - - ====> REJECT - - - - - - - - - - -\n", void);
-    //data.dets[color].reject_last_try();
+    wdata.dets[color].reject_last_try();
   }
 } // namespace moves
