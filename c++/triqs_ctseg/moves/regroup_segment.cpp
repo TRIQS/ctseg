@@ -70,7 +70,7 @@ namespace moves {
 
     SPDLOG_LOGGER_TRACE("\n - - - - - ====> ACCEPT - - - - - - - - - - -\n", void);
 
-    data.dets[color].complete_operation();
+    wdata.dets[color].complete_operation();
     // Regroup segments
     auto &sl = config.seglists[color];
     if (making_full_line) {
@@ -93,6 +93,6 @@ namespace moves {
   //--------------------------------------------------
   void regroup_segment::reject() {
     SPDLOG_LOGGER_TRACE("\n - - - - - ====> REJECT - - - - - - - - - - -\n", void);
-    data.dets[color].reject_last_try();
+    wdata.dets[color].reject_last_try();
   }
 } // namespace moves

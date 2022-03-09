@@ -71,7 +71,7 @@ namespace moves {
 
     SPDLOG_LOGGER_TRACE("\n - - - - - ====> ACCEPT - - - - - - - - - - -\n", void);
 
-    data.dets[color].complete_operation();
+    wdata.dets[color].complete_operation();
     // Split the segment
     auto &sl = config.seglists[color];
     if (is_full_line(proposed_segment, time_point_factory)) {
@@ -93,6 +93,6 @@ namespace moves {
   //--------------------------------------------------
   void split_segment::reject() {
     SPDLOG_LOGGER_TRACE("\n - - - - - ====> REJECT - - - - - - - - - - -\n", void);
-    data.dets[color].reject_last_try();
+    wdata.dets[color].reject_last_try();
   }
 }; // namespace moves
