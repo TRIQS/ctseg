@@ -1,4 +1,4 @@
-#bpragma once
+#pragma once
 #include "../work_data.hpp"
 #include "../configuration.hpp"
 
