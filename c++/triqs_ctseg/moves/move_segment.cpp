@@ -2,6 +2,8 @@
 
 namespace moves {
 
+  // FIXME WHY HERE ??
+  // return positivie : do_overlap ?
   // Checks if two segments overlap (even just at their boundaries)
   bool move_segment::no_overlap(segment_t seg1, segment_t seg2) {
     if (seg1.tau_c >= seg2.tau_cdag && seg1.tau_c <= seg2.tau_c) return false;
@@ -9,6 +11,10 @@ namespace moves {
     return true;
   }
 
+  // -------------------------------
+
+  // FIXME : why fac ? the class has time_point_factory ?
+  // 
   // Checks if a segment is movable to a color
   bool move_segment::is_movable(std::vector<segment_t> const &seglist, segment_t const &seg, qmc_time_factory_t fac) {
     bool result = true;
@@ -31,6 +37,8 @@ namespace moves {
     }
     return result;
   }
+
+  // -------------------------------
 
   double move_segment::attempt() {
 
