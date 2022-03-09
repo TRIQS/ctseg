@@ -19,84 +19,61 @@
  ******************************************************************************/
 #include "./measure_gt.hpp"
 
-namespace triqs_ctseg {
+namespace measures {
 
-  measure_gt::measure_gt(const qmc_parameters *params_, const configuration *config_, std::shared_ptr<precompute_fprefactor> fprefactor_,
-                         block_gf<imtime> &gt_, block_gf<imtime> &ft_)
-     : params(params_),
-       config(config_),
-       fprefactor(fprefactor_),
-       gt(gt_),
-       ft(ft_),
-       beta(params->beta),
-       gt_stack(),
-       Z_stack(),
-       counter(0),
-       accum(0.0),
-       Noverbeta(1.0 / gt[0].mesh().delta()) {
+  measure_g_f_tau::measure_g_f_tau(params_t const &p, work_data_t const &wdata, configuration_t const &config, results_t &results)
+     : wdata{wdata}, config{config}, results{results} {
 
- /// FIXME : clean + fix ref + resize .. + metttr 0.
+    beta = p.beta;
 
+    // init g_tau
+    auto g_init = block_gf<imtime>{triqs::mesh::imtime{beta, Fermion, p.n_tau}, p.gf_struct};
+    g_init()    = 0;
 
-    Z = 0;
-    for (int i = 0; i < gt.size(); i++) gt[i]() = 0;
-    for (int i = 0; i < ft.size(); i++) ft[i]() = 0;
+    if (p.measure_gt) g_tau = g_init;
+    if (p.measure_ft) f_tau = g_init;
+    // otherwise f/g_tau stays empty ...
   }
 
-  // --------------------------------------------------------
+  // -------------------------------------
 
-  void measure_gt::accumulate(double s) {
+  void measure_g_f_tau::accumulate(double s) {
     Z += s;
-    counter += 1;
 
-    accum              = 0.0;
-    auto closest_index = [this](auto p) {
-      double x = double(p.value) + 0.5 * gt[0].mesh().delta();
-      int n    = std::floor(x / gt[0].mesh().delta());
-      return n;
+    for (auto [bl_idx, det] : itertools::enumerate(wdata.dets)) {
+      foreach (det, [s, &g = g_tau[bl_idx]](auto const &x, auto const &y, auto const &M) {
+        // beta-periodicity is implicit in the argument, just fix the sign properly
+        auto val  = (y.first >= x.first ? s : -s) * M;
+        auto dtau = double(y.first - x.first);
+        g[closest_mesh_pt(dtau)](y.second, x.second) += val;
+      })
+        ;
+
+    // Fix me F.
+    // FIXME : 2 measure : g or f ? Only difference is ???
+    // Would simplify !!!!
+    }
+  }
+
+  // -------------------------------------
+
+  void measure_g_f_tau::collect_results(mpi::communicator const &c) {
+
+    Z = mpi::all_reduce(Z, c);
+
+    auto reduce_g = [this, c](auto &g) {
+      g = mpi::all_reduce(g, c);
+      g = g / (-this->beta * this->Z * g[0].mesh().delta());
+      // Fix the point at zero and beta, for each block
+      for (auto &g_bl : g) {
+        g_bl[0] *= 2;
+        g_bl[g_bl.mesh().size() - 1] *= 2;
+      }
+      return g;
     };
-    // loop over species and times of operators
-    for (int block = 0; block < gt.size(); block++) {
-      for (int j = 0; j < config->det(block).size(); j++) {
-        double f_pref;
-        auto y = config->det(block).get_y(j);
-        if (params->measure_ft) f_pref = fprefactor->get(std::get<2>(y), std::get<0>(y));
-        for (int i = 0; i < config->det(block).size(); i++) {
-          auto [tau_x, x_inner, x_col] = config->det(block).get_x(i);
-          auto [tau_y, y_inner, y_col] = config->det(block).get_y(j);
-          double tau                   = double(tau_y - tau_x);
-          int st                       = (tau_y >= tau_x) ? 1 : -1;
-          double meas                  = s * config->det(block).inverse_matrix(j, i);
-          gt[block][closest_mesh_pt(tau)](x_inner, y_inner) += st * meas;
-          if (block == 0 and x_inner == 0 and y_inner == 0 and closest_index(closest_mesh_pt(tau)) == 0) accum += st * meas;
-          if (params->measure_ft) ft[block][closest_mesh_pt(tau)](x_inner, y_inner) += st * meas * f_pref;
-        }
-      }
-    }
-    gt_stack << accum / (-beta * 1. / Noverbeta);
-    Z_stack << s;
+
+    // store the result (not reused later, hence we can move it).
+    if (g_tau.size() != 0) results.g_tau = reduce_g(g_tau);
+    if (f_tau.size() != 0) results.f_tau = reduce_g(f_tau);
   }
-
-  // --------------------------------------------------------
-
-  void measure_gt::collect_results(mpi::communicator const &c) {
-
-    Z  = mpi::all_reduce(Z, c);
-    gt = mpi::all_reduce(gt, c);
-    gt = gt / (-beta * Z / Noverbeta);
-    for (int k = 0; k < gt.size(); k++) {
-      gt[k][0] *= 2;
-      gt[k][gt[k].mesh().size() - 1] *= 2;
-    }
-
-    if (params->measure_ft) {
-      ft = mpi::all_reduce(ft, c);
-      ft = ft / (-beta * Z / Noverbeta);
-      for (int k = 0; k < ft.size(); k++) {
-        ft[k][0] *= 2;
-        ft[k][ft[k].mesh().size() - 1] *= 2;
-      }
-    }
-  }
-
-} // namespace triqs_ctseg
+} // namespace measures
