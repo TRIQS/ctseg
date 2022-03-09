@@ -23,4 +23,4 @@ namespace moves {
     double accept();
     void reject();
   };
-}; / namespace moves
+}; // namespace moves

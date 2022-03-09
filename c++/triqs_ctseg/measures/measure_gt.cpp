@@ -26,13 +26,8 @@ namespace measures {
 
     beta = p.beta;
 
-    // init g_tau
-    auto g_init = block_gf<imtime>{triqs::mesh::imtime{beta, Fermion, p.n_tau}, p.gf_struct};
-    g_init()    = 0;
-
-    if (p.measure_gt) g_tau = g_init;
-    if (p.measure_ft) f_tau = g_init;
-    // otherwise f/g_tau stays empty ...
+    g_tau = block_gf<imtime>{triqs::mesh::imtime{beta, Fermion, p.n_tau}, p.gf_struct};
+    g_tau()    = 0;
   }
 
   // -------------------------------------
@@ -49,9 +44,7 @@ namespace measures {
       })
         ;
 
-    // Fix me F.
-    // FIXME : 2 measure : g or f ? Only difference is ???
-    // Would simplify !!!!
+      // FIXME  F.
     }
   }
 
@@ -61,19 +54,16 @@ namespace measures {
 
     Z = mpi::all_reduce(Z, c);
 
-    auto reduce_g = [this, c](auto &g) {
-      g = mpi::all_reduce(g, c);
-      g = g / (-this->beta * this->Z * g[0].mesh().delta());
-      // Fix the point at zero and beta, for each block
-      for (auto &g_bl : g) {
-        g_bl[0] *= 2;
-        g_bl[g_bl.mesh().size() - 1] *= 2;
-      }
-      return g;
-    };
+    g_tau = mpi::all_reduce(g_tau, c);
+    g_tau = g_tau / (-beta * Z * g_tau[0].mesh().delta());
+
+    // Fix the point at zero and beta, for each block
+    for (auto &g : g_tau) {
+      g[0] *= 2;
+      g[g.mesh().size() - 1] *= 2;
+    }
 
     // store the result (not reused later, hence we can move it).
-    if (g_tau.size() != 0) results.g_tau = reduce_g(g_tau);
-    if (f_tau.size() != 0) results.f_tau = reduce_g(f_tau);
+    results.g_tau = std::move(g_tau);
   }
 } // namespace measures

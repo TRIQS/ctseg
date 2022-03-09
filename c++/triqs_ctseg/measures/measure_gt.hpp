@@ -35,7 +35,7 @@ namespace measures {
     results_t & results;
     double beta;
 
-    block_gf<imtime> g_tau, f_tau;
+    block_gf<imtime> g_tau;
 
     
     // The prefactor of integrals
