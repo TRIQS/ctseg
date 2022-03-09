@@ -25,32 +25,21 @@
 
 namespace measures {
 
-  //using namespace triqs::gfs;
-  //using namespace triqs::mesh;
-
   struct measure_g_f_tau {
 
     work_data_t const &wdata;
     configuration_t const &config;
-    results_t & results;
+    results_t &results;
     double beta;
 
     block_gf<imtime> g_tau;
 
-    
     // The prefactor of integrals
     //std::shared_ptr<precompute_fprefactor> fprefactor;
 
     double Z;
 
-    // double beta, Noverbeta, Z;
-
-    //accumulator<double> gt_stack = {0.0, -1, -1};
-    //accumulator<double> Z_stack  = {0.0, -1, -1};
-    //int counter;
-    //double accum;
-
-    measure_g_f_tau(params_t const & params, work_data_t const &wdata, configuration_t const &config, results_t &results);
+    measure_g_f_tau(params_t const &params, work_data_t const &wdata, configuration_t const &config, results_t &results);
 
     void accumulate(double s);
     void collect_results(mpi::communicator const &c);
