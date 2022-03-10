@@ -157,7 +157,8 @@ void solver_core::solve(solve_params_t const &solve_params) {
 #endif
 
   // Run and collect results
-  auto _solve_status = CTQMC.warmup_and_accumulate(p.n_warmup_cycles, p.n_cycles, p.length_cycle, triqs::utility::clock_callback(p.max_time));
+  auto _solve_status = CTQMC.warmup_and_accumulate(p.n_warmup_cycles, p.n_cycles, p.length_cycle,
+                                                   triqs::utility::clock_callback(p.max_time));
   CTQMC.collect_results(c);
 
 }; // solve

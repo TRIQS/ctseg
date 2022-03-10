@@ -23,12 +23,14 @@ namespace moves {
     auto qmc_zero = fac.get_lower_pt();
     auto qmc_beta = fac.get_upper_pt();
     if (seg.tau_c < seg.tau_cdag)
-      return is_movable(seglist, segment_t{qmc_beta, seg.tau_cdag}, fac) && is_movable(seglist, segment_t{seg.tau_c, qmc_zero}, fac);
+      return is_movable(seglist, segment_t{qmc_beta, seg.tau_cdag}, fac)
+         && is_movable(seglist, segment_t{seg.tau_c, qmc_zero}, fac);
     // Isolate last segment
     segment_t last_seg = seglist.back();
     // In case last segment is cyclic, split it and check its overlap with seg
     if (last_seg.tau_c < last_seg.tau_cdag) {
-      result = result && no_overlap(seg, segment_t{qmc_beta, last_seg.tau_cdag}) && no_overlap(seg, segment_t{last_seg.tau_c, qmc_zero});
+      result = result && no_overlap(seg, segment_t{qmc_beta, last_seg.tau_cdag})
+         && no_overlap(seg, segment_t{last_seg.tau_c, qmc_zero});
     } else
       result = result && no_overlap(seg, last_seg);
     // Check overlap of seg with the remainder of seglist
@@ -80,7 +82,8 @@ namespace moves {
     long dest_index = std::distance(destination_it, dsl.begin());
     // We insert tau_cdag as a line (first index) and tau_c as a column (second index). The index always corresponds to the
     // segment the tau_c/tau_cdag belongs to.
-    auto det_ratio = wdata.dets[destination_color].try_insert(dest_index, dest_index, {origin_segment.tau_cdag, 0}, {origin_segment.tau_c, 0})
+    auto det_ratio = wdata.dets[destination_color].try_insert(dest_index, dest_index, {origin_segment.tau_cdag, 0},
+                                                              {origin_segment.tau_c, 0})
        * wdata.dets[origin_color].try_remove(origin_index, origin_index);
 
     // ------------  Proposition ratio ------------

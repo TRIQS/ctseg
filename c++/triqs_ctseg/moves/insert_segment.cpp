@@ -25,8 +25,8 @@ namespace moves {
       long ind_segment     = rng(sl.size());
       tau1                 = sl[ind_segment].tau_cdag; // tau1 is cdag of this segment
       bool is_last_segment = ind_segment == sl.size() - 1;
-      tau2                 = sl[is_last_segment ? 0 : ind_segment + 1].tau_c; // tau2 is c of next segment, possibly cyclic
-      if (tau2 == qmc_beta and tau1 == qmc_zero) return 0;                    // If segment is a full line, cannot insert
+      tau2 = sl[is_last_segment ? 0 : ind_segment + 1].tau_c; // tau2 is c of next segment, possibly cyclic
+      if (tau2 == qmc_beta and tau1 == qmc_zero) return 0;    // If segment is a full line, cannot insert
     }
 
     // Choose new segment within insertion window
@@ -48,7 +48,8 @@ namespace moves {
       if (c != color) {
         ln_trace_ratio += -wdata.U(color, c) * overlap(config.seglists[c], proposed_segment, time_point_factory);
         ln_trace_ratio += wdata.mu(c) * proposed_segment_length;
-        if (wdata.has_Dt) ln_trace_ratio += K_overlap(config.seglists[c], proposed_segment, slice_target_to_scalar(wdata.K, color, c));
+        if (wdata.has_Dt)
+          ln_trace_ratio += K_overlap(config.seglists[c], proposed_segment, slice_target_to_scalar(wdata.K, color, c));
       }
     }
     double trace_ratio = std::exp(ln_trace_ratio);
@@ -58,13 +59,15 @@ namespace moves {
     long pos = std::distance(proposed_segment_insert_it, sl.begin());
     // We insert tau_cdag as a line (first index) and tau_c as a column (second index). The index always corresponds to the
     // segment the tau_c/tau_cdag belongs to.
-    auto det_ratio = wdata.dets[color].try_insert(pos, pos, {proposed_segment.tau_cdag, 0}, {proposed_segment.tau_c, 0});
+    auto det_ratio =
+       wdata.dets[color].try_insert(pos, pos, {proposed_segment.tau_cdag, 0}, {proposed_segment.tau_c, 0});
 
     // ------------  Proposition ratio ------------
 
-    double current_number_intervals = config_is_empty ? 2 : double(sl.size()); // Account for absence of time swapping when inserting into empty line.
-    double future_number_segments   = double(sl.size()) + 1;
-    double prop_ratio               = future_number_segments / (current_number_intervals * l * l / 2);
+    double current_number_intervals =
+       config_is_empty ? 2 : double(sl.size()); // Account for absence of time swapping when inserting into empty line.
+    double future_number_segments = double(sl.size()) + 1;
+    double prop_ratio             = future_number_segments / (current_number_intervals * l * l / 2);
 
     SPDLOG_LOGGER_TRACE("trace_ratio  = {}, prop_ratio = {}, det_ratio = {}", trace_ratio, prop_ratio, det_ratio);
 

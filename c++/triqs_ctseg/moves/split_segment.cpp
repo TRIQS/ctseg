@@ -26,7 +26,8 @@ namespace moves {
     if (dt1 == dt2) return 0;
     if (dt1 == qmc_zero || dt2 == qmc_zero || dt1 == l || dt2 == l) return 0;
     full_line = is_full_line(proposed_segment, time_point_factory);
-    if (dt1 > dt2 && !full_line) std::swap(dt1, dt2);           // If splitting a full line, the order of tau_left and tau_right is not fixed
+    if (dt1 > dt2 && !full_line)
+      std::swap(dt1, dt2); // If splitting a full line, the order of tau_left and tau_right is not fixed
     tau_left                    = proposed_segment.tau_c - dt1; // dt1 < dt2
     tau_right                   = proposed_segment.tau_c - dt2;
     auto removed_segment        = segment_t{tau_left, tau_right}; // "antisegment" : careful with order of c, cdag
@@ -42,7 +43,8 @@ namespace moves {
       if (c != color) {
         ln_trace_ratio -= -wdata.U(color, c) * overlap(config.seglists[c], removed_segment, time_point_factory);
         ln_trace_ratio -= wdata.mu(c) * removed_segment_length;
-        if (wdata.has_Dt) ln_trace_ratio -= K_overlap(config.seglists[c], removed_segment, slice_target_to_scalar(wdata.K, color, c));
+        if (wdata.has_Dt)
+          ln_trace_ratio -= K_overlap(config.seglists[c], removed_segment, slice_target_to_scalar(wdata.K, color, c));
       }
     }
     double trace_ratio = std::exp(ln_trace_ratio);
@@ -53,11 +55,13 @@ namespace moves {
      segment the tau_c/tau_cdag belongs to. Here, the cdag is always inserted at the position of the segment we are splitting.
      The c insertion position depends on whether we are splitting a full line and whether the cut out segment is cyclic, computed 
      in right_segment_idx. */
-    auto det_ratio = wdata.dets[color].try_insert(proposed_segment_idx, right_segment_idx, {tau_left, 0}, {tau_right, 0});
+    auto det_ratio =
+       wdata.dets[color].try_insert(proposed_segment_idx, right_segment_idx, {tau_left, 0}, {tau_right, 0});
 
     // ------------  Proposition ratio ------------
 
-    double current_number_segments = full_line ? 2 : int(sl.size()); // Account for the two ways of splitting a full line
+    double current_number_segments =
+       full_line ? 2 : int(sl.size()); // Account for the two ways of splitting a full line
     double future_number_intervals = full_line ? 1 : int(sl.size()) + 1;
     double prop_ratio              = (future_number_intervals) / (current_number_segments * l * l);
 
