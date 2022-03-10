@@ -14,8 +14,9 @@ struct delta_block_adaptor {
   double operator()(std::pair<qmc_time_t, int> const &x, std::pair<qmc_time_t, int> const &y) const {
     //det_scalar_t res = delta[closest_mesh_pt(double(x.first - y.first))](x.second, y.second);
     double res = delta(double(x.first - y.first))(x.second, y.second);
-    return (x.first >= y.first ? res : -res); // x,y first are time_pt, wrapping is automatic in the - operation, but need to
-                                              // compute the sign
+    return (x.first >= y.first ? res :
+                                 -res); // x,y first are time_pt, wrapping is automatic in the - operation, but need to
+                                        // compute the sign
   }
 };
 

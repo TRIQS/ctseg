@@ -21,13 +21,15 @@
 #define LOG(...) SPDLOG_TRACE(__VA_ARGS__)
 
 // checked always, even in production
-#define ALWAYS_EXPECTS(Condition, ErrorMessage, ...)                                                                                                 \
-  if (not(Condition)) {                                                                                                                              \
-    SPDLOG_CRITICAL(ErrorMessage, __VA_ARGS__);                                                                                                      \
-    throw std::runtime_error("Assertion Error, cf log");                                                                                             \
+#define ALWAYS_EXPECTS(Condition, ErrorMessage, ...)                                                                   \
+  if (not(Condition)) {                                                                                                \
+    SPDLOG_CRITICAL(ErrorMessage, __VA_ARGS__);                                                                        \
+    throw std::runtime_error("Assertion Error, cf log");                                                               \
   }
 
 // FIXME
+#define EXT_DEBUG
+
 
 using namespace triqs::gfs;
 using namespace triqs::mesh;

@@ -26,13 +26,14 @@ namespace moves {
     if (dt1 == dt2) return 0;
     if (dt1 == qmc_zero || dt2 == qmc_zero || dt1 == l || dt2 == l) return 0;
     full_line = is_full_line(proposed_segment, time_point_factory);
-    if (dt1 > dt2 && !full_line) std::swap(dt1, dt2); // If splitting a full line, the order of tau_left and tau_right is not fixed
-    tau_left                   = proposed_segment.tau_c - dt1; // dt1 < dt2
-    tau_right                  = proposed_segment.tau_c - dt2;
+    if (dt1 > dt2 && !full_line)
+      std::swap(dt1, dt2); // If splitting a full line, the order of tau_left and tau_right is not fixed
+    tau_left                    = proposed_segment.tau_c - dt1; // dt1 < dt2
+    tau_right                   = proposed_segment.tau_c - dt2;
     auto removed_segment        = segment_t{tau_left, tau_right}; // "antisegment" : careful with order of c, cdag
-    auto removed_segment_length = double(tau_left - tau_right); // accounts for cyclicity
-    bool removed_segment_cyclic = tau_left < tau_right; 
-    right_segment_idx = (full_line or removed_segment_cyclic) ? 0 : proposed_segment_idx + 1; 
+    auto removed_segment_length = double(tau_left - tau_right);   // accounts for cyclicity
+    bool removed_segment_cyclic = tau_left < tau_right;
+    right_segment_idx           = (full_line or removed_segment_cyclic) ? 0 : proposed_segment_idx + 1;
 
     SPDLOG_LOGGER_TRACE("Split: adding c at {}, cdag at {}", tau_right, tau_left);
 
@@ -43,8 +44,7 @@ namespace moves {
         ln_trace_ratio -= -wdata.U(color, c) * overlap(config.seglists[c], removed_segment, time_point_factory);
         ln_trace_ratio -= wdata.mu(c) * removed_segment_length;
         if (wdata.has_Dt)
-          ln_trace_ratio -=
-             K_overlap(config.seglists[c], removed_segment, slice_target_to_scalar(wdata.K, color, c)); 
+          ln_trace_ratio -= K_overlap(config.seglists[c], removed_segment, slice_target_to_scalar(wdata.K, color, c));
       }
     }
     double trace_ratio = std::exp(ln_trace_ratio);
@@ -84,9 +84,9 @@ namespace moves {
     } else {
       auto new_segment_left    = segment_t{proposed_segment.tau_c, tau_left};
       auto new_segment_right   = segment_t{tau_right, proposed_segment.tau_cdag};
-      auto right_segment_it = std::next(sl.begin(), right_segment_idx);
+      auto right_segment_it    = std::next(sl.begin(), right_segment_idx);
       sl[proposed_segment_idx] = new_segment_left;
-      sl.insert(right_segment_it,new_segment_right);
+      sl.insert(right_segment_it, new_segment_right);
     }
 
     // FIXME ??? SIGNE ???

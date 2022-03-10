@@ -26,7 +26,8 @@ namespace moves {
     segment_t last_seg = seglist.back();
     // In case last segment is cyclic, split it and check its overlap with seg
     if (last_seg.tau_c < last_seg.tau_cdag) {
-      result = result && no_overlap(seg, segment_t{qmc_beta, last_seg.tau_cdag}) && no_overlap(seg, segment_t{last_seg.tau_c, qmc_zero});
+      result = result && no_overlap(seg, segment_t{qmc_beta, last_seg.tau_cdag})
+         && no_overlap(seg, segment_t{last_seg.tau_c, qmc_zero});
     } else
       result = result && no_overlap(seg, last_seg);
     // Check overlap of seg with the remainder of seglist
@@ -70,7 +71,7 @@ namespace moves {
     // Reject if chosen segment overlaps with destination color
     if (not is_movable(dsl, origin_segment)) return 0;
     auto const_dest_it = ++find_segment_left(dsl, origin_segment); // returns const iterator
-    destination_it = dsl.erase(const_dest_it,const_dest_it); // hack: converts const iterator to regular iterator
+    destination_it     = dsl.erase(const_dest_it, const_dest_it);  // hack: converts const iterator to regular iterator
 
     // ------------  Trace ratio  -------------
     double ln_trace_ratio = (wdata.mu(destination_color) - wdata.mu(origin_color)) * proposed_segment_length;
@@ -78,8 +79,8 @@ namespace moves {
 
     // ------------  Det ratio  ---------------
 
-     // pos is the position of the proposed segment if inserted, converted from iterator to int
-    long dest_index  = std::distance(destination_it, dsl.begin());
+    // pos is the position of the proposed segment if inserted, converted from iterator to int
+    long dest_index = std::distance(destination_it, dsl.begin());
     // We insert tau_cdag as a line (first index) and tau_c as a column (second index). The index always corresponds to the
     // segment the tau_c/tau_cdag belongs to. 
     double det_ratio = 1.0; // FIXME: do the complete_operation/reject_last_try behave well if there was no try? 
@@ -104,7 +105,7 @@ namespace moves {
 
     wdata.dets[origin_color].complete_operation();
     wdata.dets[destination_color].complete_operation();
-    // Proceed with the move 
+    // Proceed with the move
     auto &sl  = config.seglists[origin_color];
     auto &dsl = config.seglists[destination_color];
     dsl.insert(destination_it, origin_segment);
