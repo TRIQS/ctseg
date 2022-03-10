@@ -17,11 +17,11 @@
  * You should have received a copy of the GNU General Public License along with
  * CTSEG. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-#include "./measure_gt.hpp"
+#include "./g_f_tau.hpp"
 
 namespace measures {
 
-  measure_g_f_tau::measure_g_f_tau(params_t const &p, work_data_t const &wdata, configuration_t const &config, results_t &results)
+  g_f_tau::measure_g_f_tau(params_t const &p, work_data_t const &wdata, configuration_t const &config, results_t &results)
      : wdata{wdata}, config{config}, results{results} {
 
     beta = p.beta;
@@ -32,7 +32,7 @@ namespace measures {
 
   // -------------------------------------
 
-  void measure_g_f_tau::accumulate(double s) {
+  void g_f_tau::accumulate(double s) {
     Z += s;
 
     for (auto [bl_idx, det] : itertools::enumerate(wdata.dets)) {
@@ -50,7 +50,7 @@ namespace measures {
 
   // -------------------------------------
 
-  void measure_g_f_tau::collect_results(mpi::communicator const &c) {
+  void g_f_tau::collect_results(mpi::communicator const &c) {
 
     Z = mpi::all_reduce(Z, c);
 

@@ -1,5 +1,26 @@
 #include "configuration.hpp"
 
+// Make a list of time ordered (decreasing) operators
+
+std::vector<std::tuple<qmc_time_t, int, bool>> make_time_ordered_op_list(configuration const &config) {
+
+  std::vector<std::tuple<qmc_time_t, int, bool>> result;
+
+  result.reserve(config.seglists.size()
+                 * config.seglists[0].size()); // optional : simple heuristics to reserve some space
+
+  for (auto const &[color, seglist] : itertools::enumerate(config.seglists))
+    for (auto const &seg : seglist) {
+      result.emplace_back(seg.tau_c, color, false);
+      result.emplace_back(seg.tau_cdag, color, true);
+    }
+
+  std::sort(std::begin(result), std::end(result), std::greater{});
+  return result;
+}
+
+// ---------------------------
+
 // Overlap between two non-cyclic segments.
 double overlap_seg(segment_t const &seg1, segment_t const &seg2) {
   if (seg1.tau_cdag >= seg2.tau_c || seg2.tau_cdag >= seg1.tau_c)
@@ -10,6 +31,7 @@ double overlap_seg(segment_t const &seg1, segment_t const &seg2) {
     return double(tau_start - tau_end);
   };
 };
+// ---------------------------
 
 // Overlap between segment and a list of segments.
 double overlap(std::vector<segment_t> const &seglist, segment_t const &seg, qmc_time_factory_t const &fac) {
@@ -19,7 +41,8 @@ double overlap(std::vector<segment_t> const &seglist, segment_t const &seg, qmc_
   auto beta = fac.get_upper_pt();
 
   // If seg is cyclic, split it
-  if (seg.tau_c < seg.tau_cdag) return overlap(seglist, segment_t{beta, seg.tau_cdag}, fac) + overlap(seglist, segment_t{seg.tau_c, zero}, fac);
+  if (seg.tau_c < seg.tau_cdag)
+    return overlap(seglist, segment_t{beta, seg.tau_cdag}, fac) + overlap(seglist, segment_t{seg.tau_c, zero}, fac);
   double result = 0;
   // Isolate last segment
   auto last_seg = seglist.back();
@@ -34,6 +57,7 @@ double overlap(std::vector<segment_t> const &seglist, segment_t const &seg, qmc_
     result += overlap_seg(*it, seg);
   return result;
 };
+// ---------------------------
 
 // Contribution of the dynamical interaction kernel K to the overlap between a segment and a list of segments.
 double K_overlap(std::vector<segment_t> const &seglist, segment_t const &seg, gf<imtime, scalar_valued> const &K) {
@@ -45,10 +69,21 @@ double K_overlap(std::vector<segment_t> const &seglist, segment_t const &seg, gf
   }
   return result;
 }
+// ---------------------------
 
 // Length occupied by all segments for a given color
 double density(std::vector<segment_t> const &seglist) {
   double result = 0;
   for (auto const &seg : seglist) result += double(seg.tau_c - seg.tau_cdag);
   return result;
+}
+// ---------------------------
+
+/// Find the state at tau = 0 or beta
+std::vector<bool> boundary_state(configuration_t const &config) {
+  int N = config.n_color();
+  std::vector<bool> res(N);
+  for (auto const &[c, sl] : itertools::enumerate(config.seglists))
+    res[c] = (sl.empty() ? false : is_cyclic(sl.back()));
+  return res;
 }

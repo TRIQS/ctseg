@@ -25,7 +25,7 @@
 
 namespace measures {
 
-  struct measure_g_f_tau {
+  struct g_f_tau {
 
     work_data_t const &wdata;
     configuration_t const &config;
@@ -39,7 +39,7 @@ namespace measures {
 
     double Z;
 
-    measure_g_f_tau(params_t const &params, work_data_t const &wdata, configuration_t const &config, results_t &results);
+    g_f_tau(params_t const &params, work_data_t const &wdata, configuration_t const &config, results_t &results);
 
     void accumulate(double s);
     void collect_results(mpi::communicator const &c);

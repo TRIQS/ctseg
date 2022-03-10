@@ -1,5 +1,4 @@
 #pragma once
-//#include <triqs/gfs/gf/gf_const_view.hpp>
 #include <vector>
 #include "params.hpp"
 #include "types.hpp"
@@ -10,7 +9,8 @@ struct segment_t {
   bool J_at_start = false, J_at_end = false;
 };
 
-// segment can be cyclic : tau_cdag > t_c : must be the last one ... FIXME : check invariant ...
+// Whether a segment is wrapped around beta/0
+inline bool is_cyclic(segment_t const &seg) { return seg.tau_cdag > seg.tau_c; }
 
 struct jperp_line_t {
   qmc_time_t tau_Splus, tau_Sminus; // times of the S+, S-
@@ -20,7 +20,8 @@ struct jperp_line_t {
 // ----------
 
 struct configuration_t {
-  std::vector<std::vector<segment_t>> seglists; // list of segment per color : seglist[color] is ORDERED on tau, with decreasing order.
+  std::vector<std::vector<segment_t>>
+     seglists; // list of segment per color : seglist[color] is ORDERED on tau, with decreasing order.
   std::vector<jperp_line_t> Jperp_list;
 
   configuration_t(int n_color) : seglists(n_color) {}
@@ -28,7 +29,25 @@ struct configuration_t {
   [[nodiscard]] int n_color() const { return seglists.size(); }
 };
 
+// ------------------- Invariants ---------------------------
+
+void check_invariant(configuration_t const &config) {
+#ifdef EXT_DEBUG
+  for (auto const &[c, sl] : itertools::enumerate(config.seglists))
+    for (int i = 0; i < sl.size() - 1; ++i) {
+      ALWAYS_EXPECTS((sl[i].tau_c_dag > sl[i + 1].tau_c),
+                     "Time order error between segment at position {} in config \n{}", i, config);
+      ALWAYS_EXPECTS(not is_cyclic(sl[i], "Segment at position {} should not by cyclic in config \n{}", i,
+                     config); // only last segment can be cyclic
+    }
+#endif
+}
+
 // ------------------- Functions to manipulate config --------------------------
+
+// Make a list of time ordered (decreasing) operators
+// vector of (time, color, is_dagger)
+std::vector<std::tuple<qmc_time_t, int, bool>> make_time_ordered_op_list(configuration const &config);
 
 // Comparison of segments. Returns 1 if s1 is left of s2 (we order segments by decreasing time).
 inline bool operator<(segment_t const &s1, segment_t const &s2) { return s1.tau_c > s2.tau_c; };
@@ -46,7 +65,8 @@ inline auto find_segment_left(std::vector<segment_t> const &seglist, segment_t c
 double overlap(std::vector<segment_t> const &seglist, segment_t const &seg, qmc_time_factory_t const &fac);
 
 // Contribution of the dynamical interaction kernel K to the overlap between a segment and a list of segments.
-double K_overlap(std::vector<segment_t> const &seglist, segment_t const &seg, gf_const_view<imtime, scalar_valued> const &K);
+double K_overlap(std::vector<segment_t> const &seglist, segment_t const &seg,
+                 gf_const_view<imtime, scalar_valued> const &K);
 
 // Length occupied by all segments for a given color
 double density(std::vector<segment_t> const &seglist);
@@ -57,6 +77,9 @@ inline bool is_full_line(segment_t const &seg, qmc_time_factory_t const &fac) {
   auto qmc_beta = fac.get_upper_pt();
   return seg.tau_cdag == qmc_zero && seg.tau_c == qmc_beta;
 }
+
+/// Find the state at tau = 0 or beta
+std::vector<bool> boundary_state(configuration_t const &config);
 
 // --------- DEBUG code --------------
 // print config + h5 config
