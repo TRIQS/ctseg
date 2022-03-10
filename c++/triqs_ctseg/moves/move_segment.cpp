@@ -13,17 +13,15 @@ namespace moves {
 
   // -------------------------------
 
-  // FIXME : why fac ? the class has time_point_factory ?
-  // 
   // Checks if a segment is movable to a color
-  bool move_segment::is_movable(std::vector<segment_t> const &seglist, segment_t const &seg, qmc_time_factory_t fac) {
+  bool move_segment::is_movable(std::vector<segment_t> const &seglist, segment_t const &seg) {
     bool result = true;
     if (seglist.empty()) return result;
     // If seg is cyclic, split it
-    auto qmc_zero = fac.get_lower_pt();
-    auto qmc_beta = fac.get_upper_pt();
+    auto qmc_zero = time_point_factory.get_lower_pt();
+    auto qmc_beta = time_point_factory.get_upper_pt();
     if (seg.tau_c < seg.tau_cdag)
-      return is_movable(seglist, segment_t{qmc_beta, seg.tau_cdag}, fac) && is_movable(seglist, segment_t{seg.tau_c, qmc_zero}, fac);
+      return is_movable(seglist, segment_t{qmc_beta, seg.tau_cdag}) && is_movable(seglist, segment_t{seg.tau_c, qmc_zero});
     // Isolate last segment
     segment_t last_seg = seglist.back();
     // In case last segment is cyclic, split it and check its overlap with seg
@@ -44,6 +42,8 @@ namespace moves {
 
     SPDLOG_LOGGER_TRACE("\n =================== ATTEMPT MOVE ================ \n", void);
 
+    auto qmc_beta  = time_point_factory.get_upper_pt();
+
     // ------------ Choice of segment and colors --------------
     // Select origin color
     origin_color = rng(wdata.n_color);
@@ -56,7 +56,9 @@ namespace moves {
     // Select segment to move
     origin_index                 = rng(sl.size());
     origin_segment               = sl[origin_index];
-    auto proposed_segment_length = double(origin_segment.tau_c - origin_segment.tau_cdag);
+    auto qmc_length = origin_segment.tau_c - origin_segment.tau_cdag;
+    bool moving_full_line = (qmc_length == qmc_beta);
+    auto proposed_segment_length = double(qmc_length);
 
     SPDLOG_LOGGER_TRACE("Moving c at {}, cdag at {}", origin_segment.tau_c, origin_segment.tau_cdag);
 
@@ -66,7 +68,7 @@ namespace moves {
     auto &dsl = config.seglists[destination_color];
 
     // Reject if chosen segment overlaps with destination color
-    if (not is_movable(dsl, origin_segment, time_point_factory)) return 0;
+    if (not is_movable(dsl, origin_segment)) return 0;
     auto const_dest_it = ++find_segment_left(dsl, origin_segment); // returns const iterator
     destination_it = dsl.erase(const_dest_it,const_dest_it); // hack: converts const iterator to regular iterator
 
@@ -80,8 +82,11 @@ namespace moves {
     long dest_index  = std::distance(destination_it, dsl.begin());
     // We insert tau_cdag as a line (first index) and tau_c as a column (second index). The index always corresponds to the
     // segment the tau_c/tau_cdag belongs to. 
-    auto det_ratio = wdata.dets[destination_color].try_insert(dest_index, dest_index, {origin_segment.tau_cdag, 0}, {origin_segment.tau_c, 0}) 
+    double det_ratio = 1.0; // FIXME: do the complete_operation/reject_last_try behave well if there was no try? 
+    if (not moving_full_line) {
+    det_ratio = wdata.dets[destination_color].try_insert(dest_index, dest_index, {origin_segment.tau_cdag, 0}, {origin_segment.tau_c, 0}) 
             * wdata.dets[origin_color].try_remove(origin_index,origin_index);
+    }
 
     // ------------  Proposition ratio ------------
     double prop_ratio = (int(dsl.size()) + 1) / int(sl.size());

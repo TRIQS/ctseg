@@ -48,6 +48,7 @@ namespace moves {
     // ------------  Det ratio  ---------------
     // We remove a cdag (first index) from the left segment and a c (second index) from the right segment.  
     auto det_ratio = wdata.dets[color].try_remove(left_segment_index,right_segment_index); // FIXME: ordering in det when regrouping into cyclic segment
+    // FIXME: check invariant times in det correspond to times of segs 
 
     // ------------  Proposition ratio ------------
 
@@ -55,8 +56,8 @@ namespace moves {
     double current_number_intervals = sl.size();
     // Length of future segment
     qmc_time_t l = time_point_factory.get_upper_pt();
-    if (not making_full_line) { l = left_segment.tau_c - right_segment.tau_cdag; }
-    double prop_ratio = (future_number_segments * l * l) / current_number_intervals;
+    if (not making_full_line)  l = left_segment.tau_c - right_segment.tau_cdag; 
+    double prop_ratio = (future_number_segments * l * l / (making_full_line ? 1 : 2)) / current_number_intervals;
 
     SPDLOG_LOGGER_TRACE("trace_ratio  = {}, prop_ratio = {}, det_ratio = {}", trace_ratio, prop_ratio, det_ratio);
 
@@ -75,8 +76,7 @@ namespace moves {
     if (making_full_line) {
       auto qmc_beta          = time_point_factory.get_upper_pt();
       auto qmc_zero          = time_point_factory.get_lower_pt();
-      auto new_segment       = segment_t{qmc_beta, qmc_zero};
-      sl[left_segment_index] = new_segment;
+      sl[left_segment_index] = segment_t{qmc_beta, qmc_zero};
     } else {
       auto new_segment       = segment_t{left_segment.tau_c, right_segment.tau_cdag};
       sl[left_segment_index] = new_segment;

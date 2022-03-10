@@ -64,9 +64,9 @@ namespace moves {
 
     // ------------  Proposition ratio ------------
 
-    double current_number_intervals = config_is_empty ? 2 : double(sl.size()); // Account for absence of time swapping when inserting into empty line. 
+    double current_number_intervals = std::max(1.0,double(sl.size())); 
     double future_number_segments  = double(sl.size()) + 1;
-    double prop_ratio              = future_number_segments / (current_number_intervals * l * l / 2);
+    double prop_ratio              = future_number_segments / (current_number_intervals * l * l / (config_is_empty ? 1 : 2)); // Account for absence of time swapping when inserting into empty line. 
 
     SPDLOG_LOGGER_TRACE("trace_ratio  = {}, prop_ratio = {}, det_ratio = {}", trace_ratio, prop_ratio, det_ratio);
 

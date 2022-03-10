@@ -60,9 +60,9 @@ namespace moves {
 
     // ------------  Proposition ratio ------------
 
-    double current_number_segments = full_line ? 2 : int(sl.size()); // Account for the two ways of splitting a full line
-    double future_number_intervals = full_line ? 1 : int(sl.size()) + 1;
-    double prop_ratio              = (future_number_intervals) / (current_number_segments * l * l);
+    double current_number_segments = sl.size(); 
+    double future_number_intervals = full_line ? 1 : double(sl.size()) + 1.0;
+    double prop_ratio              = (future_number_intervals) / (current_number_segments * l * l / (full_line ? 1 : 2));
 
     SPDLOG_LOGGER_TRACE("trace_ratio  = {}, prop_ratio = {}, det_ratio = {}", trace_ratio, prop_ratio, det_ratio);
 
