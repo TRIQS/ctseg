@@ -19,59 +19,29 @@
  ******************************************************************************/
 #pragma once
 #include "../configuration.hpp"
-#include "../precompute_fprefactor.hpp"
-#include "../qmc_parameters.hpp"
+#include "../work_data.hpp"
+#include "../results.hpp"
+//#include "../precompute_fprefactor.hpp"
 
-namespace triqs_ctseg {
+namespace measures {
 
-  using namespace triqs::gfs;
-  using namespace triqs::mesh;
+  struct measure_g_f_tau {
 
-  /// Measure for the Green's function in imaginary time
-  /**
- *The imaginary-time Green's function is defined as
-   $$G^\sigma_{ab}(\tau) = -\langle T_\tau
- c_{a\sigma}(\tau)c_{b\sigma}^\dagger(0) \rangle$$
- * and the corresponding improved estimator is given by
-   $$F_{ab}^{\sigma}(\tau) = -\int_0^\beta d\tilde{\tau} \sum_{c\sigma'} \langle
- T_\tau n_{c\sigma'}(\tilde{\tau})
- \mathcal{U}^{\sigma\sigma'}_{ac}(\tilde{\tau}-\tau)
- c_{a\sigma}(\tau)c_{b\sigma'}^\dagger(0) \rangle$$
+    work_data_t const &wdata;
+    configuration_t const &config;
+    results_t &results;
+    double beta;
 
- *The imaginary-time measurement is most efficient. The performance of the
- algorithm does not scale with the number of points in the grid on which it is
- measured, so this number can and should be chosen large. By Nyquist's theorem,
- the Fourier transform will be correctly reproduce the function in the frequency
- domain on the first :math:`N_\omega\approx N_\tau/4\pi` frequencies.
- *
- *These measurements are turned on by setting ``measure_gt`` and ``measure_ft``
- to ``true``, respectively. *The number of time points on the grid is specified
- through ``n_tau`` and is the same for both observables.
- */
-  struct measure_gt {
+    block_gf<imtime> g_tau;
 
-    const qmc_parameters *params;
-    const configuration *config;
+    // The prefactor of integrals
+    //std::shared_ptr<precompute_fprefactor> fprefactor;
 
-    block_gf<imtime> &gt;
-    block_gf<imtime> &ft;
+    double Z;
 
-    std::shared_ptr<precompute_fprefactor> fprefactor;
+    measure_g_f_tau(params_t const &params, work_data_t const &wdata, configuration_t const &config, results_t &results);
 
-    double beta, Noverbeta, Z;
-    accumulator<double> gt_stack = {0.0, -1, -1};
-    accumulator<double> Z_stack  = {0.0, -1, -1};
-    int counter;
-    double accum;
-
-    /// constructor
-    measure_gt(const qmc_parameters *params_, const configuration *config_, std::shared_ptr<precompute_fprefactor> fprefactor_, block_gf<imtime> &gt_,
-               block_gf<imtime> &ft_);
-
-    /// accumulate the Green's function
     void accumulate(double s);
-
-    /// reduce and normalize G
     void collect_results(mpi::communicator const &c);
   };
-} // namespace triqs_ctseg
+} // namespace measures
