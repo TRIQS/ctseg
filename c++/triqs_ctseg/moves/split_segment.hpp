@@ -5,7 +5,7 @@
 namespace moves {
 
   class split_segment {
-    work_data_t const &wdata;
+    work_data_t &wdata;
     configuration_t &config;
     triqs::mc_tools::random_generator &rng;
 
@@ -14,13 +14,14 @@ namespace moves {
     segment_t proposed_segment;
     qmc_time_t tau_left;
     qmc_time_t tau_right;
-    int proposed_segment_idx;
+    int proposed_segment_idx{};
+    int right_segment_idx{};
     bool full_line{};
     qmc_time_factory_t time_point_factory = qmc_time_factory_t{wdata.beta};
 
     public:
     // Constructor
-    split_segment(const work_data_t &data_, configuration_t &config_, triqs::mc_tools::random_generator &rng_)
+    split_segment(work_data_t &data_, configuration_t &config_, triqs::mc_tools::random_generator &rng_)
        : wdata(data_), config(config_), rng(rng_){};
     // ------------------
     double attempt();

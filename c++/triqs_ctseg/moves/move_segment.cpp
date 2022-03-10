@@ -59,16 +59,21 @@ namespace moves {
 
     // Reject if chosen segment overlaps with destination color
     if (not is_movable(dsl, origin_segment, time_point_factory)) return 0;
-    destination_it = ++find_segment_left(dsl, origin_segment);
+    auto const_dest_it = ++find_segment_left(dsl, origin_segment); // returns const iterator
+    destination_it = dsl.erase(const_dest_it,const_dest_it); // hack: converts const iterator to regular iterator
 
     // ------------  Trace ratio  -------------
-    // FIXME : here we will need chemical potential, field, etc
     double ln_trace_ratio = (wdata.mu(destination_color) - wdata.mu(origin_color)) * proposed_segment_length;
     double trace_ratio    = std::exp(ln_trace_ratio);
 
     // ------------  Det ratio  ---------------
 
-    double det_ratio = 0;
+     // pos is the position of the proposed segment if inserted, converted from iterator to int
+    long dest_index  = std::distance(destination_it, dsl.begin());
+    // We insert tau_cdag as a line (first index) and tau_c as a column (second index). The index always corresponds to the
+    // segment the tau_c/tau_cdag belongs to. 
+    auto det_ratio = wdata.dets[destination_color].try_insert(dest_index, dest_index, {origin_segment.tau_cdag, 0}, {origin_segment.tau_c, 0}) 
+            * wdata.dets[origin_color].try_remove(origin_index,origin_index);
 
     // ------------  Proposition ratio ------------
     double prop_ratio = (int(dsl.size()) + 1) / int(sl.size());
@@ -84,8 +89,9 @@ namespace moves {
 
     SPDLOG_LOGGER_TRACE("\n - - - - - ====> ACCEPT - - - - - - - - - - -\n", void);
 
-    //wdata.dets[color].complete_operation();
-    // Regroup segments
+    wdata.dets[origin_color].complete_operation();
+    wdata.dets[destination_color].complete_operation();
+    // Proceed with the move 
     auto &sl  = config.seglists[origin_color];
     auto &dsl = config.seglists[destination_color];
     dsl.insert(destination_it, origin_segment);
@@ -100,6 +106,7 @@ namespace moves {
   //--------------------------------------------------
   void move_segment::reject() {
     SPDLOG_LOGGER_TRACE("\n - - - - - ====> REJECT - - - - - - - - - - -\n", void);
-    //data.dets[color].reject_last_try();
+    wdata.dets[origin_color].reject_last_try();
+    wdata.dets[destination_color].reject_last_try();
   }
 }; // namespace moves

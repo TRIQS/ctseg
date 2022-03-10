@@ -26,7 +26,7 @@ namespace moves {
       tau1                 = sl[ind_segment].tau_cdag; // tau1 is cdag of this segment
       bool is_last_segment = ind_segment == sl.size() - 1;
       tau2                 = sl[is_last_segment ? 0 : ind_segment + 1].tau_c; // tau2 is c of next segment, possibly cyclic
-      if (tau2 - tau1 == qmc_beta) return 0;                                  // If segment is a full line, cannot insert
+      if (tau2 == qmc_beta and tau1 == qmc_zero) return 0;  // If segment is a full line, cannot insert
     }
 
     // Choose new segment within insertion window
@@ -34,7 +34,7 @@ namespace moves {
     auto dt1     = time_point_factory.get_random_pt(rng, qmc_zero, l);
     auto dt2     = time_point_factory.get_random_pt(rng, qmc_zero, l);
     if (dt1 == dt2) return 0;
-    if (dt1 > dt2) std::swap(dt1, dt2);
+    if (dt1 > dt2 and not config_is_empty) std::swap(dt1, dt2); // if inserting into an empty line, two ways to insert
     proposed_segment             = segment_t{tau1 - dt1, tau1 - dt2};
     auto proposed_segment_length = double(proposed_segment.tau_c - proposed_segment.tau_cdag); // can be cyclic.
     // The index of the segment if it is inserted in the list of segments.
@@ -50,26 +50,23 @@ namespace moves {
         ln_trace_ratio += wdata.mu(c) * proposed_segment_length;
         if (wdata.has_Dt)
           ln_trace_ratio +=
-             K_overlap(config.seglists[c], proposed_segment, slice_target_to_scalar(wdata.K, color, c)); // FIXME. Is the syntax right for slice????
+             K_overlap(config.seglists[c], proposed_segment, slice_target_to_scalar(wdata.K, color, c)); 
       }
     }
     double trace_ratio = std::exp(ln_trace_ratio);
 
     // ------------  Det ratio  ---------------
-
-    // Try insert in the det. We put all the segment in order in the dets.
-    // Returns the ratio of dets (Cf det_manip doc).
-    // pos is the index of the new segment, if inserted in the list.
-    // FIXME : std::distance of an empoty?
-    //long pos  = (config_is_empty ? 0 : std::distance(proposed_segment_insert_it, V.begin()));
+    // pos is the position of the proposed segment if inserted, converted from iterator to int
     long pos  = std::distance(proposed_segment_insert_it, sl.begin());
+    // We insert tau_cdag as a line (first index) and tau_c as a column (second index). The index always corresponds to the
+    // segment the tau_c/tau_cdag belongs to. 
     auto det_ratio = wdata.dets[color].try_insert(pos, pos, {proposed_segment.tau_cdag, 0}, {proposed_segment.tau_c, 0});
 
     // ------------  Proposition ratio ------------
 
-    double current_number_segments = std::max(int(sl.size()), 1);
+    double current_number_intervals = config_is_empty ? 2 : double(sl.size()); // Account for absence of time swapping when inserting into empty line. 
     double future_number_segments  = double(sl.size()) + 1;
-    double prop_ratio              = future_number_segments / (current_number_segments * l * l);
+    double prop_ratio              = future_number_segments / (current_number_intervals * l * l / 2);
 
     SPDLOG_LOGGER_TRACE("trace_ratio  = {}, prop_ratio = {}, det_ratio = {}", trace_ratio, prop_ratio, det_ratio);
 
@@ -82,6 +79,7 @@ namespace moves {
 
     SPDLOG_LOGGER_TRACE("\n - - - - - ====> ACCEPT - - - - - - - - - - -\n", void);
 
+    // Insert the times into the det
     wdata.dets[color].complete_operation();
     // Insert the segment in an ordered list
     config.seglists[color].insert(proposed_segment_insert_it, proposed_segment);

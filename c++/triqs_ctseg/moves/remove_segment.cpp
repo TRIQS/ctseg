@@ -33,7 +33,7 @@ namespace moves {
         ln_trace_ratio -= wdata.mu(c) * proposed_segment_length;
         if (wdata.has_Dt)
           ln_trace_ratio -=
-             K_overlap(config.seglists[c], proposed_segment, slice_target_to_scalar(wdata.K, color, c)); // FIXME. Is the syntax right for slice????
+             K_overlap(config.seglists[c], proposed_segment, slice_target_to_scalar(wdata.K, color, c));
       }
     }
     double trace_ratio = std::exp(ln_trace_ratio);
@@ -45,7 +45,7 @@ namespace moves {
     // ------------  Proposition ratio ------------
 
     double current_number_segments = sl.size();
-    double future_number_segments  = std::max(int(sl.size() - 1), 1);
+    double future_number_intervals  = current_number_segments == 1 ? 2 : int(sl.size() - 1); // Factor of 2 when inserting into empty line because no tiem swapping 
     // Limits of insertion interval for reverse move, initialise at (beta,0)
     qmc_time_t tau_left  = qmc_beta;
     qmc_time_t tau_right = qmc_zero;
@@ -57,7 +57,7 @@ namespace moves {
       tau_left  = sl[is_first_segment ? sl.size() - 1 : proposed_segment_index - 1].tau_cdag;
     }
     qmc_time_t l      = tau_left - tau_right;
-    double prop_ratio = (future_number_segments * l * l) / current_number_segments;
+    double prop_ratio = (future_number_intervals * l * l / 2) / current_number_segments;
 
     SPDLOG_LOGGER_TRACE("trace_ratio  = {}, prop_ratio = {}, det_ratio = {}", trace_ratio, prop_ratio, det_ratio);
 
@@ -70,6 +70,7 @@ namespace moves {
 
     SPDLOG_LOGGER_TRACE("\n - - - - - ====> ACCEPT - - - - - - - - - - -\n", void);
 
+    // Update the dets
     wdata.dets[color].complete_operation();
     // Remove the segment
     auto &sl                 = config.seglists[color];

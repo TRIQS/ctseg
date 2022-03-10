@@ -4,7 +4,7 @@
 
 namespace moves {
   class insert_segment {
-    work_data_t const &wdata;
+    work_data_t &wdata;
     configuration_t &config;
     triqs::mc_tools::random_generator &rng;
 
@@ -15,7 +15,7 @@ namespace moves {
     qmc_time_factory_t time_point_factory = qmc_time_factory_t{wdata.beta};
 
     public:
-    insert_segment(const work_data_t &data_, configuration_t &config_, triqs::mc_tools::random_generator &rng_)
+    insert_segment(work_data_t &data_, configuration_t &config_, triqs::mc_tools::random_generator &rng_)
        : wdata(data_), config(config_), rng(rng_){};
     // ------------------
     double attempt();
