@@ -14,7 +14,7 @@ namespace moves {
   // -------------------------------
 
   // FIXME : why fac ? the class has time_point_factory ?
-  // 
+  //
   // Checks if a segment is movable to a color
   bool move_segment::is_movable(std::vector<segment_t> const &seglist, segment_t const &seg, qmc_time_factory_t fac) {
     bool result = true;
@@ -68,7 +68,7 @@ namespace moves {
     // Reject if chosen segment overlaps with destination color
     if (not is_movable(dsl, origin_segment, time_point_factory)) return 0;
     auto const_dest_it = ++find_segment_left(dsl, origin_segment); // returns const iterator
-    destination_it = dsl.erase(const_dest_it,const_dest_it); // hack: converts const iterator to regular iterator
+    destination_it     = dsl.erase(const_dest_it, const_dest_it);  // hack: converts const iterator to regular iterator
 
     // ------------  Trace ratio  -------------
     double ln_trace_ratio = (wdata.mu(destination_color) - wdata.mu(origin_color)) * proposed_segment_length;
@@ -76,12 +76,12 @@ namespace moves {
 
     // ------------  Det ratio  ---------------
 
-     // pos is the position of the proposed segment if inserted, converted from iterator to int
-    long dest_index  = std::distance(destination_it, dsl.begin());
+    // pos is the position of the proposed segment if inserted, converted from iterator to int
+    long dest_index = std::distance(destination_it, dsl.begin());
     // We insert tau_cdag as a line (first index) and tau_c as a column (second index). The index always corresponds to the
-    // segment the tau_c/tau_cdag belongs to. 
-    auto det_ratio = wdata.dets[destination_color].try_insert(dest_index, dest_index, {origin_segment.tau_cdag, 0}, {origin_segment.tau_c, 0}) 
-            * wdata.dets[origin_color].try_remove(origin_index,origin_index);
+    // segment the tau_c/tau_cdag belongs to.
+    auto det_ratio = wdata.dets[destination_color].try_insert(dest_index, dest_index, {origin_segment.tau_cdag, 0}, {origin_segment.tau_c, 0})
+       * wdata.dets[origin_color].try_remove(origin_index, origin_index);
 
     // ------------  Proposition ratio ------------
     double prop_ratio = (int(dsl.size()) + 1) / int(sl.size());
@@ -99,7 +99,7 @@ namespace moves {
 
     wdata.dets[origin_color].complete_operation();
     wdata.dets[destination_color].complete_operation();
-    // Proceed with the move 
+    // Proceed with the move
     auto &sl  = config.seglists[origin_color];
     auto &dsl = config.seglists[destination_color];
     dsl.insert(destination_it, origin_segment);

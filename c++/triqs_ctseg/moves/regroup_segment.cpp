@@ -27,7 +27,7 @@ namespace moves {
     }
     left_segment                 = sl[left_segment_index];
     right_segment                = sl[right_segment_index];
-    auto inserted_segment        = segment_t{left_segment.tau_cdag,right_segment.tau_c}; // "antisegment" : careful with order of c, cdag
+    auto inserted_segment        = segment_t{left_segment.tau_cdag, right_segment.tau_c}; // "antisegment" : careful with order of c, cdag
     auto inserted_segment_length = double(inserted_segment.tau_c - inserted_segment.tau_cdag);
 
     SPDLOG_LOGGER_TRACE("Regroup: removing c at {}, cdag at {}", right_segment.tau_c, left_segment.tau_cdag);
@@ -38,16 +38,15 @@ namespace moves {
       if (c != color) {
         ln_trace_ratio += -wdata.U(color, c) * overlap(config.seglists[c], inserted_segment, time_point_factory);
         ln_trace_ratio += wdata.mu(c) * inserted_segment_length;
-        if (wdata.has_Dt)
-          ln_trace_ratio +=
-             K_overlap(config.seglists[c], inserted_segment, slice_target_to_scalar(wdata.K, color, c)); 
+        if (wdata.has_Dt) ln_trace_ratio += K_overlap(config.seglists[c], inserted_segment, slice_target_to_scalar(wdata.K, color, c));
       }
     }
     double trace_ratio = std::exp(ln_trace_ratio);
 
     // ------------  Det ratio  ---------------
-    // We remove a cdag (first index) from the left segment and a c (second index) from the right segment.  
-    auto det_ratio = wdata.dets[color].try_remove(left_segment_index,right_segment_index); // FIXME: ordering in det when regrouping into cyclic segment
+    // We remove a cdag (first index) from the left segment and a c (second index) from the right segment.
+    auto det_ratio =
+       wdata.dets[color].try_remove(left_segment_index, right_segment_index); // FIXME: ordering in det when regrouping into cyclic segment
 
     // ------------  Proposition ratio ------------
 
