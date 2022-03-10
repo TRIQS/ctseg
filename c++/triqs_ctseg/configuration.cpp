@@ -1,5 +1,18 @@
 #include "configuration.hpp"
 
+// ------------------- Invariants ---------------------------
+
+void check_invariant(configuration_t const &config) {
+  for (auto const &[c, sl] : itertools::enumerate(config.seglists))
+    for (int i = 0; i < sl.size() - 1; ++i) {
+      ALWAYS_EXPECTS((sl[i].tau_cdag > sl[i + 1].tau_c),
+                     "Time order error between segment at position {} in config \n{}", i, config);
+      ALWAYS_EXPECTS(not is_cyclic(sl[i]), "Segment at position {} should not by cyclic in config \n{}", i,
+                     config); // only last segment can be cyclic
+    }
+}
+// ---------------------------
+
 // Make a list of time ordered (decreasing) operators
 
 std::vector<std::tuple<qmc_time_t, int, bool>> make_time_ordered_op_list(configuration_t const &config) {
@@ -86,4 +99,14 @@ std::vector<bool> boundary_state(configuration_t const &config) {
   for (auto const &[c, sl] : itertools::enumerate(config.seglists))
     res[c] = (sl.empty() ? false : is_cyclic(sl.back())); // FIXME  BUG full line
   return res;
+}
+
+// ---------------------------
+
+std::ostream &operator<<(std::ostream &out, configuration_t const &config) {
+  for (auto const &sl : config.seglists) {
+    out << '\n';
+    for (auto const &seg : sl) out << "[" << double(seg.tau_c) << ", " << double(seg.tau_cdag) << "]    ";
+  }
+  return out;
 }

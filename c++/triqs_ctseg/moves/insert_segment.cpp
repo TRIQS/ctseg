@@ -87,11 +87,13 @@ namespace moves {
     config.seglists[color].insert(proposed_segment_insert_it, proposed_segment);
 
     // FIXME ??? SIGNE ???
-    double sign_ratio = 1; // ???config->trace.complete_insert_segment();
+    double sign_ratio = 1; 
 
+    // Check invariant 
+#ifdef EXT_DEBUG
     // SPDLOG_LOGGER_TRACE("Configuration {}", config);
-    // Check invariant ??
-    // config->trace.check_overlap_matrix_from_scratch();
+    check_invariant(config);
+#endif
 
     return sign_ratio;
   }

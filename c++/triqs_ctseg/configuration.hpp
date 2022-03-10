@@ -31,17 +31,7 @@ struct configuration_t {
 
 // ------------------- Invariants ---------------------------
 
-void check_invariant(configuration_t const &config) {
-#ifdef EXT_DEBUG
-  for (auto const &[c, sl] : itertools::enumerate(config.seglists))
-    for (int i = 0; i < sl.size() - 1; ++i) {
-      ALWAYS_EXPECTS((sl[i].tau_cdag > sl[i + 1].tau_c),
-                     "Time order error between segment at position {} in config \n{}", i, config);
-      ALWAYS_EXPECTS(not is_cyclic(sl[i]), "Segment at position {} should not by cyclic in config \n{}", i,
-                     config); // only last segment can be cyclic
-    }
-#endif
-}
+void check_invariant(configuration_t const &config);
 
 // ------------------- Functions to manipulate config --------------------------
 
@@ -84,10 +74,4 @@ std::vector<bool> boundary_state(configuration_t const &config);
 // --------- DEBUG code --------------
 // print config + h5 config
 
-#if 0
-inline void check_invariant(std::vector<segment_t> const &seglist){
-   // debug mode : check ordered.
-
-   // position of J, etc...
-};
-#endif
+std::ostream &operator<<(std::ostream &out, configuration_t const &config);
