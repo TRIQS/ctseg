@@ -20,7 +20,6 @@ struct constr_params_t {
 
   /// Number of time slices for $J_\perp(\tau)$
   int n_tau_jperp = 10001;
-
 };
 
 //---------------------------------------------
@@ -52,19 +51,19 @@ struct solve_params_t {
   /// Verbosity level
   int verbosity = mpi::communicator().rank() == 0 ? 3 : 0;
 
-  /// Whether to perform the move insert segment 
+  /// Whether to perform the move insert segment
   bool move_insert_segment = true;
 
-  /// Whether to perform the move remove segment 
+  /// Whether to perform the move remove segment
   bool move_remove_segment = true;
 
-  /// Whether to perform the move move segment 
+  /// Whether to perform the move move segment
   bool move_move = false;
 
-  /// Whether to perform the move split segment 
+  /// Whether to perform the move split segment
   bool move_split_segment = false;
 
-  /// Whether to perform the move group into spin segment 
+  /// Whether to perform the move group into spin segment
   bool move_regroup_segment = false;
 
   /// Whether to measure G(tau) (see [[measure_gt]])

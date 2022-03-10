@@ -21,7 +21,8 @@ namespace moves {
     auto qmc_zero = time_point_factory.get_lower_pt();
     auto qmc_beta = time_point_factory.get_upper_pt();
     if (seg.tau_c < seg.tau_cdag)
-      return is_movable(seglist, segment_t{qmc_beta, seg.tau_cdag}) && is_movable(seglist, segment_t{seg.tau_c, qmc_zero});
+      return is_movable(seglist, segment_t{qmc_beta, seg.tau_cdag})
+         && is_movable(seglist, segment_t{seg.tau_c, qmc_zero});
     // Isolate last segment
     segment_t last_seg = seglist.back();
     // In case last segment is cyclic, split it and check its overlap with seg
@@ -43,7 +44,7 @@ namespace moves {
 
     SPDLOG_LOGGER_TRACE("\n =================== ATTEMPT MOVE ================ \n", void);
 
-    auto qmc_beta  = time_point_factory.get_upper_pt();
+    auto qmc_beta = time_point_factory.get_upper_pt();
 
     // ------------ Choice of segment and colors --------------
     // Select origin color
@@ -57,8 +58,8 @@ namespace moves {
     // Select segment to move
     origin_index                 = rng(sl.size());
     origin_segment               = sl[origin_index];
-    auto qmc_length = origin_segment.tau_c - origin_segment.tau_cdag;
-    bool moving_full_line = (qmc_length == qmc_beta);
+    auto qmc_length              = origin_segment.tau_c - origin_segment.tau_cdag;
+    bool moving_full_line        = (qmc_length == qmc_beta);
     auto proposed_segment_length = double(qmc_length);
 
     SPDLOG_LOGGER_TRACE("Moving c at {}, cdag at {}", origin_segment.tau_c, origin_segment.tau_cdag);
@@ -82,11 +83,12 @@ namespace moves {
     // pos is the position of the proposed segment if inserted, converted from iterator to int
     long dest_index = std::distance(destination_it, dsl.begin());
     // We insert tau_cdag as a line (first index) and tau_c as a column (second index). The index always corresponds to the
-    // segment the tau_c/tau_cdag belongs to. 
-    double det_ratio = 1.0; // FIXME: do the complete_operation/reject_last_try behave well if there was no try? 
+    // segment the tau_c/tau_cdag belongs to.
+    double det_ratio = 1.0; // FIXME: do the complete_operation/reject_last_try behave well if there was no try?
     if (not moving_full_line) {
-    det_ratio = wdata.dets[destination_color].try_insert(dest_index, dest_index, {origin_segment.tau_cdag, 0}, {origin_segment.tau_c, 0}) 
-            * wdata.dets[origin_color].try_remove(origin_index,origin_index);
+      det_ratio = wdata.dets[destination_color].try_insert(dest_index, dest_index, {origin_segment.tau_cdag, 0},
+                                                           {origin_segment.tau_c, 0})
+         * wdata.dets[origin_color].try_remove(origin_index, origin_index);
     }
 
     // ------------  Proposition ratio ------------

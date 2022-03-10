@@ -27,7 +27,7 @@ namespace measures {
 
     // I take the whole configuration and make a time ordered list of operators.
     auto t_ordered_op_list = make_time_ordered_op_list(config);
-    auto zero = time_point_factory.get_lower_pt();
+    auto zero              = time_point_factory.get_lower_pt();
     t_ordered_op_list.emplace_back(zero, 0, false); // add the point 0 to make it easier later
 
     // the state at 0 or beta
@@ -38,16 +38,17 @@ namespace measures {
     long idx1 = q_tau.mesh().size();
 
     for (auto const &[tau2, color, dagger] : t_ordered_op_list) {
+
       long idx2 = closest_mesh_pt_index(this->q_tau.mesh(), tau2);
 
       for (int a = 0; a < n_color; ++a)
         for (int b = 0; b < n_color; ++b) nn_mat(a, b) += int(state_at_tau[a]) * int(state_at_0[b]);
 
+      ALWAYS_EXPECTS(idx2 < idx1, "Error at {}", tau2);
       for (long u = idx1 - 1; u >= idx2; --u) q_tau.data()(u, nda::ellipsis{}) += nn_mat;
 
       state_at_tau[color] = not state_at_tau[color]; // cross a C or a C dagger ...
       idx1                = idx2;
-      ALWAYS_EXPECTS(idx2 < idx1, "Error at {}", tau2);
     }
   }
 
