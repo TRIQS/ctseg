@@ -4,8 +4,8 @@ namespace moves {
   double remove_segment::attempt() {
 
     SPDLOG_LOGGER_TRACE("\n =================== ATTEMPT REMOVE ================ \n", void);
-    auto const qmc_beta = time_point_factory.get_upper_pt();
-    auto const qmc_zero = time_point_factory.get_lower_pt();
+    auto const qmc_beta          = time_point_factory.get_upper_pt();
+    auto const qmc_zero          = time_point_factory.get_lower_pt();
 
     // ------------ Choice of segment --------------
 
@@ -20,8 +20,7 @@ namespace moves {
     // Select segment to remove
     proposed_segment_index = rng(sl.size());
     proposed_segment       = sl[proposed_segment_index];
-    if (proposed_segment.tau_c == qmc_beta and proposed_segment.tau_cdag == qmc_zero)
-      return 0; // If segment is a full line do not remove
+    if (proposed_segment.tau_c == qmc_beta and proposed_segment.tau_cdag == qmc_zero) return 0; // If segment is a full line do not remove
     auto proposed_segment_length = double(proposed_segment.tau_c - proposed_segment.tau_cdag);
 
     SPDLOG_LOGGER_TRACE("Removing c at{}, cdag at {}", proposed_segment.tau_c, proposed_segment.tau_cdag);
@@ -33,7 +32,8 @@ namespace moves {
         ln_trace_ratio -= -wdata.U(color, c) * overlap(config.seglists[c], proposed_segment, time_point_factory);
         ln_trace_ratio -= wdata.mu(c) * proposed_segment_length;
         if (wdata.has_Dt)
-          ln_trace_ratio -= K_overlap(config.seglists[c], proposed_segment, slice_target_to_scalar(wdata.K, color, c));
+          ln_trace_ratio -=
+             K_overlap(config.seglists[c], proposed_segment, slice_target_to_scalar(wdata.K, color, c));
       }
     }
     double trace_ratio = std::exp(ln_trace_ratio);
@@ -41,13 +41,11 @@ namespace moves {
     // ------------  Det ratio  ---------------
 
     auto det_ratio = wdata.dets[color].try_remove(proposed_segment_index, proposed_segment_index);
-
+    
     // ------------  Proposition ratio ------------
 
     double current_number_segments = sl.size();
-    double future_number_intervals = current_number_segments == 1 ?
-       2 :
-       int(sl.size() - 1); // Factor of 2 when inserting into empty line because no tiem swapping
+    double future_number_intervals  = sl.size() - 1.0;  
     // Limits of insertion interval for reverse move, initialise at (beta,0)
     qmc_time_t tau_left  = qmc_beta;
     qmc_time_t tau_right = qmc_zero;
@@ -59,8 +57,7 @@ namespace moves {
       tau_left  = sl[is_first_segment ? sl.size() - 1 : proposed_segment_index - 1].tau_cdag;
     }
     qmc_time_t l      = tau_left - tau_right;
-    double prop_ratio = (future_number_intervals * l * l / 2) / current_number_segments;
-
+    double prop_ratio = (future_number_intervals * l * l / (current_number_segments == 1 ? 1 : 2)) / current_number_segments;
     SPDLOG_LOGGER_TRACE("trace_ratio  = {}, prop_ratio = {}, det_ratio = {}", trace_ratio, prop_ratio, det_ratio);
 
     return trace_ratio * det_ratio * prop_ratio;
