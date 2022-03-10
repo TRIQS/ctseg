@@ -35,9 +35,9 @@ void check_invariant(configuration_t const &config) {
 #ifdef EXT_DEBUG
   for (auto const &[c, sl] : itertools::enumerate(config.seglists))
     for (int i = 0; i < sl.size() - 1; ++i) {
-      ALWAYS_EXPECTS((sl[i].tau_c_dag > sl[i + 1].tau_c),
+      ALWAYS_EXPECTS((sl[i].tau_cdag > sl[i + 1].tau_c),
                      "Time order error between segment at position {} in config \n{}", i, config);
-      ALWAYS_EXPECTS(not is_cyclic(sl[i], "Segment at position {} should not by cyclic in config \n{}", i,
+      ALWAYS_EXPECTS(not is_cyclic(sl[i]), "Segment at position {} should not by cyclic in config \n{}", i,
                      config); // only last segment can be cyclic
     }
 #endif
@@ -47,7 +47,7 @@ void check_invariant(configuration_t const &config) {
 
 // Make a list of time ordered (decreasing) operators
 // vector of (time, color, is_dagger)
-std::vector<std::tuple<qmc_time_t, int, bool>> make_time_ordered_op_list(configuration const &config);
+std::vector<std::tuple<qmc_time_t, int, bool>> make_time_ordered_op_list(configuration_t const &config);
 
 // Comparison of segments. Returns 1 if s1 is left of s2 (we order segments by decreasing time).
 inline bool operator<(segment_t const &s1, segment_t const &s2) { return s1.tau_c > s2.tau_c; };

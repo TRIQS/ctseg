@@ -2,7 +2,7 @@
 
 // Make a list of time ordered (decreasing) operators
 
-std::vector<std::tuple<qmc_time_t, int, bool>> make_time_ordered_op_list(configuration const &config) {
+std::vector<std::tuple<qmc_time_t, int, bool>> make_time_ordered_op_list(configuration_t const &config) {
 
   std::vector<std::tuple<qmc_time_t, int, bool>> result;
 

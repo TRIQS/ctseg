@@ -15,6 +15,9 @@ struct results_t {
   /// Single-particle Green's function :math:`F(\tau)` in imaginary time.
   std::optional<g_tau_t> f_tau;
 
+  /// <n_a(tau) n_b(0)>  
+  std::optional<gf<imtime>> nn_tau;
+  
   /// Density per color. FIXME : optional ??
   nda::array<double, 1> densities;
 };

@@ -28,6 +28,8 @@
   }
 
 // FIXME
+#define EXT_DEBUG
+
 
 using namespace triqs::gfs;
 using namespace triqs::mesh;

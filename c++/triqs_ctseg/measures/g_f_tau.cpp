@@ -21,7 +21,7 @@
 
 namespace measures {
 
-  g_f_tau::measure_g_f_tau(params_t const &p, work_data_t const &wdata, configuration_t const &config,
+  g_f_tau::g_f_tau(params_t const &p, work_data_t const &wdata, configuration_t const &config,
                            results_t &results)
      : wdata{wdata}, config{config}, results{results} {
 
