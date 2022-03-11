@@ -14,7 +14,7 @@ namespace moves {
     int destination_color = 0;
     segment_t origin_segment;
     int origin_index{};
-    std::vector<segment_t>::iterator destination_it;
+    std::vector<segment_t>::const_iterator destination_it;
     qmc_time_factory_t time_point_factory = qmc_time_factory_t{wdata.beta};
     // Internal methods
     bool no_overlap(segment_t seg1, segment_t seg2);

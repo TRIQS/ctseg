@@ -27,6 +27,7 @@ namespace moves {
     }
     left_segment  = sl[left_segment_index];
     right_segment = sl[right_segment_index];
+
     auto inserted_segment =
        segment_t{left_segment.tau_cdag, right_segment.tau_c}; // "antisegment" : careful with order of c, cdag
     auto inserted_segment_length = double(inserted_segment.tau_c - inserted_segment.tau_cdag);
@@ -50,6 +51,8 @@ namespace moves {
     auto det_ratio = wdata.dets[color].try_remove(
        left_segment_index, right_segment_index); // FIXME: ordering in det when regrouping into cyclic segment
 
+    // additional sign due to "roll" is not computed at this stage, cf accept
+
     // ------------  Proposition ratio ------------
 
     double future_number_segments   = making_full_line ? 1 : int(sl.size()) - 1;
@@ -71,22 +74,25 @@ namespace moves {
     SPDLOG_LOGGER_TRACE("\n - - - - - ====> ACCEPT - - - - - - - - - - -\n", void);
 
     wdata.dets[color].complete_operation();
+
     // Regroup segments
-    auto &sl = config.seglists[color];
+    auto &sl               = config.seglists[color];
+    double additional_sign = 1;
+
     if (making_full_line) {
-      auto qmc_beta          = time_point_factory.get_upper_pt();
-      auto qmc_zero          = time_point_factory.get_lower_pt();
-      sl[left_segment_index] = segment_t{qmc_beta, qmc_zero};
+      sl[left_segment_index] = segment_t{wdata.qmc_beta, wdata.qmc_zero};
     } else {
       auto new_segment       = segment_t{left_segment.tau_c, right_segment.tau_cdag};
       sl[left_segment_index] = new_segment;
-      auto right_segment_it  = std::next(sl.begin(), right_segment_index);
-      sl.erase(right_segment_it);
+
+      // FIXME : comment
+      if (is_cyclic(new_segment)) additional_sign = wdata.dets[color].roll_matrix(work_data_t::det_t::Up);
+
+      // remove the "other" segment
+      sl.erase(sl.begin() + right_segment_index);
     }
 
-    // FIXME ??? SIGNE ???
-    double sign_ratio = 1;
-    return sign_ratio;
+    return additional_sign;
   }
 
   //--------------------------------------------------

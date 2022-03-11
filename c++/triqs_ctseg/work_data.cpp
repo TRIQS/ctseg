@@ -3,7 +3,7 @@
 #include <triqs/gfs/functions/functions2.hpp>
 #include <triqs/operators/util/extractors.hpp>
 
-work_data_t::work_data_t(params_t const &p, inputs_t const &inputs) {
+work_data_t::work_data_t(params_t const &p, inputs_t const &inputs) : qmc_tau_factory{p.beta} {
 
   beta = p.beta;
 

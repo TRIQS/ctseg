@@ -71,8 +71,7 @@ namespace moves {
 
     // Reject if chosen segment overlaps with destination color
     if (not is_movable(dsl, origin_segment)) return 0;
-    auto const_dest_it = ++find_segment_left(dsl, origin_segment); // returns const iterator
-    destination_it     = dsl.erase(const_dest_it, const_dest_it);  // hack: converts const iterator to regular iterator
+    destination_it = ++find_segment_left(dsl, origin_segment); 
 
     // ------------  Trace ratio  -------------
     double ln_trace_ratio = (wdata.mu(destination_color) - wdata.mu(origin_color)) * proposed_segment_length;
@@ -81,7 +80,7 @@ namespace moves {
     // ------------  Det ratio  ---------------
 
     // pos is the position of the proposed segment if inserted, converted from iterator to int
-    long dest_index = std::distance(destination_it, dsl.begin());
+    long dest_index = std::distance(destination_it, dsl.cbegin());
     // We insert tau_cdag as a line (first index) and tau_c as a column (second index). The index always corresponds to the
     // segment the tau_c/tau_cdag belongs to.
     double det_ratio = 1.0; // FIXME: do the complete_operation/reject_last_try behave well if there was no try?
@@ -105,18 +104,19 @@ namespace moves {
 
     SPDLOG_LOGGER_TRACE("\n - - - - - ====> ACCEPT - - - - - - - - - - -\n", void);
 
+    // Finish the det
     wdata.dets[origin_color].complete_operation();
     wdata.dets[destination_color].complete_operation();
-    // Proceed with the move
-    auto &sl  = config.seglists[origin_color];
+
+    // Add the segment at destination
     auto &dsl = config.seglists[destination_color];
     dsl.insert(destination_it, origin_segment);
-    auto origin_it = std::next(sl.begin(), origin_index);
-    sl.erase(origin_it);
+    
+    // Rm the segment at origin
+    auto &sl  = config.seglists[origin_color];
+    sl.erase(sl.begin() + origin_index);
 
-    // FIXME ??? SIGNE ???
-    double sign_ratio = 1;
-    return sign_ratio;
+    return 1;
   }
 
   //--------------------------------------------------

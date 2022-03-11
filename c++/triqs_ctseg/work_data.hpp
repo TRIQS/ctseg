@@ -27,6 +27,11 @@ struct work_data_t {
 
   int n_color;
   double beta;
+
+  qmc_time_factory_t qmc_tau_factory{beta};
+  qmc_time_t const qmc_beta = qmc_tau_factory.get_upper_pt();
+  qmc_time_t const qmc_zero = qmc_tau_factory.get_lower_pt();
+
   nda::vector<double> mu;
   nda::matrix<double> U;
 

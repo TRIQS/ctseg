@@ -13,8 +13,8 @@ namespace moves {
     int color{};
     segment_t left_segment;
     segment_t right_segment;
-    int left_segment_index{};
-    int right_segment_index{};
+    int left_segment_index;
+    int right_segment_index;
     bool making_full_line{};
     qmc_time_factory_t time_point_factory = qmc_time_factory_t{wdata.beta};
 
