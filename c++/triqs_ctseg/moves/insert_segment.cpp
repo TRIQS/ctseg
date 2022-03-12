@@ -1,4 +1,5 @@
 #include "insert_segment.hpp"
+#include "triqs_ctseg/configuration.hpp"
 
 namespace moves {
 
@@ -22,8 +23,8 @@ namespace moves {
       long ind_segment     = rng(sl.size());
       tau1                 = sl[ind_segment].tau_cdag; // tau1 is cdag of this segment
       bool is_last_segment = ind_segment == sl.size() - 1;
-      tau2 = sl[is_last_segment ? 0 : ind_segment + 1].tau_c; // tau2 is c of next segment, possibly cyclic
-      if (tau2 == wdata.qmc_beta and tau1 == wdata.qmc_zero) return 0;    // If segment is a full line, cannot insert
+      tau2 = sl[is_last_segment ? 0 : ind_segment + 1].tau_c;          // tau2 is c of next segment, possibly cyclic
+      if (tau2 == wdata.qmc_beta and tau1 == wdata.qmc_zero) return 0; // If segment is a full line, cannot insert
     }
 
     // Choose new segment within insertion window
@@ -80,18 +81,21 @@ namespace moves {
 
     // Insert the times into the det
     wdata.dets[color].complete_operation();
+
+    // Compute the sign ratio
+    double sign_ratio = 1;
+    auto &sl          = config.seglists[color];
+    if (is_cyclic(sl.back())) sign_ratio = -1;
+    if (is_cyclic(proposed_segment) and sl.size() % 2 == 0) sign_ratio = -1;
+
     // Insert the segment in an ordered list
-    config.seglists[color].insert(proposed_segment_insert_it, proposed_segment);
+    sl.insert(proposed_segment_insert_it, proposed_segment);
 
-    // FIXME ??? SIGNE ???
-    double sign_ratio = 1; 
-
-    // Check invariant 
+    // Check invariant
 #ifdef EXT_DEBUG
     // SPDLOG_LOGGER_TRACE("Configuration {}", config);
     check_invariant(config);
 #endif
-
     return sign_ratio;
   }
 

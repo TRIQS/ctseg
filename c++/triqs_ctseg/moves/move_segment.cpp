@@ -67,7 +67,7 @@ namespace moves {
 
     // Reject if chosen segment overlaps with destination color
     if (not is_movable(dsl, origin_segment)) return 0;
-    destination_it = ++find_segment_left(dsl, origin_segment); 
+    destination_it = ++find_segment_left(dsl, origin_segment);
 
     // ------------  Trace ratio  -------------
     double ln_trace_ratio = (wdata.mu(destination_color) - wdata.mu(origin_color)) * proposed_segment_length;
@@ -79,7 +79,7 @@ namespace moves {
     long dest_index = std::distance(destination_it, dsl.cbegin());
     // We insert tau_cdag as a line (first index) and tau_c as a column (second index). The index always corresponds to the
     // segment the tau_c/tau_cdag belongs to.
-    double det_ratio = 1.0; 
+    double det_ratio = 1.0;
     if (not moving_full_line) {
       det_ratio = wdata.dets[destination_color].try_insert(dest_index, dest_index, {origin_segment.tau_cdag, 0},
                                                            {origin_segment.tau_c, 0})
@@ -100,19 +100,29 @@ namespace moves {
 
     SPDLOG_LOGGER_TRACE("\n - - - - - ====> ACCEPT - - - - - - - - - - -\n", void);
 
-    // Finish the det
+    // Update the dets
     wdata.dets[origin_color].complete_operation();
     wdata.dets[destination_color].complete_operation();
 
-    // Add the segment at destination
+    double sign_ratio = 1;
+
+    // Add the segment at destination and update sign
     auto &dsl = config.seglists[destination_color];
+    if (is_cyclic(origin_segment)) {
+      if (dsl.size() % 2 == 0) sign_ratio *= -1;
+    } else if (is_cyclic(dsl.back()))
+      sign_ratio *= -1;
     dsl.insert(destination_it, origin_segment);
-    
-    // Rm the segment at origin
-    auto &sl  = config.seglists[origin_color];
+
+    // Remove the segment at origin and update sign
+    auto &sl = config.seglists[origin_color];
+    if (is_cyclic(origin_segment)) {
+      if (sl.size() % 2 == 1) sign_ratio *= -1;
+    } else if (is_cyclic(sl.back()))
+      sign_ratio *= -1;
     sl.erase(sl.begin() + origin_index);
 
-    return 1;
+    return sign_ratio;
   }
 
   //--------------------------------------------------

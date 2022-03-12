@@ -70,13 +70,18 @@ namespace moves {
 
     // Update the dets
     wdata.dets[color].complete_operation();
-    // Remove the segment
-    auto &sl                 = config.seglists[color];
-    auto proposed_segment_it = std::next(sl.begin(), proposed_segment_index);
-    sl.erase(proposed_segment_it);
 
-    // FIXME ??? SIGNE ???
+    auto &sl = config.seglists[color];
+    // Compute the sign ratio
     double sign_ratio = 1;
+    if (is_cyclic(sl[proposed_segment_index])) {
+      if (sl.size() % 2 == 1) sign_ratio = -1;
+    } else if (is_cyclic(sl.back()))
+      sign_ratio = -1;
+
+    // Remove the segment
+    sl.erase(sl.begin() + proposed_segment_index);
+
     return sign_ratio;
   }
 

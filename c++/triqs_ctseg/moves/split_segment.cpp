@@ -75,22 +75,36 @@ namespace moves {
 
     SPDLOG_LOGGER_TRACE("\n - - - - - ====> ACCEPT - - - - - - - - - - -\n", void);
 
+    // Update the dets
     wdata.dets[color].complete_operation();
-    // Split the segment
-    auto &sl = config.seglists[color];
+
+    auto &sl          = config.seglists[color];
+    double sign_ratio = 1;
+    // Split the segment and compute the sign ratio
     if (full_line) {
-      auto new_segment         = segment_t{tau_right, tau_left};
+      auto new_segment = segment_t{tau_right, tau_left};
+      if (is_cyclic(new_segment)) sign_ratio = -1;
       sl[proposed_segment_idx] = new_segment;
     } else {
-      auto new_segment_left    = segment_t{proposed_segment.tau_c, tau_left};
-      auto new_segment_right   = segment_t{tau_right, proposed_segment.tau_cdag};
-      auto right_segment_it    = std::next(sl.begin(), right_segment_idx);
+      auto new_segment_left  = segment_t{proposed_segment.tau_c, tau_left};
+      auto new_segment_right = segment_t{tau_right, proposed_segment.tau_cdag};
+      if (is_cyclic(proposed_segment)) {
+        bool kept_number_cyclic = is_cyclic(new_segment_left) or is_cyclic(new_segment_right);
+        // If we are splitting a cyclic segment and one of the new segments is cyclic, we changed the parity
+        // of the number of segments and get a - sign
+        if (kept_number_cyclic) sign_ratio = -1;
+        // Otherwise, we get a - sign only if we were in an odd configuration
+        else if (sl.size() % 2 == 1)
+          sign_ratio = -1;
+        // Always get a - sign if the config had a cyclic segment and we did not touch it
+      } else if (is_cyclic(sl.back()))
+        sign_ratio = -1;
+      // Update the proposed segment
       sl[proposed_segment_idx] = new_segment_left;
-      sl.insert(right_segment_it, new_segment_right);
+      // Insert a new segment
+      sl.insert(sl.begin() + right_segment_idx, new_segment_right);
     }
 
-    // FIXME ??? SIGNE ???
-    double sign_ratio = 1;
     return sign_ratio;
   }
 

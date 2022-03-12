@@ -73,26 +73,35 @@ namespace moves {
 
     SPDLOG_LOGGER_TRACE("\n - - - - - ====> ACCEPT - - - - - - - - - - -\n", void);
 
+    // Update the dets
     wdata.dets[color].complete_operation();
 
-    // Regroup segments
-    auto &sl               = config.seglists[color];
-    double additional_sign = 1;
-
+    // Regroup segments and copute the sign ratio
+    auto &sl          = config.seglists[color];
+    double sign_ratio = 1;
     if (making_full_line) {
+      if (is_cyclic(sl[left_segment_index])) sign_ratio = -1;
       sl[left_segment_index] = segment_t{wdata.qmc_beta, wdata.qmc_zero};
     } else {
-      auto new_segment       = segment_t{left_segment.tau_c, right_segment.tau_cdag};
+      auto new_segment        = segment_t{left_segment.tau_c, right_segment.tau_cdag};
+      bool old_segment_cyclic = is_cyclic(sl[left_segment_index]) or is_cyclic(sl[right_segment_index]);
+      // If one of the regrouped segments was cyclic, we still have a cyclic segment and we changed
+      // the parity of the number of segments
+      if (old_segment_cyclic) sign_ratio = -1;
+      // Otherwise, we may have obtained a cyclic segment from two non-cyclic segments
+      else if (is_cyclic(new_segment)) {
+        // In this case, a cdag that belonged to the first segment now belongs to the last segment:
+        // we need to "roll up" the det and this produces an additional sign.
+        sign_ratio *= wdata.dets[color].roll_matrix(work_data_t::det_t::Up);
+        // A further additional sign if we got to an odd configuration.
+        if (sl.size() % 2 == 0) sign_ratio *= -1;
+      }
+      // Update the left segment
       sl[left_segment_index] = new_segment;
-
-      // FIXME : comment
-      if (is_cyclic(new_segment)) additional_sign = wdata.dets[color].roll_matrix(work_data_t::det_t::Up);
-
-      // remove the "other" segment
+      // Remove the "other" segment
       sl.erase(sl.begin() + right_segment_index);
     }
-
-    return additional_sign;
+    return sign_ratio;
   }
 
   //--------------------------------------------------
