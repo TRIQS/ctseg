@@ -19,13 +19,13 @@ namespace moves {
     proposed_segment_idx = rng(sl.size());
     proposed_segment     = sl[proposed_segment_idx];
     // Select splitting points (tau_left,tau_right)
-    auto qmc_zero  = time_point_factory.get_lower_pt();
+    auto qmc_zero  = fac.get_lower_pt();
     qmc_time_t l   = proposed_segment.tau_c - proposed_segment.tau_cdag;
-    qmc_time_t dt1 = time_point_factory.get_random_pt(rng, qmc_zero, l);
-    qmc_time_t dt2 = time_point_factory.get_random_pt(rng, qmc_zero, l);
+    qmc_time_t dt1 = fac.get_random_pt(rng, qmc_zero, l);
+    qmc_time_t dt2 = fac.get_random_pt(rng, qmc_zero, l);
     if (dt1 == dt2) return 0;
     if (dt1 == qmc_zero || dt2 == qmc_zero || dt1 == l || dt2 == l) return 0;
-    full_line = is_full_line(proposed_segment, time_point_factory);
+    full_line = is_full_line(proposed_segment, fac);
     if (dt1 > dt2 && !full_line)
       std::swap(dt1, dt2); // If splitting a full line, the order of tau_left and tau_right is not fixed
     tau_left                    = proposed_segment.tau_c - dt1; // dt1 < dt2
@@ -41,7 +41,7 @@ namespace moves {
     double ln_trace_ratio = 0;
     for (auto c : range(wdata.n_color)) {
       if (c != color) {
-        ln_trace_ratio -= -wdata.U(color, c) * overlap(config.seglists[c], removed_segment, time_point_factory);
+        ln_trace_ratio -= -wdata.U(color, c) * overlap(config.seglists[c], removed_segment, fac);
         ln_trace_ratio -= wdata.mu(c) * removed_segment_length;
         if (wdata.has_Dt)
           ln_trace_ratio -= K_overlap(config.seglists[c], removed_segment, slice_target_to_scalar(wdata.K, color, c));

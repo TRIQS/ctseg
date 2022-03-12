@@ -4,8 +4,6 @@ namespace moves {
   double remove_segment::attempt() {
 
     SPDLOG_LOGGER_TRACE("\n =================== ATTEMPT REMOVE ================ \n", void);
-    auto const qmc_beta = time_point_factory.get_upper_pt();
-    auto const qmc_zero = time_point_factory.get_lower_pt();
 
     // ------------ Choice of segment --------------
 
@@ -20,7 +18,7 @@ namespace moves {
     // Select segment to remove
     proposed_segment_index = rng(sl.size());
     proposed_segment       = sl[proposed_segment_index];
-    if (proposed_segment.tau_c == qmc_beta and proposed_segment.tau_cdag == qmc_zero)
+    if (proposed_segment.tau_c == wdata.qmc_beta and proposed_segment.tau_cdag == wdata.qmc_zero)
       return 0; // If segment is a full line do not remove
     auto proposed_segment_length = double(proposed_segment.tau_c - proposed_segment.tau_cdag);
 
@@ -30,7 +28,7 @@ namespace moves {
     double ln_trace_ratio = 0;
     for (auto c : range(wdata.n_color)) {
       if (c != color) {
-        ln_trace_ratio -= -wdata.U(color, c) * overlap(config.seglists[c], proposed_segment, time_point_factory);
+        ln_trace_ratio -= -wdata.U(color, c) * overlap(config.seglists[c], proposed_segment, fac);
         ln_trace_ratio -= wdata.mu(c) * proposed_segment_length;
         if (wdata.has_Dt)
           ln_trace_ratio -= K_overlap(config.seglists[c], proposed_segment, slice_target_to_scalar(wdata.K, color, c));
@@ -47,8 +45,8 @@ namespace moves {
     double current_number_segments = sl.size();
     double future_number_intervals = sl.size() - 1.0;
     // Limits of insertion interval for reverse move, initialise at (beta,0)
-    qmc_time_t tau_left  = qmc_beta;
-    qmc_time_t tau_right = qmc_zero;
+    qmc_time_t tau_left  = wdata.qmc_beta;
+    qmc_time_t tau_right = wdata.qmc_zero;
     if (current_number_segments != 1) {
       bool is_last_segment  = proposed_segment_index == sl.size() - 1;
       bool is_first_segment = proposed_segment_index == 0;

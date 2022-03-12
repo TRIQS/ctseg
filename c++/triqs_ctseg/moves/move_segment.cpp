@@ -18,17 +18,15 @@ namespace moves {
     bool result = true;
     if (seglist.empty()) return result;
     // If seg is cyclic, split it
-    auto qmc_zero = time_point_factory.get_lower_pt();
-    auto qmc_beta = time_point_factory.get_upper_pt();
     if (seg.tau_c < seg.tau_cdag)
-      return is_movable(seglist, segment_t{qmc_beta, seg.tau_cdag})
-         && is_movable(seglist, segment_t{seg.tau_c, qmc_zero});
+      return is_movable(seglist, segment_t{wdata.qmc_beta, seg.tau_cdag})
+         && is_movable(seglist, segment_t{seg.tau_c, wdata.qmc_zero});
     // Isolate last segment
     segment_t last_seg = seglist.back();
     // In case last segment is cyclic, split it and check its overlap with seg
     if (last_seg.tau_c < last_seg.tau_cdag) {
-      result = result && no_overlap(seg, segment_t{qmc_beta, last_seg.tau_cdag})
-         && no_overlap(seg, segment_t{last_seg.tau_c, qmc_zero});
+      result = result && no_overlap(seg, segment_t{wdata.qmc_beta, last_seg.tau_cdag})
+         && no_overlap(seg, segment_t{last_seg.tau_c, wdata.qmc_zero});
     } else
       result = result && no_overlap(seg, last_seg);
     // Check overlap of seg with the remainder of seglist
@@ -44,8 +42,6 @@ namespace moves {
 
     SPDLOG_LOGGER_TRACE("\n =================== ATTEMPT MOVE ================ \n", void);
 
-    auto qmc_beta = time_point_factory.get_upper_pt();
-
     // ------------ Choice of segment and colors --------------
     // Select origin color
     origin_color = rng(wdata.n_color);
@@ -59,7 +55,7 @@ namespace moves {
     origin_index                 = rng(sl.size());
     origin_segment               = sl[origin_index];
     auto qmc_length              = origin_segment.tau_c - origin_segment.tau_cdag;
-    bool moving_full_line        = (qmc_length == qmc_beta);
+    bool moving_full_line        = (qmc_length == wdata.qmc_beta);
     auto proposed_segment_length = double(qmc_length);
 
     SPDLOG_LOGGER_TRACE("Moving c at {}, cdag at {}", origin_segment.tau_c, origin_segment.tau_cdag);
@@ -83,7 +79,7 @@ namespace moves {
     long dest_index = std::distance(destination_it, dsl.cbegin());
     // We insert tau_cdag as a line (first index) and tau_c as a column (second index). The index always corresponds to the
     // segment the tau_c/tau_cdag belongs to.
-    double det_ratio = 1.0; // FIXME: do the complete_operation/reject_last_try behave well if there was no try?
+    double det_ratio = 1.0; 
     if (not moving_full_line) {
       det_ratio = wdata.dets[destination_color].try_insert(dest_index, dest_index, {origin_segment.tau_cdag, 0},
                                                            {origin_segment.tau_c, 0})

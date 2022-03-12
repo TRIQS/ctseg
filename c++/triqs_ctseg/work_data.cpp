@@ -3,7 +3,7 @@
 #include <triqs/gfs/functions/functions2.hpp>
 #include <triqs/operators/util/extractors.hpp>
 
-work_data_t::work_data_t(params_t const &p, inputs_t const &inputs) : qmc_tau_factory{p.beta} {
+work_data_t::work_data_t(params_t const &p, inputs_t const &inputs, mpi::communicator c) : fac{p.beta} {
 
   beta = p.beta;
 
@@ -32,6 +32,12 @@ work_data_t::work_data_t(params_t const &p, inputs_t const &inputs) : qmc_tau_fa
   ALWAYS_EXPECTS((has_jperp and n_color != 2), "Error : has_jperp is true and we have {} colors instead of 2", n_color);
   ALWAYS_EXPECTS((has_Dt and n_color != 2), "Error : has_Dt is true and we have {} colors instead of 2", n_color);
 
+  // Report 
+  if (c.rank() == 0) {
+    spdlog::info("mu = {}\n U = {}", mu, U);
+    spdlog::info("dynamical_U = {}\n jperp_interactions = {}\n ", has_Dt, has_jperp);
+  }
+
   if (has_Dt) {
     // Compute interaction kernels K(tau), K'(tau) by integrating D(tau)
     K                    = gf<imtime>({beta, Boson, p.n_tau_k}, {n_color, n_color});
@@ -58,13 +64,13 @@ work_data_t::work_data_t(params_t const &p, inputs_t const &inputs) : qmc_tau_fa
   // .............  Determinants .....................
 
   delta = map([](gf_const_view<imtime> d) { return real(d); }, inputs.delta);
-
-  for (auto const &bl : range(delta.size())) {
-    // FIXME : spdlog. Needs communicator?
-    if (!is_gf_real(delta[bl], 1e-10)) {
-      std::cerr << "WARNING: The Delta(tau) block number " << bl << " is not real in tau space\n";
-      std::cerr << "WARNING: max(Im[Delta(tau)]) = " << max_element(abs(imag(delta[bl].data()))) << "\n";
-      std::cerr << "WARNING: Dissregarding the imaginary component in the calculation.\n";
+  if (c.rank() == 0) {
+    for (auto const &bl : range(delta.size())) {
+      if (!is_gf_real(delta[bl], 1e-10)) {
+        spdlog::info("WARNING: The Delta(tau) block number {bl} is not real in tau space\n",bl);
+        spdlog::info("WARNING: max(Im[Delta(tau)]) = {} \n",max_element(abs(imag(delta[bl].data()))));
+        spdlog::info("WARNING: Disregarding the imaginary component in the calculation.\n");
+      }
     }
     dets.emplace_back(delta_block_adaptor{real(delta[bl])}, p.det_init_size);
     dets.back().set_singular_threshold(p.det_singular_threshold);

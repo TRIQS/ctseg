@@ -17,7 +17,7 @@ namespace moves {
     int proposed_segment_idx{};
     int right_segment_idx{};
     bool full_line{};
-    qmc_time_factory_t time_point_factory = qmc_time_factory_t{wdata.beta};
+    qmc_time_factory_t fac = qmc_time_factory_t{wdata.beta};
 
     public:
     // Constructor

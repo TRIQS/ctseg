@@ -12,7 +12,7 @@ namespace measures {
     configuration_t const &config;
     results_t &results;
     double beta;
-    qmc_time_factory_t time_point_factory = qmc_time_factory_t{wdata.beta};
+    qmc_time_factory_t fac = qmc_time_factory_t{wdata.beta};
 
     gf<imtime> q_tau;
 
