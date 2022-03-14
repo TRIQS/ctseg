@@ -40,11 +40,11 @@ class solver_core {
   // Keep the last solver parameters from the last call
   std::optional<solve_params_t> last_solve_params;
 
-  //
-  inputs_t inputs;
-
   // The set of results. Will be passed to measure and init by them
   results_t results;
+
+  // The set of inputs
+  inputs_t inputs;
 
   mpi::communicator c;
   // FIXME  Why here ??
@@ -57,9 +57,6 @@ class solver_core {
 
   // Green's function views for Python interface
   // do NOT add const here : python use a non const object and non const view
-  // FIXME : probably fixed now, no ?
-
-  // FIXME : Python. ?
 
   /// Hybridization function $\Delta^\sigma_{ab}(\tau)$
   block_gf_view<imtime> Delta_tau() { return inputs.delta; }
@@ -67,9 +64,9 @@ class solver_core {
   /// Dynamical spin-spin interactions $\mathcal{J}_\perp(\tau)$
   gf_view<imtime> Jperp_tau() { return inputs.jperpt; }
 
-  /// Dynamical spin-spin interactions $\mathcal{J}_\perp(\tau)$
+  /// Dynamical density-density interactions $D_0(\tau)$
   gf_view<imtime> D0_tau() { return inputs.d0t; }
 
-  /// Monte Carlo sign
-  //double average_sign() { return average_sign_; }
+  /// Hybridization function $\Delta^\sigma_{ab}(\tau)$
+  block_gf_view<imtime> G_tau() { return results.g_tau; }
 };

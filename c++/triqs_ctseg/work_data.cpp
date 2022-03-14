@@ -32,7 +32,7 @@ work_data_t::work_data_t(params_t const &p, inputs_t const &inputs, mpi::communi
   ALWAYS_EXPECTS((has_jperp and n_color != 2), "Error : has_jperp is true and we have {} colors instead of 2", n_color);
   ALWAYS_EXPECTS((has_Dt and n_color != 2), "Error : has_Dt is true and we have {} colors instead of 2", n_color);
 
-  // Report 
+  // Report
   if (c.rank() == 0) {
     spdlog::info("mu = {}\n U = {}", mu, U);
     spdlog::info("dynamical_U = {}\n jperp_interactions = {}\n ", has_Dt, has_jperp);
@@ -67,15 +67,15 @@ work_data_t::work_data_t(params_t const &p, inputs_t const &inputs, mpi::communi
   if (c.rank() == 0) {
     for (auto const &bl : range(delta.size())) {
       if (!is_gf_real(delta[bl], 1e-10)) {
-        spdlog::info("WARNING: The Delta(tau) block number {bl} is not real in tau space\n",bl);
-        spdlog::info("WARNING: max(Im[Delta(tau)]) = {} \n",max_element(abs(imag(delta[bl].data()))));
+        spdlog::info("WARNING: The Delta(tau) block number {} is not real in tau space\n", bl);
+        spdlog::info("WARNING: max(Im[Delta(tau)]) = {} \n", max_element(abs(imag(delta[bl].data()))));
         spdlog::info("WARNING: Disregarding the imaginary component in the calculation.\n");
       }
+      dets.emplace_back(delta_block_adaptor{real(delta[bl])}, p.det_init_size);
+      dets.back().set_singular_threshold(p.det_singular_threshold);
+      dets.back().set_n_operations_before_check(p.det_n_operations_before_check);
+      dets.back().set_precision_warning(p.det_precision_warning);
+      dets.back().set_precision_error(p.det_precision_error);
     }
-    dets.emplace_back(delta_block_adaptor{real(delta[bl])}, p.det_init_size);
-    dets.back().set_singular_threshold(p.det_singular_threshold);
-    dets.back().set_n_operations_before_check(p.det_n_operations_before_check);
-    dets.back().set_precision_warning(p.det_precision_warning);
-    dets.back().set_precision_error(p.det_precision_error);
   }
 } // work_data constructor

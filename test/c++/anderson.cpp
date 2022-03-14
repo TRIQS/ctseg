@@ -19,36 +19,35 @@
  ******************************************************************************/
 #include <triqs/test_tools/gfs.hpp>
 #include <triqs_ctseg/solver_core.hpp>
-using namespace triqs_ctseg;
+
 TEST(CtHybSpin, Anderson) {
   // start the mpi
   mpi::communicator world;
 
-  double beta = 20.0;
-  double U = 1.0;
-  double mu = 1.3;
-  double epsilon = 0.2;
-  long n_cycles = 10000 / world.size();
-  long n_warmup_cycles = 1000;
-  long random_seed = 23488 + 28 * world.rank();
+  double beta         = 20.0;
+  double U            = 1.0;
+  double mu           = 1.3;
+  double epsilon      = 0.2;
+  int n_cycles        = 10000 / world.size();
+  int n_warmup_cycles = 1000;
+  int random_seed     = 23488 + 28 * world.rank();
 
   // prepare the parameters
   constr_params_t param_constructor;
   solve_params_t param_solve;
 
-  param_constructor.beta = beta;
+  param_constructor.beta      = beta;
   param_constructor.gf_struct = {{"up", 1}, {"down", 1}};
-  param_constructor.n_iw = 200;
+  int n_iw                    = 200;
 
   // create solver instance
   solver_core ctqmc(param_constructor);
 
-  // param_solve.U =  matrix<double>({{0.0,U},{U,0.0}});
-  param_solve.h_int = U * n("up", 0) * n("down", 0);
-  param_solve.n_cycles = n_cycles;
+  param_solve.h_int           = U * n("up", 0) * n("down", 0);
+  param_solve.n_cycles        = n_cycles;
   param_solve.n_warmup_cycles = n_warmup_cycles;
-  param_solve.random_seed = random_seed;
-  param_solve.measure_gw = true;
+  param_solve.random_seed     = random_seed;
+  param_solve.measure_gt      = true;
 
   // prepare G0
   nda::clef::placeholder<0> om_;

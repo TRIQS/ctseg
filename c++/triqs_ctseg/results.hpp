@@ -10,7 +10,8 @@ using g_iw_t  = block_gf<imfreq, matrix_valued>;
 struct results_t {
 
   /// Single-particle Green's function :math:`G(\tau)` in imaginary time.
-  std::optional<g_tau_t> g_tau;
+  //std::optional<g_tau_t> g_tau;
+  g_tau_t g_tau;
 
   /// Single-particle Green's function :math:`F(\tau)` in imaginary time.
   std::optional<g_tau_t> f_tau;
