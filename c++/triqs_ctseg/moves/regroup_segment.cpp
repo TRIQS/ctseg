@@ -1,16 +1,17 @@
 #include "regroup_segment.hpp"
+#include "../logs.hpp"
 
 namespace moves {
 
   double regroup_segment::attempt() {
 
-    SPDLOG_LOGGER_TRACE("\n =================== ATTEMPT REGROUP ================ \n", void);
+    SPDLOG_TRACE("\n =================== ATTEMPT REGROUP ================ \n");
 
     // ------------ Choice of segment --------------
     // Select color
     color    = rng(wdata.n_color);
     auto &sl = config.seglists[color];
-    SPDLOG_LOGGER_TRACE("Regrouping at color {}", color);
+    SPDLOG_TRACE("Regrouping at color {}", color);
 
     // If no segments nothing to regroup
     if (sl.empty()) return 0;
@@ -32,7 +33,7 @@ namespace moves {
        segment_t{left_segment.tau_cdag, right_segment.tau_c}; // "antisegment" : careful with order of c, cdag
     auto inserted_segment_length = double(inserted_segment.tau_c - inserted_segment.tau_cdag);
 
-    SPDLOG_LOGGER_TRACE("Regroup: removing c at {}, cdag at {}", right_segment.tau_c, left_segment.tau_cdag);
+    SPDLOG_TRACE("Regroup: removing c at {}, cdag at {}", right_segment.tau_c, left_segment.tau_cdag);
 
     // ------------  Trace ratio  -------------
     double ln_trace_ratio = 0;
@@ -62,7 +63,7 @@ namespace moves {
     if (not making_full_line) l = left_segment.tau_c - right_segment.tau_cdag;
     double prop_ratio = (future_number_segments * l * l / (making_full_line ? 1 : 2)) / current_number_intervals;
 
-    SPDLOG_LOGGER_TRACE("trace_ratio  = {}, prop_ratio = {}, det_ratio = {}", trace_ratio, prop_ratio, det_ratio);
+    SPDLOG_TRACE("trace_ratio  = {}, prop_ratio = {}, det_ratio = {}", trace_ratio, prop_ratio, det_ratio);
 
     return trace_ratio * det_ratio * prop_ratio;
   }
@@ -71,7 +72,7 @@ namespace moves {
 
   double regroup_segment::accept() {
 
-    SPDLOG_LOGGER_TRACE("\n - - - - - ====> ACCEPT - - - - - - - - - - -\n", void);
+    SPDLOG_TRACE("\n - - - - - ====> ACCEPT - - - - - - - - - - -\n");
 
     // Update the dets
     wdata.dets[color].complete_operation();
@@ -106,7 +107,7 @@ namespace moves {
 
   //--------------------------------------------------
   void regroup_segment::reject() {
-    SPDLOG_LOGGER_TRACE("\n - - - - - ====> REJECT - - - - - - - - - - -\n", void);
+    SPDLOG_TRACE("\n - - - - - ====> REJECT - - - - - - - - - - -\n");
     wdata.dets[color].reject_last_try();
   }
 } // namespace moves

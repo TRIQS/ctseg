@@ -1,4 +1,5 @@
 #include "move_segment.hpp"
+#include "../logs.hpp"
 
 namespace moves {
 
@@ -40,13 +41,13 @@ namespace moves {
 
   double move_segment::attempt() {
 
-    SPDLOG_LOGGER_TRACE("\n =================== ATTEMPT MOVE ================ \n", void);
+    SPDLOG_TRACE("\n =================== ATTEMPT MOVE ================ \n");
 
     // ------------ Choice of segment and colors --------------
     // Select origin color
     origin_color = rng(wdata.n_color);
     auto &sl     = config.seglists[origin_color];
-    SPDLOG_LOGGER_TRACE("Moving from color {}", origin_color);
+    SPDLOG_TRACE("Moving from color {}", origin_color);
 
     // If color has no segments, nothing to move
     if (sl.empty()) return 0;
@@ -58,7 +59,7 @@ namespace moves {
     bool moving_full_line        = (qmc_length == wdata.qmc_beta);
     auto proposed_segment_length = double(qmc_length);
 
-    SPDLOG_LOGGER_TRACE("Moving c at {}, cdag at {}", origin_segment.tau_c, origin_segment.tau_cdag);
+    SPDLOG_TRACE("Moving c at {}, cdag at {}", origin_segment.tau_c, origin_segment.tau_cdag);
 
     // Select destination color
     destination_color = rng(wdata.n_color - 1);
@@ -89,7 +90,7 @@ namespace moves {
     // ------------  Proposition ratio ------------
     double prop_ratio = (int(dsl.size()) + 1) / int(sl.size());
 
-    SPDLOG_LOGGER_TRACE("trace_ratio  = {}, prop_ratio = {}, det_ratio = {}", trace_ratio, prop_ratio, det_ratio);
+    SPDLOG_TRACE("trace_ratio  = {}, prop_ratio = {}, det_ratio = {}", trace_ratio, prop_ratio, det_ratio);
 
     return trace_ratio * det_ratio * prop_ratio;
   }
@@ -98,7 +99,7 @@ namespace moves {
 
   double move_segment::accept() {
 
-    SPDLOG_LOGGER_TRACE("\n - - - - - ====> ACCEPT - - - - - - - - - - -\n", void);
+    SPDLOG_TRACE("\n - - - - - ====> ACCEPT - - - - - - - - - - -\n");
 
     // Update the dets
     wdata.dets[origin_color].complete_operation();
@@ -127,7 +128,7 @@ namespace moves {
 
   //--------------------------------------------------
   void move_segment::reject() {
-    SPDLOG_LOGGER_TRACE("\n - - - - - ====> REJECT - - - - - - - - - - -\n", void);
+    SPDLOG_TRACE("\n - - - - - ====> REJECT - - - - - - - - - - -\n");
     wdata.dets[origin_color].reject_last_try();
     wdata.dets[destination_color].reject_last_try();
   }

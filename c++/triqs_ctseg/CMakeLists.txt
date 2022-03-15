@@ -6,7 +6,7 @@ add_library(${PROJECT_NAME}::${PROJECT_NAME}_c ALIAS ${PROJECT_NAME}_c)
 target_link_libraries(${PROJECT_NAME}_c PUBLIC triqs PRIVATE $<BUILD_INTERFACE:${PROJECT_NAME}_warnings>)
 
 # link against spdlog
-target_link_libraries(${PROJECT_NAME}_c PUBLIC spdlog)
+target_link_libraries(${PROJECT_NAME}_c PRIVATE spdlog)
 
 # Configure target and compilation
 set_target_properties(${PROJECT_NAME}_c PROPERTIES

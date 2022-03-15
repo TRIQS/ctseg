@@ -1,4 +1,5 @@
 #include "./nn_tau.hpp"
+#include "../logs.hpp"
 
 namespace triqs::mesh {
 

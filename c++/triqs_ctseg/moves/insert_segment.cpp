@@ -1,18 +1,18 @@
 #include "insert_segment.hpp"
-#include "triqs_ctseg/configuration.hpp"
+#include "../logs.hpp"
 
 namespace moves {
 
   double insert_segment::attempt() {
 
-    SPDLOG_LOGGER_TRACE("\n =================== ATTEMPT INSERT ================ \n", void);
+    SPDLOG_TRACE("\n =================== ATTEMPT INSERT ================ \n");
 
     // ------------ Choice of segment --------------
 
     // Select insertion color
     color    = rng(wdata.n_color);
     auto &sl = config.seglists[color];
-    SPDLOG_LOGGER_TRACE("Inserting at color {}", color);
+    SPDLOG_TRACE("Inserting at color {}", color);
 
     // Select insertion window [tau1,tau2] (defaults to [beta,0])
     qmc_time_t tau1      = wdata.qmc_beta;
@@ -38,7 +38,7 @@ namespace moves {
     // The index of the segment if it is inserted in the list of segments.
     proposed_segment_insert_it = std::upper_bound(sl.begin(), sl.end(), proposed_segment);
 
-    SPDLOG_LOGGER_TRACE("Inserting c at{}, cdag at {}", proposed_segment.tau_c, proposed_segment.tau_cdag);
+    SPDLOG_TRACE("Inserting c at{}, cdag at {}", proposed_segment.tau_c, proposed_segment.tau_cdag);
 
     // ------------  Trace ratio  -------------
     double ln_trace_ratio = 0;
@@ -68,7 +68,7 @@ namespace moves {
        / (current_number_intervals * l * l
           / (config_is_empty ? 1 : 2)); // Account for absence of time swapping when inserting into empty line.
 
-    SPDLOG_LOGGER_TRACE("trace_ratio  = {}, prop_ratio = {}, det_ratio = {}", trace_ratio, prop_ratio, det_ratio);
+    SPDLOG_TRACE("trace_ratio  = {}, prop_ratio = {}, det_ratio = {}", trace_ratio, prop_ratio, det_ratio);
 
     return trace_ratio * det_ratio * prop_ratio;
   }
@@ -77,7 +77,7 @@ namespace moves {
 
   double insert_segment::accept() {
 
-    SPDLOG_LOGGER_TRACE("\n - - - - - ====> ACCEPT - - - - - - - - - - -\n", void);
+    SPDLOG_TRACE("\n - - - - - ====> ACCEPT - - - - - - - - - - -\n");
 
     // Insert the times into the det
     wdata.dets[color].complete_operation();
@@ -93,7 +93,7 @@ namespace moves {
 
     // Check invariant
 #ifdef EXT_DEBUG
-    // SPDLOG_LOGGER_TRACE("Configuration {}", config);
+    // SPDLOG_TRACE("Configuration {}", config);
     check_invariant(config);
 #endif
     return sign_ratio;
@@ -101,8 +101,8 @@ namespace moves {
 
   //--------------------------------------------------
   void insert_segment::reject() {
-    SPDLOG_LOGGER_TRACE("\n - - - - - ====> REJECT - - - - - - - - - - -\n", void);
+    SPDLOG_TRACE("\n - - - - - ====> REJECT - - - - - - - - - - -\n");
     wdata.dets[color].reject_last_try();
-    // SPDLOG_LOGGER_TRACE("Configuration {}", config);
+    // SPDLOG_TRACE("Configuration {}", config);
   }
 }; // namespace moves

@@ -2,6 +2,7 @@
 #include <nda/basic_functions.hpp>
 #include <triqs/gfs/functions/functions2.hpp>
 #include <triqs/operators/util/extractors.hpp>
+#include "logs.hpp"
 
 work_data_t::work_data_t(params_t const &p, inputs_t const &inputs, mpi::communicator c) : fac{p.beta} {
 

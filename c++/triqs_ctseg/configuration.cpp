@@ -1,4 +1,5 @@
 #include "configuration.hpp"
+#include "logs.hpp"
 
 // ------------------- Invariants ---------------------------
 
