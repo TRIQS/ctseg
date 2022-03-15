@@ -73,3 +73,10 @@ external_dependency(spdlog
   GIT_TAG v1.x
   BUILD_ALWAYS
 )
+
+set_target_properties( spdlog
+    PROPERTIES
+        POSITION_INDEPENDENT_CODE ON
+  )
+
+
