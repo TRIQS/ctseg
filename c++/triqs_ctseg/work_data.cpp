@@ -16,6 +16,10 @@ work_data_t::work_data_t(params_t const &p, inputs_t const &inputs, mpi::communi
 #ifdef PRINT_CONFIG
   spdlog::set_level(spdlog::level::trace);
 #endif
+  //if constexpr (ctseg_debug) {
+  //  spdlog::set_level(spdlog::level::info);
+  //} else
+  //  spdlog::set_level(spdlog::level::off);
 
   beta = p.beta;
 
