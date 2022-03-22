@@ -113,7 +113,9 @@ namespace moves {
     ALWAYS_EXPECTS((sign_ratio * det_sign == 1.0),
                    "Error: move has produced negative sign! Det sign is {} and additional sign is {}.", det_sign,
                    sign_ratio);
+#ifdef CHECK_INVARIANTS
     check_invariant(config, wdata.dets);
+#endif
     SPDLOG_TRACE("Configuration is {}", config);
 
     return sign_ratio;

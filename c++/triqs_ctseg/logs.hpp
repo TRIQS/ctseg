@@ -2,17 +2,21 @@
 
 // spdlog
 #ifdef EXT_DEBUG
-//#include "spdlog/common.h"
-#define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_TRACE // FIXME: this doesn't work. Set in work_data
+#define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_DEBUG
 #else
-#define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_OFF
+#define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_INFO
 #endif
+#ifdef PRINT_CONFIG
+#define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_TRACE
+#endif
+
 #include "spdlog/spdlog.h"
 #include "spdlog/fmt/ostr.h"
 
+// Log messages for dubugging
 #define LOG(...) SPDLOG_DEBUG(__VA_ARGS__)
 
-// checked always, even in production
+// Checked always, even in production
 #define ALWAYS_EXPECTS(Condition, ErrorMessage, ...)                                                                   \
   if (not(Condition)) {                                                                                                \
     SPDLOG_CRITICAL(ErrorMessage, __VA_ARGS__);                                                                        \

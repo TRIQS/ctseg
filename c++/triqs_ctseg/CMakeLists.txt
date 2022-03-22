@@ -25,6 +25,22 @@ target_compile_definitions(${PROJECT_NAME}_c PUBLIC
 				$<$<BOOL:${CTSEG_DEBUG_VERIF}>:CTSEG_DEBUG_VERFIC>
 			  )
 
+option(DEBUG OFF "Activate debug log messages.")
+option(PRINT_CONFIG OFF "Print configuration after each move.")
+option(CHECK_INVARIANTS OFF "Check invariants after each move.")
+
+if(DEBUG)
+  target_compile_definitions(${PROJECT_NAME}_c PUBLIC EXT_DEBUG)
+endif()
+if(PRINT_CONFIG)
+  target_compile_definitions(${PROJECT_NAME}_c PUBLIC PRINT_CONFIG)
+endif()
+if(CHECK_INVARIANTS)
+  target_compile_definitions(${PROJECT_NAME}_c PUBLIC CHECK_INVARIANTS)
+endif()
+
+
+
 # Install library and headers
 install(TARGETS ${PROJECT_NAME}_c spdlog EXPORT ${PROJECT_NAME}-targets DESTINATION lib)
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} DESTINATION include FILES_MATCHING PATTERN "*.hpp" PATTERN "*.h")

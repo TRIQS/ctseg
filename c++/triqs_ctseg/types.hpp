@@ -3,15 +3,11 @@
 #include <triqs/gfs.hpp>
 #include <triqs/hilbert_space/fundamental_operator_set.hpp>
 #include <triqs/mc_tools/random_generator.hpp>
-//#include <triqs/mesh.hpp>
 #include <triqs/operators/many_body_operator.hpp>
 #include <triqs/operators/util/extractors.hpp>
 #include <triqs/stat.hpp>
 #include <triqs/utility/time_pt.hpp>
 #include <triqs/det_manip.hpp>
-
-// FIXME
-#define EXT_DEBUG
 
 using namespace triqs::gfs;
 using namespace triqs::mesh;

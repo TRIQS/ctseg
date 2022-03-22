@@ -8,7 +8,14 @@
 
 work_data_t::work_data_t(params_t const &p, inputs_t const &inputs, mpi::communicator c) : fac{p.beta} {
 
+  // Set logger level
   spdlog::set_level(spdlog::level::info);
+#ifdef EXT_DEBUG
+  spdlog::set_level(spdlog::level::debug);
+#endif
+#ifdef PRINT_CONFIG
+  spdlog::set_level(spdlog::level::trace);
+#endif
 
   beta = p.beta;
 
