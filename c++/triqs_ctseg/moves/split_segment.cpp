@@ -101,9 +101,6 @@ namespace moves {
         // If we are splitting a cyclic segment and both new segments are not cyclic, get a - sign
         if (not kept_number_cyclic) sign_ratio = -1;
       }
-      ALWAYS_EXPECTS((sign_ratio * det_sign == 1.0),
-                     "Error: move has produced negative sign! Det sign is {} and additional sign is {}.", det_sign,
-                     sign_ratio);
       LOG("Sign ratio is {}", sign_ratio);
 
       // Update the proposed segment
@@ -112,10 +109,12 @@ namespace moves {
       sl.insert(sl.begin() + right_segment_idx, new_segment_right);
     }
 
-    SPDLOG_TRACE("Configuration is {}", config);
-
     // Check invariant
-    check_invariant(config);
+    ALWAYS_EXPECTS((sign_ratio * det_sign == 1.0),
+                   "Error: move has produced negative sign! Det sign is {} and additional sign is {}.", det_sign,
+                   sign_ratio);
+    check_invariant(config, wdata.dets);
+    SPDLOG_TRACE("Configuration is {}", config);
 
     return sign_ratio;
   }

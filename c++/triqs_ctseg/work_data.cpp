@@ -8,7 +8,7 @@
 
 work_data_t::work_data_t(params_t const &p, inputs_t const &inputs, mpi::communicator c) : fac{p.beta} {
 
-  spdlog::set_level(spdlog::level::debug);
+  spdlog::set_level(spdlog::level::info);
 
   beta = p.beta;
 
@@ -42,7 +42,7 @@ work_data_t::work_data_t(params_t const &p, inputs_t const &inputs, mpi::communi
   if (c.rank() == 0) {
     spdlog::info("mu = {}\n U = {}", mu, U);
     spdlog::info("dynamical_U = {}\n jperp_interactions = {}\n ", has_Dt, has_jperp);
-    spdlog::info("Spdlog level is {}", spdlog::get_level());
+    //spdlog::info("Spdlog level is {}", spdlog::get_level());
   }
 
   if (has_Dt) {

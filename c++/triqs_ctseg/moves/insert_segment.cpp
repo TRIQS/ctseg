@@ -95,17 +95,17 @@ namespace moves {
     double sign_ratio = 1;
     auto &sl          = config.seglists[color];
     if (is_cyclic(proposed_segment)) sign_ratio = -1.0;
-    ALWAYS_EXPECTS((sign_ratio * det_sign == 1.0),
-                   "Error: move has produced negative sign! Det sign is {} and additional sign is {}.", det_sign,
-                   sign_ratio);
     LOG("Sign ratio is {}", sign_ratio);
 
     // Insert the segment in an ordered list
     sl.insert(proposed_segment_insert_it, proposed_segment);
-    SPDLOG_TRACE("Configuration is {}", config);
 
     // Check invariant
-    check_invariant(config);
+    ALWAYS_EXPECTS((sign_ratio * det_sign == 1.0),
+                   "Error: move has produced negative sign! Det sign is {} and additional sign is {}.", det_sign,
+                   sign_ratio);
+    check_invariant(config, wdata.dets);
+    SPDLOG_TRACE("Configuration is {}", config);
 
     return sign_ratio;
   }

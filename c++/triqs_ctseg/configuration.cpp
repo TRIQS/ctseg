@@ -3,15 +3,20 @@
 
 // ------------------- Invariants ---------------------------
 
-void check_invariant(configuration_t const &config) {
+void check_invariant(configuration_t const &config, std::vector<det_t> const &dets) {
   if (spdlog::get_level() <= 2) {
     for (auto const &[c, sl] : itertools::enumerate(config.seglists))
       if (not sl.empty()) {
+        auto const &D = dets[c];
         for (int i = 0; i < sl.size() - 1; ++i) {
           ALWAYS_EXPECTS((sl[i].tau_cdag > sl[i + 1].tau_c),
                          "Time order error in color {} at position {} in config \n{}", c, i, config);
           ALWAYS_EXPECTS(not is_cyclic(sl[i]), "Segment in color {} at position {} should not by cyclic in config \n{}",
                          c, i, config); // only last segment can be cyclic
+          ALWAYS_EXPECTS((sl[i].tau_cdag == D.get_x(i).first),
+                         "Det error (cdag) in color {} at position {} in config \n{}", c, i, config);
+          ALWAYS_EXPECTS((sl[i].tau_c == D.get_y(i).first), "Det error (c) in color {} at position {} in config \n{}",
+                         c, i, config);
         }
       }
   }

@@ -84,32 +84,37 @@ namespace moves {
     // Update the dets
     wdata.dets[color].complete_operation();
 
-    // Regroup segments and copute the sign ratio
+    // Regroup segments and compute the sign ratio
     auto &sl          = config.seglists[color];
     double sign_ratio = 1;
     if (making_full_line) {
-      if (is_cyclic(sl[left_segment_index])) sign_ratio = -1;
+      if (is_cyclic(left_segment)) sign_ratio = -1;
       sl[left_segment_index] = segment_t{wdata.qmc_beta, wdata.qmc_zero};
     } else {
-      auto new_segment        = segment_t{left_segment.tau_c, right_segment.tau_cdag};
-      bool old_segment_cyclic = is_cyclic(left_segment) or is_cyclic(right_segment);
-      if (old_segment_cyclic and !is_cyclic(new_segment)) sign_ratio = -1;
-      bool need_roll = is_cyclic(left_segment) or (!is_cyclic(left_segment) and is_cyclic(new_segment));
+      auto new_segment           = segment_t{left_segment.tau_c, right_segment.tau_cdag};
+      bool had_cyclic_segment    = is_cyclic(left_segment) or is_cyclic(right_segment);
+      bool adding_cyclic_segment = !had_cyclic_segment and is_cyclic(new_segment);
+      if (adding_cyclic_segment) sign_ratio = -1;
+      bool need_roll = is_cyclic(left_segment) or adding_cyclic_segment;
       if (need_roll) {
         // In this case, a cdag that belonged to the first segment now belongs to the last segment:
         // we need to "roll up" the det and this produces an additional sign.
-        sign_ratio *= -wdata.dets[color].roll_matrix(work_data_t::det_t::Up);
+        sign_ratio *= wdata.dets[color].roll_matrix(det_t::Up);
       }
       // Update the left segment
       sl[left_segment_index] = new_segment;
       // Remove the "other" segment
       sl.erase(sl.begin() + right_segment_index);
     }
+    LOG("Sign ratio is {}", sign_ratio);
 
-#ifdef EXT_DEBUG
-    check_invariant(config);
-#endif
-    SPDLOG_DEBUG("Configuration is {}", config);
+    // Check invariant
+    ALWAYS_EXPECTS((sign_ratio * det_sign == 1.0),
+                   "Error: move has produced negative sign! Det sign is {} and additional sign is {}.", det_sign,
+                   sign_ratio);
+
+    check_invariant(config, wdata.dets);
+    SPDLOG_TRACE("Configuration is {}", config);
 
     return sign_ratio;
   }

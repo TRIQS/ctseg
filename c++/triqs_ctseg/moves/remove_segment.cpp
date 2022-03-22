@@ -85,15 +85,15 @@ namespace moves {
     // Compute the sign ratio
     double sign_ratio = is_cyclic(sl[proposed_segment_index]) ? -1 : 1;
     LOG("Sign ratio is {}", sign_ratio);
-    ALWAYS_EXPECTS((sign_ratio * det_sign == 1.0),
-                   "Error: move has produced negative sign! Det sign is {} and additional sign is {}.", det_sign,
-                   sign_ratio);
 
     // Remove the segment
     sl.erase(sl.begin() + proposed_segment_index);
 
     // Check invariant
-    check_invariant(config);
+    ALWAYS_EXPECTS((sign_ratio * det_sign == 1.0),
+                   "Error: move has produced negative sign! Det sign is {} and additional sign is {}.", det_sign,
+                   sign_ratio);
+    check_invariant(config, wdata.dets);
     SPDLOG_TRACE("Configuration is {}", config);
 
     return sign_ratio;
