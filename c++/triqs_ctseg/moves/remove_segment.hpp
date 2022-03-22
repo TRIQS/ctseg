@@ -13,9 +13,9 @@ namespace moves {
     segment_t proposed_segment;
     int proposed_segment_index{};
     qmc_time_factory_t fac = qmc_time_factory_t{wdata.beta};
+    double det_sign;
 
     public:
-    // Constructor
     remove_segment(work_data_t &data_, configuration_t &config_, triqs::mc_tools::random_generator &rng_)
        : wdata(data_), config(config_), rng(rng_){};
     // ------------------

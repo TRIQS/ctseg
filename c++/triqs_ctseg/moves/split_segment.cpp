@@ -5,28 +5,32 @@ namespace moves {
 
   double split_segment::attempt() {
 
-    SPDLOG_TRACE("\n =================== ATTEMPT SPLIT ================ \n");
+    LOG("\n =================== ATTEMPT SPLIT ================ \n");
 
     // ------------ Choice of segment --------------
     // Select color
     color    = rng(wdata.n_color);
     auto &sl = config.seglists[color];
-    SPDLOG_TRACE("Splitting at color {}", color);
+    LOG("Splitting at color {}", color);
 
     // If color is empty, nothing to split
-    if (sl.empty()) return 0;
-
+    if (sl.empty()) {
+      LOG("Line is empty");
+      return 0;
+    }
     // Select segment to split
     proposed_segment_idx = rng(sl.size());
     proposed_segment     = sl[proposed_segment_idx];
+    full_line            = is_full_line(proposed_segment, fac);
+    if (full_line) LOG("Splitting full line.");
     // Select splitting points (tau_left,tau_right)
-    auto qmc_zero  = fac.get_lower_pt();
-    qmc_time_t l   = proposed_segment.tau_c - proposed_segment.tau_cdag;
-    qmc_time_t dt1 = fac.get_random_pt(rng, qmc_zero, l);
-    qmc_time_t dt2 = fac.get_random_pt(rng, qmc_zero, l);
-    if (dt1 == dt2) return 0;
-    if (dt1 == qmc_zero || dt2 == qmc_zero || dt1 == l || dt2 == l) return 0;
-    full_line = is_full_line(proposed_segment, fac);
+    qmc_time_t l   = full_line ? wdata.qmc_beta : proposed_segment.tau_c - proposed_segment.tau_cdag;
+    qmc_time_t dt1 = fac.get_random_pt(rng, wdata.qmc_zero, l);
+    qmc_time_t dt2 = fac.get_random_pt(rng, wdata.qmc_zero, l);
+    if (dt1 == dt2 || dt1 == wdata.qmc_zero || dt2 == wdata.qmc_zero || dt1 == l || dt2 == l) {
+      LOG("Generated time at boundary");
+      return 0;
+    }
     if (dt1 > dt2 && !full_line)
       std::swap(dt1, dt2); // If splitting a full line, the order of tau_left and tau_right is not fixed
     tau_left                    = proposed_segment.tau_c - dt1; // dt1 < dt2
@@ -36,13 +40,14 @@ namespace moves {
     bool removed_segment_cyclic = tau_left < tau_right;
     right_segment_idx           = (full_line or removed_segment_cyclic) ? 0 : proposed_segment_idx + 1;
 
-    SPDLOG_TRACE("Split: adding c at {}, cdag at {}", tau_right, tau_left);
+    LOG("Split: adding c at {}, cdag at {}", tau_right, tau_left);
 
     // ------------  Trace ratio  -------------
     double ln_trace_ratio = 0;
     for (auto c : range(wdata.n_color)) {
       if (c != color) {
         ln_trace_ratio -= -wdata.U(color, c) * overlap(config.seglists[c], removed_segment, fac);
+        LOG("Overlap is {}", ln_trace_ratio);
         ln_trace_ratio -= wdata.mu(c) * removed_segment_length;
         if (wdata.has_Dt)
           ln_trace_ratio -= K_overlap(config.seglists[c], removed_segment, slice_target_to_scalar(wdata.K, color, c));
@@ -65,16 +70,18 @@ namespace moves {
     double future_number_intervals = full_line ? 1 : double(sl.size()) + 1.0;
     double prop_ratio = (future_number_intervals) / (current_number_segments * l * l / (full_line ? 1 : 2));
 
-    SPDLOG_TRACE("trace_ratio  = {}, prop_ratio = {}, det_ratio = {}", trace_ratio, prop_ratio, det_ratio);
+    LOG("trace_ratio  = {}, prop_ratio = {}, det_ratio = {}", trace_ratio, prop_ratio, det_ratio);
 
-    return trace_ratio * det_ratio * prop_ratio;
+    double prod = trace_ratio * det_ratio * prop_ratio;
+    det_sign    = (det_ratio > 0) ? 1.0 : -1.0;
+    return (std::isfinite(prod) ? prod : det_sign);
   }
 
   //--------------------------------------------------
 
   double split_segment::accept() {
 
-    SPDLOG_TRACE("\n - - - - - ====> ACCEPT - - - - - - - - - - -\n");
+    LOG("\n - - - - - ====> ACCEPT - - - - - - - - - - -\n");
 
     // Update the dets
     wdata.dets[color].complete_operation();
@@ -91,27 +98,31 @@ namespace moves {
       auto new_segment_right = segment_t{tau_right, proposed_segment.tau_cdag};
       if (is_cyclic(proposed_segment)) {
         bool kept_number_cyclic = is_cyclic(new_segment_left) or is_cyclic(new_segment_right);
-        // If we are splitting a cyclic segment and one of the new segments is cyclic, we changed the parity
-        // of the number of segments and get a - sign
-        if (kept_number_cyclic) sign_ratio = -1;
-        // Otherwise, we get a - sign only if we were in an odd configuration
-        else if (sl.size() % 2 == 1)
-          sign_ratio = -1;
-        // Always get a - sign if the config had a cyclic segment and we did not touch it
-      } else if (is_cyclic(sl.back()))
-        sign_ratio = -1;
+        // If we are splitting a cyclic segment and both new segments are not cyclic, get a - sign
+        if (not kept_number_cyclic) sign_ratio = -1;
+      }
+      ALWAYS_EXPECTS((sign_ratio * det_sign == 1.0),
+                     "Error: move has produced negative sign! Det sign is {} and additional sign is {}.", det_sign,
+                     sign_ratio);
+      LOG("Sign ratio is {}", sign_ratio);
+
       // Update the proposed segment
       sl[proposed_segment_idx] = new_segment_left;
       // Insert a new segment
       sl.insert(sl.begin() + right_segment_idx, new_segment_right);
     }
 
+    SPDLOG_TRACE("Configuration is {}", config);
+
+    // Check invariant
+    check_invariant(config);
+
     return sign_ratio;
   }
 
   //--------------------------------------------------
   void split_segment::reject() {
-    SPDLOG_TRACE("\n - - - - - ====> REJECT - - - - - - - - - - -\n");
+    LOG("\n - - - - - ====> REJECT - - - - - - - - - - -\n");
     wdata.dets[color].reject_last_try();
   }
 }; // namespace moves

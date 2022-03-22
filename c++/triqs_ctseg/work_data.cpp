@@ -3,8 +3,12 @@
 #include <triqs/gfs/functions/functions2.hpp>
 #include <triqs/operators/util/extractors.hpp>
 #include "logs.hpp"
+#include "spdlog/common.h"
+#include "spdlog/spdlog.h"
 
 work_data_t::work_data_t(params_t const &p, inputs_t const &inputs, mpi::communicator c) : fac{p.beta} {
+
+  spdlog::set_level(spdlog::level::debug);
 
   beta = p.beta;
 
@@ -30,13 +34,15 @@ work_data_t::work_data_t(params_t const &p, inputs_t const &inputs, mpi::communi
   has_jperp = max_element(abs(inputs.jperpt.data())) > 1.e-13;
 
   // Check: no J_perp or D(tau) implementation for more than 2 colors
-  ALWAYS_EXPECTS((has_jperp and n_color != 2), "Error : has_jperp is true and we have {} colors instead of 2", n_color);
-  ALWAYS_EXPECTS((has_Dt and n_color != 2), "Error : has_Dt is true and we have {} colors instead of 2", n_color);
-
+  if (n_color != 2) {
+    ALWAYS_EXPECTS((not has_jperp), "Error : has_jperp is true and we have {} colors instead of 2", n_color);
+    ALWAYS_EXPECTS((not has_Dt), "Error : has_Dt is true and we have {} colors instead of 2", n_color);
+  }
   // Report
   if (c.rank() == 0) {
     spdlog::info("mu = {}\n U = {}", mu, U);
     spdlog::info("dynamical_U = {}\n jperp_interactions = {}\n ", has_Dt, has_jperp);
+    spdlog::info("Spdlog level is {}", spdlog::get_level());
   }
 
   if (has_Dt) {

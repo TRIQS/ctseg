@@ -4,13 +4,17 @@
 // ------------------- Invariants ---------------------------
 
 void check_invariant(configuration_t const &config) {
-  for (auto const &[c, sl] : itertools::enumerate(config.seglists))
-    for (int i = 0; i < sl.size() - 1; ++i) {
-      ALWAYS_EXPECTS((sl[i].tau_cdag > sl[i + 1].tau_c),
-                     "Time order error between segment at position {} in config \n{}", i, config);
-      ALWAYS_EXPECTS(not is_cyclic(sl[i]), "Segment at position {} should not by cyclic in config \n{}", i,
-                     config); // only last segment can be cyclic
-    }
+  if (spdlog::get_level() <= 2) {
+    for (auto const &[c, sl] : itertools::enumerate(config.seglists))
+      if (not sl.empty()) {
+        for (int i = 0; i < sl.size() - 1; ++i) {
+          ALWAYS_EXPECTS((sl[i].tau_cdag > sl[i + 1].tau_c),
+                         "Time order error in color {} at position {} in config \n{}", c, i, config);
+          ALWAYS_EXPECTS(not is_cyclic(sl[i]), "Segment in color {} at position {} should not by cyclic in config \n{}",
+                         c, i, config); // only last segment can be cyclic
+        }
+      }
+  }
 }
 // ---------------------------
 
@@ -74,7 +78,8 @@ double overlap(std::vector<segment_t> const &seglist, segment_t const &seg, qmc_
 // ---------------------------
 
 // Contribution of the dynamical interaction kernel K to the overlap between a segment and a list of segments.
-double K_overlap(std::vector<segment_t> const &seglist, segment_t const &seg, gf<imtime, scalar_valued> const &K) {
+double K_overlap(std::vector<segment_t> const &seglist, segment_t const &seg,
+                 gf_const_view<imtime, scalar_valued> const &K) {
   if (seglist.empty()) return 0;
   double result = 0;
   for (auto seg_in_list : seglist) {
@@ -105,9 +110,10 @@ std::vector<bool> boundary_state(configuration_t const &config) {
 // ---------------------------
 
 std::ostream &operator<<(std::ostream &out, configuration_t const &config) {
-  for (auto const &sl : config.seglists) {
+  for (auto const &[c, sl] : itertools::enumerate(config.seglists)) {
     out << '\n';
-    for (auto const &seg : sl) out << "[" << double(seg.tau_c) << ", " << double(seg.tau_cdag) << "]    ";
+    for (auto const &[i, seg] : itertools::enumerate(sl))
+      out << "Color " << c << ". Position " << i << " : [" << seg.tau_c << ", " << seg.tau_cdag << "]\n";
   }
   return out;
 }

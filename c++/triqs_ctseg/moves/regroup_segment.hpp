@@ -17,9 +17,9 @@ namespace moves {
     int right_segment_index;
     bool making_full_line{};
     qmc_time_factory_t fac = qmc_time_factory_t{wdata.beta};
+    double det_sign;
 
     public:
-    // Constructor
     regroup_segment(work_data_t &data_, configuration_t &config_, triqs::mc_tools::random_generator &rng_)
        : wdata(data_), config(config_), rng(rng_){};
     // ------------------
