@@ -25,13 +25,10 @@ DOC
 """
 from .solver import Solver
 from .solver_core import SolverCore
-from .block_matrix import BlockMatrix, BlockMatrixComplex
 
-__all__ = ['Solver','SolverCore', 'BlockMatrix', 'BlockMatrixComplex']
+__all__ = ['Solver', 'SolverCore']
+
 
 class Cpp2pyInfo:
-    table_imports = {
-        'triqs_ctseg::block_matrix' : 'triqs_ctseg.block_matrix',
-        }
-
+    table_imports = {}
     table_converters = {}

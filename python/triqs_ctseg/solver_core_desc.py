@@ -1,5 +1,5 @@
 # Generated automatically using the command :
-# c++2py ../../c++/triqs_ctseg/solver_core.hpp -p --members_read_only -a triqs_ctseg -m solver_core -o solver_core --moduledoc="The python module for triqs_ctseg" -C triqs -C nda_py --includes=../../c++ --includes=/usr/local/include/ --cxxflags="-std=c++20" --target_file_only
+# c++2py ../../c++/triqs_ctseg/solver_core.hpp -p --members_read_only -a triqs_ctseg -m solver_core -o solver_core --only="results_t solver_core" --moduledoc="The python module for triqs_ctseg" -C triqs -C nda_py --includes=../../c++ --includes=/usr/local/include/ --cxxflags="-std=c++20" --target_file_only
 from cpp2py.wrap_generator import *
 
 # The module
@@ -13,6 +13,7 @@ module.add_include("triqs_ctseg/solver_core.hpp")
 
 # Add here anything to add in the C++ code at the start, e.g. namespace using
 module.add_preamble("""
+#include <cpp2py/converters/optional.hpp>
 #include <cpp2py/converters/pair.hpp>
 #include <cpp2py/converters/string.hpp>
 #include <cpp2py/converters/vector.hpp>
@@ -24,6 +25,36 @@ module.add_preamble("""
 """)
 
 
+# The class results_t
+c = class_(
+        py_type = "ResultsT",  # name of the python class
+        c_type = "results_t",   # name of the C++ class
+        doc = r"""""",   # doc of the C++ class
+        hdf5 = False,
+)
+
+c.add_member(c_name = "g_tau",
+             c_type = "g_tau_t",
+             read_only= True,
+             doc = r"""""")
+
+c.add_member(c_name = "f_tau",
+             c_type = "std::optional<g_tau_t>",
+             read_only= True,
+             doc = r"""Single-particle Green's function :math:`F(\tau)` in imaginary time.""")
+
+c.add_member(c_name = "nn_tau",
+             c_type = "std::optional<gf<imtime>>",
+             read_only= True,
+             doc = r"""<n_a(tau) n_b(0)>""")
+
+c.add_member(c_name = "densities",
+             c_type = "nda::array<double, 1>",
+             read_only= True,
+             doc = r"""Density per color. FIXME : optional ??""")
+
+module.add_class(c)
+
 # The class solver_core
 c = class_(
         py_type = "SolverCore",  # name of the python class
@@ -31,6 +62,11 @@ c = class_(
         doc = r"""Main solver class""",   # doc of the C++ class
         hdf5 = False,
 )
+
+c.add_member(c_name = "results",
+             c_type = "results_t",
+             read_only= True,
+             doc = r"""""")
 
 c.add_constructor("""(**constr_params_t)""", doc = r"""
 
@@ -87,6 +123,8 @@ c.add_method("""void solve (**solve_params_t)""",
 +-------------------------------+---------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
 | measure_gt                    | bool                | true                                    | Whether to measure G(tau) (see [[measure_gt]])                                                                    |
 +-------------------------------+---------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
+| measure_n                     | bool                | true                                    | Whether to measure density (see [[measure_density]])                                                              |
++-------------------------------+---------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
 | measure_nn                    | bool                | false                                   | Whether to measure <nn> (see [[measure_nn]])                                                                      |
 +-------------------------------+---------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
 | measure_nnt                   | bool                | false                                   | Whether to measure langle n(tau)n(0)rangle (see [[measure_nnt]])                                                  |
@@ -115,7 +153,11 @@ c.add_property(name = "Jperp_tau",
 
 c.add_property(name = "D0_tau",
                getter = cfunction("gf_view<triqs::mesh::imtime> D0_tau ()"),
-               doc = r"""Dynamical spin-spin interactions $\mathcal{J}_\perp(\tau)$""")
+               doc = r"""Dynamical density-density interactions $D_0(\tau)$""")
+
+c.add_property(name = "G_tau",
+               getter = cfunction("block_gf_view<triqs::mesh::imtime> G_tau ()"),
+               doc = r"""Hybridization function $\Delta^\sigma_{ab}(\tau)$""")
 
 module.add_class(c)
 
@@ -194,6 +236,11 @@ c.add_member(c_name = "measure_gt",
              c_type = "bool",
              initializer = """ true """,
              doc = r"""Whether to measure G(tau) (see [[measure_gt]])""")
+
+c.add_member(c_name = "measure_n",
+             c_type = "bool",
+             initializer = """ true """,
+             doc = r"""Whether to measure density (see [[measure_density]])""")
 
 c.add_member(c_name = "measure_nn",
              c_type = "bool",

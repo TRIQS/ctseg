@@ -65,7 +65,7 @@ namespace moves {
     // Length of future segment
     qmc_time_t l = wdata.qmc_beta;
     if (not making_full_line) l = left_segment.tau_c - right_segment.tau_cdag;
-    double prop_ratio = (future_number_segments * l * l / (making_full_line ? 1 : 2)) / current_number_intervals;
+    double prop_ratio = current_number_intervals / (future_number_segments * l * l / (making_full_line ? 1 : 2));
 
     LOG("trace_ratio  = {}, prop_ratio = {}, det_ratio = {}", trace_ratio, prop_ratio, det_ratio);
 

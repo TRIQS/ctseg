@@ -33,12 +33,11 @@ namespace moves {
     }
     if (dt1 > dt2 && !full_line)
       std::swap(dt1, dt2); // If splitting a full line, the order of tau_left and tau_right is not fixed
-    tau_left                    = proposed_segment.tau_c - dt1; // dt1 < dt2
-    tau_right                   = proposed_segment.tau_c - dt2;
-    auto removed_segment        = segment_t{tau_left, tau_right}; // "antisegment" : careful with order of c, cdag
-    auto removed_segment_length = double(tau_left - tau_right);   // accounts for cyclicity
-    bool removed_segment_cyclic = tau_left < tau_right;
-    right_segment_idx           = (full_line or removed_segment_cyclic) ? 0 : proposed_segment_idx + 1;
+    tau_left             = proposed_segment.tau_c - dt1; // dt1 < dt2
+    tau_right            = proposed_segment.tau_c - dt2;
+    auto removed_segment = segment_t{tau_left, tau_right}; // "antisegment" : careful with order of c, cdag
+    segment_overboard    = is_cyclic(proposed_segment) and !is_cyclic(segment_t{tau_right, proposed_segment.tau_cdag});
+    right_segment_idx    = (full_line or segment_overboard) ? 0 : proposed_segment_idx + 1;
 
     LOG("Split: adding c at {}, cdag at {}", tau_right, tau_left);
 
@@ -48,7 +47,7 @@ namespace moves {
       if (c != color) {
         ln_trace_ratio -= -wdata.U(color, c) * overlap(config.seglists[c], removed_segment, fac);
         LOG("Overlap is {}", ln_trace_ratio);
-        ln_trace_ratio -= wdata.mu(c) * removed_segment_length;
+        ln_trace_ratio -= wdata.mu(c) * removed_segment.length();
         if (wdata.has_Dt)
           ln_trace_ratio -= K_overlap(config.seglists[c], removed_segment, slice_target_to_scalar(wdata.K, color, c));
       }
@@ -68,7 +67,7 @@ namespace moves {
 
     double current_number_segments = sl.size();
     double future_number_intervals = full_line ? 1 : double(sl.size()) + 1.0;
-    double prop_ratio = (future_number_intervals) / (current_number_segments * l * l / (full_line ? 1 : 2));
+    double prop_ratio = (current_number_segments * l * l / (full_line ? 1 : 2)) / (future_number_intervals);
 
     LOG("trace_ratio  = {}, prop_ratio = {}, det_ratio = {}", trace_ratio, prop_ratio, det_ratio);
 
@@ -99,7 +98,8 @@ namespace moves {
       if (is_cyclic(proposed_segment)) {
         bool kept_number_cyclic = is_cyclic(new_segment_left) or is_cyclic(new_segment_right);
         // If we are splitting a cyclic segment and both new segments are not cyclic, get a - sign
-        if (not kept_number_cyclic) sign_ratio = -1;
+        if (not kept_number_cyclic) sign_ratio *= -1;
+        if (segment_overboard) sign_ratio *= wdata.dets[color].roll_matrix(det_t::Down);
       }
       LOG("Sign ratio is {}", sign_ratio);
 
@@ -109,13 +109,15 @@ namespace moves {
       sl.insert(sl.begin() + right_segment_idx, new_segment_right);
     }
 
-    // Check invariant
-    ALWAYS_EXPECTS((sign_ratio * det_sign == 1.0),
-                   "Error: move has produced negative sign! Det sign is {} and additional sign is {}.", det_sign,
-                   sign_ratio);
 #ifdef CHECK_INVARIANTS
     check_invariant(config, wdata.dets);
 #endif
+
+    // Check invariant
+    ALWAYS_EXPECTS((sign_ratio * det_sign == 1.0),
+                   "Error: move has produced negative sign! Det sign is {} and additional sign is {}. Config: {}.",
+                   det_sign, sign_ratio, config);
+
     SPDLOG_TRACE("Configuration is {}", config);
 
     return sign_ratio;

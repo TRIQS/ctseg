@@ -7,6 +7,7 @@
 struct segment_t {
   qmc_time_t tau_c, tau_cdag; // time of c and cdag
   bool J_at_start = false, J_at_end = false;
+  double length() const { return double(tau_c - tau_cdag); };
 };
 
 // Whether a segment is wrapped around beta/0
@@ -48,7 +49,7 @@ double overlap_seg(segment_t const &seg1, segment_t const &seg2);
 // Find index of first segment starting left of seg.tau_c.
 inline auto find_segment_left(std::vector<segment_t> const &seglist, segment_t const &seg) {
   auto seg_iter = std::upper_bound(seglist.begin(), seglist.end(), seg);
-  return seg_iter--;
+  return (seg_iter == seglist.begin()) ? seg_iter : --seg_iter;
 };
 
 // Overlap between segment and a list of segments.

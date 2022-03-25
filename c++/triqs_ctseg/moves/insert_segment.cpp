@@ -72,7 +72,7 @@ namespace moves {
 
     double current_number_intervals = std::max(1.0, double(sl.size()));
     double future_number_segments   = double(sl.size()) + 1;
-    double prop_ratio = future_number_segments / (current_number_intervals * l * l / (config_is_empty ? 1 : 2));
+    double prop_ratio = (current_number_intervals * l * l / (config_is_empty ? 1 : 2)) / future_number_segments;
     // Account for absence of time swapping when inserting into empty line.
 
     LOG("trace_ratio  = {}, prop_ratio = {}, det_ratio = {}", trace_ratio, prop_ratio, det_ratio);

@@ -63,7 +63,7 @@ namespace moves {
     }
     qmc_time_t l = (current_number_segments == 1) ? wdata.qmc_beta : tau_left - tau_right;
     double prop_ratio =
-       (future_number_intervals * l * l / (current_number_segments == 1 ? 1 : 2)) / current_number_segments;
+       current_number_segments / (future_number_intervals * l * l / (current_number_segments == 1 ? 1 : 2));
     LOG("trace_ratio  = {}, prop_ratio = {}, det_ratio = {}", trace_ratio, prop_ratio, det_ratio);
 
     det_sign    = (det_ratio > 0) ? 1.0 : -1.0;

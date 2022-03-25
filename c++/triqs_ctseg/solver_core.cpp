@@ -10,7 +10,6 @@
 #include "logs.hpp"
 
 using namespace moves;
-using namespace measures;
 
 solver_core::solver_core(constr_params_t const &p) : constr_params(p) {
 
@@ -61,8 +60,9 @@ void solver_core::solve(solve_params_t const &solve_params) {
   if (p.move_regroup_segment) CTQMC.add_move(regroup_segment(wdata, config, CTQMC.get_rng()), "regroup two segments");
 
   // initialize measurements
-  if (p.measure_gt) CTQMC.add_measure(g_f_tau(p, wdata, config, results), "G(tau) measurement");
-  if (p.measure_nnt) CTQMC.add_measure(nn_tau(p, wdata, config, results), "nn(tau) measurement");
+  if (p.measure_gt) CTQMC.add_measure(measures::g_f_tau(p, wdata, config, results), "G(tau) measurement");
+  if (p.measure_n) CTQMC.add_measure(measures::density(p, wdata, config, results), "Density measurement");
+  if (p.measure_nnt) CTQMC.add_measure(measures::nn_tau(p, wdata, config, results), "nn(tau) measurement");
     //if (p.measure_nn)
     //  CTQMC.add_measure(measure_nn(&params, &config, &nn_matrix),
     //                   "density measurement");

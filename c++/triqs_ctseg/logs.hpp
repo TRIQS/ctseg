@@ -1,13 +1,12 @@
 #pragma once
 
 // spdlog
-#ifdef EXT_DEBUG
+#ifdef PRINT_CONFIG
+#define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_TRACE
+#elif defined(EXT_DEBUG)
 #define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_DEBUG
 #else
 #define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_INFO
-#endif
-#ifdef PRINT_CONFIG
-#define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_TRACE
 #endif
 
 #include "spdlog/spdlog.h"

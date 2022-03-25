@@ -40,9 +40,6 @@ class solver_core {
   // Keep the last solver parameters from the last call
   std::optional<solve_params_t> last_solve_params;
 
-  // The set of results. Will be passed to measure and init by them
-  results_t results;
-
   // The set of inputs
   inputs_t inputs;
 
@@ -51,6 +48,9 @@ class solver_core {
   //double percent_done_, average_sign_;
 
   public:
+  // The set of results. Will be passed to measure and init by them
+  results_t results;
+
   CPP2PY_ARG_AS_DICT solver_core(constr_params_t const &p);
 
   CPP2PY_ARG_AS_DICT void solve(solve_params_t const &p);

@@ -17,6 +17,7 @@ namespace moves {
     int proposed_segment_idx{};
     int right_segment_idx{};
     bool full_line{};
+    bool segment_overboard;
     qmc_time_factory_t fac = qmc_time_factory_t{wdata.beta};
     double det_sign;
 

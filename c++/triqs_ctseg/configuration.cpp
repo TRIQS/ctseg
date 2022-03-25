@@ -8,14 +8,20 @@ void check_invariant(configuration_t const &config, std::vector<det_t> const &de
     if (not sl.empty()) {
       auto const &D = dets[c];
       for (int i = 0; i < sl.size() - 1; ++i) {
+        ALWAYS_EXPECTS((sl[i].tau_cdag != sl[i].tau_c), "Degenerate segment in color {} at position {} in config \n{}",
+                       c, i, config);
         ALWAYS_EXPECTS((sl[i].tau_cdag > sl[i + 1].tau_c), "Time order error in color {} at position {} in config \n{}",
                        c, i, config);
         ALWAYS_EXPECTS(not is_cyclic(sl[i]), "Segment in color {} at position {} should not by cyclic in config \n{}",
                        c, i, config); // only last segment can be cyclic
-        ALWAYS_EXPECTS((sl[i].tau_cdag == D.get_x(i).first),
-                       "Det error (cdag) in color {} at position {} in config \n{}", c, i, config);
-        ALWAYS_EXPECTS((sl[i].tau_c == D.get_y(i).first), "Det error (c) in color {} at position {} in config \n{}", c,
-                       i, config);
+        ALWAYS_EXPECTS(
+           (sl[i].tau_cdag == D.get_x(i).first),
+           "Det error in color {}. The segment in position {} has tau_cdag = {}, while the det has {} in row {}. Config : \n{}",
+           c, i, sl[i].tau_cdag, D.get_x(i).first, i, config);
+        ALWAYS_EXPECTS(
+           (sl[i].tau_c == D.get_y(i).first),
+           "Det error in color {}. The segment in position {} has tau_c = {}, while the det has {} in column {}.  Config : \n{}",
+           c, i, sl[i].tau_c, D.get_y(i).first, i, config);
       }
     }
   LOG("Invariants OK.");
@@ -45,12 +51,12 @@ std::vector<std::tuple<qmc_time_t, int, bool>> make_time_ordered_op_list(configu
 
 // Overlap between two non-cyclic segments.
 double overlap_seg(segment_t const &seg1, segment_t const &seg2) {
-  if (seg1.tau_cdag >= seg2.tau_c || seg2.tau_cdag >= seg1.tau_c)
+  if (seg1.tau_cdag >= seg2.tau_c or seg2.tau_cdag >= seg1.tau_c)
     return 0;
   else {
     qmc_time_t tau_start = std::min(seg1.tau_c, seg2.tau_c);
     qmc_time_t tau_end   = std::max(seg1.tau_cdag, seg2.tau_cdag);
-    return double(tau_start - tau_end);
+    return double(tau_start - tau_end); // FIXME: overlap of two full lines
   };
 };
 // ---------------------------
@@ -63,19 +69,19 @@ double overlap(std::vector<segment_t> const &seglist, segment_t const &seg, qmc_
   auto beta = fac.get_upper_pt();
 
   // If seg is cyclic, split it
-  if (seg.tau_c < seg.tau_cdag)
+  if (is_cyclic(seg))
     return overlap(seglist, segment_t{beta, seg.tau_cdag}, fac) + overlap(seglist, segment_t{seg.tau_c, zero}, fac);
   double result = 0;
   // Isolate last segment
   auto last_seg = seglist.back();
   // In case last segment is cyclic, split it and compute its overlap with seg
-  if (last_seg.tau_c < last_seg.tau_cdag)
+  if (is_cyclic(last_seg))
     result += overlap_seg(seg, segment_t{beta, last_seg.tau_cdag}) + overlap_seg(seg, segment_t{last_seg.tau_c, zero});
   else
     result += overlap_seg(seg, last_seg);
 
   // Compute overlap of seg with the remainder of seglist
-  for (auto it = find_segment_left(seglist, seg); it->tau_c < seg.tau_cdag && it != --seglist.end(); ++it) //
+  for (auto it = find_segment_left(seglist, seg); it->tau_c > seg.tau_cdag && it != --seglist.end(); ++it) //
     result += overlap_seg(*it, seg);
   return result;
 };

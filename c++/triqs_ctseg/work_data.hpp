@@ -28,4 +28,8 @@ struct work_data_t {
   using delta_target_t = matrix_real_valued;
   block_gf<imtime, delta_target_t> delta; // Hybridization function
   std::vector<det_t> dets;                // The determinants
+
+  public:
+  // Random time generation that excludes values at boundaries
+  qmc_time_t make_random_time(triqs::mc_tools::random_generator &rng, qmc_time_t const &tau1, qmc_time_t const &tau2);
 };

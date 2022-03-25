@@ -25,16 +25,17 @@ TEST(CtHybSpin, Anderson) {
   // start the mpi
   mpi::communicator world;
 
-  double beta    = 20.0;
-  double U       = 1.0;
-  double mu      = 1.3;
+  double beta = 20.0;
+  double U    = 1.0;
+  double mu   = 1.3;
+  //double mu      = 0.5;
   double epsilon = 0.2;
   //int n_cycles   = 10000 / world.size();
-  int n_cycles = 1;
-  //int n_warmup_cycles = 1000;
-  int n_warmup_cycles = 1;
-  int length_cycle    = 50;
-  int random_seed     = 23488 + 28 * world.rank();
+  int n_cycles        = 10000;
+  int n_warmup_cycles = 1000;
+  //int n_warmup_cycles = 1;
+  int length_cycle = 50;
+  int random_seed  = 23488 + 28 * world.rank();
 
   // prepare the parameters
   constr_params_t param_constructor;

@@ -93,3 +93,24 @@ work_data_t::work_data_t(params_t const &p, inputs_t const &inputs, mpi::communi
     }
   }
 } // work_data constructor
+
+// Random time generation that excludes values at boundaries, accounts for cyclicity
+qmc_time_t work_data_t::make_random_time(triqs::mc_tools::random_generator &rng, qmc_time_t const &tau1,
+                                         qmc_time_t const &tau2) {
+  auto l   = tau2 - tau1;
+  auto tau = tau1 + fac.get_random_pt(rng, qmc_zero, l);
+  auto dt  = fac.get_epsilon();
+  if (tau == tau1) {
+    if (tau1 < tau2)
+      return tau1 + dt;
+    else
+      return tau1 - dt;
+  }
+  if (tau == tau2) {
+    if (tau1 < tau2)
+      return tau2 - dt;
+    else
+      return tau2 + dt;
+  }
+  return tau;
+}
