@@ -54,28 +54,28 @@ work_data_t::work_data_t(params_t const &p, inputs_t const &inputs, mpi::communi
 
   if (has_Dt) {
     // Compute interaction kernels K(tau), K'(tau) by integrating D(tau)
-    K                    = gf<imtime>({beta, Boson, p.n_tau_k}, {n_color, n_color});
-    Kprime               = gf<imtime>({beta, Boson, p.n_tau_k}, {n_color, n_color});
-    auto D_data          = inputs.d0t.data()(0, 0, range());
-    auto first_integral  = nda::zeros<dcomplex>(p.n_tau_k);
-    auto second_integral = nda::zeros<dcomplex>(p.n_tau_k);
+    K                              = gf<imtime>({beta, Boson, p.n_tau_k}, {n_color, n_color});
+    Kprime                         = gf<imtime>({beta, Boson, p.n_tau_k}, {n_color, n_color});
+    nda::array<dcomplex, 1> D_data = inputs.d0t.data()(range(), 0, 0);
+    auto first_integral            = nda::zeros<dcomplex>(p.n_tau_k);
+    auto second_integral           = nda::zeros<dcomplex>(p.n_tau_k);
     std::partial_sum(D_data.begin(), D_data.end(), first_integral.begin());
     std::partial_sum(first_integral.begin(), first_integral.end(), second_integral.begin());
     first_integral *= beta / (p.n_tau_k - 1);
     second_integral *= (beta / (p.n_tau_k - 1)) * (beta / (p.n_tau_k - 1));
-    Kprime.data()(0, 1, range()) = first_integral - second_integral(p.n_tau_k - 1) / beta;
-    Kprime.data()(1, 0, range()) = Kprime.data()(0, 1, range());
+    Kprime.data()(range(), 0, 1) = first_integral - second_integral(p.n_tau_k - 1) / beta;
+    Kprime.data()(range(), 1, 0) = Kprime.data()(range(), 1, 0);
     auto ramp                    = nda::zeros<double>(p.n_tau_k);
     for (auto n : range(p.n_tau_k)) { ramp(n) = n * beta / (p.n_tau_k - 1); }
-    K.data()(0, 1, range()) = second_integral - second_integral(0) - ramp * second_integral(p.n_tau_k - 1) / beta;
-    K.data()(1, 0, range()) = K.data()(0, 1, range());
+    K.data()(range(), 0, 1) = second_integral - second_integral(0) - ramp * second_integral(p.n_tau_k - 1) / beta;
+    K.data()(range(), 1, 0) = K.data()(range(), 0, 1);
 
     // Renormalize U and mu
     U -= real(2 * Kprime(0));
-    mu += real(Kprime.data()(0, 1, 0)); // FIXME: true?
+    mu += real(Kprime.data()(0, 0, 1)); // FIXME: true?
   }
 
-  // .............  Determinants .....................
+  // ................  Determinants .....................
 
   delta = map([](gf_const_view<imtime> d) { return real(d); }, inputs.delta);
   if (c.rank() == 0) {

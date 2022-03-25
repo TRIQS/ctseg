@@ -66,7 +66,4 @@ class solver_core {
 
   /// Dynamical density-density interactions $D_0(\tau)$
   gf_view<imtime> D0_tau() { return inputs.d0t; }
-
-  /// Hybridization function $\Delta^\sigma_{ab}(\tau)$
-  block_gf_view<imtime> G_tau() { return results.g_tau; }
 };
