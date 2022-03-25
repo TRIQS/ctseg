@@ -7,7 +7,10 @@
 struct segment_t {
   qmc_time_t tau_c, tau_cdag; // time of c and cdag
   bool J_at_start = false, J_at_end = false;
-  double length() const { return double(tau_c - tau_cdag); };
+  [[nodiscard]] double length() const {
+    auto length = double(tau_c - tau_cdag);
+    return (length == 0) ? double(tau_c) : length;
+  };
 };
 
 // Whether a segment is wrapped around beta/0

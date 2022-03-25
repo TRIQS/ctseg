@@ -26,36 +26,35 @@ namespace moves {
         LOG("Segment is full line");
         return 0; // If segment is full line nothing to regroup
       }
-      left_segment_index  = 0;
-      right_segment_index = 0;
+      left_seg_idx  = 0;
+      right_seg_idx = 0;
     } else {
-      left_segment_index  = rng(sl.size());
-      right_segment_index = (left_segment_index == sl.size() - 1) ? 0 : left_segment_index + 1;
+      left_seg_idx  = rng(sl.size());
+      right_seg_idx = (left_seg_idx == sl.size() - 1) ? 0 : left_seg_idx + 1;
     }
-    left_segment  = sl[left_segment_index];
-    right_segment = sl[right_segment_index];
+    left_seg  = sl[left_seg_idx];
+    right_seg = sl[right_seg_idx];
 
-    auto inserted_segment =
-       segment_t{left_segment.tau_cdag, right_segment.tau_c}; // "antisegment" : careful with order of c, cdag
-    auto inserted_segment_length = double(inserted_segment.tau_c - inserted_segment.tau_cdag);
+    auto inserted_seg = segment_t{left_seg.tau_cdag, right_seg.tau_c}; // "antisegment" : careful with order of c, cdag
 
-    LOG("Regroup: removing c at {}, cdag at {}", right_segment.tau_c, left_segment.tau_cdag);
+    LOG("Regroup at positions {} and {}: removing c at {}, cdag at {}", left_seg_idx, right_seg_idx, right_seg.tau_c,
+        left_seg.tau_cdag);
 
     // ------------  Trace ratio  -------------
     double ln_trace_ratio = 0;
     for (auto c : range(wdata.n_color)) {
       if (c != color) {
-        ln_trace_ratio += -wdata.U(color, c) * overlap(config.seglists[c], inserted_segment, fac);
-        ln_trace_ratio += wdata.mu(c) * inserted_segment_length;
+        ln_trace_ratio += -wdata.U(color, c) * overlap(config.seglists[c], inserted_seg, fac);
+        ln_trace_ratio += wdata.mu(c) * inserted_seg.length();
         if (wdata.has_Dt)
-          ln_trace_ratio += K_overlap(config.seglists[c], inserted_segment, slice_target_to_scalar(wdata.K, color, c));
+          ln_trace_ratio += K_overlap(config.seglists[c], inserted_seg, slice_target_to_scalar(wdata.K, color, c));
       }
     }
     double trace_ratio = std::exp(ln_trace_ratio);
 
     // ------------  Det ratio  ---------------
     // We remove a cdag (first index) from the left segment and a c (second index) from the right segment.
-    auto det_ratio = wdata.dets[color].try_remove(left_segment_index, right_segment_index);
+    auto det_ratio = wdata.dets[color].try_remove(left_seg_idx, right_seg_idx);
     // additional sign due to "roll" is not computed at this stage, cf accept
 
     // ------------  Proposition ratio ------------
@@ -63,9 +62,10 @@ namespace moves {
     double future_number_segments   = making_full_line ? 1 : int(sl.size()) - 1;
     double current_number_intervals = sl.size();
     // Length of future segment
-    qmc_time_t l = wdata.qmc_beta;
-    if (not making_full_line) l = left_segment.tau_c - right_segment.tau_cdag;
-    double prop_ratio = current_number_intervals / (future_number_segments * l * l / (making_full_line ? 1 : 2));
+    qmc_time_t new_length = wdata.qmc_beta;
+    if (not making_full_line) new_length = left_seg.tau_c - right_seg.tau_cdag;
+    double prop_ratio =
+       current_number_intervals / (future_number_segments * new_length * new_length / (making_full_line ? 1 : 2));
 
     LOG("trace_ratio  = {}, prop_ratio = {}, det_ratio = {}", trace_ratio, prop_ratio, det_ratio);
 
@@ -88,34 +88,33 @@ namespace moves {
     auto &sl          = config.seglists[color];
     double sign_ratio = 1;
     if (making_full_line) {
-      if (is_cyclic(left_segment)) sign_ratio = -1;
-      sl[left_segment_index] = segment_t{wdata.qmc_beta, wdata.qmc_zero};
+      if (is_cyclic(left_seg)) sign_ratio = -1;
+      sl[left_seg_idx] = segment_t{wdata.qmc_beta, wdata.qmc_zero};
     } else {
-      auto new_segment           = segment_t{left_segment.tau_c, right_segment.tau_cdag};
-      bool had_cyclic_segment    = is_cyclic(left_segment) or is_cyclic(right_segment);
+      auto new_segment           = segment_t{left_seg.tau_c, right_seg.tau_cdag};
+      bool had_cyclic_segment    = is_cyclic(left_seg) or is_cyclic(right_seg);
       bool adding_cyclic_segment = !had_cyclic_segment and is_cyclic(new_segment);
       if (adding_cyclic_segment) sign_ratio = -1;
-      bool need_roll = is_cyclic(left_segment) or adding_cyclic_segment;
+      bool need_roll = is_cyclic(left_seg) or adding_cyclic_segment;
       if (need_roll) {
         // In this case, a cdag that belonged to the first segment now belongs to the last segment:
         // we need to "roll up" the det and this produces an additional sign.
         sign_ratio *= wdata.dets[color].roll_matrix(det_t::Up);
       }
       // Update the left segment
-      sl[left_segment_index] = new_segment;
+      sl[left_seg_idx] = new_segment;
       // Remove the "other" segment
-      sl.erase(sl.begin() + right_segment_index);
+      sl.erase(sl.begin() + right_seg_idx);
     }
     LOG("Sign ratio is {}", sign_ratio);
 
     // Check invariant
-    ALWAYS_EXPECTS((sign_ratio * det_sign == 1.0),
-                   "Error: move has produced negative sign! Det sign is {} and additional sign is {}.", det_sign,
-                   sign_ratio);
-
 #ifdef CHECK_INVARIANTS
     check_invariant(config, wdata.dets);
 #endif
+    ALWAYS_EXPECTS((sign_ratio * det_sign == 1.0),
+                   "Error: move has produced negative sign! Det sign is {} and additional sign is {}.", det_sign,
+                   sign_ratio);
     SPDLOG_TRACE("Configuration is {}", config);
 
     return sign_ratio;

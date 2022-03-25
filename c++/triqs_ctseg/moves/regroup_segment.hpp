@@ -11,10 +11,10 @@ namespace moves {
 
     // Internal data
     int color{};
-    segment_t left_segment;
-    segment_t right_segment;
-    int left_segment_index;
-    int right_segment_index;
+    segment_t left_seg;
+    segment_t right_seg;
+    int left_seg_idx;
+    int right_seg_idx;
     bool making_full_line{};
     qmc_time_factory_t fac = qmc_time_factory_t{wdata.beta};
     double det_sign;

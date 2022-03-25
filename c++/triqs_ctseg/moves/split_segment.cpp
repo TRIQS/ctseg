@@ -13,33 +13,37 @@ namespace moves {
     auto &sl = config.seglists[color];
     LOG("Splitting at color {}", color);
 
-    // If color is empty, nothing to split
     if (sl.empty()) {
-      LOG("Line is empty");
+      LOG("Nothing to split");
       return 0;
     }
-    // Select segment to split
-    proposed_segment_idx = rng(sl.size());
-    proposed_segment     = sl[proposed_segment_idx];
-    full_line            = is_full_line(proposed_segment, fac);
-    if (full_line) LOG("Splitting full line.");
-    // Select splitting points (tau_left,tau_right)
-    qmc_time_t l   = full_line ? wdata.qmc_beta : proposed_segment.tau_c - proposed_segment.tau_cdag;
-    qmc_time_t dt1 = fac.get_random_pt(rng, wdata.qmc_zero, l);
-    qmc_time_t dt2 = fac.get_random_pt(rng, wdata.qmc_zero, l);
-    if (dt1 == dt2 || dt1 == wdata.qmc_zero || dt2 == wdata.qmc_zero || dt1 == l || dt2 == l) {
-      LOG("Generated time at boundary");
-      return 0;
-    }
-    if (dt1 > dt2 && !full_line)
-      std::swap(dt1, dt2); // If splitting a full line, the order of tau_left and tau_right is not fixed
-    tau_left             = proposed_segment.tau_c - dt1; // dt1 < dt2
-    tau_right            = proposed_segment.tau_c - dt2;
-    auto removed_segment = segment_t{tau_left, tau_right}; // "antisegment" : careful with order of c, cdag
-    segment_overboard    = is_cyclic(proposed_segment) and !is_cyclic(segment_t{tau_right, proposed_segment.tau_cdag});
-    right_segment_idx    = (full_line or segment_overboard) ? 0 : proposed_segment_idx + 1;
 
-    LOG("Split: adding c at {}, cdag at {}", tau_right, tau_left);
+    // Select segment to split
+    prop_seg_idx        = rng(sl.size());
+    prop_seg            = sl[prop_seg_idx];
+    splitting_full_line = is_full_line(prop_seg, fac);
+    if (splitting_full_line) LOG("Splitting full line.");
+
+    // Select splitting points (tau_left,tau_right)
+    qmc_time_t prop_seg_length = splitting_full_line ? wdata.qmc_beta : prop_seg.tau_c - prop_seg.tau_cdag;
+    qmc_time_t dt1             = wdata.make_random_time(rng, prop_seg_length);
+    qmc_time_t dt2             = wdata.make_random_time(rng, prop_seg_length);
+    if (dt1 == dt2) {
+      LOG("Generated equal times");
+      return 0;
+    }
+    if (dt1 > dt2 && !splitting_full_line)
+      std::swap(dt1, dt2); // If splitting a full line, the order of tau_left and tau_right is not fixed
+    tau_left             = prop_seg.tau_c - dt1; // dt1 < dt2
+    tau_right            = prop_seg.tau_c - dt2;
+    auto removed_segment = segment_t{tau_left, tau_right}; // "antisegment" : careful with order of c, cdag
+    // Check whether the splitting of a cyclic segment produces a new segment at the beginning of seglist
+    // (useful for config update and dets)
+    segment_overboard = is_cyclic(prop_seg) and !is_cyclic(segment_t{tau_right, prop_seg.tau_cdag});
+    // Index of the rightmost of the two produced segments (the one to the left is always at prop_seg_idx)
+    right_seg_idx = (splitting_full_line or segment_overboard) ? 0 : prop_seg_idx + 1;
+
+    LOG("Splitting at position {} : adding c at {}, cdag at {}", prop_seg_idx, tau_right, tau_left);
 
     // ------------  Trace ratio  -------------
     double ln_trace_ratio = 0;
@@ -58,16 +62,17 @@ namespace moves {
 
     /* We insert tau_cdag as a line (first index) and tau_c as a column (second index). The index always corresponds to the
      segment the tau_c/tau_cdag belongs to. Here, the cdag is always inserted at the position of the segment we are splitting.
-     The c insertion position depends on whether we are splitting a full line and whether the cut out segment is cyclic, computed 
-     in right_segment_idx. */
-    auto det_ratio =
-       wdata.dets[color].try_insert(proposed_segment_idx, right_segment_idx, {tau_left, 0}, {tau_right, 0});
+     The c insertion position depends on whether we are splitting a full line and whether the right segment is "overboard", computed 
+     in right_seg_idx. */
+    auto det_ratio = wdata.dets[color].try_insert(prop_seg_idx, right_seg_idx, {tau_left, 0}, {tau_right, 0});
+    // additional sign due to "roll" is not computed at this stage, cf accept
 
     // ------------  Proposition ratio ------------
 
     double current_number_segments = sl.size();
-    double future_number_intervals = full_line ? 1 : double(sl.size()) + 1.0;
-    double prop_ratio = (current_number_segments * l * l / (full_line ? 1 : 2)) / (future_number_intervals);
+    double future_number_intervals = splitting_full_line ? 1 : double(sl.size()) + 1.0;
+    double prop_ratio = (current_number_segments * prop_seg_length * prop_seg_length / (splitting_full_line ? 1 : 2))
+       / (future_number_intervals);
 
     LOG("trace_ratio  = {}, prop_ratio = {}, det_ratio = {}", trace_ratio, prop_ratio, det_ratio);
 
@@ -88,32 +93,31 @@ namespace moves {
     auto &sl          = config.seglists[color];
     double sign_ratio = 1;
     // Split the segment and compute the sign ratio
-    if (full_line) {
+    if (splitting_full_line) {
       auto new_segment = segment_t{tau_right, tau_left};
       if (is_cyclic(new_segment)) sign_ratio = -1;
-      sl[proposed_segment_idx] = new_segment;
+      sl[prop_seg_idx] = new_segment;
     } else {
-      auto new_segment_left  = segment_t{proposed_segment.tau_c, tau_left};
-      auto new_segment_right = segment_t{tau_right, proposed_segment.tau_cdag};
-      if (is_cyclic(proposed_segment)) {
-        bool kept_number_cyclic = is_cyclic(new_segment_left) or is_cyclic(new_segment_right);
+      auto new_seg_left  = segment_t{prop_seg.tau_c, tau_left};
+      auto new_seg_right = segment_t{tau_right, prop_seg.tau_cdag};
+      if (is_cyclic(prop_seg)) {
+        bool kept_number_cyclic = is_cyclic(new_seg_left) or is_cyclic(new_seg_right);
         // If we are splitting a cyclic segment and both new segments are not cyclic, get a - sign
         if (not kept_number_cyclic) sign_ratio *= -1;
         if (segment_overboard) sign_ratio *= wdata.dets[color].roll_matrix(det_t::Down);
       }
-      LOG("Sign ratio is {}", sign_ratio);
 
+      LOG("Sign ratio is {}", sign_ratio);
       // Update the proposed segment
-      sl[proposed_segment_idx] = new_segment_left;
+      sl[prop_seg_idx] = new_seg_left;
       // Insert a new segment
-      sl.insert(sl.begin() + right_segment_idx, new_segment_right);
+      sl.insert(sl.begin() + right_seg_idx, new_seg_right);
     }
 
+    // Check invariant
 #ifdef CHECK_INVARIANTS
     check_invariant(config, wdata.dets);
 #endif
-
-    // Check invariant
     ALWAYS_EXPECTS((sign_ratio * det_sign == 1.0),
                    "Error: move has produced negative sign! Det sign is {} and additional sign is {}. Config: {}.",
                    det_sign, sign_ratio, config);

@@ -31,5 +31,5 @@ struct work_data_t {
 
   public:
   // Random time generation that excludes values at boundaries
-  qmc_time_t make_random_time(triqs::mc_tools::random_generator &rng, qmc_time_t const &tau1, qmc_time_t const &tau2);
+  qmc_time_t make_random_time(triqs::mc_tools::random_generator &rng, qmc_time_t const &l);
 };

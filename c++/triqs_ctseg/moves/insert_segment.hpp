@@ -10,8 +10,8 @@ namespace moves {
 
     // Internal data
     int color = 0;
-    segment_t proposed_segment;
-    std::vector<segment_t>::iterator proposed_segment_insert_it;
+    segment_t prop_seg;
+    std::vector<segment_t>::iterator prop_seg_it;
     qmc_time_factory_t fac = qmc_time_factory_t{wdata.beta};
     double det_sign;
 

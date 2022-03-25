@@ -26,6 +26,7 @@ namespace moves {
 
   double insert_split_segment::attempt() {
 
+#if 0
     LOG("\n =================== ATTEMPT INSERT/SPLIT ================ \n");
 
     // Select insertion color
@@ -154,6 +155,8 @@ namespace moves {
     double prod = trace_ratio * det_ratio * prop_ratio;
     det_sign    = (det_ratio > 0) ? 1.0 : -1.0;
     return (std::isfinite(prod) ? prod : det_sign);
+#endif
+    return 0;
   }
 
   //--------------------------------------------------
