@@ -59,6 +59,7 @@ TEST(CtHybSpin, Anderson) {
   param_solve.move_remove_segment  = true;
   param_solve.move_split_segment   = true;
   param_solve.move_regroup_segment = true;
+  param_solve.move_move_segment    = true;
 
   // prepare G0
   nda::clef::placeholder<0> om_;

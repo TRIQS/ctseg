@@ -46,12 +46,10 @@ namespace moves {
     LOG("Splitting at position {} : adding c at {}, cdag at {}", prop_seg_idx, tau_right, tau_left);
 
     // ------------  Trace ratio  -------------
-    double ln_trace_ratio = 0;
+    double ln_trace_ratio = -wdata.mu(color) * removed_segment.length();
     for (auto c : range(wdata.n_color)) {
       if (c != color) {
         ln_trace_ratio -= -wdata.U(color, c) * overlap(config.seglists[c], removed_segment, fac);
-        LOG("Overlap is {}", ln_trace_ratio);
-        ln_trace_ratio -= wdata.mu(c) * removed_segment.length();
         if (wdata.has_Dt)
           ln_trace_ratio -= K_overlap(config.seglists[c], removed_segment, slice_target_to_scalar(wdata.K, color, c));
       }

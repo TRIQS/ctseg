@@ -58,7 +58,7 @@ struct solve_params_t {
   bool move_remove_segment = true;
 
   /// Whether to perform the move move segment
-  bool move_move = false;
+  bool move_move_segment = false;
 
   /// Whether to perform the move split segment
   bool move_split_segment = false;

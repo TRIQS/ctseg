@@ -9,8 +9,6 @@
 #include "moves.hpp"
 #include "logs.hpp"
 
-using namespace moves;
-
 solver_core::solver_core(constr_params_t const &p) : constr_params(p) {
 
   beta = p.beta;
@@ -51,21 +49,16 @@ void solver_core::solve(solve_params_t const &solve_params) {
   auto CTQMC = triqs::mc_tools::mc_generic<double>(p.random_name, p.random_seed, p.verbosity);
 
   // initialize moves
-  if (p.move_insert_segment) CTQMC.add_move(insert_segment{wdata, config, CTQMC.get_rng()}, "segment insertion");
-  if (p.move_remove_segment) CTQMC.add_move(remove_segment(wdata, config, CTQMC.get_rng()), "segment removal");
-  if (p.move_move) CTQMC.add_move(move_segment(wdata, config, CTQMC.get_rng()), "segment move to another line");
-
-  if (p.move_split_segment) CTQMC.add_move(split_segment(wdata, config, CTQMC.get_rng()), "split a segment");
-
-  if (p.move_regroup_segment) CTQMC.add_move(regroup_segment(wdata, config, CTQMC.get_rng()), "regroup two segments");
+  if (p.move_insert_segment) CTQMC.add_move(moves::insert_segment{wdata, config, CTQMC.get_rng()}, "insert");
+  if (p.move_remove_segment) CTQMC.add_move(moves::remove_segment{wdata, config, CTQMC.get_rng()}, "remove");
+  if (p.move_move_segment) CTQMC.add_move(moves::move_segment{wdata, config, CTQMC.get_rng()}, "move");
+  if (p.move_split_segment) CTQMC.add_move(moves::split_segment{wdata, config, CTQMC.get_rng()}, "split");
+  if (p.move_regroup_segment) CTQMC.add_move(moves::regroup_segment{wdata, config, CTQMC.get_rng()}, "regroup");
 
   // initialize measurements
-  if (p.measure_gt) CTQMC.add_measure(measures::g_f_tau(p, wdata, config, results), "G(tau) measurement");
-  if (p.measure_n) CTQMC.add_measure(measures::density(p, wdata, config, results), "Density measurement");
-  if (p.measure_nnt) CTQMC.add_measure(measures::nn_tau(p, wdata, config, results), "nn(tau) measurement");
-    //if (p.measure_nn)
-    //  CTQMC.add_measure(measure_nn(&params, &config, &nn_matrix),
-    //                   "density measurement");
+  if (p.measure_gt) CTQMC.add_measure(measures::g_f_tau{p, wdata, config, results}, "G(tau) measurement");
+  if (p.measure_n) CTQMC.add_measure(measures::density{p, wdata, config, results}, "Density measurement");
+  if (p.measure_nnt) CTQMC.add_measure(measures::nn_tau{p, wdata, config, results}, "nn(tau) measurement");
 
     // FIXME  ? Keep ? ?
 #if 0

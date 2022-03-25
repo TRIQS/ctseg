@@ -41,11 +41,10 @@ namespace moves {
         left_seg.tau_cdag);
 
     // ------------  Trace ratio  -------------
-    double ln_trace_ratio = 0;
+    double ln_trace_ratio = wdata.mu(color) * inserted_seg.length();
     for (auto c : range(wdata.n_color)) {
       if (c != color) {
         ln_trace_ratio += -wdata.U(color, c) * overlap(config.seglists[c], inserted_seg, fac);
-        ln_trace_ratio += wdata.mu(c) * inserted_seg.length();
         if (wdata.has_Dt)
           ln_trace_ratio += K_overlap(config.seglists[c], inserted_seg, slice_target_to_scalar(wdata.K, color, c));
       }
