@@ -1,5 +1,6 @@
 #pragma once
 
+// FIXME : ??
 // spdlog
 #ifdef PRINT_CONFIG
 #define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_TRACE
@@ -7,6 +8,11 @@
 #define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_DEBUG
 #else
 #define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_INFO
+//static constexpr bool ctseg_debug = true;
+//#define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_TRACE // FIXME: this doesn't work. Set in work_data
+//#else
+//static constexpr bool ctseg_debug = false;
+//#define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_OFF
 #endif
 
 #include "spdlog/spdlog.h"
