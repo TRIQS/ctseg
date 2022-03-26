@@ -80,12 +80,12 @@ namespace moves {
     if (wdata.has_Dt) {
       for (auto c : range(wdata.n_color)) {
         if (c != destination_color) {
-          ln_trace_ratio +=
-             K_overlap(config.seglists[c], origin_segment, slice_target_to_scalar(wdata.K, destination_color, c));
+          //ln_trace_ratio +=
+          //  K_overlap(config.seglists[c], origin_segment, slice_target_to_scalar(wdata.K, destination_color, c));
         }
         if (c != origin_color) {
-          ln_trace_ratio -=
-             K_overlap(config.seglists[c], origin_segment, slice_target_to_scalar(wdata.K, origin_color, c));
+          //ln_trace_ratio -=
+          //  K_overlap(config.seglists[c], origin_segment, slice_target_to_scalar(wdata.K, origin_color, c));
         }
       }
     }

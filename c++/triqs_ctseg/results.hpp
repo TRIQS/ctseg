@@ -11,13 +11,13 @@ struct results_t {
 
   /// Single-particle Green's function :math:`G(\tau)` in imaginary time.
   //std::optional<g_tau_t> g_tau;
-  g_tau_t g_tau;
+  g_tau_t G_tau;
 
   /// Dynamical interaction kernel K(tau)
-  gf<imtime> K;
+  gf<imtime> K_tau;
 
   /// Single-particle Green's function :math:`F(\tau)` in imaginary time.
-  std::optional<g_tau_t> f_tau;
+  std::optional<g_tau_t> F_tau;
 
   /// <n_a(tau) n_b(0)>
   std::optional<gf<imtime>> nn_tau;

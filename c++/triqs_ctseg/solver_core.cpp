@@ -43,6 +43,7 @@ void solver_core::solve(solve_params_t const &solve_params) {
 
   work_data_t wdata{p, inputs, c};
   configuration_t config{wdata.n_color};
+  results.K_tau = wdata.K;
 
   // ................   QMC  ...................
 
@@ -77,7 +78,6 @@ void solver_core::solve(solve_params_t const &solve_params) {
   auto _solve_status = CTQMC.warmup_and_accumulate(p.n_warmup_cycles, p.n_cycles, p.length_cycle,
                                                    triqs::utility::clock_callback(p.max_time));
   CTQMC.collect_results(c);
-  results.K = wdata.K;
   //SPDLOG_INFO("Final config {}", config);
 
 }; // solve

@@ -88,13 +88,13 @@ double overlap(std::vector<segment_t> const &seglist, segment_t const &seg, qmc_
 // ---------------------------
 
 // Contribution of the dynamical interaction kernel K to the overlap between a segment and a list of segments.
-double K_overlap(std::vector<segment_t> const &seglist, segment_t const &seg,
-                 gf_const_view<imtime, scalar_valued> const &K) {
+double K_overlap(std::vector<segment_t> const &seglist, qmc_time_t const &tau_c, qmc_time_t const &tau_cdag,
+                 gf<imtime, matrix_valued> const &K, int c1, int c2) {
   if (seglist.empty()) return 0;
   double result = 0;
   for (auto seg_in_list : seglist) {
-    result += real(K(double(seg.tau_c - seg_in_list.tau_c)) + K(double(seg.tau_cdag - seg_in_list.tau_cdag))
-                   - K(double(seg.tau_cdag - seg_in_list.tau_c)) - K(double(seg.tau_c - seg_in_list.tau_cdag)));
+    result += real(K(double(tau_c - seg_in_list.tau_c))(c1, c2) + K(double(tau_cdag - seg_in_list.tau_cdag))(c1, c2)
+                   - K(double(tau_cdag - seg_in_list.tau_c))(c1, c2) - K(double(tau_c - seg_in_list.tau_cdag))(c1, c2));
   }
   return result;
 }

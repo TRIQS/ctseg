@@ -43,7 +43,8 @@ TEST(CtHybSpin, Anderson) {
 
   param_constructor.beta      = beta;
   param_constructor.gf_struct = {{"up", 1}, {"down", 1}};
-  int n_iw                    = 200;
+  param_constructor.n_tau     = 10001;
+  int n_iw                    = 1000;
 
   // create solver instance
   solver_core ctqmc(param_constructor);
@@ -76,13 +77,13 @@ TEST(CtHybSpin, Anderson) {
   // Save the results
   if (world.rank() == 0) {
     h5::file G_file("anderson.out.h5", 'w');
-    h5_write(G_file, "(ctqmc.G_tau()[0])", ctqmc.G_tau()[0]);
+    h5_write(G_file, "(ctqmc.G_tau()[0])", ctqmc.results.G_tau()[0]);
   }
   if (world.rank() == 0) {
     h5::file G_file("anderson.ref.h5", 'r');
     gf<imtime> g;
     h5_read(G_file, "(ctqmc.G_tau()[0])", g);
-    EXPECT_GF_NEAR(g, ctqmc.G_tau()[0]);
+    EXPECT_GF_NEAR(g, ctqmc.results.G_tau()[0]);
   }
 }
 MAKE_MAIN;

@@ -59,8 +59,8 @@ inline auto find_segment_left(std::vector<segment_t> const &seglist, segment_t c
 double overlap(std::vector<segment_t> const &seglist, segment_t const &seg, qmc_time_factory_t const &fac);
 
 // Contribution of the dynamical interaction kernel K to the overlap between a segment and a list of segments.
-double K_overlap(std::vector<segment_t> const &seglist, segment_t const &seg,
-                 gf_const_view<imtime, scalar_valued> const &K);
+double K_overlap(std::vector<segment_t> const &seglist, qmc_time_t const &tau_c, qmc_time_t const &tau_cdag,
+                 gf<imtime, matrix_valued> const &K, int c1, int c2);
 
 // Length occupied by all segments for a given color
 double density(std::vector<segment_t> const &seglist);

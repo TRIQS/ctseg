@@ -1,9 +1,9 @@
 # Generated automatically using the command :
-# c++2py ../../c++/triqs_ctseg/solver_core.hpp -p --members_read_only -a triqs_ctseg -m solver_core -o solver_core --only="results_t solver_core" --moduledoc="The python module for triqs_ctseg" -C triqs -C nda_py --includes=../../c++ --includes=/usr/local/include/ --cxxflags="-std=c++20" --target_file_only
+# c++2py ../../c++/triqs_ctseg/solver_core.hpp -p --members_read_only -a triqs_ctseg_J -m solver_core -o solver_core --only="results_t solver_core" --moduledoc="The python module for triqs_ctseg" -C triqs -C nda_py --includes=../../c++ --includes=/usr/local/include/ --cxxflags="-std=c++20" --target_file_only
 from cpp2py.wrap_generator import *
 
 # The module
-module = module_(full_name = "solver_core", doc = r"The python module for triqs_ctseg", app_name = "triqs_ctseg")
+module = module_(full_name = "solver_core", doc = r"The python module for triqs_ctseg", app_name = "triqs_ctseg_J")
 
 # Imports
 module.add_imports(*['triqs.gf', 'triqs.gf.meshes', 'triqs.operators'])
@@ -33,12 +33,17 @@ c = class_(
         hdf5 = False,
 )
 
-c.add_member(c_name = "g_tau",
+c.add_member(c_name = "G_tau",
              c_type = "g_tau_t",
              read_only= True,
              doc = r"""""")
 
-c.add_member(c_name = "f_tau",
+c.add_member(c_name = "K_tau",
+             c_type = "gf<triqs::mesh::imtime>",
+             read_only= True,
+             doc = r"""Dynamical interaction kernel K(tau)""")
+
+c.add_member(c_name = "F_tau",
              c_type = "std::optional<g_tau_t>",
              read_only= True,
              doc = r"""Single-particle Green's function :math:`F(\tau)` in imaginary time.""")
@@ -115,7 +120,7 @@ c.add_method("""void solve (**solve_params_t)""",
 +-------------------------------+---------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
 | move_remove_segment           | bool                | true                                    | Whether to perform the move remove segment                                                                        |
 +-------------------------------+---------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
-| move_move                     | bool                | false                                   | Whether to perform the move move segment                                                                          |
+| move_move_segment             | bool                | false                                   | Whether to perform the move move segment                                                                          |
 +-------------------------------+---------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
 | move_split_segment            | bool                | false                                   | Whether to perform the move split segment                                                                         |
 +-------------------------------+---------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
@@ -154,10 +159,6 @@ c.add_property(name = "Jperp_tau",
 c.add_property(name = "D0_tau",
                getter = cfunction("gf_view<triqs::mesh::imtime> D0_tau ()"),
                doc = r"""Dynamical density-density interactions $D_0(\tau)$""")
-
-c.add_property(name = "G_tau",
-               getter = cfunction("block_gf_view<triqs::mesh::imtime> G_tau ()"),
-               doc = r"""Hybridization function $\Delta^\sigma_{ab}(\tau)$""")
 
 module.add_class(c)
 
@@ -217,7 +218,7 @@ c.add_member(c_name = "move_remove_segment",
              initializer = """ true """,
              doc = r"""Whether to perform the move remove segment""")
 
-c.add_member(c_name = "move_move",
+c.add_member(c_name = "move_move_segment",
              c_type = "bool",
              initializer = """ false """,
              doc = r"""Whether to perform the move move segment""")

@@ -64,6 +64,6 @@ namespace measures {
     }
 
     // store the result (not reused later, hence we can move it).
-    results.g_tau = std::move(g_tau);
+    results.G_tau = std::move(g_tau);
   }
 } // namespace measures
