@@ -32,7 +32,7 @@ namespace moves {
       LOG("Generated equal times");
       return 0;
     }
-    if (dt1 > dt2 && !splitting_full_line)
+    if (dt1 > dt2 and !splitting_full_line)
       std::swap(dt1, dt2); // If splitting a full line, the order of tau_left and tau_right is not fixed
     tau_left             = prop_seg.tau_c - dt1; // dt1 < dt2
     tau_right            = prop_seg.tau_c - dt2;
@@ -49,7 +49,11 @@ namespace moves {
     double ln_trace_ratio = -wdata.mu(color) * removed_segment.length();
     for (auto c : range(wdata.n_color)) {
       if (c != color) { ln_trace_ratio -= -wdata.U(color, c) * overlap(config.seglists[c], removed_segment, fac); }
-      if (wdata.has_Dt) ln_trace_ratio += K_overlap(config.seglists[c], tau_right, tau_left, wdata.K, color, c);
+      if (wdata.has_Dt) {
+        ln_trace_ratio += K_overlap(config.seglists[c], tau_right, tau_left, wdata.K, color, c);
+        if (splitting_full_line)
+          ln_trace_ratio -= K_overlap(config.seglists[c], wdata.qmc_beta, wdata.qmc_zero, wdata.K, color, c);
+      }
     }
     if (wdata.has_Dt)
       ln_trace_ratio += -real(wdata.K(double(tau_left - tau_right))(color, color)); // Correct double counting

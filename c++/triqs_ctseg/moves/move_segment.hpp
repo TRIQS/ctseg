@@ -18,7 +18,7 @@ namespace moves {
     qmc_time_factory_t fac = qmc_time_factory_t{wdata.beta};
     double det_sign;
     // Internal methods
-    bool no_overlap(segment_t seg1, segment_t seg2);
+    bool do_overlap(segment_t seg1, segment_t seg2);
     bool is_movable(std::vector<segment_t> const &seglist, segment_t const &seg);
 
     public:

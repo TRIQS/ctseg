@@ -4,11 +4,9 @@
 namespace moves {
 
   // FIXME WHY HERE ?? -- because the function overlap_seg in config returns 0 if boundaries coincide
-  // return positivie : do_overlap ?
   // Checks if two segments overlap (even just at their boundaries)
-  bool move_segment::no_overlap(segment_t seg1, segment_t seg2) {
-    if (seg1.tau_c >= seg2.tau_cdag && seg1.tau_c <= seg2.tau_c) return false;
-    if (seg1.tau_cdag >= seg2.tau_cdag && seg1.tau_c <= seg2.tau_c) return false;
+  bool move_segment::do_overlap(segment_t seg1, segment_t seg2) {
+    if (seg1.tau_cdag > seg2.tau_c or seg2.tau_cdag > seg1.tau_c) return false;
     return true;
   }
 
@@ -19,20 +17,18 @@ namespace moves {
     bool result = true;
     if (seglist.empty()) return result;
     // If seg is cyclic, split it
-    if (seg.tau_c < seg.tau_cdag)
+    if (is_cyclic(seg))
       return is_movable(seglist, segment_t{wdata.qmc_beta, seg.tau_cdag})
          and is_movable(seglist, segment_t{seg.tau_c, wdata.qmc_zero});
-    // Isolate last segment
-    segment_t last_seg = seglist.back();
-    // In case last segment is cyclic, split it and check its overlap with seg
-    if (last_seg.tau_c < last_seg.tau_cdag) {
-      result = result and no_overlap(seg, segment_t{wdata.qmc_beta, last_seg.tau_cdag})
-         and no_overlap(seg, segment_t{last_seg.tau_c, wdata.qmc_zero});
+    // In case last segment in list is cyclic, split it and check its overlap with seg
+    if (is_cyclic(seglist.back())) {
+      result = result and !do_overlap(seg, segment_t{wdata.qmc_beta, seglist.back().tau_cdag})
+         and !do_overlap(seg, segment_t{seglist.back().tau_c, wdata.qmc_zero});
     } else
-      result = result and no_overlap(seg, last_seg);
+      result = result and !do_overlap(seg, seglist.back());
     // Check overlap of seg with the remainder of seglist
-    for (auto it = find_segment_left(seglist, seg); it->tau_c > seg.tau_cdag and it != --seglist.end(); ++it) {
-      result = result and no_overlap(*it, seg);
+    for (auto it = find_segment_left(seglist, seg); it->tau_c >= seg.tau_cdag and it != --seglist.end(); ++it) {
+      result = result and !do_overlap(*it, seg);
     }
     return result;
   }
@@ -77,19 +73,7 @@ namespace moves {
     // ------------  Trace ratio  -------------
 
     double ln_trace_ratio = (wdata.mu(destination_color) - wdata.mu(origin_color)) * origin_segment.length();
-    if (wdata.has_Dt) {
-      for (auto c : range(wdata.n_color)) {
-        if (c != destination_color) {
-          //ln_trace_ratio +=
-          //  K_overlap(config.seglists[c], origin_segment, slice_target_to_scalar(wdata.K, destination_color, c));
-        }
-        if (c != origin_color) {
-          //ln_trace_ratio -=
-          //  K_overlap(config.seglists[c], origin_segment, slice_target_to_scalar(wdata.K, origin_color, c));
-        }
-      }
-    }
-    double trace_ratio = std::exp(ln_trace_ratio);
+    double trace_ratio    = std::exp(ln_trace_ratio);
 
     // ------------  Det ratio  ---------------
 

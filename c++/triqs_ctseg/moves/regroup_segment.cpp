@@ -14,7 +14,7 @@ namespace moves {
     LOG("Regrouping at color {}", color);
 
     // If no segments nothing to regroup
-    if (sl.empty() or sl.size() == 1) {
+    if (sl.empty()) {
       LOG("Color is empty");
       return 0;
     }
@@ -44,8 +44,11 @@ namespace moves {
     double ln_trace_ratio = wdata.mu(color) * inserted_seg.length();
     for (auto c : range(wdata.n_color)) {
       if (c != color) { ln_trace_ratio += -wdata.U(color, c) * overlap(config.seglists[c], inserted_seg, fac); }
-      if (wdata.has_Dt)
+      if (wdata.has_Dt) {
         ln_trace_ratio -= K_overlap(config.seglists[c], right_seg.tau_c, left_seg.tau_cdag, wdata.K, color, c);
+        if (making_full_line and c != color)
+          ln_trace_ratio += K_overlap(config.seglists[c], wdata.qmc_beta, wdata.qmc_zero, wdata.K, color, c);
+      }
     }
     if (wdata.has_Dt)
       ln_trace_ratio -=
