@@ -9,6 +9,7 @@
 work_data_t::work_data_t(params_t const &p, inputs_t const &inputs, mpi::communicator c) : fac{p.beta} {
 
   // Set logger level
+  spdlog::set_pattern("%v");
   spdlog::set_level(spdlog::level::info);
 #ifdef EXT_DEBUG
   spdlog::set_level(spdlog::level::debug);
@@ -49,6 +50,8 @@ work_data_t::work_data_t(params_t const &p, inputs_t const &inputs, mpi::communi
     ALWAYS_EXPECTS((not has_jperp), "Error : has_jperp is true and we have {} colors instead of 2", n_color);
     ALWAYS_EXPECTS((not has_Dt), "Error : has_Dt is true and we have {} colors instead of 2", n_color);
   }
+
+  if (has_jperp) Jperp = inputs.jperpt;
 
   if (has_Dt) {
     // Compute interaction kernels K(tau), K'(tau) by integrating D(tau)

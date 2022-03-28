@@ -26,6 +26,7 @@ void check_invariant(configuration_t const &config, std::vector<det_t> const &de
     }
   LOG("Invariants OK.");
 }
+
 // ---------------------------
 
 // Make a list of time ordered (decreasing) operators
@@ -49,6 +50,14 @@ std::vector<std::tuple<qmc_time_t, int, bool>> make_time_ordered_op_list(configu
 
 // ---------------------------
 
+// Find index of first segment starting left of seg.tau_c.
+auto find_segment_left(std::vector<segment_t> const &seglist, segment_t const &seg) {
+  auto seg_iter = std::upper_bound(seglist.begin(), seglist.end(), seg);
+  return (seg_iter == seglist.begin()) ? seg_iter : --seg_iter;
+};
+
+// ---------------------------
+
 // Overlap between two non-cyclic segments.
 double overlap_seg(segment_t const &seg1, segment_t const &seg2) {
   if (seg1.tau_cdag >= seg2.tau_c or seg2.tau_cdag >= seg1.tau_c)
@@ -59,6 +68,15 @@ double overlap_seg(segment_t const &seg1, segment_t const &seg2) {
     return double(tau_start - tau_end); // FIXME: overlap of two full lines
   };
 };
+
+// ---------------------------
+
+// Checks if two segments overlap (even just at their boundaries)
+bool do_overlap(segment_t seg1, segment_t seg2) {
+  if (seg1.tau_cdag > seg2.tau_c or seg2.tau_cdag > seg1.tau_c) return false;
+  return true;
+}
+
 // ---------------------------
 
 // Overlap between segment and a list of segments.
@@ -85,6 +103,32 @@ double overlap(std::vector<segment_t> const &seglist, segment_t const &seg, qmc_
     result += overlap_seg(*it, seg);
   return result;
 };
+
+// ---------------------------
+
+// Checks if segment is movable to a given color
+bool is_movable(std::vector<segment_t> const &seglist, segment_t const &seg, qmc_time_factory_t fac) {
+  bool result = true;
+  if (seglist.empty()) return result;
+  auto zero = fac.get_lower_pt();
+  auto beta = fac.get_upper_pt();
+  // If seg is cyclic, split it
+  if (is_cyclic(seg))
+    return is_movable(seglist, segment_t{beta, seg.tau_cdag}, fac)
+       and is_movable(seglist, segment_t{seg.tau_c, zero}, fac);
+  // In case last segment in list is cyclic, split it and check its overlap with seg
+  if (is_cyclic(seglist.back())) {
+    result = result and !do_overlap(seg, segment_t{beta, seglist.back().tau_cdag})
+       and !do_overlap(seg, segment_t{seglist.back().tau_c, zero});
+  } else
+    result = result and !do_overlap(seg, seglist.back());
+  // Check overlap of seg with the remainder of seglist
+  for (auto it = find_segment_left(seglist, seg); it->tau_c >= seg.tau_cdag and it != --seglist.end(); ++it) {
+    result = result and !do_overlap(*it, seg);
+  }
+  return result;
+}
+
 // ---------------------------
 
 // Contribution of the dynamical interaction kernel K to the overlap between a segment and a list of segments.
@@ -108,7 +152,7 @@ double density(std::vector<segment_t> const &seglist) {
 }
 // ---------------------------
 
-/// Find the state at tau = 0 or beta
+// Find the state at tau = 0 or beta
 std::vector<bool> boundary_state(configuration_t const &config) {
   int N = config.n_color();
   std::vector<bool> res(N);
@@ -119,6 +163,12 @@ std::vector<bool> boundary_state(configuration_t const &config) {
 
 // ---------------------------
 
+// Find segments corresponding to bosonic line
+auto find_spin_segment(int line_idx, configuration_t const &config) { auto &line = config.Jperp_list[line_idx]; }
+
+// ---------------------------
+
+// Print config
 std::ostream &operator<<(std::ostream &out, configuration_t const &config) {
   for (auto const &[c, sl] : itertools::enumerate(config.seglists)) {
     out << '\n';

@@ -22,7 +22,7 @@ struct work_data_t {
   nda::matrix<double> U;
 
   bool has_Dt, has_jperp;
-  gf<imtime> K, Kprime;
+  gf<imtime> K, Kprime, Jperp;
 
   // FIXME off diagonal delta ??
   using delta_target_t = matrix_real_valued;
