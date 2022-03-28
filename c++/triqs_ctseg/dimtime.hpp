@@ -43,10 +43,10 @@ namespace triqs::utility {
     double const val               = 0;
     uint64_t const n               = 0;
     static constexpr uint64_t Nmax = std::numeric_limits<uint64_t>::max();
-   
+
     ///
     dimtime_t() = default;
-    
+
     // Not for users. Use the factories
     dimtime_t(uint64_t n_, double beta_) : beta(beta_), val(beta_ * (double(n_) / double(Nmax))), n(n_) {}
 
@@ -70,11 +70,15 @@ namespace triqs::utility {
       return {rng(tau2.n - tau1.n) + tau1.n, tau1.beta};
     }
 
+    /// Get maximum point (i.e. $\tau =\beta$)
+    // e.g. make_beta(tau.beta)
+    static dimtime_t make_beta(double beta) { return {Nmax, beta}; }
+
     /// Get minimum point (i.e. $\tau =0$)
-    static dimtime_t zero(double beta) { return {0, beta}; }
+    static dimtime_t make_zero(double beta) { return {0, beta}; }
 
     /// Get epsilon, defined as $\epsilon = \beta /N_max$
-    static dimtime_t epsilon(double beta) { return {1, beta}; }
+    static dimtime_t make_epsilon(double beta) { return {1, beta}; }
   };
 
   // ----- arithmetic operations --------
@@ -110,17 +114,17 @@ namespace triqs::utility {
   inline double operator*(dimtime_t const &a, dimtime_t const &b) { return double(a) * double(b); }
   inline double operator/(dimtime_t const &a, dimtime_t const &b) { return double(a) / double(b); }
 
-  inline double operator +(dimtime_t const &x, double y) { return double(x) + y; }
-  inline double operator +(double y, dimtime_t const &x) { return y + double(x); }
-  
-  inline double operator -(dimtime_t const &x, double y) { return double(x) - y; }
-  inline double operator -(double y, dimtime_t const &x) { return y - double(x); }
-  
-  inline double operator *(dimtime_t const &x, double y) { return double(x) * y; }
-  inline double operator *(double y, dimtime_t const &x) { return y * double(x); }
-  
-  inline double operator /(dimtime_t const &x, double y) { return double(x) / y; }
-  inline double operator /(double y, dimtime_t const &x) { return y / double(x); }
+  inline double operator+(dimtime_t const &x, double y) { return double(x) + y; }
+  inline double operator+(double y, dimtime_t const &x) { return y + double(x); }
+
+  inline double operator-(dimtime_t const &x, double y) { return double(x) - y; }
+  inline double operator-(double y, dimtime_t const &x) { return y - double(x); }
+
+  inline double operator*(dimtime_t const &x, double y) { return double(x) * y; }
+  inline double operator*(double y, dimtime_t const &x) { return y * double(x); }
+
+  inline double operator/(dimtime_t const &x, double y) { return double(x) / y; }
+  inline double operator/(double y, dimtime_t const &x) { return y / double(x); }
 
   // ----- IO --------
 
