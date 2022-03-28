@@ -9,6 +9,8 @@
 #include <triqs/utility/time_pt.hpp>
 #include <triqs/det_manip.hpp>
 
+#include "./dimtime.hpp"
+
 using namespace triqs::gfs;
 using namespace triqs::mesh;
 using namespace triqs::stat;
@@ -25,6 +27,8 @@ using G_iw_t  = block_gf<imfreq, matrix_valued>;
 // QMC times
 using qmc_time_t         = triqs::utility::time_pt;
 using qmc_time_factory_t = triqs::utility::time_segment;
+
+
 
 /// A lambda to adapt the Delta function for the call of the det.
 struct delta_block_adaptor {
