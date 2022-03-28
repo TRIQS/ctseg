@@ -3,6 +3,40 @@
 
 namespace moves {
 
+  // FIXME WHY HERE ?? -- because the function overlap_seg in config returns 0 if boundaries coincide
+  // Checks if two segments overlap (even just at their boundaries)
+  bool move_segment::do_overlap(segment_t seg1, segment_t seg2) {
+    assert(not iscyclic(seg1));
+    assert(not iscyclic(seg2));
+    if (seg1.tau_cdag > seg2.tau_c or seg2.tau_cdag > seg1.tau_c) return false;
+    return true;
+  }
+
+  // -------------------------------
+
+  // Checks if a segment is movable to a color
+  bool move_segment::is_insertable(std::vector<segment_t> const &seglist, segment_t const &seg) {
+    bool result = true;
+    if (seglist.empty()) return result;
+    // If seg is cyclic, split it
+    if (is_cyclic(seg))
+      return is_insertable(seglist, segment_t{wdata.qmc_beta, seg.tau_cdag})
+         and is_insertable(seglist, segment_t{seg.tau_c, wdata.qmc_zero});
+    // In case last segment in list is cyclic, split it and check its overlap with seg
+    if (is_cyclic(seglist.back())) {
+      result = result and !do_overlap(seg, segment_t{wdata.qmc_beta, seglist.back().tau_cdag})
+         and !do_overlap(seg, segment_t{seglist.back().tau_c, wdata.qmc_zero});
+    } else
+      result = result and !do_overlap(seg, seglist.back());
+    // Check overlap of seg with the remainder of seglist
+    for (auto it = find_segment_left(seglist, seg); it->tau_c >= seg.tau_cdag and it != --seglist.end(); ++it) {
+      result = result and !do_overlap(*it, seg);
+    }
+    return result;
+  }
+
+  // -------------------------------
+
   double move_segment::attempt() {
 
     LOG("\n =================== ATTEMPT MOVE ================ \n");
@@ -14,10 +48,7 @@ namespace moves {
     LOG("Moving from color {}", origin_color);
 
     // If color has no segments, nothing to move
-    if (sl.empty()) {
-      LOG("Nothing to move!");
-      return 0;
-    }
+    if (sl.empty()) return 0;
 
     // Select segment to move
     origin_index   = rng(sl.size());
@@ -31,7 +62,7 @@ namespace moves {
     LOG("Moving to color {}", destination_color);
 
     // Reject if chosen segment overlaps with destination color
-    if (not is_insertable(dsl, origin_segment, fac)) {
+    if (not is_insertable(dsl, origin_segment)) {
       LOG("Space is occupied in destination color.");
       return 0;
     }

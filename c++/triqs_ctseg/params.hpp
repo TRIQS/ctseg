@@ -66,6 +66,15 @@ struct solve_params_t {
   /// Whether to perform the move group into spin segment
   bool move_regroup_segment = false;
 
+  /// Whether to perform the move insert spin segment
+  bool move_insert_spin_segment = false;
+
+  /// Whether to perform the move remove spin segment
+  bool move_remove_spin_segment = false;
+
+  /// Whether to perform the move swap spin lines
+  bool move_swap_spin_lines = false;
+
   /// Whether to measure G(tau) (see [[measure_gt]])
   bool measure_gt = true;
 

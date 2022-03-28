@@ -69,15 +69,13 @@ double overlap_seg(segment_t const &seg1, segment_t const &seg2) {
   };
 };
 
-  // ---------------------------
+// ---------------------------
 
-#if 0
-// Checks if two segments overlap (even just at their boundaries)
-bool do_overlap(segment_t seg1, segment_t seg2) {
-  if (seg1.tau_cdag > seg2.tau_c or seg2.tau_cdag > seg1.tau_c) return false;
-  return true;
+// Checks if two segments are completely disjoint (accounting for boundaries)
+bool disjoint(segment_t seg1, segment_t seg2) {
+  if (seg1.tau_cdag > seg2.tau_c or seg2.tau_cdag > seg1.tau_c) return true;
+  return false;
 }
-#endif
 
 // ---------------------------
 
@@ -106,33 +104,30 @@ double overlap(std::vector<segment_t> const &seglist, segment_t const &seg, qmc_
   return result;
 };
 
-  // ---------------------------
+// ---------------------------
 
-#if 0
 // Checks if segment is movable to a given color
-bool is_movable(std::vector<segment_t> const &seglist, segment_t const &seg, qmc_time_factory_t fac) {
+bool is_insertable(std::vector<segment_t> const &seglist, segment_t const &seg, qmc_time_factory_t fac) {
   bool result = true;
   if (seglist.empty()) return result;
   auto zero = fac.get_lower_pt();
   auto beta = fac.get_upper_pt();
   // If seg is cyclic, split it
   if (is_cyclic(seg))
-    return is_movable(seglist, segment_t{beta, seg.tau_cdag}, fac)
-       and is_movable(seglist, segment_t{seg.tau_c, zero}, fac);
+    return is_insertable(seglist, segment_t{beta, seg.tau_cdag}, fac)
+       and is_insertable(seglist, segment_t{seg.tau_c, zero}, fac);
   // In case last segment in list is cyclic, split it and check its overlap with seg
   if (is_cyclic(seglist.back())) {
-    result = result and !do_overlap(seg, segment_t{beta, seglist.back().tau_cdag})
-       and !do_overlap(seg, segment_t{seglist.back().tau_c, zero});
+    result = result and disjoint(seg, segment_t{beta, seglist.back().tau_cdag})
+       and disjoint(seg, segment_t{seglist.back().tau_c, zero});
   } else
-    result = result and !do_overlap(seg, seglist.back());
+    result = result and disjoint(seg, seglist.back());
   // Check overlap of seg with the remainder of seglist
   for (auto it = find_segment_left(seglist, seg); it->tau_c >= seg.tau_cdag and it != --seglist.end(); ++it) {
-    result = result and !do_overlap(*it, seg);
+    result = result and disjoint(*it, seg);
   }
   return result;
 }
-
-#endif
 
 // ---------------------------
 
@@ -169,7 +164,22 @@ std::vector<bool> boundary_state(configuration_t const &config) {
 // ---------------------------
 
 // Find segments corresponding to bosonic line
-auto find_spin_segment(int line_idx, configuration_t const &config) { auto &line = config.Jperp_list[line_idx]; }
+std::pair<std::vector<segment_t>::const_iterator, std::vector<segment_t>::const_iterator>
+find_spin_segments(int line_idx, configuration_t const &config) {
+  auto const &line    = config.Jperp_list[line_idx];
+  auto const &sl_up   = config.seglists[0];
+  auto const &sl_down = config.seglists[1];
+  // In spin up line, the c conneted to the J line is a at tau_Sminus
+  auto c_up  = segment_t{line.tau_Sminus, line.tau_Sminus};
+  auto it_up = std::lower_bound(sl_up.cbegin(), sl_up.cend(), c_up);
+  // In spin down line, the c conneted to the J line is a at tau_Splus
+  auto c_down  = segment_t{line.tau_Splus, line.tau_Splus};
+  auto it_down = std::lower_bound(sl_down.cbegin(), sl_down.cend(), c_down);
+  std::pair<std::vector<segment_t>::const_iterator, std::vector<segment_t>::const_iterator> result;
+  result.first  = it_up;
+  result.second = it_down;
+  return result;
+}
 
 // ---------------------------
 

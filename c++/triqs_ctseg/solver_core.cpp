@@ -55,6 +55,11 @@ void solver_core::solve(solve_params_t const &solve_params) {
   if (p.move_move_segment) CTQMC.add_move(moves::move_segment{wdata, config, CTQMC.get_rng()}, "move");
   if (p.move_split_segment) CTQMC.add_move(moves::split_segment{wdata, config, CTQMC.get_rng()}, "split");
   if (p.move_regroup_segment) CTQMC.add_move(moves::regroup_segment{wdata, config, CTQMC.get_rng()}, "regroup");
+  if (p.move_insert_spin_segment)
+    CTQMC.add_move(moves::insert_spin_segment{wdata, config, CTQMC.get_rng()}, "spin insert");
+  if (p.move_remove_spin_segment)
+    CTQMC.add_move(moves::remove_spin_segment{wdata, config, CTQMC.get_rng()}, "spin remove");
+  if (p.move_swap_spin_lines) CTQMC.add_move(moves::swap_spin_lines{wdata, config, CTQMC.get_rng()}, "spin swap");
 
   // initialize measurements
   if (p.measure_gt) CTQMC.add_measure(measures::g_f_tau{p, wdata, config, results}, "G(tau) measurement");

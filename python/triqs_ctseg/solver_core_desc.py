@@ -126,6 +126,12 @@ c.add_method("""void solve (**solve_params_t)""",
 +-------------------------------+---------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
 | move_regroup_segment          | bool                | false                                   | Whether to perform the move group into spin segment                                                               |
 +-------------------------------+---------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
+| move_insert_spin_segment      | bool                | false                                   | Whether to perform the move insert spin segment                                                                   |
++-------------------------------+---------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
+| move_remove_spin_segment      | bool                | false                                   | Whether to perform the move remove spin segment                                                                   |
++-------------------------------+---------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
+| move_swap_spin_lines          | bool                | false                                   | Whether to perform the move swap spin lines                                                                       |
++-------------------------------+---------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
 | measure_gt                    | bool                | true                                    | Whether to measure G(tau) (see [[measure_gt]])                                                                    |
 +-------------------------------+---------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
 | measure_n                     | bool                | true                                    | Whether to measure density (see [[measure_density]])                                                              |
@@ -232,6 +238,21 @@ c.add_member(c_name = "move_regroup_segment",
              c_type = "bool",
              initializer = """ false """,
              doc = r"""Whether to perform the move group into spin segment""")
+
+c.add_member(c_name = "move_insert_spin_segment",
+             c_type = "bool",
+             initializer = """ false """,
+             doc = r"""Whether to perform the move insert spin segment""")
+
+c.add_member(c_name = "move_remove_spin_segment",
+             c_type = "bool",
+             initializer = """ false """,
+             doc = r"""Whether to perform the move remove spin segment""")
+
+c.add_member(c_name = "move_swap_spin_lines",
+             c_type = "bool",
+             initializer = """ false """,
+             doc = r"""Whether to perform the move swap spin lines""")
 
 c.add_member(c_name = "measure_gt",
              c_type = "bool",
