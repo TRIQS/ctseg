@@ -56,19 +56,19 @@ inline bool is_full_line(segment_t const &seg, qmc_time_factory_t const &fac) {
 std::vector<std::tuple<qmc_time_t, int, bool>> make_time_ordered_op_list(configuration_t const &config);
 
 // Find index of first segment starting left of seg.tau_c.
-inline auto find_segment_left(std::vector<segment_t> const &seglist, segment_t const &seg);
+std::vector<segment_t>::const_iterator find_segment_left(std::vector<segment_t> const &seglist, segment_t const &seg);
 
 // Overlap between two non-cyclic segments.
 double overlap_seg(segment_t const &seg1, segment_t const &seg2);
 
 // Checks if two segments overlap (even just at their boundaries)
-bool do_overlap(segment_t seg1, segment_t seg2);
+//bool do_overlap(segment_t seg1, segment_t seg2);
 
 // Overlap between segment and a list of segments.
 double overlap(std::vector<segment_t> const &seglist, segment_t const &seg, qmc_time_factory_t const &fac);
 
 // Checks if segment is movable to a given color
-bool is_movable(std::vector<segment_t> const &seglist, segment_t const &seg, qmc_time_factory_t fac);
+//bool is_movable(std::vector<segment_t> const &seglist, segment_t const &seg, qmc_time_factory_t fac);
 
 // Contribution of the dynamical interaction kernel K to the overlap between a segment and a list of segments.
 double K_overlap(std::vector<segment_t> const &seglist, qmc_time_t const &tau_c, qmc_time_t const &tau_cdag,

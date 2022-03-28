@@ -51,7 +51,7 @@ std::vector<std::tuple<qmc_time_t, int, bool>> make_time_ordered_op_list(configu
 // ---------------------------
 
 // Find index of first segment starting left of seg.tau_c.
-auto find_segment_left(std::vector<segment_t> const &seglist, segment_t const &seg) {
+std::vector<segment_t>::const_iterator find_segment_left(std::vector<segment_t> const &seglist, segment_t const &seg) {
   auto seg_iter = std::upper_bound(seglist.begin(), seglist.end(), seg);
   return (seg_iter == seglist.begin()) ? seg_iter : --seg_iter;
 };
@@ -69,13 +69,15 @@ double overlap_seg(segment_t const &seg1, segment_t const &seg2) {
   };
 };
 
-// ---------------------------
+  // ---------------------------
 
+#if 0
 // Checks if two segments overlap (even just at their boundaries)
 bool do_overlap(segment_t seg1, segment_t seg2) {
   if (seg1.tau_cdag > seg2.tau_c or seg2.tau_cdag > seg1.tau_c) return false;
   return true;
 }
+#endif
 
 // ---------------------------
 
@@ -104,8 +106,9 @@ double overlap(std::vector<segment_t> const &seglist, segment_t const &seg, qmc_
   return result;
 };
 
-// ---------------------------
+  // ---------------------------
 
+#if 0
 // Checks if segment is movable to a given color
 bool is_movable(std::vector<segment_t> const &seglist, segment_t const &seg, qmc_time_factory_t fac) {
   bool result = true;
@@ -128,6 +131,8 @@ bool is_movable(std::vector<segment_t> const &seglist, segment_t const &seg, qmc
   }
   return result;
 }
+
+#endif
 
 // ---------------------------
 

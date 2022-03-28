@@ -6,6 +6,8 @@ namespace moves {
   // FIXME WHY HERE ?? -- because the function overlap_seg in config returns 0 if boundaries coincide
   // Checks if two segments overlap (even just at their boundaries)
   bool move_segment::do_overlap(segment_t seg1, segment_t seg2) {
+    assert(not iscyclic(seg1));
+    assert(not iscyclic(seg2));
     if (seg1.tau_cdag > seg2.tau_c or seg2.tau_cdag > seg1.tau_c) return false;
     return true;
   }
