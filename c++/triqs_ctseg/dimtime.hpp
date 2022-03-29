@@ -37,69 +37,100 @@ namespace triqs::utility {
   *   This allows exact comparisons, which notoriously dangerous on floating point number.
   *
   */
-  struct dimtime_t {
+  class dimtime_t {
 
-    double const beta              = 0;
-    double const val               = 0;
-    uint64_t const n               = 0;
+    double _beta = 0;
+    uint64_t n   = 0;
+
+    public:
     static constexpr uint64_t Nmax = std::numeric_limits<uint64_t>::max();
 
     ///
     dimtime_t() = default;
 
     // Not for users. Use the factories
-    dimtime_t(uint64_t n_, double beta_) : beta(beta_), val(beta_ * (double(n_) / double(Nmax))), n(n_) {}
+    dimtime_t(uint64_t n_, double beta_) : _beta(beta_), n(n_) {}
 
     /// Comparisons (using integer, so it is safe)
     auto operator<=>(dimtime_t const &tau) const { return n <=> tau.n; }
     bool operator==(dimtime_t const &tau) const { return n == tau.n; }
 
     /// To cast to double, but it has to be done explicitly.
-    explicit operator double() const { return val; } // cast to a double
+    explicit operator double() const { return _beta * (double(n) / double(Nmax)); }
 
-    // ---- Factories ----
+    /// get beta as double
+    double get_beta() const { return _beta; }
 
-    /// Get a random point in $[0, tau[$
-    static dimtime_t random(auto &rng, dimtime_t const &tau) { return {rng(tau.n), tau.beta}; }
+    /// dimtime_t at tau = beta
+    dimtime_t beta() const { return {Nmax, _beta}; }
 
-    /// Get a random point in $[0,\beta[$
-    static dimtime_t random(auto &rng, double beta) { return {rng(Nmax), beta}; }
+    /// dimtime_t at tau = beta
+    static dimtime_t beta(double beta) { return {Nmax, beta}; }
 
-    // Get a random point in $[tau1, tau2[$
-    static dimtime_t random(auto &rng, dimtime_t const &tau1, dimtime_t const &tau2) {
-      return {rng(tau2.n - tau1.n) + tau1.n, tau1.beta};
-    }
+    /// $\tau =0$
+    dimtime_t zero() const { return {0, _beta}; }
 
-    /// Get maximum point (i.e. $\tau =\beta$)
-    // e.g. make_beta(tau.beta)
-    static dimtime_t make_beta(double beta) { return {Nmax, beta}; }
-
-    /// Get minimum point (i.e. $\tau =0$)
-    static dimtime_t make_zero(double beta) { return {0, beta}; }
+    /// $\tau =0$
+    static dimtime_t zero(double beta) { return {0, beta}; }
 
     /// Get epsilon, defined as $\epsilon = \beta /N_max$
-    static dimtime_t make_epsilon(double beta) { return {1, beta}; }
+    dimtime_t epsilon() const { return {1, _beta}; }
+
+    /// Get epsilon, defined as $\epsilon = \beta /N_max$
+    static dimtime_t epsilon(double beta) { return {1, beta}; }
+
+    // Get a random point in $]tau1, tau2[$
+    static dimtime_t random(auto &rng, dimtime_t const &tau1, dimtime_t const &tau2) {
+      auto n1 = tau1.n + 1;
+      return {rng(tau2.n - n1) + n1, tau1._beta};
+    }
+
+    /// Get a random point in $]0, tau[$
+    static dimtime_t random(auto &rng, dimtime_t const &tau) { return {rng(tau.n - 1) + 1, tau._beta}; }
+
+    // ----- Some basic op, with cyclicity --------
+
+    friend dimtime_t operator+(dimtime_t const &a, dimtime_t const &b) {
+      bool wrapped = ((dimtime_t::Nmax - std::max(a.n, b.n)) < std::min(a.n, b.n));
+      if (!wrapped)
+        return {(a.n + b.n) % dimtime_t::Nmax, a._beta};
+      else
+        return {((a.n + b.n) + 1) % dimtime_t::Nmax, a._beta};
+    }
+
+    friend dimtime_t operator-(dimtime_t const &a, dimtime_t const &b) {
+      uint64_t p = (a.n >= b.n ? (a.n - b.n) % dimtime_t::Nmax : dimtime_t::Nmax - (b.n - a.n));
+      return {p, a._beta};
+    }
+
+    /// unary -
+    friend dimtime_t operator-(dimtime_t const &a) { return {dimtime_t::Nmax - a.n, a._beta}; }
+
+    // ----- IO --------
+
+    /// Stream insertion
+    friend std::ostream &operator<<(std::ostream &out, dimtime_t const &p) {
+      return out << double(p) << " [dimtime_t : beta = " << p._beta << " n = " << p.n << "]";
+    }
+
+    /// Write into HDF5
+    friend void h5_write(h5::group fg, std::string const &subgroup_name, dimtime_t const &g) {
+      auto gr = fg.create_group(subgroup_name);
+      h5_write(gr, "beta", g._beta);
+      h5_write(gr, "n", g.n);
+    }
+
+    /// Read from HDF5
+    friend void h5_read(h5::group fg, std::string const &subgroup_name, dimtime_t &g) {
+      auto gr = fg.open_group(subgroup_name);
+      h5_read(gr, "beta", g._beta);
+      h5_read(gr, "n", g.n);
+    }
   };
 
   // ----- arithmetic operations --------
 
   // NB adding and substracting is cyclic on [0, beta]
-
-  inline dimtime_t operator+(dimtime_t const &a, dimtime_t const &b) {
-    bool wrapped = ((dimtime_t::Nmax - std::max(a.n, b.n)) < std::min(a.n, b.n));
-    if (!wrapped)
-      return {(a.n + b.n) % dimtime_t::Nmax, a.beta};
-    else
-      return {((a.n + b.n) + 1) % dimtime_t::Nmax, a.beta};
-  }
-
-  inline dimtime_t operator-(dimtime_t const &a, dimtime_t const &b) {
-    uint64_t n = (a.n >= b.n ? (a.n - b.n) % dimtime_t::Nmax : dimtime_t::Nmax - (b.n - a.n));
-    return {n, a.beta};
-  }
-
-  /// unary -
-  inline dimtime_t operator-(dimtime_t const &a) { return {dimtime_t::Nmax - a.n, a.beta}; }
 
   /// division by integer
   //inline dimtime_t div_by_int(dimtime_t const &a, size_t b) { return {a.n / b, a.beta}; }
@@ -126,26 +157,4 @@ namespace triqs::utility {
   inline double operator/(dimtime_t const &x, double y) { return double(x) / y; }
   inline double operator/(double y, dimtime_t const &x) { return y / double(x); }
 
-  // ----- IO --------
-
-  /// Stream insertion
-  inline std::ostream &operator<<(std::ostream &out, dimtime_t const &p) {
-    return out << p.val << " [dimtime_t : beta = " << p.beta << " n = " << p.n << "]";
-  }
-
-  /// Write into HDF5
-  inline void h5_write(h5::group fg, std::string const &subgroup_name, dimtime_t const &g) {
-    auto gr = fg.create_group(subgroup_name);
-    h5_write(gr, "beta", g.beta);
-    h5_write(gr, "val", g.val);
-    h5_write(gr, "n", g.n);
-  }
-
-  /// Read from HDF5
-  inline void h5_read(h5::group fg, std::string const &subgroup_name, dimtime_t &g) {
-    auto gr = fg.open_group(subgroup_name);
-    h5_read(gr, "beta", g.beta);
-    h5_read(gr, "val", g.val);
-    h5_read(gr, "n", g.n);
-  }
 } // namespace triqs::utility
