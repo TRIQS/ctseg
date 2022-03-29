@@ -183,6 +183,22 @@ find_spin_segments(int line_idx, configuration_t const &config) {
 
 // ---------------------------
 
+// Same as std::upper_bound, but i-th element of vector is returned by f[i]
+long upper_bound(auto f, long N, auto const &value) {
+  long first = 0, count = N;
+
+  while (count > 0) {
+    long step = count / 2;
+    if (value < f(first + step))
+      count = step;
+    else {
+      first += step + 1;
+      count -= step + 1;
+    }
+  }
+  return first;
+}
+
 // Print config
 std::ostream &operator<<(std::ostream &out, configuration_t const &config) {
   for (auto const &[c, sl] : itertools::enumerate(config.seglists)) {

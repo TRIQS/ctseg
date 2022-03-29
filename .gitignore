@@ -4,4 +4,8 @@ doc/reference
 .*.swp
 build
 .cache
+core*
+.vscode
+trash
+
 

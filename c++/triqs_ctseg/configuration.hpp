@@ -88,6 +88,9 @@ std::vector<bool> boundary_state(configuration_t const &config);
 std::pair<std::vector<segment_t>::const_iterator, std::vector<segment_t>::const_iterator>
 find_spin_segments(int line_idx, configuration_t const &config);
 
+// Same as std::upper_bound, but i-th element of vector is returned by f[i]
+long upper_bound(auto f, long N, auto const &value);
+
 // ----------- DEBUG code --------------
 // Print config
 std::ostream &operator<<(std::ostream &out, configuration_t const &config);
