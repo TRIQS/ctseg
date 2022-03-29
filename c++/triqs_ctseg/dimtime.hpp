@@ -59,7 +59,7 @@ namespace triqs::utility {
     explicit operator double() const { return _beta * (double(n) / double(Nmax)); }
 
     /// get beta as double
-    double get_beta() const { return _beta; }
+    //double get_beta() const { return _beta; }
 
     /// dimtime_t at tau = beta
     dimtime_t beta() const { return {Nmax, _beta}; }
