@@ -8,7 +8,6 @@ namespace moves {
     LOG("\n =================== ATTEMPT REMOVE ================ \n");
 
     // ------------ Choice of segment --------------
-
     // Select removal color
     color    = rng(wdata.n_color);
     auto &sl = config.seglists[color];

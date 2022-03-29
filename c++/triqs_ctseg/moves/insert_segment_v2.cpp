@@ -1,18 +1,25 @@
-#include "insert_segment.hpp"
+#include "insert_segment_v2.hpp"
 #include "../logs.hpp"
 #include <cmath>
 
 namespace moves {
 
-  double insert_segment::attempt() {
+  double insert_segment_v2::attempt() {
 
     LOG("\n =================== ATTEMPT INSERT ================ \n");
 
-    // ------------ Choice of segment --------------
     // Select insertion color
-    color    = rng(wdata.n_color);
-    auto &sl = config.seglists[color];
+    color = rng(wdata.n_color);
     LOG("Inserting at color {}", color);
+
+    current_density = density(config.seglists[color]);
+    if (rng.preview() < current_density) {
+      need_flip = true;
+      config    = flip(config, wdata.beta);
+      LOG("Inserting antisegment.");
+    }
+
+    auto &sl = config.seglists[color];
 
     // Select insertion window [wtau_left,wtau_right]
     dimtime_t wtau_left = wdata.qmc_beta, wtau_right = wdata.qmc_zero;
@@ -43,11 +50,13 @@ namespace moves {
     prop_seg = segment_t{wtau_left - dt1, wtau_left - dt2};
     // The index of prop_seg if it is inserted in the list of segments.
     prop_seg_it = std::upper_bound(sl.begin(), sl.end(), prop_seg);
-    //long prop_seg_idx = std::distance(sl.begin(), prop_seg_it);
 
-    LOG("Inserting segment at position {}, with c at {}, cdag at {}", prop_seg_idx, prop_seg.tau_c, prop_seg.tau_cdag);
+    LOG("Inserting segment at position {}, with c at {}, cdag at {}, with flip = {}.", prop_seg_idx, prop_seg.tau_c,
+        prop_seg.tau_cdag, need_flip);
 
     // ------------  Trace ratio  -------------
+
+    // FIXME: works when splitting full line?
     double ln_trace_ratio = wdata.mu(color) * prop_seg.length();
     for (auto c : range(wdata.n_color)) {
       if (c != color) { ln_trace_ratio += -wdata.U(color, c) * overlap(config.seglists[c], prop_seg); }
@@ -60,21 +69,33 @@ namespace moves {
     double trace_ratio = std::exp(ln_trace_ratio);
 
     // ------------  Det ratio  ---------------
-    auto det_c_time     = [&](long i) { return wdata.dets[color].get_y(i).first; };
-    auto det_cdag_time  = [&](long i) { return wdata.dets[color].get_x(i).first; };
-    long det_index_c    = lower_bound(det_c_time, wdata.dets[color].size(), prop_seg.tau_c);
-    long det_index_cdag = lower_bound(det_cdag_time, wdata.dets[color].size(), prop_seg.tau_cdag);
-    // We insert tau_cdag as a line (first index) and tau_c as a column (second index). The index always corresponds to the
-    // segment the tau_c/tau_cdag belongs to.
-    auto det_ratio =
+
+    auto det_c_time    = [&](long i) { return wdata.dets[color].get_y(i).first; };
+    auto det_cdag_time = [&](long i) { return wdata.dets[color].get_x(i).first; };
+    long det_index_c = 0, det_index_cdag = 0;
+    if (need_flip) {
+      det_index_c    = lower_bound(det_c_time, wdata.dets[color].size(), prop_seg.tau_cdag);
+      det_index_cdag = lower_bound(det_cdag_time, wdata.dets[color].size(), prop_seg.tau_c);
+    } else {
+      det_index_c    = lower_bound(det_c_time, wdata.dets[color].size(), prop_seg.tau_c);
+      det_index_cdag = lower_bound(det_cdag_time, wdata.dets[color].size(), prop_seg.tau_cdag);
+    }
+    // Times are ordered in det. We insert tau_cdag as a line (first index) and tau_c as a column (second index).
+    double det_ratio =
        wdata.dets[color].try_insert(det_index_cdag, det_index_c, {prop_seg.tau_cdag, 0}, {prop_seg.tau_c, 0});
 
     // ------------  Proposition ratio ------------
 
+    double future_density = current_density + prop_seg.length();
+    double density_ratio  = future_density / (1 - current_density);
+    if (need_flip) {
+      future_density = 1 - future_density;
+      density_ratio  = (1 - future_density) / current_density;
+    }
     double current_number_intervals = std::max(1.0, double(sl.size()));
     double future_number_segments   = double(sl.size()) + 1;
-    double prop_ratio =
-       (current_number_intervals * window_length * window_length / (sl.empty() ? 1 : 2)) / future_number_segments;
+    double prop_ratio               = density_ratio
+       * (current_number_intervals * window_length * window_length / (sl.empty() ? 1 : 2)) / future_number_segments;
     // Account for absence of time swapping when inserting into empty line.
 
     LOG("trace_ratio  = {}, prop_ratio = {}, det_ratio = {}", trace_ratio, prop_ratio, det_ratio);
@@ -87,7 +108,7 @@ namespace moves {
 
   //--------------------------------------------------
 
-  double insert_segment::accept() {
+  double insert_segment_v2::accept() {
 
     LOG("\n - - - - - ====> ACCEPT - - - - - - - - - - -\n");
 
@@ -102,8 +123,9 @@ namespace moves {
 
     // Insert the segment in an ordered list
     sl.insert(prop_seg_it, prop_seg);
+    if (need_flip) config = flip(config, wdata.beta);
 
-    // Check invariant
+      // Check invariant
 #ifdef CHECK_INVARIANTS
     check_invariant(config, wdata.dets);
 #endif
@@ -116,8 +138,9 @@ namespace moves {
   }
 
   //--------------------------------------------------
-  void insert_segment::reject() {
+  void insert_segment_v2::reject() {
     LOG("\n - - - - - ====> REJECT - - - - - - - - - - -\n");
     wdata.dets[color].reject_last_try();
+    if (need_flip) config = flip(config, wdata.beta);
   }
 }; // namespace moves

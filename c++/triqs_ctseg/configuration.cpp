@@ -153,6 +153,7 @@ double K_overlap(std::vector<segment_t> const &seglist, dimtime_t const &tau_c, 
 double density(std::vector<segment_t> const &seglist) {
   double result = 0;
   for (auto const &seg : seglist) result += double(seg.tau_c - seg.tau_cdag);
+  if (is_full_line(seglist[0])) return double(seglist[0].tau_c.beta());
   return result;
 }
 // ---------------------------
