@@ -61,10 +61,14 @@ namespace moves {
     double trace_ratio = std::exp(ln_trace_ratio);
 
     // ------------  Det ratio  ---------------
+    auto det_c_time     = [&](long i) { return wdata.dets[color].get_y(i).first; };
+    auto det_cdag_time  = [&](long i) { return wdata.dets[color].get_x(i).first; };
+    long det_index_c    = lower_bound(det_c_time, wdata.dets[color].size(), prop_seg.tau_c);
+    long det_index_cdag = lower_bound(det_cdag_time, wdata.dets[color].size(), prop_seg.tau_cdag);
     // We insert tau_cdag as a line (first index) and tau_c as a column (second index). The index always corresponds to the
     // segment the tau_c/tau_cdag belongs to.
     auto det_ratio =
-       wdata.dets[color].try_insert(prop_seg_idx, prop_seg_idx, {prop_seg.tau_cdag, 0}, {prop_seg.tau_c, 0});
+       wdata.dets[color].try_insert(det_index_cdag, det_index_c, {prop_seg.tau_cdag, 0}, {prop_seg.tau_c, 0});
 
     // ------------  Proposition ratio ------------
 
@@ -76,8 +80,9 @@ namespace moves {
 
     LOG("trace_ratio  = {}, prop_ratio = {}, det_ratio = {}", trace_ratio, prop_ratio, det_ratio);
 
-    double prod = trace_ratio * det_ratio * prop_ratio;
-    det_sign    = (det_ratio > 0) ? 1.0 : -1.0;
+    double prod = trace_ratio * abs(det_ratio) * prop_ratio;
+    //det_sign    = (det_ratio > 0) ? 1.0 : -1.0;
+    det_sign = 1;
     return (std::isfinite(prod) ? prod : det_sign);
   }
 
@@ -93,7 +98,7 @@ namespace moves {
     // Compute the sign ratio
     double sign_ratio = 1;
     auto &sl          = config.seglists[color];
-    if (is_cyclic(prop_seg)) sign_ratio = -1.0;
+    //if (is_cyclic(prop_seg)) sign_ratio = -1.0;
     LOG("Sign ratio is {}", sign_ratio);
 
     // Insert the segment in an ordered list

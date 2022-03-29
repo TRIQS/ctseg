@@ -89,18 +89,20 @@ std::vector<bool> boundary_state(configuration_t const &config);
 std::pair<std::vector<segment_t>::const_iterator, std::vector<segment_t>::const_iterator>
 find_spin_segments(int line_idx, configuration_t const &config);
 
-// Same as std::upper_bound, but i-th element of vector is returned by f[i]
-inline long upper_bound(auto f, long N, auto const &value) {
+// Flip config
+configuration_t flip(configuration_t const &config, double const &beta);
+
+// Same as std::lower_bound, but i-th element of vector is returned by f[i]
+long lower_bound(auto f, long N, auto const &value) {
   long first = 0, count = N;
 
   while (count > 0) {
     long step = count / 2;
-    if (value < f(first + step))
-      count = step;
-    else {
+    if (f(first + step) < value) {
       first += step + 1;
       count -= step + 1;
-    }
+    } else
+      count = step;
   }
   return first;
 }

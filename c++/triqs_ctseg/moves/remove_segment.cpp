@@ -42,8 +42,12 @@ namespace moves {
     double trace_ratio = std::exp(ln_trace_ratio);
 
     // ------------  Det ratio  ---------------
+    auto det_c_time     = [&](long i) { return wdata.dets[color].get_y(i).first; };
+    auto det_cdag_time  = [&](long i) { return wdata.dets[color].get_x(i).first; };
+    long det_index_c    = lower_bound(det_c_time, wdata.dets[color].size(), prop_seg.tau_c);
+    long det_index_cdag = lower_bound(det_cdag_time, wdata.dets[color].size(), prop_seg.tau_cdag);
 
-    auto det_ratio = wdata.dets[color].try_remove(prop_seg_idx, prop_seg_idx);
+    auto det_ratio = wdata.dets[color].try_remove(det_index_cdag, det_index_c);
 
     // ------------  Proposition ratio ------------
 
@@ -63,8 +67,9 @@ namespace moves {
        / (future_number_intervals * window_length * window_length / (current_number_segments == 1 ? 1 : 2));
     LOG("trace_ratio  = {}, prop_ratio = {}, det_ratio = {}", trace_ratio, prop_ratio, det_ratio);
 
-    det_sign    = (det_ratio > 0) ? 1.0 : -1.0;
-    double prod = trace_ratio * det_ratio * prop_ratio;
+    //det_sign    = (det_ratio > 0) ? 1.0 : -1.0;
+    det_sign    = 1;
+    double prod = trace_ratio * abs(det_ratio) * prop_ratio;
 
     return (std::isfinite(prod)) ? prod : det_sign;
   }
@@ -80,7 +85,8 @@ namespace moves {
 
     auto &sl = config.seglists[color];
     // Compute the sign ratio
-    double sign_ratio = is_cyclic(sl[prop_seg_idx]) ? -1 : 1;
+    //double sign_ratio = is_cyclic(sl[prop_seg_idx]) ? -1 : 1;
+    double sign_ratio = 1;
     LOG("Sign ratio is {}", sign_ratio);
 
     // Remove the segment

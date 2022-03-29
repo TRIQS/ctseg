@@ -13,7 +13,7 @@ namespace moves {
     // Select spin insertion color
     orig_color = rng(wdata.n_color);
     auto &sl   = config.seglists[orig_color];
-    LOG("Inserting spin: splitting at color {}", color);
+    LOG("Inserting spin: splitting at color {}", orig_color);
     dest_color = orig_color == 0 ? 1 : 0;
     auto &dsl  = config.seglists[dest_color];
 

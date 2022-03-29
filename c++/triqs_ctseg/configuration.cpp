@@ -14,14 +14,20 @@ void check_invariant(configuration_t const &config, std::vector<det_t> const &de
                        c, i, config);
         ALWAYS_EXPECTS(not is_cyclic(sl[i]), "Segment in color {} at position {} should not by cyclic in config \n{}",
                        c, i, config); // only last segment can be cyclic
-        ALWAYS_EXPECTS(
+                                      /*         ALWAYS_EXPECTS(
            (sl[i].tau_cdag == D.get_x(i).first),
            "Det error in color {}. The segment in position {} has tau_cdag = {}, while the det has {} in row {}. Config : \n{}",
            c, i, sl[i].tau_cdag, D.get_x(i).first, i, config);
         ALWAYS_EXPECTS(
            (sl[i].tau_c == D.get_y(i).first),
            "Det error in color {}. The segment in position {} has tau_c = {}, while the det has {} in column {}.  Config : \n{}",
-           c, i, sl[i].tau_c, D.get_y(i).first, i, config);
+           c, i, sl[i].tau_c, D.get_y(i).first, i, config); */
+      }
+      for (int i = 0; i < D.size() - 1; ++i) {
+        ALWAYS_EXPECTS((D.get_x(i).first < D.get_x(i + 1).first),
+                       "Det time order error (cdag) in color {} at position {} in config \n{}", c, i, config);
+        ALWAYS_EXPECTS((D.get_y(i).first < D.get_y(i + 1).first),
+                       "Det time order error (c) in color {} at position {} in config \n{}", c, i, config);
       }
     }
   LOG("Invariants OK.");
@@ -194,15 +200,16 @@ configuration_t flip(configuration_t const &config, double const &beta) {
     } else {                                           // Swap c and cdag
       for (auto i : range(sl.size())) {
         if (is_cyclic(sl.back())) {
-          ind = i == 0 ? sl.size() - 1 : i - 1;
+          long ind = (i == 0) ? long(sl.size()) - 1 : i - 1;
           fsl.emplace_back(segment_t{sl[ind].tau_cdag, sl[i].tau_c, sl[ind].J_cdag, sl[i].J_c});
         } else {
-          ind = i == sl.size() - 1 ? 0 : i + 1;
+          long ind = (i == sl.size() - 1) ? 0 : i + 1;
           fsl.emplace_back(segment_t{sl[i].tau_cdag, sl[ind].tau_c, sl[i].J_cdag, sl[ind].J_c});
         }
       } // loop over segs
     }   // general case
   }     // loop over colors
+  return flipped_config;
 }
 
 // Print config

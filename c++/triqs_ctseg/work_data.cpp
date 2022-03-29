@@ -105,4 +105,5 @@ work_data_t::work_data_t(params_t const &p, inputs_t const &inputs, mpi::communi
       dets.back().set_precision_error(p.det_precision_error);
     }
   }
+
 } // work_data constructor
