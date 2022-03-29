@@ -5,7 +5,7 @@
 namespace moves {
 
   // Find the segement to the left of tau (accounting for cyclicity), and whether tau is inside
-  void insert_split_segment::prep_insertion(std::vector<segment_t> const &seglist, qmc_time_t tau) {
+  void insert_split_segment::prep_insertion(std::vector<segment_t> const &seglist, dimtime_t tau) {
     is_inside = false;
     seg_it    = seglist.cend();
     if (seglist.empty()) return;
@@ -35,7 +35,7 @@ namespace moves {
     LOG("Inserting/splitting at color {}", color);
 
     // Select first time
-    tau1 = wdata.make_random_time(rng, wdata.qmc_zero, wdata.qmc_beta);
+    tau1 = dimtime_t::random(rng, wdata.qmc_zero, wdata.qmc_beta);
     LOG("First time is {}", tau1);
     try {
       prep_insertion(sl, tau1);
@@ -52,7 +52,7 @@ namespace moves {
       LOG("First time is inside a segment: attempt SPLIT at position {}.", seg_idx);
 
       // ------------- Choose second time ---------
-      tau2 = wdata.make_random_time(rng, seg_it->tau_cdag, seg_it->tau_c);
+      tau2 = dimtime_t::random(rng, seg_it->tau_cdag, seg_it->tau_c);
       if (tau2 == tau1) {
         LOG("Second time equal to first time.");
         return 0;
@@ -94,7 +94,7 @@ namespace moves {
 
       // ------------ Find insertion window [wtau1,wtau2] ------------
       insert_into_empty_line = seg_it == sl.end();
-      qmc_time_t wtau1, wtau2;
+      dimtime_t wtau1, wtau2;
       if (insert_into_empty_line) {
         wtau1         = wdata.qmc_beta;
         wtau2         = wdata.qmc_zero;
@@ -107,7 +107,7 @@ namespace moves {
       }
 
       // ------------- Choose second time --------------
-      tau2 = wdata.make_random_time(rng, wtau2, wtau1);
+      tau2 = dimtime_t::random(rng, wtau2, wtau1);
       if (tau2 == tau1) {
         LOG("Second time equal to first time.");
         return 0;

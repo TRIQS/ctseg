@@ -50,7 +50,7 @@ namespace moves {
     double current_number_segments = sl.size();
     double future_number_intervals = std::max(1.0, sl.size() - 1.0);
     // Insertion window for reverse move, initialise at (beta,0)
-    qmc_time_t wtau_left, wtau_right;
+    dimtime_t wtau_left, wtau_right;
     if (current_number_segments != 1) {
       bool is_last_segment  = prop_seg_idx == sl.size() - 1;
       bool is_first_segment = prop_seg_idx == 0;
@@ -58,8 +58,8 @@ namespace moves {
       wtau_right = sl[is_last_segment ? 0 : prop_seg_idx + 1].tau_c;
       wtau_left  = sl[is_first_segment ? sl.size() - 1 : prop_seg_idx - 1].tau_cdag;
     }
-    qmc_time_t window_length = (current_number_segments == 1) ? wdata.qmc_beta : wtau_left - wtau_right;
-    double prop_ratio        = current_number_segments
+    dimtime_t window_length = (current_number_segments == 1) ? wdata.qmc_beta : wtau_left - wtau_right;
+    double prop_ratio       = current_number_segments
        / (future_number_intervals * window_length * window_length / (current_number_segments == 1 ? 1 : 2));
     LOG("trace_ratio  = {}, prop_ratio = {}, det_ratio = {}", trace_ratio, prop_ratio, det_ratio);
 

@@ -12,8 +12,8 @@ namespace moves {
     // Internal data
     int color = 0;
     segment_t prop_seg;
-    qmc_time_t tau_left;
-    qmc_time_t tau_right;
+    dimtime_t tau_left;
+    dimtime_t tau_right;
     int prop_seg_idx{};
     int right_seg_idx{};
     bool splitting_full_line{};

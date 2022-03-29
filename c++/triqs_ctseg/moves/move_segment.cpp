@@ -31,7 +31,7 @@ namespace moves {
     LOG("Moving to color {}", destination_color);
 
     // Reject if chosen segment overlaps with destination color
-    if (not is_insertable(dsl, origin_segment, fac)) {
+    if (not is_insertable(dsl, origin_segment)) {
       LOG("Space is occupied in destination color.");
       return 0;
     }
@@ -51,7 +51,7 @@ namespace moves {
     // We insert tau_cdag as a line (first index) and tau_c as a column (second index). The index always corresponds to the
     // segment the tau_c/tau_cdag belongs to.
     double det_ratio      = 1.0;
-    bool moving_full_line = is_full_line(origin_segment, fac);
+    bool moving_full_line = is_full_line(origin_segment);
     if (not moving_full_line) {
       det_ratio = wdata.dets[destination_color].try_insert(dest_index, dest_index, {origin_segment.tau_cdag, 0},
                                                            {origin_segment.tau_c, 0})

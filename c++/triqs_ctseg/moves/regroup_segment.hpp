@@ -16,7 +16,6 @@ namespace moves {
     int left_seg_idx;
     int right_seg_idx;
     bool making_full_line{};
-    qmc_time_factory_t fac = qmc_time_factory_t{wdata.beta};
     double det_sign;
 
     public:

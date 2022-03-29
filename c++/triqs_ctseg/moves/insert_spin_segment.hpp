@@ -13,8 +13,7 @@ namespace moves {
     segment_t prop_seg, spin_seg;
     int prop_seg_idx;
     bool splitting_full_line;
-    qmc_time_factory_t fac = qmc_time_factory_t{wdata.beta};
-    qmc_time_t tau_left, tau_right;
+    dimtime_t tau_left, tau_right;
     double det_sign;
 
     public:

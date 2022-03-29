@@ -104,7 +104,7 @@ namespace moves {
 
     // ------------  Proposition ratio ------------
 
-    qmc_time_t new_seg_length =
+    dimtime_t new_seg_length =
        making_full_line ? wdata.qmc_beta : dsl[dest_left_idx].tau_c - dsl[dest_right_idx].tau_cdag;
     double future_number_seg = making_full_line ? 1 : double(dsl.size()) + 1;
     double prop_ratio        = (double(wdata.n_color) * future_number_seg * new_seg_length * new_seg_length / 2)

@@ -5,8 +5,9 @@
 #include "logs.hpp"
 #include "spdlog/common.h"
 #include "spdlog/spdlog.h"
+#include "triqs_ctseg/types.hpp"
 
-work_data_t::work_data_t(params_t const &p, inputs_t const &inputs, mpi::communicator c) : fac{p.beta} {
+work_data_t::work_data_t(params_t const &p, inputs_t const &inputs, mpi::communicator c) {
 
   // Set logger level
   spdlog::set_pattern("%v");
@@ -22,7 +23,9 @@ work_data_t::work_data_t(params_t const &p, inputs_t const &inputs, mpi::communi
   //} else
   //  spdlog::set_level(spdlog::level::off);
 
-  beta = p.beta;
+  beta     = p.beta;
+  qmc_zero = dimtime_t::zero(beta);
+  qmc_beta = dimtime_t::beta(beta);
 
   // Number of colors from Green's function structure
   n_color = 0;
@@ -103,10 +106,3 @@ work_data_t::work_data_t(params_t const &p, inputs_t const &inputs, mpi::communi
     }
   }
 } // work_data constructor
-
-// Random time generation that excludes values at boundaries, accounts for cyclicity
-qmc_time_t work_data_t::make_random_time(triqs::mc_tools::random_generator &rng, qmc_time_t const &l) {
-  auto dt = fac.get_random_pt(rng, qmc_zero, l);
-  if (dt == qmc_zero) return fac.get_epsilon();
-  return dt;
-}

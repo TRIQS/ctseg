@@ -31,9 +31,9 @@ void check_invariant(configuration_t const &config, std::vector<det_t> const &de
 
 // Make a list of time ordered (decreasing) operators
 
-std::vector<std::tuple<qmc_time_t, int, bool>> make_time_ordered_op_list(configuration_t const &config) {
+std::vector<std::tuple<dimtime_t, int, bool>> make_time_ordered_op_list(configuration_t const &config) {
 
-  std::vector<std::tuple<qmc_time_t, int, bool>> result;
+  std::vector<std::tuple<dimtime_t, int, bool>> result;
 
   result.reserve(config.seglists.size()
                  * config.seglists[0].size()); // optional : simple heuristics to reserve some space
@@ -63,8 +63,8 @@ double overlap_seg(segment_t const &seg1, segment_t const &seg2) {
   if (seg1.tau_cdag >= seg2.tau_c or seg2.tau_cdag >= seg1.tau_c)
     return 0;
   else {
-    qmc_time_t tau_start = std::min(seg1.tau_c, seg2.tau_c);
-    qmc_time_t tau_end   = std::max(seg1.tau_cdag, seg2.tau_cdag);
+    dimtime_t tau_start = std::min(seg1.tau_c, seg2.tau_c);
+    dimtime_t tau_end   = std::max(seg1.tau_cdag, seg2.tau_cdag);
     return double(tau_start - tau_end); // FIXME: overlap of two full lines
   };
 };
@@ -80,15 +80,15 @@ bool disjoint(segment_t seg1, segment_t seg2) {
 // ---------------------------
 
 // Overlap between segment and a list of segments.
-double overlap(std::vector<segment_t> const &seglist, segment_t const &seg, qmc_time_factory_t const &fac) {
+double overlap(std::vector<segment_t> const &seglist, segment_t const &seg) {
   if (seglist.empty()) return 0;
 
-  auto zero = fac.get_lower_pt();
-  auto beta = fac.get_upper_pt();
+  auto beta = seg.tau_c.beta();
+  auto zero = seg.tau_c.zero();
 
   // If seg is cyclic, split it
   if (is_cyclic(seg))
-    return overlap(seglist, segment_t{beta, seg.tau_cdag}, fac) + overlap(seglist, segment_t{seg.tau_c, zero}, fac);
+    return overlap(seglist, segment_t{beta, seg.tau_cdag}) + overlap(seglist, segment_t{seg.tau_c, zero});
   double result = 0;
   // Isolate last segment
   auto last_seg = seglist.back();
@@ -107,15 +107,14 @@ double overlap(std::vector<segment_t> const &seglist, segment_t const &seg, qmc_
 // ---------------------------
 
 // Checks if segment is movable to a given color
-bool is_insertable(std::vector<segment_t> const &seglist, segment_t const &seg, qmc_time_factory_t fac) {
+bool is_insertable(std::vector<segment_t> const &seglist, segment_t const &seg) {
   bool result = true;
   if (seglist.empty()) return result;
-  auto zero = fac.get_lower_pt();
-  auto beta = fac.get_upper_pt();
+  auto beta = seg.tau_c.beta();
+  auto zero = seg.tau_c.zero();
   // If seg is cyclic, split it
   if (is_cyclic(seg))
-    return is_insertable(seglist, segment_t{beta, seg.tau_cdag}, fac)
-       and is_insertable(seglist, segment_t{seg.tau_c, zero}, fac);
+    return is_insertable(seglist, segment_t{beta, seg.tau_cdag}) and is_insertable(seglist, segment_t{seg.tau_c, zero});
   // In case last segment in list is cyclic, split it and check its overlap with seg
   if (is_cyclic(seglist.back())) {
     result = result and disjoint(seg, segment_t{beta, seglist.back().tau_cdag})
@@ -132,7 +131,7 @@ bool is_insertable(std::vector<segment_t> const &seglist, segment_t const &seg, 
 // ---------------------------
 
 // Contribution of the dynamical interaction kernel K to the overlap between a segment and a list of segments.
-double K_overlap(std::vector<segment_t> const &seglist, qmc_time_t const &tau_c, qmc_time_t const &tau_cdag,
+double K_overlap(std::vector<segment_t> const &seglist, dimtime_t const &tau_c, dimtime_t const &tau_cdag,
                  gf<imtime, matrix_valued> const &K, int c1, int c2) {
   if (seglist.empty()) return 0;
   double result = 0;

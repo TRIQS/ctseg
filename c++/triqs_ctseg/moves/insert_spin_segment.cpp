@@ -25,13 +25,13 @@ namespace moves {
     // Randomly choose one existing segment
     prop_seg_idx        = rng(sl.size());
     prop_seg            = sl[prop_seg_idx];
-    splitting_full_line = is_full_line(prop_seg, fac);
+    splitting_full_line = is_full_line(prop_seg);
     if (splitting_full_line) LOG("Inserting spin into full line.");
 
     // Choose spin insertion points (tau_left,tau_right)
-    qmc_time_t prop_seg_length = splitting_full_line ? wdata.qmc_beta : prop_seg.tau_c - prop_seg.tau_cdag;
-    qmc_time_t dt1             = wdata.make_random_time(rng, prop_seg_length);
-    qmc_time_t dt2             = wdata.make_random_time(rng, prop_seg_length);
+    dimtime_t prop_seg_length = splitting_full_line ? wdata.qmc_beta : prop_seg.tau_c - prop_seg.tau_cdag;
+    dimtime_t dt1             = dimtime_t::random(rng, prop_seg_length);
+    dimtime_t dt2             = dimtime_t::random(rng, prop_seg_length);
     if (dt1 == dt2) {
       LOG("Generated equal times");
       return 0;
@@ -43,7 +43,7 @@ namespace moves {
     spin_seg  = segment_t{tau_left, tau_right};
     LOG("Inserting spins at tau_left = {}, tau_right = {}", tau_left, tau_right);
 
-    if (not is_insertable(dsl, spin_seg, fac)) {
+    if (not is_insertable(dsl, spin_seg)) {
       return 0;
       LOG("Space is occupied on other line.");
     }

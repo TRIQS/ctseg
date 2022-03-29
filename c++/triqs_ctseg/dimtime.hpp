@@ -61,6 +61,12 @@ namespace triqs::utility {
     /// get beta as double
     //double get_beta() const { return _beta; }
 
+    /// Check if dimtime is zero
+    static bool is_zero(dimtime_t tau) { return tau == tau.zero(); };
+
+    /// Check if dimtime is zero
+    static bool is_beta(dimtime_t tau) { return tau == tau.beta(); };
+
     /// dimtime_t at tau = beta
     dimtime_t beta() const { return {Nmax, _beta}; }
 

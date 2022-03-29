@@ -12,7 +12,6 @@ namespace moves {
     int color = 0;
     segment_t prop_seg;
     int prop_seg_idx;
-    qmc_time_factory_t fac = qmc_time_factory_t{wdata.beta};
     double det_sign;
 
     public:

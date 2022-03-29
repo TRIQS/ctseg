@@ -22,7 +22,7 @@ namespace moves {
     // Select pair of segments (or cyclic segment) to regroup
     making_full_line = sl.size() == 1;
     if (making_full_line) {
-      if (is_full_line(sl[0], fac)) {
+      if (is_full_line(sl[0])) {
         LOG("Segment is full line");
         return 0; // If segment is full line nothing to regroup
       }
@@ -43,7 +43,7 @@ namespace moves {
     // ------------  Trace ratio  -------------
     double ln_trace_ratio = wdata.mu(color) * inserted_seg.length();
     for (auto c : range(wdata.n_color)) {
-      if (c != color) { ln_trace_ratio += -wdata.U(color, c) * overlap(config.seglists[c], inserted_seg, fac); }
+      if (c != color) { ln_trace_ratio += -wdata.U(color, c) * overlap(config.seglists[c], inserted_seg); }
       if (wdata.has_Dt) {
         ln_trace_ratio -= K_overlap(config.seglists[c], right_seg.tau_c, left_seg.tau_cdag, wdata.K, color, c);
         if (making_full_line and c != color)
@@ -65,7 +65,7 @@ namespace moves {
     double future_number_segments   = making_full_line ? 1 : int(sl.size()) - 1;
     double current_number_intervals = sl.size();
     // Length of future segment
-    qmc_time_t new_length = wdata.qmc_beta;
+    dimtime_t new_length = wdata.qmc_beta;
     if (not making_full_line) new_length = left_seg.tau_c - right_seg.tau_cdag;
     double prop_ratio =
        current_number_intervals / (future_number_segments * new_length * new_length / (making_full_line ? 1 : 2));

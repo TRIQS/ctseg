@@ -14,9 +14,7 @@ struct work_data_t {
   int n_color;
   double beta;
 
-  qmc_time_factory_t fac;
-  qmc_time_t const qmc_beta = fac.get_upper_pt();
-  qmc_time_t const qmc_zero = fac.get_lower_pt();
+  dimtime_t qmc_zero, qmc_beta;
 
   nda::vector<double> mu;
   nda::matrix<double> U;
@@ -28,8 +26,4 @@ struct work_data_t {
   using delta_target_t = matrix_real_valued;
   block_gf<imtime, delta_target_t> delta; // Hybridization function
   std::vector<det_t> dets;                // The determinants
-
-  public:
-  // Random time generation that excludes values at boundaries
-  qmc_time_t make_random_time(triqs::mc_tools::random_generator &rng, qmc_time_t const &l);
 };

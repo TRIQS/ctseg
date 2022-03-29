@@ -13,8 +13,8 @@ namespace moves {
     segment_t proposed_segment;
     std::vector<segment_t>::const_iterator seg_it;
     std::vector<segment_t>::const_iterator insert_it;
-    qmc_time_t tau1;
-    qmc_time_t tau2;
+    dimtime_t tau1;
+    dimtime_t tau2;
     long seg_idx;
     long insert_idx;
     long right_seg_idx;
@@ -23,7 +23,7 @@ namespace moves {
     bool insert_into_empty_line;
     double det_sign;
 
-    void prep_insertion(std::vector<segment_t> const &seglist, qmc_time_t tau);
+    void prep_insertion(std::vector<segment_t> const &seglist, dimtime_t tau);
 
     public:
     insert_split_segment(work_data_t &data_, configuration_t &config_, triqs::mc_tools::random_generator &rng_)

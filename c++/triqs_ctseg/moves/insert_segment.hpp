@@ -12,7 +12,6 @@ namespace moves {
     int color = 0;
     segment_t prop_seg;
     std::vector<segment_t>::iterator prop_seg_it;
-    qmc_time_factory_t fac = qmc_time_factory_t{wdata.beta};
     double det_sign;
 
     public:

@@ -65,7 +65,7 @@ namespace moves {
     double future_number_segments   = making_full_line ? 1 : int(sl.size()) - 1;
     double current_number_intervals = sl.size();
     // Length of future segment
-    qmc_time_t new_length = wdata.qmc_beta;
+    dimtime_t new_length = wdata.qmc_beta;
     if (not making_full_line) new_length = left_seg.tau_c - right_seg.tau_cdag;
     double prop_ratio =
        current_number_intervals / (future_number_segments * new_length * new_length / (making_full_line ? 1 : 2));

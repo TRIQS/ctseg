@@ -21,13 +21,13 @@ namespace moves {
     // Select segment to split
     prop_seg_idx        = rng(sl.size());
     prop_seg            = sl[prop_seg_idx];
-    splitting_full_line = is_full_line(prop_seg, fac);
+    splitting_full_line = is_full_line(prop_seg);
     if (splitting_full_line) LOG("Splitting full line.");
 
     // Select splitting points (tau_left,tau_right)
-    qmc_time_t prop_seg_length = splitting_full_line ? wdata.qmc_beta : prop_seg.tau_c - prop_seg.tau_cdag;
-    qmc_time_t dt1             = wdata.make_random_time(rng, prop_seg_length);
-    qmc_time_t dt2             = wdata.make_random_time(rng, prop_seg_length);
+    dimtime_t prop_seg_length = splitting_full_line ? wdata.qmc_beta : prop_seg.tau_c - prop_seg.tau_cdag;
+    dimtime_t dt1             = dimtime_t::random(rng, prop_seg_length);
+    dimtime_t dt2             = dimtime_t::random(rng, prop_seg_length);
     if (dt1 == dt2) {
       LOG("Generated equal times");
       return 0;
@@ -48,7 +48,7 @@ namespace moves {
     // ------------  Trace ratio  -------------
     double ln_trace_ratio = -wdata.mu(color) * removed_segment.length();
     for (auto c : range(wdata.n_color)) {
-      if (c != color) { ln_trace_ratio -= -wdata.U(color, c) * overlap(config.seglists[c], removed_segment, fac); }
+      if (c != color) { ln_trace_ratio -= -wdata.U(color, c) * overlap(config.seglists[c], removed_segment); }
       if (wdata.has_Dt) {
         ln_trace_ratio += K_overlap(config.seglists[c], tau_right, tau_left, wdata.K, color, c);
         if (splitting_full_line)

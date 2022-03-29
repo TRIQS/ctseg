@@ -16,7 +16,7 @@ namespace moves {
     LOG("Inserting at color {}", color);
 
     // Select insertion window [wtau_left,wtau_right]
-    qmc_time_t wtau_left = wdata.qmc_beta, wtau_right = wdata.qmc_zero;
+    dimtime_t wtau_left = wdata.qmc_beta, wtau_right = wdata.qmc_zero;
 
     if (not sl.empty()) {
       if (is_full_line(sl.back(), fac)) {
@@ -31,11 +31,11 @@ namespace moves {
     }
 
     LOG("Insertion window is wtau_left = {}, wtau_right = {}", wtau_left, wtau_right);
-    qmc_time_t window_length = sl.empty() ? wdata.qmc_beta : wtau_left - wtau_right;
+    dimtime_t window_length = sl.empty() ? wdata.qmc_beta : wtau_left - wtau_right;
 
     // Choose two random times in insertion window
-    auto dt1 = wdata.make_random_time(rng, window_length);
-    auto dt2 = wdata.make_random_time(rng, window_length);
+    auto dt1 = dimtime_t::random(rng, window_length);
+    auto dt2 = dimtime_t::random(rng, window_length);
     if (dt1 == dt2) {
       LOG("Generated equal times");
       return 0;

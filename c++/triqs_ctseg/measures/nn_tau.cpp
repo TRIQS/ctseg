@@ -28,8 +28,8 @@ namespace measures {
 
     // I take the whole configuration and make a time ordered list of operators.
     auto t_ordered_op_list = make_time_ordered_op_list(config);
-    
-    auto zero              = fac.get_lower_pt();
+
+    auto zero = dimtime_t::zero(beta);
     t_ordered_op_list.emplace_back(zero, 0, false); // add the point 0 to make it easier later
 
     // the state at 0 or beta

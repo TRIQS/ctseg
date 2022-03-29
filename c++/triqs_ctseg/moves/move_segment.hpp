@@ -15,7 +15,6 @@ namespace moves {
     segment_t origin_segment;
     int origin_index{};
     std::vector<segment_t>::const_iterator destination_it;
-    qmc_time_factory_t fac = qmc_time_factory_t{wdata.beta};
     double det_sign;
 
     public:
