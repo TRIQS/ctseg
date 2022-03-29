@@ -182,20 +182,27 @@ find_spin_segments(int line_idx, configuration_t const &config) {
 
 // ---------------------------
 
-// Same as std::upper_bound, but i-th element of vector is returned by f[i]
-long upper_bound(auto f, long N, auto const &value) {
-  long first = 0, count = N;
-
-  while (count > 0) {
-    long step = count / 2;
-    if (value < f(first + step))
-      count = step;
-    else {
-      first += step + 1;
-      count -= step + 1;
-    }
-  }
-  return first;
+// Flip config
+configuration_t flip(configuration_t const &config, double const &beta) {
+  auto flipped_config       = configuration_t{config.n_color()};
+  flipped_config.Jperp_list = config.Jperp_list;
+  for (auto const &[c, sl] : itertools::enumerate(config.seglists)) {
+    auto &fsl = flipped_config.seglists[c];
+    if (sl.empty()) // Flipped config is full line
+      fsl.emplace_back(segment_t{dimtime_t::beta(beta), dimtime_t::zero(beta)});
+    else if (sl.size() == 1 and is_full_line(sl[0])) { // Do nothing: flipped config empty
+    } else {                                           // Swap c and cdag
+      for (auto i : range(sl.size())) {
+        if (is_cyclic(sl.back())) {
+          ind = i == 0 ? sl.size() - 1 : i - 1;
+          fsl.emplace_back(segment_t{sl[ind].tau_cdag, sl[i].tau_c, sl[ind].J_cdag, sl[i].J_c});
+        } else {
+          ind = i == sl.size() - 1 ? 0 : i + 1;
+          fsl.emplace_back(segment_t{sl[i].tau_cdag, sl[ind].tau_c, sl[i].J_cdag, sl[ind].J_c});
+        }
+      } // loop over segs
+    }   // general case
+  }     // loop over colors
 }
 
 // Print config
