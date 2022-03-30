@@ -5,8 +5,11 @@
 
 #include "work_data.hpp"
 #include "configuration.hpp"
+
+// FIXME : remove those includers ??
 #include "measures.hpp"
 #include "moves.hpp"
+
 #include "logs.hpp"
 
 solver_core::solver_core(constr_params_t const &p) : constr_params(p) {
@@ -62,9 +65,12 @@ void solver_core::solve(solve_params_t const &solve_params) {
   if (p.move_swap_spin_lines) CTQMC.add_move(moves::swap_spin_lines{wdata, config, CTQMC.get_rng()}, "spin swap");
 
   // initialize measurements
-  if (p.measure_gt) CTQMC.add_measure(measures::g_f_tau{p, wdata, config, results}, "G(tau) measurement");
-  if (p.measure_n) CTQMC.add_measure(measures::density{p, wdata, config, results}, "Density measurement");
-  if (p.measure_nnt) CTQMC.add_measure(measures::nn_tau{p, wdata, config, results}, "nn(tau) measurement");
+  if (p.measure_gt) CTQMC.add_measure(measures::g_f_tau{p, wdata, config, results}, "G(tau)");
+  if (p.measure_n) CTQMC.add_measure(measures::density{p, wdata, config, results}, "Density");
+  if (p.measure_nnt) CTQMC.add_measure(measures::nn_tau{p, wdata, config, results}, "nn(tau)");
+
+  if (p.measure_perturbation_order_histograms)
+    CTQMC.add_measure(measures::perturbation_order_histo{p, wdata, config, results}, "Perturbation orders");
 
     // FIXME  ? Keep ? ?
 #if 0

@@ -1,6 +1,7 @@
 #pragma once
 #include <optional>
 #include "types.hpp"
+#include <triqs/stat/histograms.hpp>
 
 // One-particle Green's function types
 using g_tau_t = block_gf<imtime, matrix_valued>;
@@ -24,6 +25,13 @@ struct results_t {
 
   /// Density per color. FIXME : optional ??
   nda::array<double, 1> densities;
+
+  /// Perturbation order histogram
+  std::optional<triqs::stat::histogram> perturbation_order_histo_Delta;
+
+ /// Perturbation order histogram
+  std::optional<triqs::stat::histogram> perturbation_order_histo_Jperp;
+
 };
 
 /// writes all containers to hdf5 file
