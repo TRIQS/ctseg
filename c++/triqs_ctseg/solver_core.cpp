@@ -72,19 +72,6 @@ void solver_core::solve(solve_params_t const &solve_params) {
   if (p.measure_perturbation_order_histograms)
     CTQMC.add_measure(measures::perturbation_order_histo{p, wdata, config, results}, "Perturbation orders");
 
-    // FIXME  ? Keep ? ?
-#if 0
-  if (p.measure_hist)
-    CTQMC.add_measure(measure_hist(&config, &hist), "histogram measurement");
- 
-  if (p.measure_hist_composite)
-    CTQMC.add_measure(measure_hist_composite(&config, &hist_composite),
-                      "histogram of composite order measurement");
-  if (p.measure_statehist)
-    CTQMC.add_measure(measure_statehist(&params, &config, &state_hist),
-                      "impurity state histogram measurement");
-#endif
-
   // Run and collect results
   auto _solve_status = CTQMC.warmup_and_accumulate(p.n_warmup_cycles, p.n_cycles, p.length_cycle,
                                                    triqs::utility::clock_callback(p.max_time));

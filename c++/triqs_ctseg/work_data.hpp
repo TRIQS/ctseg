@@ -20,6 +20,8 @@ struct work_data_t {
   nda::matrix<double> U;
 
   bool has_Dt, has_jperp;
+  // FIXME : real_valued ?? : remove real everywhere ? 
+  // Jperp : should be scalar ? or matrix ? 
   gf<imtime> K, Kprime, Jperp;
 
   // FIXME off diagonal delta ??
