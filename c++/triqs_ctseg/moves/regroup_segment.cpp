@@ -104,7 +104,7 @@ namespace moves {
     if (making_full_line) {
       sl[left_seg_idx] = segment_t{tau_t::beta(), tau_t::zero()};
     } else {
-      auto new_segment = segment_t{left_seg.tau_c, right_seg.tau_cdag};
+      auto new_segment = segment_t{left_seg.tau_c, right_seg.tau_cdag, left_seg.J_c, right_seg.J_cdag};
       // Update the left segment
       sl[left_seg_idx] = new_segment;
       // Remove the "other" segment

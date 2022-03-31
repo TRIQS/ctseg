@@ -57,7 +57,8 @@ namespace moves {
     tau_left  = prop_seg.tau_c - dt1; // dt1 < dt2
     tau_right = prop_seg.tau_c - dt2;
     spin_seg  = segment_t{tau_left, tau_right, true, true};
-    LOG("Inserting spins at tau_left = {}, tau_right = {}", tau_left, tau_right);
+    LOG("Inserting spins in segment at position {}, at tau_left = {}, tau_right = {}", prop_seg_idx, tau_left,
+        tau_right);
 
     if (not is_insertable(dsl, spin_seg)) {
       LOG("ABORT : Space is occupied on other line.");
@@ -132,9 +133,6 @@ namespace moves {
     auto spin_seg_it = std::upper_bound(dsl.begin(), dsl.end(), spin_seg);
     dsl.insert(spin_seg_it, spin_seg);
 
-    LOG("Seg insertion OK");
-    LOG("{}, {}");
-
     // Insert Jperp line
     auto &jl = config.Jperp_list;
     if (dest_color == 0)
@@ -143,9 +141,7 @@ namespace moves {
       jl.push_back(jperp_line_t{spin_seg.tau_cdag, spin_seg.tau_c});
 
     // Check invariant
-    // FIXME : the check of J_c flags in the invariants
     if constexpr (check_invariants or ctseg_debug) check_invariant(config, wdata.dets);
-
     LOG("Configuration is {}", config);
 
     return 1.0;

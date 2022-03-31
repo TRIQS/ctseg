@@ -100,8 +100,8 @@ namespace moves {
       auto new_segment = segment_t{tau_right, tau_left};
       sl[prop_seg_idx] = new_segment;
     } else {
-      auto new_seg_left  = segment_t{prop_seg.tau_c, tau_left};
-      auto new_seg_right = segment_t{tau_right, prop_seg.tau_cdag};
+      auto new_seg_left  = segment_t{prop_seg.tau_c, tau_left, prop_seg.J_c, false};
+      auto new_seg_right = segment_t{tau_right, prop_seg.tau_cdag, false, prop_seg.J_cdag};
       // Update the proposed segment
       sl[prop_seg_idx] = new_seg_left;
       // Insert a new segment

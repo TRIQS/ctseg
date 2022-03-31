@@ -44,8 +44,8 @@ TEST(CtHybSpin, Anderson) {
   param_solve.move_split_segment       = true;
   param_solve.move_regroup_segment     = true;
   param_solve.move_move_segment        = true;
-  param_solve.move_insert_spin_segment = true;
-  param_solve.move_remove_spin_segment = true;
+  param_solve.move_insert_spin_segment = false;
+  param_solve.move_remove_spin_segment = false;
   // Moves for test purposes - do not use
   param_solve.move_insert_segment_v2  = false;
   param_solve.move_remove_segment_v2  = false;

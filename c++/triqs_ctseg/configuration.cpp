@@ -4,34 +4,83 @@
 // ------------------- Invariants ---------------------------
 
 void check_invariant(configuration_t const &config, std::vector<det_t> const &dets) {
-  for (auto const &[c, sl] : itertools::enumerate(config.seglists))
+
+  // Prepare lists of times in spin lines
+  auto const &jl = config.Jperp_list;
+  std::vector<tau_t> Splus, Sminus;
+  for (auto const &[i, line] : itertools::enumerate(config.Jperp_list)) {
+    Splus.push_back(line.tau_Splus);
+    Sminus.push_back(line.tau_Sminus);
+  }
+  std::sort(Splus.begin(), Splus.end());
+  std::sort(Sminus.begin(), Sminus.end());
+
+  for (auto const &[c, sl] : itertools::enumerate(config.seglists)) {
+    auto Splus_  = Splus;
+    auto Sminus_ = Sminus; // will be emptied throughout the checks
     if (not sl.empty()) {
-      for (int i = 0; i < sl.size() - 1; ++i) {
+      // Segments
+      for (int i = 0; i < sl.size(); ++i) {
+        if (i != sl.size() - 1) {
+          ALWAYS_EXPECTS((sl[i].tau_cdag > sl[i + 1].tau_c),
+                         "Time order error in color {} at position {} in config \n{}", c, i, config);
+          ALWAYS_EXPECTS(not is_cyclic(sl[i]), "Segment in color {} at position {} should not by cyclic in config \n{}",
+                         c, i, config); // only last segment can be cyclic
+        }
         ALWAYS_EXPECTS((sl[i].tau_cdag != sl[i].tau_c), "Degenerate segment in color {} at position {} in config \n{}",
                        c, i, config);
-        ALWAYS_EXPECTS((sl[i].tau_cdag > sl[i + 1].tau_c), "Time order error in color {} at position {} in config \n{}",
-                       c, i, config);
-        ALWAYS_EXPECTS(not is_cyclic(sl[i]), "Segment in color {} at position {} should not by cyclic in config \n{}",
-                       c, i, config); // only last segment can be cyclic
-                                      /*         ALWAYS_EXPECTS(
-           (sl[i].tau_cdag == D.get_x(i).first),
-           "Det error in color {}. The segment in position {} has tau_cdag = {}, while the det has {} in row {}. Config : \n{}",
-           c, i, sl[i].tau_cdag, D.get_x(i).first, i, config);
-        ALWAYS_EXPECTS(
-           (sl[i].tau_c == D.get_y(i).first),
-           "Det error in color {}. The segment in position {} has tau_c = {}, while the det has {} in column {}.  Config : \n{}",
-           c, i, sl[i].tau_c, D.get_y(i).first, i, config); */
-      }
-      auto const &D = dets[c];
-      if (not is_full_line(sl[0])) {
-        for (int i = 0; i < D.size() - 1; ++i) {
-          ALWAYS_EXPECTS((D.get_x(i).first < D.get_x(i + 1).first),
-                         "Det time order error (cdag) in color {} at position {} in config \n{}", c, i, config);
-          ALWAYS_EXPECTS((D.get_y(i).first < D.get_y(i + 1).first),
-                         "Det time order error (c) in color {} at position {} in config \n{}", c, i, config);
+
+        // Spin lines: each tag has to correpond to the time in a line
+        if (not jl.empty()) {
+          if (sl[i].J_c) {
+            auto splus_it  = std::lower_bound(Splus_.begin(), Splus_.end(), sl[i].tau_c);
+            auto sminus_it = std::lower_bound(Sminus_.begin(), Sminus_.end(), sl[i].tau_c);
+            tau_t tau_plus = tau_t::zero(), tau_minus = tau_t::zero();
+            if (splus_it != Splus_.end()) tau_plus = *splus_it;
+            if (sminus_it != Sminus_.end()) tau_minus = *sminus_it;
+            bool time_in_jlist = sl[i].tau_c == tau_plus or sl[i].tau_c == tau_minus;
+            ALWAYS_EXPECTS(
+               time_in_jlist,
+               "Error: the c in segment at position {} in color {} has a J flag but is not in J list. Config : \n{}", i,
+               c, config);
+            if (sl[i].tau_c == tau_plus)
+              Splus_.erase(splus_it);
+            else
+              Sminus_.erase(sminus_it);
+          }
+          if (sl[i].J_cdag) {
+            auto splus_it  = std::lower_bound(Splus_.begin(), Splus_.end(), sl[i].tau_cdag);
+            auto sminus_it = std::lower_bound(Sminus_.begin(), Sminus_.end(), sl[i].tau_cdag);
+            tau_t tau_plus = tau_t::zero(), tau_minus = tau_t::zero();
+            if (splus_it != Splus_.end()) tau_plus = *splus_it;
+            if (sminus_it != Sminus_.end()) tau_minus = *sminus_it;
+            bool time_in_jlist = sl[i].tau_cdag == tau_plus or sl[i].tau_cdag == tau_minus;
+            ALWAYS_EXPECTS(
+               time_in_jlist,
+               "Error: the cdag in segment at position {} in color {} has a J flag but is not in J list. Config : \n{}",
+               i, c, config);
+            if (sl[i].tau_cdag == tau_plus)
+              Splus_.erase(splus_it);
+            else
+              Sminus_.erase(sminus_it);
+          }
         }
       }
     }
+    ALWAYS_EXPECTS(Splus_.empty() and Sminus_.empty(),
+                   "Error: some spin lines do not have corresponding tags on segments. Config: \n{}", config);
+
+    // Dets: times must be ordered
+    auto const &D = dets[c];
+    if (D.size() != 0) {
+      for (int i = 0; i < D.size() - 1; ++i) {
+        ALWAYS_EXPECTS((D.get_x(i).first < D.get_x(i + 1).first),
+                       "Det time order error (cdag) in color {} at position {} in config \n{}", c, i, config);
+        ALWAYS_EXPECTS((D.get_y(i).first < D.get_y(i + 1).first),
+                       "Det time order error (c) in color {} at position {} in config \n{}", c, i, config);
+      }
+    }
+  }
   LOG("Invariants OK.");
 }
 
@@ -219,7 +268,10 @@ double config_sign(configuration_t const &config, std::vector<det_t> const &dets
   double sign = 1.0;
   for (auto const &[c, sl] : itertools::enumerate(config.seglists)) {
     if (not sl.empty()) {
-      if (is_cyclic(sl.back())) sign *= (dets[c].size() % 2 == 0) ? 1 : -1;
+      bool starts_with_dagger = false;
+      auto s                  = dets[c].size();
+      if (s != 0) starts_with_dagger = dets[c].get_x(s - 1) > dets[c].get_y(s - 1);
+      if (starts_with_dagger) sign *= (s % 2 == 0) ? 1 : -1;
     }
   }
   return sign;
@@ -230,7 +282,12 @@ std::ostream &operator<<(std::ostream &out, configuration_t const &config) {
   for (auto const &[c, sl] : itertools::enumerate(config.seglists)) {
     out << '\n';
     for (auto const &[i, seg] : itertools::enumerate(sl))
-      out << "Color " << c << ". Position " << i << " : [" << seg.tau_c << ", " << seg.tau_cdag << "]\n";
+      out << "Color " << c << ". Position " << i << " : [ J:" << seg.J_c << " " << seg.tau_c << ", " << seg.tau_cdag
+          << " J:" << seg.J_cdag << "]\n";
+  }
+  out << "\nSpin lines : \n";
+  for (auto const &[i, line] : itertools::enumerate(config.Jperp_list)) {
+    out << "S_minus : [" << line.tau_Sminus << "] S_plus : [" << line.tau_Splus << "]\n";
   }
   return out;
 }

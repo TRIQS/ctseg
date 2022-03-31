@@ -39,14 +39,14 @@ namespace moves {
         dest_color = 1;
         orig_it    = it_up;
         dest_it    = it_down;
-        LOG("Removing segment at spin up");
+        LOG("Removing segment at spin up (color 0)");
       } else {
         spin_seg   = spin_seg_down;
         orig_color = 1;
         dest_color = 0;
         orig_it    = it_down;
         dest_it    = it_up;
-        LOG("Removing segment at spin down");
+        LOG("Removing segment at spin down (color 1)");
       }
     } else if (*it_up == spin_seg_up) {
       spin_seg   = spin_seg_up;
@@ -54,14 +54,14 @@ namespace moves {
       dest_color = 1;
       orig_it    = it_up;
       dest_it    = it_down;
-      LOG("Removing segment at spin up");
+      LOG("Removing segment at spin up (color 0)");
     } else if (*it_down == spin_seg_down) {
       spin_seg   = spin_seg_down;
       orig_color = 1;
       dest_color = 0;
       orig_it    = it_down;
       dest_it    = it_up;
-      LOG("Removing segment at spin down");
+      LOG("Removing segment at spin down (color 1)");
     } else {
       LOG("Bosonic line does not correspond to a segment.");
       return 0;
@@ -70,6 +70,7 @@ namespace moves {
     auto &dsl      = config.seglists[dest_color];
     dest_right_idx = std::distance(dsl.cbegin(), dest_it);
     dest_left_idx  = (dest_right_idx == 0) ? int(dsl.size()) - 1 : dest_right_idx - 1;
+    LOG("Regrouping between positions {} and {} in opposite spin.", dest_left_idx, dest_right_idx);
 
     // ------------- Check if space is free -------------
 
@@ -134,7 +135,8 @@ namespace moves {
     if (making_full_line) {
       dsl[0] = segment_t{tau_t::beta(), tau_t::zero()};
     } else {
-      auto new_seg       = segment_t{dsl[dest_left_idx].tau_c, dsl[dest_right_idx].tau_cdag};
+      auto new_seg       = segment_t{dsl[dest_left_idx].tau_c, dsl[dest_right_idx].tau_cdag, dsl[dest_left_idx].J_c,
+                               dsl[dest_right_idx].J_cdag};
       dsl[dest_left_idx] = new_seg;
       dsl.erase(dsl.begin() + dest_right_idx);
     }
