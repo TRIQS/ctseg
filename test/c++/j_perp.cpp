@@ -78,7 +78,7 @@ TEST(CtHybSpin, Anderson) {
     h5_write(G_file, "(ctqmc.G_tau()[0])", ctqmc.results.G_tau()[0]);
   }
   if (world.rank() == 0) {
-    h5::file G_file("dynamical_U.ref.h5", 'r');
+    h5::file G_file("jperp.ref.h5", 'r');
     gf<imtime> g;
     h5_read(G_file, "(ctqmc.G_tau()[0])", g);
     EXPECT_GF_NEAR(g, ctqmc.results.G_tau()[0]);
