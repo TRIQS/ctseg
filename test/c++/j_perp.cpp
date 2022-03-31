@@ -61,19 +61,19 @@ TEST(CtHybSpin, Anderson) {
   ctqmc.Delta_tau()[0] = delta_tau;
   ctqmc.Delta_tau()[1] = delta_tau;
 
-  // Prepare dynamical interaction
+  // Prepare j_perp interaction
   double l  = 1.0; // electron boson coupling
   double w0 = 1.0; // screening frequency
   auto D0w  = gf<imfreq>({beta, Boson, n_iw}, {1, 1});
   D0w(om_) << 2 * l * l * w0 / (om_ * om_ - w0 * w0);
-  ctqmc.D0_tau() = fourier(D0w);
+  ctqmc.Jperp_tau() = fourier(D0w);
 
   // Solve!!
   ctqmc.solve(param_solve);
 
   // Save the results
   if (world.rank() == 0) {
-    h5::file G_file("dynamical_U.out.h5", 'w');
+    h5::file G_file("jperp.out.h5", 'w');
     h5_write(G_file, "(ctqmc.G_tau()[0])", ctqmc.results.G_tau()[0]);
   }
   if (world.rank() == 0) {

@@ -132,6 +132,9 @@ namespace moves {
     auto spin_seg_it = std::upper_bound(dsl.begin(), dsl.end(), spin_seg);
     dsl.insert(spin_seg_it, spin_seg);
 
+    LOG("Seg insertion OK");
+    LOG("{}, {}");
+
     // Insert Jperp line
     auto &jl = config.Jperp_list;
     if (dest_color == 0)
