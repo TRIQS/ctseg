@@ -49,7 +49,7 @@ namespace measures {
       for (int a = 0; a < n_color; ++a)
         for (int b = 0; b < n_color; ++b) nn_mat(a, b) += int(state_at_tau[a]) * int(state_at_0[b]);
 
-      ALWAYS_EXPECTS(idx2 < idx1, "Error at {}", tau2);
+      ALWAYS_EXPECTS(idx2 <= idx1, "Error at {} \n idx1 = {}, idx2 = {}, ", tau2, idx1, idx2);
       for (long u = idx1 - 1; u >= idx2; --u) q_tau.data()(u, nda::ellipsis{}) += nn_mat;
 
       state_at_tau[color] = not state_at_tau[color]; // cross a C or a C dagger ...

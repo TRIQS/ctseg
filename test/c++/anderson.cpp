@@ -35,7 +35,7 @@ TEST(CtHybSpin, Anderson) {
   param_solve.random_seed     = random_seed;
   // Measures
   param_solve.measure_gt  = true;
-  param_solve.measure_nnt = false;
+  param_solve.measure_nnt = true;
   // Moves
   param_solve.move_insert_segment  = true;
   param_solve.move_remove_segment  = true;
@@ -65,6 +65,8 @@ TEST(CtHybSpin, Anderson) {
     h5::file G_file("anderson.out.h5", 'w');
     h5_write(G_file, "(ctqmc.G_tau()[0])", ctqmc.results.G_tau()[0]);
   }
+
+  // Compare with reference
   if (world.rank() == 0) {
     h5::file G_file("anderson.ref.h5", 'r');
     gf<imtime> g;
