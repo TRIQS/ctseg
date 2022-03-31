@@ -9,7 +9,7 @@ namespace moves {
     triqs::mc_tools::random_generator &rng;
 
     // Internal data
-    int color = 0;
+    int color;
     segment_t prop_seg;
     std::vector<segment_t>::iterator prop_seg_it;
     double det_sign;

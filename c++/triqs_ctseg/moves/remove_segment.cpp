@@ -26,6 +26,10 @@ namespace moves {
       LOG("Cannot remove full line.");
       return 0;
     }
+    if (prop_seg.J_c or prop_seg.J_cdag) {
+      LOG("Segment has spin line attached, cannot remove.");
+      return 0;
+    }
 
     LOG("Removing segment at position {} : c at {}, cdag at {}", prop_seg_idx, prop_seg.tau_c, prop_seg.tau_cdag);
 
@@ -41,12 +45,13 @@ namespace moves {
     double trace_ratio = std::exp(ln_trace_ratio);
 
     // ------------  Det ratio  ---------------
-    auto det_c_time     = [&](long i) { return wdata.dets[color].get_y(i).first; };
-    auto det_cdag_time  = [&](long i) { return wdata.dets[color].get_x(i).first; };
-    long det_index_c    = lower_bound(det_c_time, wdata.dets[color].size(), prop_seg.tau_c);
-    long det_index_cdag = lower_bound(det_cdag_time, wdata.dets[color].size(), prop_seg.tau_cdag);
+    auto &D             = wdata.dets[color];
+    auto det_c_time     = [&](long i) { return D.get_y(i).first; };
+    auto det_cdag_time  = [&](long i) { return D.get_x(i).first; };
+    long det_index_c    = lower_bound(det_c_time, D.size(), prop_seg.tau_c);
+    long det_index_cdag = lower_bound(det_cdag_time, D.size(), prop_seg.tau_cdag);
 
-    auto det_ratio = wdata.dets[color].try_remove(det_index_cdag, det_index_c);
+    auto det_ratio = D.try_remove(det_index_cdag, det_index_c);
 
     // ------------  Proposition ratio ------------
 
@@ -66,9 +71,8 @@ namespace moves {
        / (future_number_intervals * window_length * window_length / (current_number_segments == 1 ? 1 : 2));
     LOG("trace_ratio  = {}, prop_ratio = {}, det_ratio = {}", trace_ratio, prop_ratio, det_ratio);
 
-    //det_sign    = (det_ratio > 0) ? 1.0 : -1.0;
-    det_sign    = 1;
-    double prod = trace_ratio * abs(det_ratio) * prop_ratio;
+    det_sign    = (det_ratio > 0) ? 1.0 : -1.0;
+    double prod = trace_ratio * det_ratio * prop_ratio;
 
     return (std::isfinite(prod)) ? prod : det_sign;
   }
@@ -79,17 +83,18 @@ namespace moves {
 
     LOG("\n - - - - - ====> ACCEPT - - - - - - - - - - -\n");
 
+    double initial_sign = config_sign(config, wdata.dets);
+
     // Update the dets
     wdata.dets[color].complete_operation();
 
     auto &sl = config.seglists[color];
-    // Compute the sign ratio
-    //double sign_ratio = is_cyclic(sl[prop_seg_idx]) ? -1 : 1;
-    double sign_ratio = 1;
-    LOG("Sign ratio is {}", sign_ratio);
-
     // Remove the segment
     sl.erase(sl.begin() + prop_seg_idx);
+
+    double final_sign = config_sign(config, wdata.dets);
+    double sign_ratio = initial_sign / final_sign;
+    LOG("Sign ratio is {}", sign_ratio);
 
 // Check invariant
 #ifdef CHECK_INVARIANTS

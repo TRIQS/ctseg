@@ -10,18 +10,14 @@ namespace moves {
     triqs::mc_tools::random_generator &rng;
 
     // Internal data
-    int color = 0;
+    int color;
     segment_t prop_seg;
-    dimtime_t tau_left;
-    dimtime_t tau_right;
-    int prop_seg_idx{};
-    int right_seg_idx{};
-    bool splitting_full_line{};
-    bool segment_overboard;
+    dimtime_t tau_left, tau_right;
+    int prop_seg_idx, right_seg_idx;
+    bool splitting_full_line;
     double det_sign;
 
     public:
-    // Constructor
     split_segment(work_data_t &data_, configuration_t &config_, triqs::mc_tools::random_generator &rng_)
        : wdata(data_), config(config_), rng(rng_){};
     // ------------------

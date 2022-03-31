@@ -10,18 +10,15 @@ namespace moves {
     triqs::mc_tools::random_generator &rng;
 
     // Internal data
-    int origin_color      = 0;
-    int destination_color = 0;
+    int origin_color, destination_color;
     segment_t origin_segment;
-    int origin_index{};
+    int origin_index;
     std::vector<segment_t>::const_iterator destination_it;
     double det_sign;
     bool need_flip;
-    std::vector<segment_t> sl;
-    std::vector<segment_t> dsl;
+    std::vector<segment_t> sl, dsl;
 
     public:
-    // Constructor
     move_segment(work_data_t &data_, configuration_t &config_, triqs::mc_tools::random_generator &rng_)
        : wdata(data_), config(config_), rng(rng_){};
     // ------------------

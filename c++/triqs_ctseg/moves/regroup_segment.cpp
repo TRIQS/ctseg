@@ -35,12 +35,18 @@ namespace moves {
     left_seg  = sl[left_seg_idx];
     right_seg = sl[right_seg_idx];
 
+    if (left_seg.J_cdag or right_seg.J_c) {
+      LOG("At least one of the operators has spin line attached, cannot regroup.");
+      return 0;
+    }
+
     auto inserted_seg = segment_t{left_seg.tau_cdag, right_seg.tau_c}; // "antisegment" : careful with order of c, cdag
 
     LOG("Regroup at positions {} and {}: removing c at {}, cdag at {}", left_seg_idx, right_seg_idx, right_seg.tau_c,
         left_seg.tau_cdag);
 
     // ------------  Trace ratio  -------------
+
     double ln_trace_ratio = wdata.mu(color) * inserted_seg.length();
     for (auto c : range(wdata.n_color)) {
       if (c != color) { ln_trace_ratio += -wdata.U(color, c) * overlap(config.seglists[c], inserted_seg); }
@@ -56,13 +62,13 @@ namespace moves {
     double trace_ratio = std::exp(ln_trace_ratio);
 
     // ------------  Det ratio  ---------------
-    auto det_c_time     = [&](long i) { return wdata.dets[color].get_y(i).first; };
-    auto det_cdag_time  = [&](long i) { return wdata.dets[color].get_x(i).first; };
-    long det_index_c    = lower_bound(det_c_time, wdata.dets[color].size(), sl[right_seg_idx].tau_c);
-    long det_index_cdag = lower_bound(det_cdag_time, wdata.dets[color].size(), sl[left_seg_idx].tau_cdag);
+    auto &D             = wdata.dets[color];
+    auto det_c_time     = [&](long i) { return D.get_y(i).first; };
+    auto det_cdag_time  = [&](long i) { return D.get_x(i).first; };
+    long det_index_c    = lower_bound(det_c_time, D.size(), sl[right_seg_idx].tau_c);
+    long det_index_cdag = lower_bound(det_cdag_time, D.size(), sl[left_seg_idx].tau_cdag);
     // We remove a cdag (first index) from the left segment and a c (second index) from the right segment.
-    auto det_ratio = wdata.dets[color].try_remove(det_index_cdag, det_index_c);
-    // additional sign due to "roll" is not computed at this stage, cf accept
+    auto det_ratio = D.try_remove(det_index_cdag, det_index_c);
 
     // ------------  Proposition ratio ------------
 
@@ -76,9 +82,8 @@ namespace moves {
 
     LOG("trace_ratio  = {}, prop_ratio = {}, det_ratio = {}", trace_ratio, prop_ratio, det_ratio);
 
-    //det_sign    = (det_ratio > 0) ? 1.0 : -1.0;
-    det_sign    = 1;
-    double prod = trace_ratio * abs(det_ratio) * prop_ratio;
+    det_sign    = (det_ratio > 0) ? 1.0 : -1.0;
+    double prod = trace_ratio * det_ratio * prop_ratio;
 
     return (std::isfinite(prod)) ? prod : det_sign;
   }
@@ -89,31 +94,25 @@ namespace moves {
 
     LOG("\n - - - - - ====> ACCEPT - - - - - - - - - - -\n");
 
+    double initial_sign = config_sign(config, wdata.dets);
+
     // Update the dets
     wdata.dets[color].complete_operation();
 
-    // Regroup segments and compute the sign ratio
-    auto &sl          = config.seglists[color];
-    double sign_ratio = 1;
+    // Regroup segments
+    auto &sl = config.seglists[color];
     if (making_full_line) {
-      //if (is_cyclic(left_seg)) sign_ratio = -1;
       sl[left_seg_idx] = segment_t{wdata.qmc_beta, wdata.qmc_zero};
     } else {
-      auto new_segment           = segment_t{left_seg.tau_c, right_seg.tau_cdag};
-      bool had_cyclic_segment    = is_cyclic(left_seg) or is_cyclic(right_seg);
-      bool adding_cyclic_segment = !had_cyclic_segment and is_cyclic(new_segment);
-      //if (adding_cyclic_segment) sign_ratio = -1;
-      bool need_roll = is_cyclic(left_seg) or adding_cyclic_segment;
-      if (need_roll) {
-        // In this case, a cdag that belonged to the first segment now belongs to the last segment:
-        // we need to "roll up" the det and this produces an additional sign.
-        //sign_ratio *= wdata.dets[color].roll_matrix(det_t::Up);
-      }
+      auto new_segment = segment_t{left_seg.tau_c, right_seg.tau_cdag};
       // Update the left segment
       sl[left_seg_idx] = new_segment;
       // Remove the "other" segment
       sl.erase(sl.begin() + right_seg_idx);
     }
+
+    double final_sign = config_sign(config, wdata.dets);
+    double sign_ratio = final_sign / initial_sign;
     LOG("Sign ratio is {}", sign_ratio);
 
     // Check invariant

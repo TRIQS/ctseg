@@ -41,11 +41,11 @@ namespace moves {
     }
     if (dt1 > dt2 and !sl.empty()) std::swap(dt1, dt2); // if inserting into an empty line, two ways to insert
     prop_seg = segment_t{wtau_left - dt1, wtau_left - dt2};
-    // The index of prop_seg if it is inserted in the list of segments.
-    prop_seg_it       = std::upper_bound(sl.begin(), sl.end(), prop_seg);
-    long prop_seg_idx = std::distance(sl.begin(), prop_seg_it);
+    // Iterator for inserting prop_seg into the list of segments.
+    prop_seg_it = std::upper_bound(sl.begin(), sl.end(), prop_seg);
 
-    LOG("Inserting segment at position {}, with c at {}, cdag at {}", prop_seg_idx, prop_seg.tau_c, prop_seg.tau_cdag);
+    LOG("Inserting segment at position {}, with c at {}, cdag at {}", std::distance(sl.begin(), prop_seg_it),
+        prop_seg.tau_c, prop_seg.tau_cdag);
 
     // ------------  Trace ratio  -------------
     double ln_trace_ratio = wdata.mu(color) * prop_seg.length();
@@ -60,14 +60,13 @@ namespace moves {
     double trace_ratio = std::exp(ln_trace_ratio);
 
     // ------------  Det ratio  ---------------
-    auto det_c_time     = [&](long i) { return wdata.dets[color].get_y(i).first; };
-    auto det_cdag_time  = [&](long i) { return wdata.dets[color].get_x(i).first; };
-    long det_index_c    = lower_bound(det_c_time, wdata.dets[color].size(), prop_seg.tau_c);
-    long det_index_cdag = lower_bound(det_cdag_time, wdata.dets[color].size(), prop_seg.tau_cdag);
-    // We insert tau_cdag as a line (first index) and tau_c as a column (second index). The index always corresponds to the
-    // segment the tau_c/tau_cdag belongs to.
-    auto det_ratio =
-       wdata.dets[color].try_insert(det_index_cdag, det_index_c, {prop_seg.tau_cdag, 0}, {prop_seg.tau_c, 0});
+    auto &D             = wdata.dets[color];
+    auto det_c_time     = [&](long i) { return D.get_y(i).first; };
+    auto det_cdag_time  = [&](long i) { return D.get_x(i).first; };
+    long det_index_c    = lower_bound(det_c_time, D.size(), prop_seg.tau_c);
+    long det_index_cdag = lower_bound(det_cdag_time, D.size(), prop_seg.tau_cdag);
+    // We insert tau_cdag as a line (first index) and tau_c as a column (second index).
+    auto det_ratio = D.try_insert(det_index_cdag, det_index_c, {prop_seg.tau_cdag, 0}, {prop_seg.tau_c, 0});
 
     // ------------  Proposition ratio ------------
 
@@ -79,9 +78,8 @@ namespace moves {
 
     LOG("trace_ratio  = {}, prop_ratio = {}, det_ratio = {}", trace_ratio, prop_ratio, det_ratio);
 
-    double prod = trace_ratio * abs(det_ratio) * prop_ratio;
-    //det_sign    = (det_ratio > 0) ? 1.0 : -1.0;
-    det_sign = 1;
+    double prod = trace_ratio * det_ratio * prop_ratio;
+    det_sign    = (det_ratio > 0) ? 1.0 : -1.0;
     return (std::isfinite(prod) ? prod : det_sign);
   }
 
@@ -91,17 +89,15 @@ namespace moves {
 
     LOG("\n - - - - - ====> ACCEPT - - - - - - - - - - -\n");
 
+    double initial_sign = config_sign(config, wdata.dets);
     // Insert the times into the det
     wdata.dets[color].complete_operation();
-
-    // Compute the sign ratio
-    double sign_ratio = 1;
-    auto &sl          = config.seglists[color];
-    //if (is_cyclic(prop_seg)) sign_ratio = -1.0;
-    LOG("Sign ratio is {}", sign_ratio);
-
     // Insert the segment in an ordered list
+    auto &sl = config.seglists[color];
     sl.insert(prop_seg_it, prop_seg);
+    double final_sign = config_sign(config, wdata.dets);
+    double sign_ratio = final_sign / initial_sign;
+    LOG("Sign ratio is {}", sign_ratio);
 
     // Check invariant
 #ifdef CHECK_INVARIANTS

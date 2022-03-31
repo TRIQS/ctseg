@@ -10,12 +10,10 @@ namespace moves {
     triqs::mc_tools::random_generator &rng;
 
     // Internal data
-    int color{};
-    segment_t left_seg;
-    segment_t right_seg;
-    int left_seg_idx;
-    int right_seg_idx;
-    bool making_full_line{};
+    int color;
+    segment_t left_seg, right_seg;
+    int left_seg_idx, right_seg_idx;
+    bool making_full_line;
     double det_sign;
 
     public:

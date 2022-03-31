@@ -13,11 +13,6 @@ namespace moves {
     LOG("Removing at color {}", color);
     need_flip = false;
 
-    SPDLOG_TRACE("Configuration is {}", config);
-    configuration_t flipped_config = config;
-    flipped_config.seglists[color] = flip(config.seglists[color], wdata.beta);
-    SPDLOG_TRACE("Flipped configuration is {}", flipped_config);
-
     current_density = density(config.seglists[color]);
     if (rng() < 1.0) {
       need_flip = true;

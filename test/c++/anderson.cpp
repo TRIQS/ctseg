@@ -26,7 +26,7 @@ TEST(CtHybSpin, Anderson) {
   mpi::communicator world;
 
   double beta = 20.0;
-  double U    = 4.0;
+  double U    = 0.0;
   double mu   = 0.2;
   //double mu      = 0.5;
   double epsilon = 0.2;
@@ -34,7 +34,7 @@ TEST(CtHybSpin, Anderson) {
   int n_cycles        = 1;
   int n_warmup_cycles = 1;
   //int n_warmup_cycles = 1;
-  int length_cycle = 50;
+  int length_cycle = 20;
   int random_seed  = 23488 + 28 * world.rank();
 
   // prepare the parameters
@@ -49,18 +49,22 @@ TEST(CtHybSpin, Anderson) {
   // create solver instance
   solver_core ctqmc(param_constructor);
 
-  param_solve.h_int                = U * n("up", 0) * n("down", 0);
-  param_solve.hartree_shift        = {mu, mu};
-  param_solve.n_cycles             = n_cycles;
-  param_solve.n_warmup_cycles      = n_warmup_cycles;
-  param_solve.length_cycle         = length_cycle;
-  param_solve.random_seed          = random_seed;
-  param_solve.measure_gt           = true;
-  param_solve.move_insert_segment  = true;
-  param_solve.move_remove_segment  = true;
-  param_solve.move_split_segment   = true;
-  param_solve.move_regroup_segment = true;
-  param_solve.move_move_segment    = true;
+  param_solve.h_int                   = U * n("up", 0) * n("down", 0);
+  param_solve.hartree_shift           = {mu, mu};
+  param_solve.n_cycles                = n_cycles;
+  param_solve.n_warmup_cycles         = n_warmup_cycles;
+  param_solve.length_cycle            = length_cycle;
+  param_solve.random_seed             = random_seed;
+  param_solve.measure_gt              = true;
+  param_solve.move_insert_segment_v2  = false;
+  param_solve.move_remove_segment_v2  = false;
+  param_solve.move_split_segment_v2   = false;
+  param_solve.move_regroup_segment_v2 = false;
+  param_solve.move_insert_segment     = true;
+  param_solve.move_remove_segment     = true;
+  param_solve.move_split_segment      = true;
+  param_solve.move_regroup_segment    = true;
+  param_solve.move_move_segment       = true;
 
   // prepare G0
   nda::clef::placeholder<0> om_;

@@ -90,8 +90,10 @@ std::pair<std::vector<segment_t>::const_iterator, std::vector<segment_t>::const_
 find_spin_segments(int line_idx, configuration_t const &config);
 
 // Flip config
-//configuration_t flip(configuration_t const &config, double const &beta);
 std::vector<segment_t> flip(std::vector<segment_t> const &sl, double const &beta);
+
+// Sign of a config
+double config_sign(configuration_t const &config, std::vector<det_t> const &dets);
 
 // Same as std::lower_bound, but i-th element of vector is returned by f[i]
 long lower_bound(auto f, long N, auto const &value) {

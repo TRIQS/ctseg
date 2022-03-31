@@ -53,9 +53,8 @@ namespace moves {
     }
 
     // Find where origin segment should be inserted in destination color
-    destination_it  = std::upper_bound(dsl.begin(), dsl.end(), origin_segment);
-    long dest_index = std::distance(dsl.cbegin(), destination_it);
-    LOG("Moving to position {}", dest_index);
+    destination_it = std::upper_bound(dsl.begin(), dsl.end(), origin_segment);
+    LOG("Moving to position {}", std::distance(dsl.cbegin(), destination_it));
 
     // ------------  Trace ratio  -------------
 
@@ -67,10 +66,12 @@ namespace moves {
 
     // We insert tau_cdag as a line (first index) and tau_c as a column (second index). The index always corresponds to the
     // segment the tau_c/tau_cdag belongs to.
-    auto det_c_time_orig    = [&](long i) { return wdata.dets[origin_color].get_y(i).first; };
-    auto det_cdag_time_orig = [&](long i) { return wdata.dets[origin_color].get_x(i).first; };
-    auto det_c_time_dest    = [&](long i) { return wdata.dets[destination_color].get_y(i).first; };
-    auto det_cdag_time_dest = [&](long i) { return wdata.dets[destination_color].get_x(i).first; };
+    auto &D_orig            = wdata.dets[origin_color];
+    auto &D_dest            = wdata.dets[destination_color];
+    auto det_c_time_orig    = [&](long i) { return D_orig.get_y(i).first; };
+    auto det_cdag_time_orig = [&](long i) { return D_orig.get_x(i).first; };
+    auto det_c_time_dest    = [&](long i) { return D_dest.get_y(i).first; };
+    auto det_cdag_time_dest = [&](long i) { return D_dest.get_x(i).first; };
     long det_index_c_orig = 0, det_index_cdag_orig = 0;
     long det_index_c_dest = 0, det_index_cdag_dest = 0;
     double det_ratio = 1;
@@ -78,23 +79,21 @@ namespace moves {
     // c and cdag are inverted if we flip
     if (not is_full_line(origin_segment)) {
       if (need_flip) {
-        det_index_c_orig    = lower_bound(det_c_time_orig, wdata.dets[origin_color].size(), origin_segment.tau_cdag);
-        det_index_cdag_orig = lower_bound(det_cdag_time_orig, wdata.dets[origin_color].size(), origin_segment.tau_c);
-        det_index_c_dest = lower_bound(det_c_time_dest, wdata.dets[destination_color].size(), origin_segment.tau_cdag);
-        det_index_cdag_dest =
-           lower_bound(det_cdag_time_dest, wdata.dets[destination_color].size(), origin_segment.tau_c);
-        det_ratio = wdata.dets[destination_color].try_insert(det_index_cdag_dest, det_index_c_dest,
-                                                             {origin_segment.tau_c, 0}, {origin_segment.tau_cdag, 0})
-           * wdata.dets[origin_color].try_remove(det_index_cdag_orig, det_index_c_orig);
+        det_index_c_orig    = lower_bound(det_c_time_orig, D_orig.size(), origin_segment.tau_cdag);
+        det_index_cdag_orig = lower_bound(det_cdag_time_orig, D_orig.size(), origin_segment.tau_c);
+        det_index_c_dest    = lower_bound(det_c_time_dest, D_dest.size(), origin_segment.tau_cdag);
+        det_index_cdag_dest = lower_bound(det_cdag_time_dest, D_dest.size(), origin_segment.tau_c);
+        det_ratio           = D_dest.try_insert(det_index_cdag_dest, det_index_c_dest, {origin_segment.tau_c, 0},
+                                                {origin_segment.tau_cdag, 0})
+           * D_orig.try_remove(det_index_cdag_orig, det_index_c_orig);
       } else {
-        det_index_c_orig    = lower_bound(det_c_time_orig, wdata.dets[origin_color].size(), origin_segment.tau_c);
-        det_index_cdag_orig = lower_bound(det_cdag_time_orig, wdata.dets[origin_color].size(), origin_segment.tau_cdag);
-        det_index_c_dest    = lower_bound(det_c_time_dest, wdata.dets[destination_color].size(), origin_segment.tau_c);
-        det_index_cdag_dest =
-           lower_bound(det_cdag_time_dest, wdata.dets[destination_color].size(), origin_segment.tau_cdag);
-        det_ratio = wdata.dets[destination_color].try_insert(det_index_cdag_dest, det_index_c_dest,
-                                                             {origin_segment.tau_cdag, 0}, {origin_segment.tau_c, 0})
-           * wdata.dets[origin_color].try_remove(det_index_cdag_orig, det_index_c_orig);
+        det_index_c_orig    = lower_bound(det_c_time_orig, D_orig.size(), origin_segment.tau_c);
+        det_index_cdag_orig = lower_bound(det_cdag_time_orig, D_orig.size(), origin_segment.tau_cdag);
+        det_index_c_dest    = lower_bound(det_c_time_dest, D_dest.size(), origin_segment.tau_c);
+        det_index_cdag_dest = lower_bound(det_cdag_time_dest, D_dest.size(), origin_segment.tau_cdag);
+        det_ratio           = D_dest.try_insert(det_index_cdag_dest, det_index_c_dest, {origin_segment.tau_cdag, 0},
+                                                {origin_segment.tau_c, 0})
+           * D_orig.try_remove(det_index_cdag_orig, det_index_c_orig);
       }
     }
 
@@ -111,9 +110,8 @@ namespace moves {
 
     LOG("trace_ratio  = {}, prop_ratio = {}, det_ratio = {}", trace_ratio, prop_ratio, det_ratio);
 
-    double prod = trace_ratio * abs(det_ratio) * prop_ratio;
-    //det_sign    = (det_ratio > 0) ? 1.0 : -1.0;
-    det_sign = 1.0;
+    double prod = trace_ratio * det_ratio * prop_ratio;
+    det_sign    = (det_ratio > 0) ? 1.0 : -1.0;
     return (std::isfinite(prod) ? prod : det_sign);
   }
 
@@ -123,11 +121,11 @@ namespace moves {
 
     LOG("\n - - - - - ====> ACCEPT - - - - - - - - - - -\n");
 
+    double initial_sign = config_sign(config, wdata.dets);
+
     // Update the dets
     wdata.dets[origin_color].complete_operation();
     wdata.dets[destination_color].complete_operation();
-
-    double sign_ratio = 1;
 
     // Add the segment at destination
     dsl.insert(destination_it, origin_segment);
@@ -142,6 +140,10 @@ namespace moves {
       config.seglists[origin_color]      = sl;
       config.seglists[destination_color] = dsl;
     }
+
+    double final_sign = config_sign(config, wdata.dets);
+    double sign_ratio = final_sign / initial_sign;
+    LOG("Sign ratio is {}", sign_ratio);
 
     // Check invariant
 #ifdef CHECK_INVARIANTS

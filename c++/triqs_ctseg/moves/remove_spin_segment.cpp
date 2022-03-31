@@ -144,17 +144,13 @@ namespace moves {
     auto &jl = config.Jperp_list;
     jl.erase(jl.begin() + line_idx);
 
-    double sign_ratio = 1;
     // Check invariant
 #ifdef CHECK_INVARIANTS
     check_invariant(config, wdata.dets);
 #endif
-    ALWAYS_EXPECTS((sign_ratio * det_sign == 1.0),
-                   "Error: move has produced negative sign! Det sign is {} and additional sign is {}.", det_sign,
-                   sign_ratio);
     SPDLOG_TRACE("Configuration is {}", config);
 
-    return sign_ratio;
+    return 1.0;
   }
 
   //--------------------------------------------------
