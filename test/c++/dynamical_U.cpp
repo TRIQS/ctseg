@@ -7,14 +7,14 @@ TEST(CtHybSpin, Anderson) {
   mpi::communicator world;
 
   double beta         = 20.0;
-  double U            = 1.0;
-  double mu           = 0.5;
+  double U            = 2.0;
+  double mu           = 1.0;
   double epsilon      = 0.2;
   int n_cycles        = 10000 / world.size();
   int n_warmup_cycles = 1000;
   int length_cycle    = 50;
   int random_seed     = 23488 + 28 * world.rank();
-  int n_iw            = 1000;
+  int n_iw            = 5000;
 
   // Prepare the parameters
   constr_params_t param_constructor;
@@ -22,7 +22,7 @@ TEST(CtHybSpin, Anderson) {
 
   param_constructor.beta      = beta;
   param_constructor.gf_struct = {{"up", 1}, {"down", 1}};
-  param_constructor.n_tau     = 10001;
+  param_constructor.n_tau     = 20001;
 
   // Create solver instance
   solver_core ctqmc(param_constructor);
@@ -57,16 +57,23 @@ TEST(CtHybSpin, Anderson) {
   ctqmc.Delta_tau()[0] = delta_tau;
   ctqmc.Delta_tau()[1] = delta_tau;
 
+  // Prepare dynamical interaction
+  double l  = 1.0; // electron boson coupling
+  double w0 = 1.0; // screening frequency
+  auto D0w  = gf<imfreq>({beta, Boson, n_iw}, {1, 1});
+  D0w(om_) << 2 * l * l * w0 / (om_ * om_ - w0 * w0);
+  ctqmc.D0_tau() = fourier(D0w);
+
   // Solve!!
   ctqmc.solve(param_solve);
 
   // Save the results
   if (world.rank() == 0) {
-    h5::file G_file("anderson.out.h5", 'w');
+    h5::file G_file("dynamical_U.out.h5", 'w');
     h5_write(G_file, "(ctqmc.G_tau()[0])", ctqmc.results.G_tau()[0]);
   }
   if (world.rank() == 0) {
-    h5::file G_file("anderson.ref.h5", 'r');
+    h5::file G_file("no_trace.ref.h5", 'r');
     gf<imtime> g;
     h5_read(G_file, "(ctqmc.G_tau()[0])", g);
     EXPECT_GF_NEAR(g, ctqmc.results.G_tau()[0]);

@@ -7,8 +7,8 @@ TEST(CtHybSpin, Anderson) {
   mpi::communicator world;
 
   double beta         = 20.0;
-  double U            = 1.0;
-  double mu           = 0.5;
+  double U            = 0.0;
+  double mu           = 0.0;
   double epsilon      = 0.2;
   int n_cycles        = 10000 / world.size();
   int n_warmup_cycles = 1000;
@@ -62,11 +62,11 @@ TEST(CtHybSpin, Anderson) {
 
   // Save the results
   if (world.rank() == 0) {
-    h5::file G_file("anderson.out.h5", 'w');
+    h5::file G_file("no_trace.out.h5", 'w');
     h5_write(G_file, "(ctqmc.G_tau()[0])", ctqmc.results.G_tau()[0]);
   }
   if (world.rank() == 0) {
-    h5::file G_file("anderson.ref.h5", 'r');
+    h5::file G_file("no_trace.ref.h5", 'r');
     gf<imtime> g;
     h5_read(G_file, "(ctqmc.G_tau()[0])", g);
     EXPECT_GF_NEAR(g, ctqmc.results.G_tau()[0]);
