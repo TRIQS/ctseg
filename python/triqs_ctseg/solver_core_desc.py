@@ -116,6 +116,14 @@ c.add_method("""void solve (**solve_params_t)""",
 +-------------------------------+---------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
 | verbosity                     | int                 | mpi::communicator().rank()==0?3:0       | Verbosity level                                                                                                   |
 +-------------------------------+---------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
+| move_insert_segment_v2        | bool                | false                                   | Whether to perform the move insert segment                                                                        |
++-------------------------------+---------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
+| move_remove_segment_v2        | bool                | false                                   | Whether to perform the move remove segment                                                                        |
++-------------------------------+---------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
+| move_split_segment_v2         | bool                | false                                   | Whether to perform the move split segment                                                                         |
++-------------------------------+---------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
+| move_regroup_segment_v2       | bool                | false                                   | Whether to perform the move group into spin segment                                                               |
++-------------------------------+---------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
 | move_insert_segment           | bool                | true                                    | Whether to perform the move insert segment                                                                        |
 +-------------------------------+---------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
 | move_remove_segment           | bool                | true                                    | Whether to perform the move remove segment                                                                        |
@@ -213,6 +221,26 @@ c.add_member(c_name = "verbosity",
              c_type = "int",
              initializer = """ mpi::communicator().rank()==0?3:0 """,
              doc = r"""Verbosity level""")
+
+c.add_member(c_name = "move_insert_segment_v2",
+             c_type = "bool",
+             initializer = """ false """,
+             doc = r"""Whether to perform the move insert segment""")
+
+c.add_member(c_name = "move_remove_segment_v2",
+             c_type = "bool",
+             initializer = """ false """,
+             doc = r"""Whether to perform the move remove segment""")
+
+c.add_member(c_name = "move_split_segment_v2",
+             c_type = "bool",
+             initializer = """ false """,
+             doc = r"""Whether to perform the move split segment""")
+
+c.add_member(c_name = "move_regroup_segment_v2",
+             c_type = "bool",
+             initializer = """ false """,
+             doc = r"""Whether to perform the move group into spin segment""")
 
 c.add_member(c_name = "move_insert_segment",
              c_type = "bool",

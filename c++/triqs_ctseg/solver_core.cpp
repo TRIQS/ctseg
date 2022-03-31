@@ -50,6 +50,11 @@ void solver_core::solve(solve_params_t const &solve_params) {
   auto CTQMC = triqs::mc_tools::mc_generic<double>(p.random_name, p.random_seed, p.verbosity);
 
   // initialize moves
+  if (p.move_insert_segment_v2) CTQMC.add_move(moves::insert_segment_v2{wdata, config, CTQMC.get_rng()}, "insert v2");
+  if (p.move_remove_segment_v2) CTQMC.add_move(moves::remove_segment_v2{wdata, config, CTQMC.get_rng()}, "remove v2");
+  if (p.move_split_segment_v2) CTQMC.add_move(moves::split_segment_v2{wdata, config, CTQMC.get_rng()}, "split v2");
+  if (p.move_regroup_segment_v2)
+    CTQMC.add_move(moves::regroup_segment_v2{wdata, config, CTQMC.get_rng()}, "regroup v2");
   if (p.move_insert_segment) CTQMC.add_move(moves::insert_segment{wdata, config, CTQMC.get_rng()}, "insert");
   if (p.move_remove_segment) CTQMC.add_move(moves::remove_segment{wdata, config, CTQMC.get_rng()}, "remove");
   if (p.move_move_segment) CTQMC.add_move(moves::move_segment{wdata, config, CTQMC.get_rng()}, "move");

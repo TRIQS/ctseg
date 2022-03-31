@@ -10,8 +10,25 @@ namespace moves {
     // ------------ Choice of segment and colors --------------
     // Select origin color
     origin_color = rng(wdata.n_color);
-    auto &sl     = config.seglists[origin_color];
     LOG("Moving from color {}", origin_color);
+
+    // Select destination color
+    destination_color = rng(wdata.n_color - 1);
+    if (destination_color >= origin_color) ++destination_color;
+    LOG("Moving to color {}", destination_color);
+
+    need_flip = false;
+
+    double current_density = density(config.seglists[origin_color]);
+    if (rng() < current_density / wdata.beta) {
+      need_flip = true;
+      sl        = flip(config.seglists[origin_color], wdata.beta);
+      dsl       = flip(config.seglists[destination_color], wdata.beta);
+      LOG("Moving antisegment.");
+    } else {
+      sl  = config.seglists[origin_color];
+      dsl = config.seglists[destination_color];
+    }
 
     // If color has no segments, nothing to move
     if (sl.empty()) {
@@ -24,11 +41,10 @@ namespace moves {
     origin_segment = sl[origin_index];
     LOG("Moving segment at position {}", origin_index);
 
-    // Select destination color
-    destination_color = rng(wdata.n_color - 1);
-    if (destination_color >= origin_color) ++destination_color;
-    auto &dsl = config.seglists[destination_color];
-    LOG("Moving to color {}", destination_color);
+    if (origin_segment.J_c or origin_segment.J_cdag) {
+      LOG("Segment has spin line attached: cannot move.");
+      return 0;
+    }
 
     // Reject if chosen segment overlaps with destination color
     if (not is_insertable(dsl, origin_segment)) {
@@ -43,28 +59,61 @@ namespace moves {
 
     // ------------  Trace ratio  -------------
 
-    double ln_trace_ratio = (wdata.mu(destination_color) - wdata.mu(origin_color)) * origin_segment.length();
-    double trace_ratio    = std::exp(ln_trace_ratio);
+    double ln_trace_ratio =
+       (need_flip ? -1 : 1) * (wdata.mu(destination_color) - wdata.mu(origin_color)) * origin_segment.length();
+    double trace_ratio = std::exp(ln_trace_ratio);
 
     // ------------  Det ratio  ---------------
 
     // We insert tau_cdag as a line (first index) and tau_c as a column (second index). The index always corresponds to the
     // segment the tau_c/tau_cdag belongs to.
-    double det_ratio      = 1.0;
-    bool moving_full_line = is_full_line(origin_segment);
-    if (not moving_full_line) {
-      det_ratio = wdata.dets[destination_color].try_insert(dest_index, dest_index, {origin_segment.tau_cdag, 0},
-                                                           {origin_segment.tau_c, 0})
-         * wdata.dets[origin_color].try_remove(origin_index, origin_index);
+    auto det_c_time_orig    = [&](long i) { return wdata.dets[origin_color].get_y(i).first; };
+    auto det_cdag_time_orig = [&](long i) { return wdata.dets[origin_color].get_x(i).first; };
+    auto det_c_time_dest    = [&](long i) { return wdata.dets[destination_color].get_y(i).first; };
+    auto det_cdag_time_dest = [&](long i) { return wdata.dets[destination_color].get_x(i).first; };
+    long det_index_c_orig = 0, det_index_cdag_orig = 0;
+    long det_index_c_dest = 0, det_index_cdag_dest = 0;
+    double det_ratio = 1;
+    // Times are ordered in det. We insert tau_cdag as a line (first index) and tau_c as a column.
+    // c and cdag are inverted if we flip
+    if (not is_full_line(origin_segment)) {
+      if (need_flip) {
+        det_index_c_orig    = lower_bound(det_c_time_orig, wdata.dets[origin_color].size(), origin_segment.tau_cdag);
+        det_index_cdag_orig = lower_bound(det_cdag_time_orig, wdata.dets[origin_color].size(), origin_segment.tau_c);
+        det_index_c_dest = lower_bound(det_c_time_dest, wdata.dets[destination_color].size(), origin_segment.tau_cdag);
+        det_index_cdag_dest =
+           lower_bound(det_cdag_time_dest, wdata.dets[destination_color].size(), origin_segment.tau_c);
+        det_ratio = wdata.dets[destination_color].try_insert(det_index_cdag_dest, det_index_c_dest,
+                                                             {origin_segment.tau_c, 0}, {origin_segment.tau_cdag, 0})
+           * wdata.dets[origin_color].try_remove(det_index_cdag_orig, det_index_c_orig);
+      } else {
+        det_index_c_orig    = lower_bound(det_c_time_orig, wdata.dets[origin_color].size(), origin_segment.tau_c);
+        det_index_cdag_orig = lower_bound(det_cdag_time_orig, wdata.dets[origin_color].size(), origin_segment.tau_cdag);
+        det_index_c_dest    = lower_bound(det_c_time_dest, wdata.dets[destination_color].size(), origin_segment.tau_c);
+        det_index_cdag_dest =
+           lower_bound(det_cdag_time_dest, wdata.dets[destination_color].size(), origin_segment.tau_cdag);
+        det_ratio = wdata.dets[destination_color].try_insert(det_index_cdag_dest, det_index_c_dest,
+                                                             {origin_segment.tau_cdag, 0}, {origin_segment.tau_c, 0})
+           * wdata.dets[origin_color].try_remove(det_index_cdag_orig, det_index_c_orig);
+      }
     }
 
     // ------------  Proposition ratio ------------
-    double prop_ratio = int(sl.size()) / (int(dsl.size()) + 1);
+
+    double future_dest_density = density(dsl) + origin_segment.length();
+    double density_ratio       = (wdata.beta - future_dest_density) / (wdata.beta - current_density);
+    if (need_flip) {
+      future_dest_density = wdata.beta - future_dest_density;
+      density_ratio       = future_dest_density / current_density;
+    }
+
+    double prop_ratio = density_ratio * int(sl.size()) / (int(dsl.size()) + 1);
 
     LOG("trace_ratio  = {}, prop_ratio = {}, det_ratio = {}", trace_ratio, prop_ratio, det_ratio);
 
-    double prod = trace_ratio * det_ratio * prop_ratio;
-    det_sign    = (det_ratio > 0) ? 1.0 : -1.0;
+    double prod = trace_ratio * abs(det_ratio) * prop_ratio;
+    //det_sign    = (det_ratio > 0) ? 1.0 : -1.0;
+    det_sign = 1.0;
     return (std::isfinite(prod) ? prod : det_sign);
   }
 
@@ -81,12 +130,18 @@ namespace moves {
     double sign_ratio = 1;
 
     // Add the segment at destination
-    auto &dsl = config.seglists[destination_color];
     dsl.insert(destination_it, origin_segment);
 
     // Remove the segment at origin
-    auto &sl = config.seglists[origin_color];
     sl.erase(sl.begin() + origin_index);
+
+    if (need_flip) {
+      config.seglists[origin_color]      = flip(sl, wdata.beta);
+      config.seglists[destination_color] = flip(dsl, wdata.beta);
+    } else {
+      config.seglists[origin_color]      = sl;
+      config.seglists[destination_color] = dsl;
+    }
 
     // Check invariant
 #ifdef CHECK_INVARIANTS

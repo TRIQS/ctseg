@@ -1,10 +1,10 @@
-#include "insert_segment_v2.hpp"
+#include "split_segment_v2.hpp"
 #include "../logs.hpp"
 #include <cmath>
 
 namespace moves {
 
-  double insert_segment_v2::attempt() {
+  double split_segment_v2::attempt() {
 
     LOG("\n =================== ATTEMPT INSERT ================ \n");
 
@@ -13,9 +13,14 @@ namespace moves {
     LOG("Inserting at color {}", color);
     need_flip = false;
 
+    SPDLOG_TRACE("Configuration is {}", config);
+    configuration_t flipped_config = config;
+    flipped_config.seglists[color] = flip(config.seglists[color], wdata.beta);
+    SPDLOG_TRACE("Flipped configuration is {}", flipped_config);
+
     current_density = density(config.seglists[color]);
-    if (rng() < current_density / wdata.beta) {
-      //if (rng() < 0.5) {
+    LOG("Rand = {}, Density = {}", rand, current_density / wdata.beta);
+    if (rng() < 1.0) {
       need_flip = true;
       sl        = flip(config.seglists[color], wdata.beta);
       LOG("Inserting antisegment.");
@@ -23,6 +28,7 @@ namespace moves {
       sl = config.seglists[color];
     }
 
+    LOG("Flip = {}", need_flip);
     // Select insertion window [wtau_left,wtau_right]
     dimtime_t wtau_left = wdata.qmc_beta, wtau_right = wdata.qmc_zero;
 
@@ -99,13 +105,13 @@ namespace moves {
 
     // ------------  Proposition ratio ------------
 
-    double future_density = current_density + prop_seg.length();
-    double density_ratio  = (future_density) / (wdata.beta - current_density);
+    /* double future_density = current_density + prop_seg.length();
+    double density_ratio  = (wdata.beta - future_density) / (wdata.beta - current_density);
     if (need_flip) {
       future_density = wdata.beta - future_density;
-      density_ratio  = (wdata.beta - future_density) / current_density;
-    }
-    //density_ratio                   = 1;
+      density_ratio  = future_density / current_density;
+    } */
+    double density_ratio            = 1.0;
     double current_number_intervals = std::max(1.0, double(sl.size()));
     double future_number_segments   = double(sl.size()) + 1;
     double prop_ratio               = density_ratio
@@ -122,7 +128,7 @@ namespace moves {
 
   //--------------------------------------------------
 
-  double insert_segment_v2::accept() {
+  double split_segment_v2::accept() {
 
     LOG("\n - - - - - ====> ACCEPT - - - - - - - - - - -\n");
 
@@ -153,7 +159,7 @@ namespace moves {
   }
 
   //--------------------------------------------------
-  void insert_segment_v2::reject() {
+  void split_segment_v2::reject() {
     LOG("\n - - - - - ====> REJECT - - - - - - - - - - -\n");
     wdata.dets[color].reject_last_try();
   }

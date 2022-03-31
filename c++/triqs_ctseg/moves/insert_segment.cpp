@@ -42,8 +42,8 @@ namespace moves {
     if (dt1 > dt2 and !sl.empty()) std::swap(dt1, dt2); // if inserting into an empty line, two ways to insert
     prop_seg = segment_t{wtau_left - dt1, wtau_left - dt2};
     // The index of prop_seg if it is inserted in the list of segments.
-    prop_seg_it = std::upper_bound(sl.begin(), sl.end(), prop_seg);
-    //long prop_seg_idx = std::distance(sl.begin(), prop_seg_it);
+    prop_seg_it       = std::upper_bound(sl.begin(), sl.end(), prop_seg);
+    long prop_seg_idx = std::distance(sl.begin(), prop_seg_it);
 
     LOG("Inserting segment at position {}, with c at {}, cdag at {}", prop_seg_idx, prop_seg.tau_c, prop_seg.tau_cdag);
 

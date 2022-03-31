@@ -16,6 +16,9 @@ namespace moves {
     int origin_index{};
     std::vector<segment_t>::const_iterator destination_it;
     double det_sign;
+    bool need_flip;
+    std::vector<segment_t> sl;
+    std::vector<segment_t> dsl;
 
     public:
     // Constructor

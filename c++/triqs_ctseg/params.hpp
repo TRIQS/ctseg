@@ -52,6 +52,18 @@ struct solve_params_t {
   int verbosity = mpi::communicator().rank() == 0 ? 3 : 0;
 
   /// Whether to perform the move insert segment
+  bool move_insert_segment_v2 = false;
+
+  /// Whether to perform the move remove segment
+  bool move_remove_segment_v2 = false;
+
+  /// Whether to perform the move split segment
+  bool move_split_segment_v2 = false;
+
+  /// Whether to perform the move group into spin segment
+  bool move_regroup_segment_v2 = false;
+
+  /// Whether to perform the move insert segment
   bool move_insert_segment = true;
 
   /// Whether to perform the move remove segment

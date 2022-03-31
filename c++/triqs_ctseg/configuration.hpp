@@ -12,7 +12,7 @@ struct segment_t {
   // Length of segment (accounts for cyclicity)
   double length() const {
     auto length = double(tau_c - tau_cdag);
-    if (tau_c == tau_c.beta() and tau_cdag == tau_c.zero()) return 0;
+    if (tau_c == tau_c.beta() and tau_cdag == tau_c.zero()) return double(tau_c.beta());
     return length;
   };
 };
@@ -90,7 +90,8 @@ std::pair<std::vector<segment_t>::const_iterator, std::vector<segment_t>::const_
 find_spin_segments(int line_idx, configuration_t const &config);
 
 // Flip config
-configuration_t flip(configuration_t const &config, double const &beta);
+//configuration_t flip(configuration_t const &config, double const &beta);
+std::vector<segment_t> flip(std::vector<segment_t> const &sl, double const &beta);
 
 // Same as std::lower_bound, but i-th element of vector is returned by f[i]
 long lower_bound(auto f, long N, auto const &value) {

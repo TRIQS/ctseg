@@ -6,7 +6,6 @@
 void check_invariant(configuration_t const &config, std::vector<det_t> const &dets) {
   for (auto const &[c, sl] : itertools::enumerate(config.seglists))
     if (not sl.empty()) {
-      auto const &D = dets[c];
       for (int i = 0; i < sl.size() - 1; ++i) {
         ALWAYS_EXPECTS((sl[i].tau_cdag != sl[i].tau_c), "Degenerate segment in color {} at position {} in config \n{}",
                        c, i, config);
@@ -23,11 +22,14 @@ void check_invariant(configuration_t const &config, std::vector<det_t> const &de
            "Det error in color {}. The segment in position {} has tau_c = {}, while the det has {} in column {}.  Config : \n{}",
            c, i, sl[i].tau_c, D.get_y(i).first, i, config); */
       }
-      for (int i = 0; i < D.size() - 1; ++i) {
-        ALWAYS_EXPECTS((D.get_x(i).first < D.get_x(i + 1).first),
-                       "Det time order error (cdag) in color {} at position {} in config \n{}", c, i, config);
-        ALWAYS_EXPECTS((D.get_y(i).first < D.get_y(i + 1).first),
-                       "Det time order error (c) in color {} at position {} in config \n{}", c, i, config);
+      auto const &D = dets[c];
+      if (not is_full_line(sl[0])) {
+        for (int i = 0; i < D.size() - 1; ++i) {
+          ALWAYS_EXPECTS((D.get_x(i).first < D.get_x(i + 1).first),
+                         "Det time order error (cdag) in color {} at position {} in config \n{}", c, i, config);
+          ALWAYS_EXPECTS((D.get_y(i).first < D.get_y(i + 1).first),
+                         "Det time order error (c) in color {} at position {} in config \n{}", c, i, config);
+        }
       }
     }
   LOG("Invariants OK.");
@@ -151,6 +153,7 @@ double K_overlap(std::vector<segment_t> const &seglist, dimtime_t const &tau_c, 
 
 // Length occupied by all segments for a given color
 double density(std::vector<segment_t> const &seglist) {
+  if (seglist.empty()) return 0;
   double result = 0;
   for (auto const &seg : seglist) result += double(seg.tau_c - seg.tau_cdag);
   if (is_full_line(seglist[0])) return double(seglist[0].tau_c.beta());
@@ -189,7 +192,7 @@ find_spin_segments(int line_idx, configuration_t const &config) {
 
 // ---------------------------
 
-// Flip config
+/* // Flip config
 configuration_t flip(configuration_t const &config, double const &beta) {
   auto flipped_config       = configuration_t{config.n_color()};
   flipped_config.Jperp_list = config.Jperp_list;
@@ -211,6 +214,27 @@ configuration_t flip(configuration_t const &config, double const &beta) {
     }   // general case
   }     // loop over colors
   return flipped_config;
+} */
+
+// Flip seglist
+std::vector<segment_t> flip(std::vector<segment_t> const &sl, double const &beta) {
+  auto fsl = std::vector<segment_t>{};
+  fsl.reserve(sl.size() + 1);
+  if (sl.empty()) // Flipped seglist is full line
+    fsl.emplace_back(segment_t{dimtime_t::beta(beta), dimtime_t::zero(beta)});
+  else if (sl.size() == 1 and is_full_line(sl[0])) { // Do nothing: flipped config empty
+  } else {                                           // Swap c and cdag
+    for (auto i : range(sl.size())) {
+      if (is_cyclic(sl.back())) {
+        long ind = (i == 0) ? long(sl.size()) - 1 : i - 1;
+        fsl.emplace_back(segment_t{sl[ind].tau_cdag, sl[i].tau_c, sl[ind].J_cdag, sl[i].J_c});
+      } else {
+        long ind = (i == sl.size() - 1) ? 0 : i + 1;
+        fsl.emplace_back(segment_t{sl[i].tau_cdag, sl[ind].tau_c, sl[i].J_cdag, sl[ind].J_c});
+      }
+    } // loop over segs
+  }   // general case
+  return fsl;
 }
 
 // Print config

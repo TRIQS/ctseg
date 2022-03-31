@@ -3,7 +3,7 @@
 #include "../configuration.hpp"
 
 namespace moves {
-  class insert_segment_v2 {
+  class split_segment_v2 {
     work_data_t &wdata;
     configuration_t &config;
     triqs::mc_tools::random_generator &rng;
@@ -18,7 +18,7 @@ namespace moves {
     double det_sign;
 
     public:
-    insert_segment_v2(work_data_t &data_, configuration_t &config_, triqs::mc_tools::random_generator &rng_)
+    split_segment_v2(work_data_t &data_, configuration_t &config_, triqs::mc_tools::random_generator &rng_)
        : wdata(data_), config(config_), rng(rng_){};
     // ------------------
     double attempt();
