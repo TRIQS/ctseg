@@ -23,6 +23,7 @@
 #include <limits>
 #include <iostream>
 #include <cmath>
+#include <assert.h>
 
 namespace triqs::utility {
 
@@ -53,11 +54,11 @@ namespace triqs::utility {
 
     /// Comparisons (using integer, so it is safe)
     auto operator<=>(dimtime_t const &tau) const {
-      //ALWAYS_EXPECTS(tau._beta == _beta);
+      assert(tau._beta == _beta);
       return n <=> tau.n;
     }
     bool operator==(dimtime_t const &tau) const {
-      //ALWAYS_EXPECTS(tau._beta == _beta);
+      assert(tau._beta == _beta);
       return n == tau.n;
     }
 

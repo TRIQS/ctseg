@@ -4,6 +4,15 @@
 
 namespace moves {
 
+  insert_spin_segment::insert_spin_segment(work_data_t &data_, configuration_t &config_,
+                                           triqs::mc_tools::random_generator &rng_)
+     : wdata(data_), config(config_), rng(rng_) {
+    ALWAYS_EXPECTS(config.n_color() == 2, "spin add/remove move only implemented for n_color == 2, got {}",
+                   config.n_color());
+  }
+
+  // --------------------------------------------------
+
   double insert_spin_segment::attempt() {
 
     LOG("\n =================== ATTEMPT INSERT SPIN ================ \n");
