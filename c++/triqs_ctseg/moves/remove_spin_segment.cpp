@@ -145,10 +145,8 @@ namespace moves {
     jl.erase(jl.begin() + line_idx);
 
     // Check invariant
-#ifdef CHECK_INVARIANTS
-    check_invariant(config, wdata.dets);
-#endif
-    SPDLOG_TRACE("Configuration is {}", config);
+    if constexpr (check_invariants or ctseg_debug) check_invariant(config, wdata.dets);
+    LOG("Configuration is {}", config);
 
     return 1.0;
   }

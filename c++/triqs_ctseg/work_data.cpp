@@ -12,22 +12,11 @@ work_data_t::work_data_t(params_t const &p, inputs_t const &inputs, mpi::communi
   // Set logger level
   spdlog::set_pattern("%v");
   spdlog::set_level(spdlog::level::info);
-#ifdef EXT_DEBUG
-  spdlog::set_level(spdlog::level::debug);
-#endif
-#ifdef PRINT_CONFIG
-  spdlog::set_level(spdlog::level::trace);
-#endif
-  //if constexpr (ctseg_debug) {
-  //  spdlog::set_level(spdlog::level::info);
-  //} else
-  //  spdlog::set_level(spdlog::level::off);
+  if constexpr (ctseg_debug) spdlog::set_level(spdlog::level::debug);
 
   beta     = p.beta;
   qmc_zero = dimtime_t::zero(beta);
   qmc_beta = dimtime_t::beta(beta);
-  SPDLOG_INFO("Beta - Zero = {}", qmc_beta - qmc_zero);
-  SPDLOG_INFO("double(Beta - Zero = {})", double(qmc_beta - qmc_zero));
 
   // Number of colors from Green's function structure
   n_color = 0;
@@ -86,8 +75,8 @@ work_data_t::work_data_t(params_t const &p, inputs_t const &inputs, mpi::communi
 
   // Report
   if (c.rank() == 0) {
-    spdlog::info("mu = {}\n U = {}", mu, U);
-    spdlog::info("dynamical_U = {}\n jperp_interactions = {}\n ", has_Dt, has_jperp);
+    spdlog::info("mu = {} \nU = {}", mu, U);
+    spdlog::info("Dynamical interactions = {}, J_perp interactions = {}", has_Dt, has_jperp);
   }
 
   // ................  Determinants .....................
@@ -96,9 +85,9 @@ work_data_t::work_data_t(params_t const &p, inputs_t const &inputs, mpi::communi
   if (c.rank() == 0) {
     for (auto const &bl : range(delta.size())) {
       if (!is_gf_real(delta[bl], 1e-10)) {
-        spdlog::info("WARNING: The Delta(tau) block number {} is not real in tau space\n", bl);
-        spdlog::info("WARNING: max(Im[Delta(tau)]) = {} \n", max_element(abs(imag(delta[bl].data()))));
-        spdlog::info("WARNING: Disregarding the imaginary component in the calculation.\n");
+        spdlog::info("WARNING: The Delta(tau) block number {} is not real in tau space", bl);
+        spdlog::info("WARNING: max(Im[Delta(tau)]) = {}", max_element(abs(imag(delta[bl].data()))));
+        spdlog::info("WARNING: Disregarding the imaginary component in the calculation.");
       }
       dets.emplace_back(delta_block_adaptor{real(delta[bl])}, p.det_init_size);
       dets.back().set_singular_threshold(p.det_singular_threshold);

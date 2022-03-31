@@ -206,7 +206,7 @@ namespace moves {
 #ifdef CHECK_INVARIANTS
     check_invariant(config, wdata.dets);
 #endif
-    SPDLOG_TRACE("Configuration is {}", config);
+    LOG("Configuration is {}", config);
 
     return sign_ratio;
   }

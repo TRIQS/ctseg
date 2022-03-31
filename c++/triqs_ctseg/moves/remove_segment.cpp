@@ -96,14 +96,12 @@ namespace moves {
     double sign_ratio = initial_sign / final_sign;
     LOG("Sign ratio is {}", sign_ratio);
 
-// Check invariant
-#ifdef CHECK_INVARIANTS
-    check_invariant(config, wdata.dets);
-#endif
+    // Check invariant
+    if constexpr (check_invariants or ctseg_debug) check_invariant(config, wdata.dets);
     ALWAYS_EXPECTS((sign_ratio * det_sign == 1.0),
                    "Error: move has produced negative sign! Det sign is {} and additional sign is {}.", det_sign,
                    sign_ratio);
-    SPDLOG_TRACE("Configuration is {}", config);
+    LOG("Configuration is {}", config);
 
     return sign_ratio;
   }

@@ -170,10 +170,9 @@ namespace moves {
     //jl.push_back(jperp_line_t{spin_seg.tau_cdag, spin_seg.tau_c});
 
     // Add the check of J_c flags in the invariants
-#ifdef CHECK_INVARIANTS
-    check_invariant(config, wdata.dets);
-#endif
-    SPDLOG_TRACE("Configuration is {}", config);
+    if constexpr (check_invariants or ctseg_debug) check_invariant(config, wdata.dets);
+
+    LOG("Configuration is {}", config);
 
     return 1.0;
   }

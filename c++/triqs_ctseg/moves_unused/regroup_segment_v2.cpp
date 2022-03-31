@@ -1,10 +1,10 @@
-#include "remove_segment_v2.hpp"
+#include "regroup_segment_v2.hpp"
 #include "../logs.hpp"
 #include <cmath>
 
 namespace moves {
 
-  double remove_segment_v2::attempt() {
+  double regroup_segment_v2::attempt() {
 
     LOG("\n =================== ATTEMPT REMOVE ================ \n");
 
@@ -14,8 +14,7 @@ namespace moves {
     need_flip = false;
 
     current_density = density(config.seglists[color]);
-    if (rng() < 1 - current_density / wdata.beta) {
-      //if (rng() < 0.5) {
+    if (rng() < 1.0) {
       need_flip = true;
       sl        = flip(config.seglists[color], wdata.beta);
       LOG("Removing antisegment.");
@@ -80,13 +79,13 @@ namespace moves {
 
     // ------------  Proposition ratio ------------
 
-    double future_density = current_density - prop_seg.length();
-    double density_ratio  = (wdata.beta - future_density) / (current_density);
+    /* double future_density = current_density - prop_seg.length();
+    double density_ratio  = (wdata.beta - future_density) / (wdata.beta - current_density);
     if (need_flip) {
       future_density = wdata.beta - future_density;
-      density_ratio  = (future_density) / (wdata.beta - current_density);
-    }
-    //density_ratio                  = 1;
+      density_ratio  = future_density / current_density;
+    } */
+    double density_ratio           = 1;
     double current_number_segments = sl.size();
     double future_number_intervals = std::max(1.0, sl.size() - 1.0);
     // Insertion window for reverse move
@@ -112,7 +111,7 @@ namespace moves {
 
   //--------------------------------------------------
 
-  double remove_segment_v2::accept() {
+  double regroup_segment_v2::accept() {
 
     LOG("\n - - - - - ====> ACCEPT - - - - - - - - - - -\n");
 
@@ -137,13 +136,13 @@ namespace moves {
     ALWAYS_EXPECTS((sign_ratio * det_sign == 1.0),
                    "Error: move has produced negative sign! Det sign is {} and additional sign is {}.", det_sign,
                    sign_ratio);
-    //SPDLOG_TRACE("Configuration is {}", config);
+    //LOG("Configuration is {}", config);
 
     return sign_ratio;
   }
 
   //--------------------------------------------------
-  void remove_segment_v2::reject() {
+  void regroup_segment_v2::reject() {
     LOG("\n - - - - - ====> REJECT - - - - - - - - - - -\n");
     wdata.dets[color].reject_last_try();
   }
