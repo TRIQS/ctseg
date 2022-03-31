@@ -23,6 +23,7 @@ static constexpr bool check_invariants = false;
 // Checked always, even in production
 #define ALWAYS_EXPECTS(Condition, ErrorMessage, ...)                                                                   \
   if (not(Condition)) {                                                                                                \
-    SPDLOG_CRITICAL(ErrorMessage, __VA_ARGS__);                                                                        \
+    SPDLOG_CRITICAL("Error in function {} in file  {} at line {}", __FUNCTION__, __FILE__, __LINE__);                  \
+    SPDLOG_CRITICAL(ErrorMessage, __VA_ARGS__);                                                                      \
     throw std::runtime_error("Assertion Error, cf log");                                                               \
   }
