@@ -13,7 +13,7 @@ namespace moves {
     segment_t prop_seg, spin_seg;
     int prop_seg_idx;
     bool splitting_full_line;
-    dimtime_t tau_left, tau_right;
+    tau_t tau_left, tau_right;
     double det_sign;
 
     public:

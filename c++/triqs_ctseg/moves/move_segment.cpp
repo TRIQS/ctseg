@@ -22,8 +22,8 @@ namespace moves {
     double current_density = density(config.seglists[origin_color]);
     if (rng() < current_density / wdata.beta) {
       need_flip = true;
-      sl        = flip(config.seglists[origin_color], wdata.beta);
-      dsl       = flip(config.seglists[destination_color], wdata.beta);
+      sl        = flip(config.seglists[origin_color]);
+      dsl       = flip(config.seglists[destination_color]);
       LOG("Moving antisegment.");
     } else {
       sl  = config.seglists[origin_color];
@@ -59,7 +59,7 @@ namespace moves {
     // ------------  Trace ratio  -------------
 
     double ln_trace_ratio =
-       (need_flip ? -1 : 1) * (wdata.mu(destination_color) - wdata.mu(origin_color)) * origin_segment.length();
+       (need_flip ? -1 : 1) * (wdata.mu(destination_color) - wdata.mu(origin_color)) * double(origin_segment.length());
     double trace_ratio = std::exp(ln_trace_ratio);
 
     // ------------  Det ratio  ---------------
@@ -134,8 +134,8 @@ namespace moves {
     sl.erase(sl.begin() + origin_index);
 
     if (need_flip) {
-      config.seglists[origin_color]      = flip(sl, wdata.beta);
-      config.seglists[destination_color] = flip(dsl, wdata.beta);
+      config.seglists[origin_color]      = flip(sl);
+      config.seglists[destination_color] = flip(dsl);
     } else {
       config.seglists[origin_color]      = sl;
       config.seglists[destination_color] = dsl;

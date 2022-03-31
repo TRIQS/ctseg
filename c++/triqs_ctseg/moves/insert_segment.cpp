@@ -15,7 +15,7 @@ namespace moves {
     LOG("Inserting at color {}", color);
 
     // Select insertion window [wtau_left,wtau_right]
-    dimtime_t wtau_left = wdata.qmc_beta, wtau_right = wdata.qmc_zero;
+    tau_t wtau_left = tau_t::beta(), wtau_right = tau_t::zero();
 
     if (not sl.empty()) {
       if (is_full_line(sl.back())) {
@@ -30,22 +30,19 @@ namespace moves {
     }
 
     LOG("Insertion window is wtau_left = {}, wtau_right = {}", wtau_left, wtau_right);
-    dimtime_t window_length = sl.empty() ? wdata.qmc_beta : wtau_left - wtau_right;
+    tau_t window_length = sl.empty() ? tau_t::beta() : wtau_left - wtau_right;
 
     // Choose two random times in insertion window
-    auto dt1 = dimtime_t::random(rng, window_length);
-    auto dt2 = dimtime_t::random(rng, window_length);
+    auto dt1 = tau_t::random(rng, window_length);
+    auto dt2 = tau_t::random(rng, window_length);
     if (dt1 == dt2) {
       LOG("Generated equal times");
       return 0;
     }
     if (dt1 > dt2 and !sl.empty()) std::swap(dt1, dt2); // if inserting into an empty line, two ways to insert
     prop_seg = segment_t{wtau_left - dt1, wtau_left - dt2};
-    // Iterator for inserting prop_seg into the list of segments.
-    prop_seg_it = std::upper_bound(sl.begin(), sl.end(), prop_seg);
 
-    LOG("Inserting segment at position {}, with c at {}, cdag at {}", std::distance(sl.begin(), prop_seg_it),
-        prop_seg.tau_c, prop_seg.tau_cdag);
+    LOG("Inserting segment with c at {}, cdag at {}", prop_seg.tau_c, prop_seg.tau_cdag);
 
     // ------------  Trace ratio  -------------
     double ln_trace_ratio = wdata.mu(color) * prop_seg.length();
@@ -93,7 +90,8 @@ namespace moves {
     // Insert the times into the det
     wdata.dets[color].complete_operation();
     // Insert the segment in an ordered list
-    auto &sl = config.seglists[color];
+    auto &sl         = config.seglists[color];
+    auto prop_seg_it = std::upper_bound(sl.begin(), sl.end(), prop_seg);
     sl.insert(prop_seg_it, prop_seg);
     double final_sign = config_sign(config, wdata.dets);
     double sign_ratio = final_sign / initial_sign;

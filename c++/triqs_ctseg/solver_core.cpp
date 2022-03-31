@@ -15,6 +15,7 @@
 solver_core::solver_core(constr_params_t const &p) : constr_params(p) {
 
   beta = p.beta;
+  tau_t::set_beta(beta);
 
   inputs.delta  = block_gf<imtime>(triqs::mesh::imtime{beta, Fermion, p.n_tau}, p.gf_struct);
   inputs.d0t    = gf<imtime>({beta, Boson, p.n_tau_k}, {1, 1});

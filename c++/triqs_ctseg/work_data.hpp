@@ -14,14 +14,12 @@ struct work_data_t {
   int n_color;
   double beta;
 
-  dimtime_t qmc_zero, qmc_beta;
-
   nda::vector<double> mu;
   nda::matrix<double> U;
 
   bool has_Dt, has_jperp;
-  // FIXME : real_valued ?? : remove real everywhere ? 
-  // Jperp : should be scalar ? or matrix ? 
+  // FIXME : real_valued ?? : remove real everywhere ?
+  // Jperp : should be scalar ? or matrix ?
   gf<imtime> K, Kprime, Jperp;
 
   // FIXME off diagonal delta ??

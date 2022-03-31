@@ -5,11 +5,11 @@
 namespace moves {
 
   // Find the segement to the left of tau (accounting for cyclicity), and whether tau is inside
-  void insert_split_segment::prep_insertion(std::vector<segment_t> const &seglist, dimtime_t tau) {
+  void insert_split_segment::prep_insertion(std::vector<segment_t> const &seglist, tau_t tau) {
     is_inside = false;
     seg_it    = seglist.cend();
     if (seglist.empty()) return;
-    seg_it = find_segment_left(seglist, segment_t{tau, wdata.qmc_zero});
+    seg_it = find_segment_left(seglist, segment_t{tau, tau_t::zero()});
     if (seg_it->tau_c > tau) { // Actually found segment to the left
       if (seg_it->tau_cdag == tau or seg_it->tau_c == tau) throw;
       if (seg_it->tau_cdag < tau or is_cyclic(*seg_it)) is_inside = true;
@@ -35,7 +35,7 @@ namespace moves {
     LOG("Inserting/splitting at color {}", color);
 
     // Select first time
-    tau1 = dimtime_t::random(rng, wdata.qmc_zero, wdata.qmc_beta);
+    tau1 = tau_t::random(rng, tau_t::zero(), tau_t::beta());
     LOG("First time is {}", tau1);
     try {
       prep_insertion(sl, tau1);
@@ -52,7 +52,7 @@ namespace moves {
       LOG("First time is inside a segment: attempt SPLIT at position {}.", seg_idx);
 
       // ------------- Choose second time ---------
-      tau2 = dimtime_t::random(rng, seg_it->tau_cdag, seg_it->tau_c);
+      tau2 = tau_t::random(rng, seg_it->tau_cdag, seg_it->tau_c);
       if (tau2 == tau1) {
         LOG("Second time equal to first time.");
         return 0;
@@ -94,10 +94,10 @@ namespace moves {
 
       // ------------ Find insertion window [wtau1,wtau2] ------------
       insert_into_empty_line = seg_it == sl.end();
-      dimtime_t wtau1, wtau2;
+      tau_t wtau1, wtau2;
       if (insert_into_empty_line) {
-        wtau1         = wdata.qmc_beta;
-        wtau2         = wdata.qmc_zero;
+        wtau1         = tau_t::beta();
+        wtau2         = tau_t::zero();
         window_length = wdata.beta;
       } else {
         wtau1            = seg_it->tau_cdag;
@@ -107,7 +107,7 @@ namespace moves {
       }
 
       // ------------- Choose second time --------------
-      tau2 = dimtime_t::random(rng, wtau2, wtau1);
+      tau2 = tau_t::random(rng, wtau2, wtau1);
       if (tau2 == tau1) {
         LOG("Second time equal to first time.");
         return 0;

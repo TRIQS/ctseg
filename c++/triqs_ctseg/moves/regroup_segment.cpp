@@ -53,7 +53,7 @@ namespace moves {
       if (wdata.has_Dt) {
         ln_trace_ratio -= K_overlap(config.seglists[c], right_seg.tau_c, left_seg.tau_cdag, wdata.K, color, c);
         if (making_full_line and c != color)
-          ln_trace_ratio += K_overlap(config.seglists[c], wdata.qmc_beta, wdata.qmc_zero, wdata.K, color, c);
+          ln_trace_ratio += K_overlap(config.seglists[c], tau_t::beta(), tau_t::zero(), wdata.K, color, c);
       }
     }
     if (wdata.has_Dt)
@@ -75,7 +75,7 @@ namespace moves {
     double future_number_segments   = making_full_line ? 1 : int(sl.size()) - 1;
     double current_number_intervals = sl.size();
     // Length of future segment
-    dimtime_t new_length = wdata.qmc_beta;
+    tau_t new_length = tau_t::beta();
     if (not making_full_line) new_length = left_seg.tau_c - right_seg.tau_cdag;
     double prop_ratio =
        current_number_intervals / (future_number_segments * new_length * new_length / (making_full_line ? 1 : 2));
@@ -102,7 +102,7 @@ namespace moves {
     // Regroup segments
     auto &sl = config.seglists[color];
     if (making_full_line) {
-      sl[left_seg_idx] = segment_t{wdata.qmc_beta, wdata.qmc_zero};
+      sl[left_seg_idx] = segment_t{tau_t::beta(), tau_t::zero()};
     } else {
       auto new_segment = segment_t{left_seg.tau_c, right_seg.tau_cdag};
       // Update the left segment

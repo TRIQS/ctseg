@@ -25,9 +25,8 @@ namespace moves {
     if (splitting_full_line) LOG("Splitting full line.");
 
     // Select splitting points (tau_left,tau_right)
-    dimtime_t prop_seg_length = splitting_full_line ? wdata.qmc_beta : prop_seg.tau_c - prop_seg.tau_cdag;
-    dimtime_t dt1             = dimtime_t::random(rng, prop_seg_length);
-    dimtime_t dt2             = dimtime_t::random(rng, prop_seg_length);
+    tau_t dt1 = tau_t::random(rng, prop_seg.length());
+    tau_t dt2 = tau_t::random(rng, prop_seg.length());
     if (dt1 == dt2) {
       LOG("Generated equal times");
       return 0;
@@ -52,7 +51,7 @@ namespace moves {
       if (wdata.has_Dt) {
         ln_trace_ratio += K_overlap(config.seglists[c], tau_right, tau_left, wdata.K, color, c);
         if (splitting_full_line)
-          ln_trace_ratio -= K_overlap(config.seglists[c], wdata.qmc_beta, wdata.qmc_zero, wdata.K, color, c);
+          ln_trace_ratio -= K_overlap(config.seglists[c], tau_t::beta(), tau_t::zero(), wdata.K, color, c);
       }
     }
     if (wdata.has_Dt)
@@ -73,7 +72,8 @@ namespace moves {
 
     double current_number_segments = sl.size();
     double future_number_intervals = splitting_full_line ? 1 : double(sl.size()) + 1.0;
-    double prop_ratio = (current_number_segments * prop_seg_length * prop_seg_length / (splitting_full_line ? 1 : 2))
+    double prop_ratio =
+       (current_number_segments * prop_seg.length() * prop_seg.length() / (splitting_full_line ? 1 : 2))
        / (future_number_intervals);
 
     LOG("trace_ratio  = {}, prop_ratio = {}, det_ratio = {}", trace_ratio, prop_ratio, det_ratio);

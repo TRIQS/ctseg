@@ -89,7 +89,7 @@ namespace moves {
         // "antisegment" - careful with order
         ln_trace_ratio -= K_overlap(config.seglists[c], spin_seg.tau_cdag, spin_seg.tau_c, wdata.K, dest_color, c);
         if (making_full_line)
-          ln_trace_ratio += K_overlap(config.seglists[c], wdata.qmc_beta, wdata.qmc_zero, wdata.K, dest_color, c);
+          ln_trace_ratio += K_overlap(config.seglists[c], tau_t::beta(), tau_t::zero(), wdata.K, dest_color, c);
       }
       // Correct for the interactions of the removed operators with themselves
       ln_trace_ratio -= real(wdata.K(double(spin_seg.tau_c - spin_seg.tau_cdag))(orig_color, orig_color));
@@ -104,8 +104,7 @@ namespace moves {
 
     // ------------  Proposition ratio ------------
 
-    dimtime_t new_seg_length =
-       making_full_line ? wdata.qmc_beta : dsl[dest_left_idx].tau_c - dsl[dest_right_idx].tau_cdag;
+    tau_t new_seg_length = making_full_line ? tau_t::beta() : dsl[dest_left_idx].tau_c - dsl[dest_right_idx].tau_cdag;
     double future_number_seg = making_full_line ? 1 : double(dsl.size()) + 1;
     double prop_ratio        = (double(wdata.n_color) * future_number_seg * new_seg_length * new_seg_length / 2)
        / double(config.Jperp_list.size());
@@ -133,7 +132,7 @@ namespace moves {
 
     // Regroup segment at destination
     if (making_full_line) {
-      dsl[0] = segment_t{wdata.qmc_beta, wdata.qmc_zero};
+      dsl[0] = segment_t{tau_t::beta(), tau_t::zero()};
     } else {
       auto new_seg       = segment_t{dsl[dest_left_idx].tau_c, dsl[dest_right_idx].tau_cdag};
       dsl[dest_left_idx] = new_seg;

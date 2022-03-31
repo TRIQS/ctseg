@@ -6,19 +6,15 @@
 // Segment: (time of c, time of c^dagger)
 struct segment_t {
 
-  dimtime_t tau_c, tau_cdag; // time of c and cdag
+  tau_t tau_c, tau_cdag; // time of c and cdag
   bool J_c = false, J_cdag = false;
 
   // Length of segment (accounts for cyclicity)
-  double length() const {
-    auto length = double(tau_c - tau_cdag);
-    if (tau_c == tau_c.beta() and tau_cdag == tau_c.zero()) return double(tau_c.beta());
-    return length;
-  };
+  tau_t length() const { return tau_c - tau_cdag; };
 };
 
 struct jperp_line_t {
-  dimtime_t tau_Sminus, tau_Splus; // times of the S-, S+
+  tau_t tau_Sminus, tau_Splus; // times of the S-, S+
 };
 
 // ----------
@@ -52,13 +48,11 @@ inline bool operator==(segment_t const &s1, segment_t const &s2) {
 inline bool is_cyclic(segment_t const &seg) { return seg.tau_cdag > seg.tau_c; }
 
 // Check whether segment is a full line.
-inline bool is_full_line(segment_t const &seg) {
-  return dimtime_t::is_zero(seg.tau_cdag) && dimtime_t::is_beta(seg.tau_c);
-}
+inline bool is_full_line(segment_t const &seg) { return seg.tau_c - seg.tau_cdag == tau_t::beta(); }
 
 // Make a list of time ordered (decreasing) operators
 // vector of (time, color, is_dagger)
-std::vector<std::tuple<dimtime_t, int, bool>> make_time_ordered_op_list(configuration_t const &config);
+std::vector<std::tuple<tau_t, int, bool>> make_time_ordered_op_list(configuration_t const &config);
 
 // Find index of first segment starting left of seg.tau_c.
 std::vector<segment_t>::const_iterator find_segment_left(std::vector<segment_t> const &seglist, segment_t const &seg);
@@ -76,7 +70,7 @@ double overlap(std::vector<segment_t> const &seglist, segment_t const &seg);
 bool is_insertable(std::vector<segment_t> const &seglist, segment_t const &seg);
 
 // Contribution of the dynamical interaction kernel K to the overlap between a segment and a list of segments.
-double K_overlap(std::vector<segment_t> const &seglist, dimtime_t const &tau_c, dimtime_t const &tau_cdag,
+double K_overlap(std::vector<segment_t> const &seglist, tau_t const &tau_c, tau_t const &tau_cdag,
                  gf<imtime, matrix_valued> const &K, int c1, int c2);
 
 // Length occupied by all segments for a given color
@@ -90,7 +84,7 @@ std::pair<std::vector<segment_t>::const_iterator, std::vector<segment_t>::const_
 find_spin_segments(int line_idx, configuration_t const &config);
 
 // Flip config
-std::vector<segment_t> flip(std::vector<segment_t> const &sl, double const &beta);
+std::vector<segment_t> flip(std::vector<segment_t> const &sl);
 
 // Sign of a config
 double config_sign(configuration_t const &config, std::vector<det_t> const &dets);

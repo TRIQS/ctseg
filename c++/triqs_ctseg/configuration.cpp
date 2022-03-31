@@ -39,9 +39,9 @@ void check_invariant(configuration_t const &config, std::vector<det_t> const &de
 
 // Make a list of time ordered (decreasing) operators
 
-std::vector<std::tuple<dimtime_t, int, bool>> make_time_ordered_op_list(configuration_t const &config) {
+std::vector<std::tuple<tau_t, int, bool>> make_time_ordered_op_list(configuration_t const &config) {
 
-  std::vector<std::tuple<dimtime_t, int, bool>> result;
+  std::vector<std::tuple<tau_t, int, bool>> result;
 
   result.reserve(config.seglists.size()
                  * config.seglists[0].size()); // optional : simple heuristics to reserve some space
@@ -71,8 +71,8 @@ double overlap_seg(segment_t const &seg1, segment_t const &seg2) {
   if (seg1.tau_cdag >= seg2.tau_c or seg2.tau_cdag >= seg1.tau_c)
     return 0;
   else {
-    dimtime_t tau_start = std::min(seg1.tau_c, seg2.tau_c);
-    dimtime_t tau_end   = std::max(seg1.tau_cdag, seg2.tau_cdag);
+    tau_t tau_start = std::min(seg1.tau_c, seg2.tau_c);
+    tau_t tau_end   = std::max(seg1.tau_cdag, seg2.tau_cdag);
     return double(tau_start - tau_end); // FIXME: overlap of two full lines
   };
 };
@@ -139,7 +139,7 @@ bool is_insertable(std::vector<segment_t> const &seglist, segment_t const &seg) 
 // ---------------------------
 
 // Contribution of the dynamical interaction kernel K to the overlap between a segment and a list of segments.
-double K_overlap(std::vector<segment_t> const &seglist, dimtime_t const &tau_c, dimtime_t const &tau_cdag,
+double K_overlap(std::vector<segment_t> const &seglist, tau_t const &tau_c, tau_t const &tau_cdag,
                  gf<imtime, matrix_valued> const &K, int c1, int c2) {
   if (seglist.empty()) return 0;
   double result = 0;
@@ -156,7 +156,6 @@ double density(std::vector<segment_t> const &seglist) {
   if (seglist.empty()) return 0;
   double result = 0;
   for (auto const &seg : seglist) result += double(seg.tau_c - seg.tau_cdag);
-  if (is_full_line(seglist[0])) return double(seglist[0].tau_c.beta());
   return result;
 }
 // ---------------------------
@@ -193,11 +192,11 @@ find_spin_segments(int line_idx, configuration_t const &config) {
 // ---------------------------
 
 // Flip seglist
-std::vector<segment_t> flip(std::vector<segment_t> const &sl, double const &beta) {
+std::vector<segment_t> flip(std::vector<segment_t> const &sl) {
   auto fsl = std::vector<segment_t>{};
   fsl.reserve(sl.size() + 1);
   if (sl.empty()) // Flipped seglist is full line
-    fsl.emplace_back(segment_t{dimtime_t::beta(beta), dimtime_t::zero(beta)});
+    fsl.emplace_back(segment_t{tau_t::beta(), tau_t::zero()});
   else if (sl.size() == 1 and is_full_line(sl[0])) { // Do nothing: flipped config empty
   } else {                                           // Swap c and cdag
     for (auto i : range(sl.size())) {

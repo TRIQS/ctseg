@@ -12,7 +12,7 @@ namespace moves {
     // Internal data
     int color;
     segment_t prop_seg;
-    dimtime_t tau_left, tau_right;
+    tau_t tau_left, tau_right;
     int prop_seg_idx, right_seg_idx;
     bool splitting_full_line;
     double det_sign;
