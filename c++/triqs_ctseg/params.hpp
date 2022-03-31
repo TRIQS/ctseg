@@ -51,6 +51,8 @@ struct solve_params_t {
   /// Verbosity level
   int verbosity = mpi::communicator().rank() == 0 ? 3 : 0;
 
+  // -------- Move control --------------
+
   /// Whether to perform the move insert segment
   bool move_insert_segment_v2 = false;
 
@@ -86,6 +88,11 @@ struct solve_params_t {
 
   /// Whether to perform the move swap spin lines
   bool move_swap_spin_lines = false;
+
+  // -------- Measure control --------------
+
+  /// Whether to measure the perturbation order histograms (Order in Delta, and Jperp)
+  bool measure_perturbation_order_histograms = true;
 
   /// Whether to measure G(tau) (see [[measure_gt]])
   bool measure_gt = true;

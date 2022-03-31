@@ -5,8 +5,11 @@
 
 #include "work_data.hpp"
 #include "configuration.hpp"
+
+// FIXME : remove those includers ??
 #include "measures.hpp"
 #include "moves.hpp"
+
 #include "logs.hpp"
 
 solver_core::solver_core(constr_params_t const &p) : constr_params(p) {
@@ -67,22 +70,12 @@ void solver_core::solve(solve_params_t const &solve_params) {
   if (p.move_swap_spin_lines) CTQMC.add_move(moves::swap_spin_lines{wdata, config, CTQMC.get_rng()}, "spin swap");
 
   // initialize measurements
-  if (p.measure_gt) CTQMC.add_measure(measures::g_f_tau{p, wdata, config, results}, "G(tau) measurement");
-  if (p.measure_n) CTQMC.add_measure(measures::density{p, wdata, config, results}, "Density measurement");
-  if (p.measure_nnt) CTQMC.add_measure(measures::nn_tau{p, wdata, config, results}, "nn(tau) measurement");
+  if (p.measure_gt) CTQMC.add_measure(measures::g_f_tau{p, wdata, config, results}, "G(tau)");
+  if (p.measure_n) CTQMC.add_measure(measures::density{p, wdata, config, results}, "Density");
+  if (p.measure_nnt) CTQMC.add_measure(measures::nn_tau{p, wdata, config, results}, "nn(tau)");
 
-    // FIXME  ? Keep ? ?
-#if 0
-  if (p.measure_hist)
-    CTQMC.add_measure(measure_hist(&config, &hist), "histogram measurement");
- 
-  if (p.measure_hist_composite)
-    CTQMC.add_measure(measure_hist_composite(&config, &hist_composite),
-                      "histogram of composite order measurement");
-  if (p.measure_statehist)
-    CTQMC.add_measure(measure_statehist(&params, &config, &state_hist),
-                      "impurity state histogram measurement");
-#endif
+  if (p.measure_perturbation_order_histograms)
+    CTQMC.add_measure(measures::perturbation_order_histo{p, wdata, config, results}, "Perturbation orders");
 
   // Run and collect results
   auto _solve_status = CTQMC.warmup_and_accumulate(p.n_warmup_cycles, p.n_cycles, p.length_cycle,
