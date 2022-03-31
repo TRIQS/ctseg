@@ -24,6 +24,9 @@ namespace measures {
   // -------------------------------------
 
   void nn_tau::accumulate(double s) {
+
+    LOG("\n =================== MEASURE NN(tau) ================ \n");
+
     Z += s;
 
     // I take the whole configuration and make a time ordered list of operators.

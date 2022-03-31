@@ -26,6 +26,8 @@ work_data_t::work_data_t(params_t const &p, inputs_t const &inputs, mpi::communi
   beta     = p.beta;
   qmc_zero = dimtime_t::zero(beta);
   qmc_beta = dimtime_t::beta(beta);
+  SPDLOG_INFO("Beta - Zero = {}", qmc_beta - qmc_zero);
+  SPDLOG_INFO("double(Beta - Zero = {})", double(qmc_beta - qmc_zero));
 
   // Number of colors from Green's function structure
   n_color = 0;

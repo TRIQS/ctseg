@@ -6,6 +6,9 @@ namespace moves {
 
   double insert_spin_segment::attempt() {
 
+    ALWAYS_EXPECTS((wdata.n_color == 2), "Insert spin segment only implemented for n_color = 2, but here n_color = {}",
+                   wdata.n_color);
+
     LOG("\n =================== ATTEMPT INSERT SPIN ================ \n");
 
     // ------------ Choice of segments --------------
@@ -53,7 +56,7 @@ namespace moves {
     tau_left  = prop_seg.tau_c - dt1; // dt1 < dt2
     tau_right = prop_seg.tau_c - dt2;
     spin_seg  = segment_t{tau_left, tau_right, true, true};
-    LOG("Inserting spins at segment {} ", spin_seg);
+    LOG("Inserting spins at tau_left = {}, tau_right = {}", tau_left, tau_right);
 
     if (not is_insertable(dsl, spin_seg)) {
       LOG("ABORT : Space is occupied on other line.");
@@ -64,20 +67,17 @@ namespace moves {
 
     double ln_trace_ratio = (wdata.mu(dest_color) - wdata.mu(orig_color)) * spin_seg.length();
     if (wdata.has_Dt) {
-      for (auto c : range(wdata.n_color)) {
-        // FIXME : simply
-        // for (auto [c, sl] : itertools::enumerate(config.seglists))
+      for (auto [c, slist] : itertools::enumerate(config.seglists)) {
         // "antisegment" - careful with order
-        ln_trace_ratio += K_overlap(config.seglists[c], spin_seg.tau_cdag, spin_seg.tau_c, wdata.K, orig_color, c);
-        ln_trace_ratio += K_overlap(config.seglists[c], spin_seg.tau_c, spin_seg.tau_cdag, wdata.K, dest_color, c);
+        ln_trace_ratio += K_overlap(slist, spin_seg.tau_cdag, spin_seg.tau_c, wdata.K, orig_color, c);
+        ln_trace_ratio += K_overlap(slist, spin_seg.tau_c, spin_seg.tau_cdag, wdata.K, dest_color, c);
         if (splitting_full_line)
-          ln_trace_ratio -= K_overlap(config.seglists[c], wdata.qmc_beta, wdata.qmc_zero, wdata.K, orig_color, c);
+          ln_trace_ratio -= K_overlap(slist, wdata.qmc_beta, wdata.qmc_zero, wdata.K, orig_color, c);
       }
       // Add interactions of the inserted operators with themselves
-      // FIXME : wdata.K(spin_seg.length()) ....
       // Why real ?? K is not real ??
-      ln_trace_ratio -= real(wdata.K(double(spin_seg.tau_c - spin_seg.tau_cdag))(orig_color, orig_color));
-      ln_trace_ratio -= real(wdata.K(double(spin_seg.tau_c - spin_seg.tau_cdag))(dest_color, dest_color));
+      ln_trace_ratio -= real(wdata.K(spin_seg.length())(orig_color, orig_color));
+      ln_trace_ratio -= real(wdata.K(spin_seg.length())(dest_color, dest_color));
     }
     double trace_ratio = std::exp(ln_trace_ratio);
     trace_ratio *= -real(wdata.Jperp(double(spin_seg.tau_c - spin_seg.tau_cdag))(0, 0)) / 2;

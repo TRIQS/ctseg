@@ -166,7 +166,7 @@ std::vector<bool> boundary_state(configuration_t const &config) {
   int N = config.n_color();
   std::vector<bool> res(N);
   for (auto const &[c, sl] : itertools::enumerate(config.seglists))
-    res[c] = (sl.empty() ? false : is_cyclic(sl.back())); // FIXME  BUG full line
+    res[c] = (sl.empty() ? false : is_cyclic(sl.back()) or is_full_line(sl.back()));
   return res;
 }
 
