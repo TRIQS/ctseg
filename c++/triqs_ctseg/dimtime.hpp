@@ -52,14 +52,20 @@ namespace triqs::utility {
     dimtime_t(uint64_t n_, double beta_) : _beta(beta_), n(n_) {}
 
     /// Comparisons (using integer, so it is safe)
-    auto operator<=>(dimtime_t const &tau) const { return n <=> tau.n; }
-    bool operator==(dimtime_t const &tau) const { return n == tau.n; }
+    auto operator<=>(dimtime_t const &tau) const {
+      ALWAYS_EXPECTS(tau._beta == _beta);
+      return n <=> tau.n;
+    }
+    bool operator==(dimtime_t const &tau) const {
+      ALWAYS_EXPECTS(tau._beta == _beta);
+      return n == tau.n;
+    }
 
     /// To cast to double, but it has to be done explicitly.
     explicit operator double() const { return _beta * (double(n) / double(Nmax)); }
 
     /// get beta as double
-    //double get_beta() const { return _beta; }
+    double get_beta() const { return _beta; }
 
     /// Check if dimtime is zero
     static bool is_zero(dimtime_t tau) { return tau == tau.zero(); };
