@@ -1,7 +1,9 @@
 #pragma once
 #include <vector>
-#include "params.hpp"
+//#include "params.hpp"
 #include "types.hpp"
+
+// FIXME : EXPLAIN ....
 
 // Segment: (time of c, time of c^dagger)
 struct segment_t {
@@ -11,8 +13,12 @@ struct segment_t {
 
   // Length of segment (accounts for cyclicity)
   tau_t length() const { return tau_c - tau_cdag; };
+  
+  static segment_t full_line() { return {tau_t::beta(), tau_t::zero()}; }
 };
 
+// Store a couple of S+, S- 
+// FIXME : need to store the color, which is today just 0,1
 struct jperp_line_t {
   tau_t tau_Sminus, tau_Splus; // times of the S-, S+
 };
@@ -32,6 +38,7 @@ struct configuration_t {
 
 // ------------------- Invariants ---------------------------
 
+// FIXME : separate files
 void check_invariant(configuration_t const &config, std::vector<det_t> const &dets);
 
 // ------------------- Functions to manipulate config --------------------------
@@ -90,11 +97,13 @@ std::vector<segment_t> flip(std::vector<segment_t> const &sl);
 double config_sign(configuration_t const &config, std::vector<det_t> const &dets);
 
 // Same as std::lower_bound, but i-th element of vector is returned by f[i]
+// f is called on 0:N strictly
 long lower_bound(auto f, long N, auto const &value) {
   long first = 0, count = N;
 
   while (count > 0) {
     long step = count / 2;
+    assert(first + step < N);
     if (f(first + step) < value) {
       first += step + 1;
       count -= step + 1;
