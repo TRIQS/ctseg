@@ -31,10 +31,10 @@ TEST(CtHybSpin, Anderson) {
   //double mu      = 0.5;
   double epsilon = 0.2;
   //int n_cycles   = 10000 / world.size();
-  int n_cycles        = 1;
+  int n_cycles        = 100;
   int n_warmup_cycles = 1;
   //int n_warmup_cycles = 1;
-  int length_cycle = 20;
+  int length_cycle = 50;
   int random_seed  = 23488 + 28 * world.rank();
 
   // prepare the parameters
@@ -56,15 +56,16 @@ TEST(CtHybSpin, Anderson) {
   param_solve.length_cycle            = length_cycle;
   param_solve.random_seed             = random_seed;
   param_solve.measure_gt              = true;
-  param_solve.move_insert_segment_v2  = false;
-  param_solve.move_remove_segment_v2  = false;
-  param_solve.move_split_segment_v2   = false;
-  param_solve.move_regroup_segment_v2 = false;
+  param_solve.measure_nnt             = true;
   param_solve.move_insert_segment     = true;
   param_solve.move_remove_segment     = true;
   param_solve.move_split_segment      = true;
   param_solve.move_regroup_segment    = true;
   param_solve.move_move_segment       = true;
+  param_solve.move_insert_segment_v2  = false;
+  param_solve.move_remove_segment_v2  = false;
+  param_solve.move_split_segment_v2   = false;
+  param_solve.move_regroup_segment_v2 = false;
 
   // prepare G0
   nda::clef::placeholder<0> om_;
