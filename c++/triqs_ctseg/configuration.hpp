@@ -80,6 +80,10 @@ bool is_insertable(std::vector<segment_t> const &seglist, segment_t const &seg);
 double K_overlap(std::vector<segment_t> const &seglist, tau_t const &tau_c, tau_t const &tau_cdag,
                  gf<imtime, matrix_valued> const &K, int c1, int c2);
 
+// Contribution of the dynamical interaction kernel K to the overlap between an operator and a list of segments.
+double K_overlap(std::vector<segment_t> const &seglist, tau_t const &tau, bool is_c, gf<imtime, matrix_valued> const &K,
+                 int c1, int c2);
+
 // Length occupied by all segments for a given color
 double density(std::vector<segment_t> const &seglist);
 

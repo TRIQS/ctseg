@@ -126,8 +126,9 @@ namespace moves {
     // Choose random time in window
     tau_t dt        = tau_t::random(rng, window_length);
     tau_t tau_c_new = sl[idx_left].tau_cdag - dt;
+    tau_t tau_c     = sl[idx].tau_c;
 
-    LOG("Spin {}: moving c at position {} from {} to {}.", spin, idx, sl[idx].tau_c, tau_c_new);
+    LOG("Spin {}: moving c at position {} from {} to {}.", spin, idx, tau_c, tau_c_new);
     auto new_seg = segment_t{tau_c_new, sl[idx].tau_cdag};
 
     // -------- Trace ratio ---------
@@ -136,7 +137,8 @@ namespace moves {
         ln_trace_ratio += -wdata.U(c, color) * overlap(slc, new_seg);
         ln_trace_ratio -= -wdata.U(c, color) * overlap(slc, sl[idx]);
       }
-      ln_trace_ratio += K_overlap(new_seg.tau_c, slc, true) - K_overlap(sl[idx].tau_c, slc, true);
+      ln_trace_ratio +=
+         K_overlap(slc, tau_c_new, true, wdata.K, c, color) - K_overlap(slc, tau_c, true, wdata.K, c, color);
     }
 
     // -------- Det ratio ----------

@@ -198,6 +198,17 @@ double K_overlap(std::vector<segment_t> const &seglist, tau_t const &tau_c, tau_
   }
   return result;
 }
+
+// Contribution of the dynamical interaction kernel K to the overlap between an operator and a list of segments.
+double K_overlap(std::vector<segment_t> const &seglist, tau_t const &tau, bool is_c, gf<imtime, matrix_valued> const &K,
+                 int c1, int c2) {
+  if (seglist.empty()) return 0;
+  double result = 0;
+  for (auto seg_in_list : seglist) {
+    result += real(K(double(tau - seg_in_list.tau_c))(c1, c2) - K(double(tau - seg_in_list.tau_cdag))(c1, c2));
+  }
+  return is_c ? result : -result;
+}
 // ---------------------------
 
 // Length occupied by all segments for a given color

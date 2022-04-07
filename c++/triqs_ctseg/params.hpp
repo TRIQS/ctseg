@@ -54,18 +54,6 @@ struct solve_params_t {
   // -------- Move control --------------
 
   /// Whether to perform the move insert segment
-  bool move_insert_segment_v2 = false;
-
-  /// Whether to perform the move remove segment
-  bool move_remove_segment_v2 = false;
-
-  /// Whether to perform the move split segment
-  bool move_split_segment_v2 = false;
-
-  /// Whether to perform the move group into spin segment
-  bool move_regroup_segment_v2 = false;
-
-  /// Whether to perform the move insert segment
   bool move_insert_segment = true;
 
   /// Whether to perform the move remove segment
@@ -86,8 +74,28 @@ struct solve_params_t {
   /// Whether to perform the move remove spin segment
   bool move_remove_spin_segment = false;
 
+  /// Whether to perform the move insert spin segment
+  bool move_split_spin_segment = false;
+
+  /// Whether to perform the move remove spin segment
+  bool move_regroup_spin_segment = false;
+
   /// Whether to perform the move swap spin lines
   bool move_swap_spin_lines = false;
+
+  // -----------
+
+  /// Whether to perform the move insert segment
+  bool move_insert_segment_v2 = false;
+
+  /// Whether to perform the move remove segment
+  bool move_remove_segment_v2 = false;
+
+  /// Whether to perform the move split segment
+  bool move_split_segment_v2 = false;
+
+  /// Whether to perform the move group into spin segment
+  bool move_regroup_segment_v2 = false;
 
   // -------- Measure control --------------
 

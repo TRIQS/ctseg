@@ -151,7 +151,7 @@ namespace moves {
     }
     tau_t tau_c_new = dsl[idx_cdag].tau_cdag;
     auto new_seg    = segment_t{tau_c_new, sl[idx_c].tau_cdag};
-    LOG("Spin {}: moving c from {} to {}.", spin, sl[idx].tau_c, tau_c_new);
+    LOG("Spin {}: moving c from {} to {}.", spin, tau_c, tau_c_new);
 
     // -------- Trace ratio ---------
     for (auto const &[c, slc] : itertools::enumerate(config.seglists)) {
@@ -159,7 +159,8 @@ namespace moves {
         ln_trace_ratio += -wdata.U(c, color) * overlap(slc, new_seg);
         ln_trace_ratio -= -wdata.U(c, color) * overlap(slc, sl[idx_c]);
       }
-      ln_trace_ratio += K_overlap(new_seg.tau_c, slc, true) - K_overlap(sl[idx_c].tau_c, slc, true);
+      ln_trace_ratio +=
+         K_overlap(slc, tau_c_new, true, wdata.K, c, color) - K_overlap(slc, tau_c, true, wdata.K, c, color);
     }
 
     // -------- Det ratio ----------
