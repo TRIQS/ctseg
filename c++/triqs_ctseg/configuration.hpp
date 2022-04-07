@@ -13,11 +13,11 @@ struct segment_t {
 
   // Length of segment (accounts for cyclicity)
   tau_t length() const { return tau_c - tau_cdag; };
-  
+
   static segment_t full_line() { return {tau_t::beta(), tau_t::zero()}; }
 };
 
-// Store a couple of S+, S- 
+// Store a couple of S+, S-
 // FIXME : need to store the color, which is today just 0,1
 struct jperp_line_t {
   tau_t tau_Sminus, tau_Splus; // times of the S-, S+
@@ -112,6 +112,10 @@ long lower_bound(auto f, long N, auto const &value) {
   }
   return first;
 }
+
+// Find the indices of the segments whose cdag are in ]wtau_left,wtau_right[
+std::vector<long> cdag_in_window(tau_t const &wtau_left, tau_t const &wtau_right,
+                                 std::vector<segment_t> const &seglist);
 
 // ----------- DEBUG code --------------
 // Print config

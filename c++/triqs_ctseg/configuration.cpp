@@ -277,6 +277,26 @@ double config_sign(configuration_t const &config, std::vector<det_t> const &dets
   return sign;
 }
 
+// ---------------------------
+
+// Find the indices of the segments whose cdag are in ]wtau_left,wtau_right[
+std::vector<long> cdag_in_window(tau_t const &wtau_left, tau_t const &wtau_right,
+                                 std::vector<segment_t> const &seglist) {
+  std::vector<long> found_indices;
+  if (seglist.empty()) return found_indices; // should never happen, but protect
+  found_indices.reserve(seglist.size());
+  for (auto it = find_segment_left(seglist, segment_t{wtau_left, wtau_left});
+       it->tau_cdag > wtau_right and it != --seglist.end(); ++it) {
+    found_indices.push_back(std::distance(seglist.cbegin(), it));
+  }
+  // Check separately for last segment (may be cyclic)
+  if (seglist.back().tau_cdag < wtau_left and seglist.back().tau_cdag > wtau_right)
+    found_indices.push_back(seglist.size() - 1);
+  return found_indices;
+}
+
+// ---------------------------
+
 // Print config
 std::ostream &operator<<(std::ostream &out, configuration_t const &config) {
   for (auto const &[c, sl] : itertools::enumerate(config.seglists)) {
