@@ -65,8 +65,13 @@ TEST(CtHybSpin, Anderson) {
   double l  = 1.0; // electron boson coupling
   double w0 = 1.0; // screening frequency
   auto D0w  = gf<imfreq>({beta, Boson, n_iw}, {1, 1});
+  auto D0t  = gf<imtime>({beta, Boson, param_constructor.n_tau}, {1, 1});
   D0w(om_) << 2 * l * l * w0 / (om_ * om_ - w0 * w0);
-  ctqmc.D0_tau() = fourier(D0w);
+  D0t()                                = fourier(D0w);
+  ctqmc.D0_tau().data()(range(), 0, 0) = D0t.data()(range(), 0, 0);
+  ctqmc.D0_tau().data()(range(), 0, 1) = D0t.data()(range(), 0, 0);
+  ctqmc.D0_tau().data()(range(), 1, 0) = D0t.data()(range(), 0, 0);
+  ctqmc.D0_tau().data()(range(), 1, 1) = D0t.data()(range(), 0, 0);
 
   // Solve!!
   ctqmc.solve(param_solve);

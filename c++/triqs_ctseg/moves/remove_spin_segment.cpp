@@ -70,16 +70,14 @@ namespace moves {
     auto &dsl      = config.seglists[dest_color];
     dest_right_idx = std::distance(dsl.cbegin(), dest_it);
     dest_left_idx  = (dest_right_idx == 0) ? int(dsl.size()) - 1 : dest_right_idx - 1;
-    LOG("Regrouping between positions {} and {} in opposite spin.", dest_left_idx, dest_right_idx);
 
     // ------------- Check if space is free -------------
 
-    if (not making_full_line) {
-      if (dsl[dest_left_idx].tau_cdag != spin_seg.tau_c) {
-        LOG("Space in opposite line is occupied.");
-        return 0;
-      }
+    if (dsl[dest_left_idx].tau_cdag != spin_seg.tau_c) {
+      LOG("Space in opposite line is occupied.");
+      return 0;
     }
+    LOG("Regrouping between positions {} and {} in opposite spin.", dest_left_idx, dest_right_idx);
 
     // ------------  Trace ratio  -------------
 

@@ -90,6 +90,7 @@ namespace moves {
     LOG("\n - - - - - ====> ACCEPT - - - - - - - - - - -\n");
 
     double initial_sign = config_sign(config, wdata.dets);
+    LOG("Initial sign is {}. Initial configuration: {}", initial_sign, config);
 
     // Update the dets
     wdata.dets[color].complete_operation();
@@ -110,7 +111,7 @@ namespace moves {
 
     double final_sign = config_sign(config, wdata.dets);
     double sign_ratio = final_sign / initial_sign;
-    LOG("Sign ratio is {}", sign_ratio);
+    LOG("Final sign is {}", final_sign);
 
     // Check invariant
     if constexpr (check_invariants or ctseg_debug) check_invariant(config, wdata.dets);

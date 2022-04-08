@@ -47,15 +47,15 @@ work_data_t::work_data_t(params_t const &p, inputs_t const &inputs, mpi::communi
 
   if (has_Dt) {
     // Compute interaction kernels K(tau), K'(tau) by integrating D(tau)
-    K                              = gf<imtime>({beta, Boson, p.n_tau_k}, {n_color, n_color});
-    Kprime                         = gf<imtime>({beta, Boson, p.n_tau_k}, {n_color, n_color});
-    nda::array<dcomplex, 1> D_data = inputs.d0t.data()(range(), 0, 0);
-    auto ramp                      = nda::zeros<double>(p.n_tau_k);
+    K         = gf<imtime>({beta, Boson, p.n_tau_k}, {n_color, n_color});
+    Kprime    = gf<imtime>({beta, Boson, p.n_tau_k}, {n_color, n_color});
+    auto ramp = nda::zeros<double>(p.n_tau_k);
     for (auto n : range(p.n_tau_k)) { ramp(n) = n * beta / (p.n_tau_k - 1); }
     for (auto c1 : range(n_color)) {
       for (auto c2 : range(n_color)) {
-        auto first_integral  = nda::zeros<dcomplex>(p.n_tau_k);
-        auto second_integral = nda::zeros<dcomplex>(p.n_tau_k);
+        nda::array<dcomplex, 1> D_data = inputs.d0t.data()(range(), c1, c2);
+        auto first_integral            = nda::zeros<dcomplex>(p.n_tau_k);
+        auto second_integral           = nda::zeros<dcomplex>(p.n_tau_k);
         for (int i = 1; i < D_data.size(); ++i) {
           first_integral(i)  = first_integral(i - 1) + (D_data(i) + D_data(i - 1)) / 2;
           second_integral(i) = second_integral(i - 1) + (first_integral(i) + first_integral(i - 1)) / 2;

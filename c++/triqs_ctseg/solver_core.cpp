@@ -17,8 +17,11 @@ solver_core::solver_core(constr_params_t const &p) : constr_params(p) {
   beta = p.beta;
   tau_t::set_beta(beta);
 
+  int n_color = 0;
+  for (auto const &[bl_name, bl_size] : p.gf_struct) { n_color += bl_size; }
+
   inputs.delta  = block_gf<imtime>(triqs::mesh::imtime{beta, Fermion, p.n_tau}, p.gf_struct);
-  inputs.d0t    = gf<imtime>({beta, Boson, p.n_tau_k}, {1, 1});
+  inputs.d0t    = gf<imtime>({beta, Boson, p.n_tau_k}, {n_color, n_color});
   inputs.jperpt = gf<imtime>({beta, Boson, p.n_tau_jperp}, {1, 1});
 
   inputs.delta()  = 0;
@@ -67,7 +70,8 @@ void solver_core::solve(solve_params_t const &solve_params) {
     CTQMC.add_move(moves::split_spin_segment{wdata, config, CTQMC.get_rng()}, "spin split");
   if (p.move_regroup_spin_segment and wdata.has_jperp)
     CTQMC.add_move(moves::regroup_spin_segment{wdata, config, CTQMC.get_rng()}, "spin regroup");
-  if (p.move_swap_spin_lines) CTQMC.add_move(moves::swap_spin_lines{wdata, config, CTQMC.get_rng()}, "spin swap");
+  if (p.move_swap_spin_lines and wdata.has_jperp)
+    CTQMC.add_move(moves::swap_spin_lines{wdata, config, CTQMC.get_rng()}, "spin swap");
 
   // unused moves - for testing purposes
   /* if (p.move_insert_segment_v2) CTQMC.add_move(moves::insert_segment_v2{wdata, config, CTQMC.get_rng()}, "insert v2");

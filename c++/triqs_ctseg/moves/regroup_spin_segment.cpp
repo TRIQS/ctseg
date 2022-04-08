@@ -12,7 +12,6 @@ namespace moves {
     LOG("\n =================== ATTEMPT REGROUP SPIN ================ \n");
 
     ln_trace_ratio = 0;
-    det_ratio      = 1;
     prop_ratio     = 1;
 
     // ----------- Propose move in each color ----------
@@ -21,6 +20,7 @@ namespace moves {
     std::tie(idx_c_down, idx_cdag_up, tau_down, prop_failed) = propose(1); // spin down
     if (prop_failed) return 0;
 
+    // ----------- Trace ratio -----------
     // Correct for the dynamical interaction between the two operators that have been moved
     if (wdata.has_Dt) {
       auto &sl_up   = config.seglists[0];
@@ -32,7 +32,29 @@ namespace moves {
 
     double trace_ratio = std::exp(ln_trace_ratio);
     trace_ratio *= -real(wdata.Jperp(double(tau_up - tau_down))(0, 0)) / 2;
-    prop_ratio /= double(config.Jperp_list.size()) + 1;
+    prop_ratio /= (double(config.Jperp_list.size()) + 1);
+
+    // ----------- Det ratio -----------
+
+    auto &sl_up      = config.seglists[0];
+    auto &sl_down    = config.seglists[1];
+    double det_ratio = 1;
+
+    // Spin up
+    auto &D_up             = wdata.dets[0];
+    auto det_c_time_up     = [&](long i) { return D_up.get_y(i).first; };
+    auto det_cdag_time_up  = [&](long i) { return D_up.get_x(i).first; };
+    long det_index_c_up    = lower_bound(det_c_time_up, D_up.size(), sl_up[idx_c_up].tau_c);
+    long det_index_cdag_up = lower_bound(det_cdag_time_up, D_up.size(), sl_up[idx_cdag_up].tau_cdag);
+    det_ratio *= D_up.try_remove(det_index_cdag_up, det_index_c_up);
+
+    // Spin down
+    auto &D_down             = wdata.dets[1];
+    auto det_c_time_down     = [&](long i) { return D_down.get_y(i).first; };
+    auto det_cdag_time_down  = [&](long i) { return D_down.get_x(i).first; };
+    auto det_index_c_down    = lower_bound(det_c_time_down, D_down.size(), sl_down[idx_c_down].tau_c);
+    auto det_index_cdag_down = lower_bound(det_cdag_time_down, D_down.size(), sl_down[idx_cdag_down].tau_cdag);
+    det_ratio *= D_down.try_remove(det_index_cdag_down, det_index_c_down);
 
     LOG("trace_ratio  = {}, prop_ratio = {}, det_ratio = {}", trace_ratio, prop_ratio, det_ratio);
 
@@ -48,6 +70,7 @@ namespace moves {
     LOG("\n - - - - - ====> ACCEPT - - - - - - - - - - -\n");
 
     double initial_sign = config_sign(config, wdata.dets);
+    LOG("Initial sign is {}. Initial configuration: {}", initial_sign, config);
 
     // Update dets
     wdata.dets[0].complete_operation();
@@ -56,6 +79,8 @@ namespace moves {
     // Update the segments
     auto &sl_up               = config.seglists[0];
     auto &sl_down             = config.seglists[1];
+    auto old_seg_up           = sl_up[idx_c_up];
+    auto old_seg_down         = sl_down[idx_c_down];
     sl_up[idx_c_up].tau_c     = tau_up;
     sl_down[idx_c_down].tau_c = tau_down;
 
@@ -65,19 +90,39 @@ namespace moves {
     sl_down[idx_c_down].J_c       = true;
     sl_up[idx_cdag_up].J_cdag     = true;
 
+    // Fix segment ordering
+    auto new_seg_up = sl_up[idx_c_up];
+    if (is_cyclic(new_seg_up) and !is_cyclic(old_seg_up)) {
+      sl_up.erase(sl_up.begin() + idx_c_up);
+      sl_up.insert(sl_up.end(), new_seg_up);
+    }
+    if (!is_cyclic(new_seg_up) and is_cyclic(old_seg_up)) {
+      sl_up.erase(sl_up.begin() + idx_c_up);
+      sl_up.insert(sl_up.begin(), new_seg_up);
+    }
+    auto new_seg_down = sl_down[idx_c_down];
+    if (is_cyclic(new_seg_down) and !is_cyclic(old_seg_down)) {
+      sl_down.erase(sl_down.begin() + idx_c_down);
+      sl_down.insert(sl_down.end(), new_seg_down);
+    }
+    if (!is_cyclic(new_seg_down) and is_cyclic(old_seg_down)) {
+      sl_down.erase(sl_down.begin() + idx_c_down);
+      sl_down.insert(sl_down.begin(), new_seg_down);
+    }
+
     // Add spin line
     config.Jperp_list.push_back(jperp_line_t{tau_up, tau_down});
 
     // Compute sign
     double final_sign = config_sign(config, wdata.dets);
     double sign_ratio = final_sign / initial_sign;
-    LOG("Sign ratio is {}", sign_ratio);
+    LOG("Final sign is {}", final_sign);
 
     // Check invariant
     if constexpr (check_invariants or ctseg_debug) check_invariant(config, wdata.dets);
     ALWAYS_EXPECTS((sign_ratio * det_sign == 1.0),
-                   "Error: move has produced negative sign! Det sign is {} and additional sign is {}.", det_sign,
-                   sign_ratio);
+                   "Error: move has produced negative sign! Det sign is {} and additional sign is {}. Config: ",
+                   det_sign, sign_ratio, config);
     LOG("Configuration is {}", config);
 
     return sign_ratio;
@@ -136,9 +181,11 @@ namespace moves {
     tau_t wtau_left     = sl[idx_left].tau_cdag;
     tau_t wtau_right    = sl[idx_c].tau_cdag;
     tau_t window_length = (idx_left == idx_c) ? tau_t::beta() : wtau_left - wtau_right;
+    LOG("Spin {}: wtau_left = {}, wtau_right = {}", spin, wtau_left, wtau_right);
 
     // Find the cdag in opposite spin that are within the window
     auto cdag_list = cdag_in_window(wtau_left, wtau_right, dsl);
+    for (auto const &ind : cdag_list) { LOG("cdag index : {}", ind); }
     if (cdag_list.empty()) {
       LOG("Spin {}: cannot regroup because there are no suitable cdag operators.", spin);
       return result;
@@ -162,12 +209,6 @@ namespace moves {
       ln_trace_ratio +=
          K_overlap(slc, tau_c_new, true, wdata.K, c, color) - K_overlap(slc, tau_c, true, wdata.K, c, color);
     }
-
-    // -------- Det ratio ----------
-    auto &D          = wdata.dets[color];
-    auto det_c_time  = [&](long i) { return D.get_y(i).first; };
-    long det_index_c = lower_bound(det_c_time, D.size(), sl[idx_c].tau_c);
-    det_ratio *= D.try_change_col(det_index_c, {tau_c_new, 0});
 
     // --------- Prop ratio ---------
     prop_ratio *= (double(sl.size()) * cdag_list.size()) / window_length;

@@ -84,6 +84,7 @@ namespace moves {
     LOG("\n - - - - - ====> ACCEPT - - - - - - - - - - -\n");
 
     double initial_sign = config_sign(config, wdata.dets);
+    LOG("Initial sign is {}. Initial configuration: {}", initial_sign, config);
 
     // Update the dets
     wdata.dets[color].complete_operation();
@@ -94,13 +95,13 @@ namespace moves {
 
     double final_sign = config_sign(config, wdata.dets);
     double sign_ratio = initial_sign / final_sign;
-    LOG("Sign ratio is {}", sign_ratio);
+    LOG("Final sign is {}", final_sign);
 
     // Check invariant
     if constexpr (check_invariants or ctseg_debug) check_invariant(config, wdata.dets);
     ALWAYS_EXPECTS((sign_ratio * det_sign == 1.0),
-                   "Error: move has produced negative sign! Det sign is {} and additional sign is {}.", det_sign,
-                   sign_ratio);
+                   "Error: move has produced negative sign! Det sign is {} and additional sign is {}. Config: ",
+                   det_sign, sign_ratio, config);
     LOG("Configuration is {}", config);
 
     return sign_ratio;
