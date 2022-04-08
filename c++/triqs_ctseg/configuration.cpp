@@ -243,10 +243,7 @@ find_spin_segments(int line_idx, configuration_t const &config) {
   // In spin down line, the c conneted to the J line is a at tau_Splus
   auto c_down  = segment_t{line.tau_Splus, line.tau_Splus};
   auto it_down = std::lower_bound(sl_down.cbegin(), sl_down.cend(), c_down);
-  std::pair<std::vector<segment_t>::const_iterator, std::vector<segment_t>::const_iterator> result;
-  result.first  = it_up;
-  result.second = it_down;
-  return result;
+  return std::make_pair(it_up, it_down);
 }
 
 // ---------------------------
@@ -277,15 +274,44 @@ std::vector<segment_t> flip(std::vector<segment_t> const &sl) {
 // Sign of a configuration
 double config_sign(configuration_t const &config, std::vector<det_t> const &dets) {
   double sign = 1.0;
-  for (auto const &[c, sl] : itertools::enumerate(config.seglists)) {
+  // For every color we compute the sign of the permutation that takes
+  // [(c_dag c) (c_dag c) (c_dag c) ...] with the cdag in increasing time order
+  // to the completely time-ordered list of operators (with increasing time)
+  for (auto c : range(config.n_color())) {
+    auto s = long(dets[c].size());
+    if (s != 0) {
+      // We first compute the sign of the permutation that takes
+      // [(c_dag c) (c_dag c) (c_dag c) ...] with the cdag time-ordered to
+      // [(c_dag c_dag ... cdag)(c c ... c)] with the c and c_dag time-ordered
+      if ((s * (s - 1) / 2) % 2 == 1) sign *= -1;
+      // We then compute the sign of the permutation that takes
+      // [(c_dag c_dag ... cdag)(c c ... c)] with the c and c_dag time-ordered
+      // to the completely time-ordered list of operators
+      int idx_c = 0, idx_cdag = 0;
+      for (int n = 0; n < 2 * s - 1; ++n) {
+        if (dets[c].get_x(idx_cdag) < dets[c].get_y(idx_c)) {
+          ++idx_cdag;
+        } else {
+          // Count the number of transpositions
+          if ((s - idx_cdag) % 2 == 1) sign *= -1;
+          ++idx_c;
+        }
+      }
+    }
+  }
+  return sign;
+
+  /*   
+    // Old sign computation, works only without J_perp
+    for (auto const &[c, sl] : itertools::enumerate(config.seglists)) {
     if (not sl.empty()) {
       bool starts_with_dagger = false;
       auto s                  = dets[c].size();
       if (s != 0) starts_with_dagger = dets[c].get_x(s - 1) > dets[c].get_y(s - 1);
-      if (starts_with_dagger) sign *= (s % 2 == 0) ? 1 : -1;
+      if (starts_with_dagger) sign *= (s % 2 == 0) ? 1 : -1; 
+
     }
-  }
-  return sign;
+  } */
 }
 
 // ---------------------------
@@ -298,7 +324,7 @@ std::vector<long> cdag_in_window(tau_t const &wtau_left, tau_t const &wtau_right
   found_indices.reserve(seglist.size());
   for (auto it = find_segment_left(seglist, segment_t{wtau_left, wtau_left});
        it->tau_cdag > wtau_right and it != --seglist.end(); ++it) {
-    found_indices.push_back(std::distance(seglist.cbegin(), it));
+    if (it->tau_cdag < wtau_left) found_indices.push_back(std::distance(seglist.cbegin(), it));
   }
   // Check separately for last segment (may be cyclic)
   if (seglist.back().tau_cdag < wtau_left and seglist.back().tau_cdag > wtau_right)
