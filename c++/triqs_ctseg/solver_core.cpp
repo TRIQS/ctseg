@@ -37,7 +37,7 @@ void solver_core::solve(solve_params_t const &solve_params) {
   if (c.rank() == 0)
     std::cout << "\n"
                  "╔╦╗╦═╗╦╔═╗ ╔═╗  ┌─┐┌┬┐┌─┐┌─┐┌─┐\n"
-                 " ║ ╠╦╝║║═╬╗╚═╗  │   │ └─┐├┤ │ ┬\n"
+                 " ║ ╠╦╝║║═╬╗╚═╗  │   │ └─┐├┤ │ ┬    NEW \n"
                  " ╩ ╩╚═╩╚═╝╚╚═╝  └─┘ ┴ └─┘└─┘└─┘\n";
 
   // parameters

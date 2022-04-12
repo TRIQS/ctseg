@@ -181,11 +181,9 @@ namespace moves {
     tau_t wtau_left     = sl[idx_left].tau_cdag;
     tau_t wtau_right    = sl[idx_c].tau_cdag;
     tau_t window_length = (idx_left == idx_c) ? tau_t::beta() : wtau_left - wtau_right;
-    LOG("Spin {}: wtau_left = {}, wtau_right = {}", spin, wtau_left, wtau_right);
 
     // Find the cdag in opposite spin that are within the window
     auto cdag_list = cdag_in_window(wtau_left, wtau_right, dsl);
-    for (auto const &ind : cdag_list) { LOG("cdag index : {}", ind); }
     if (cdag_list.empty()) {
       LOG("Spin {}: cannot regroup because there are no suitable cdag operators.", spin);
       return result;

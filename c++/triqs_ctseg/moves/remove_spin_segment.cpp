@@ -21,11 +21,13 @@ namespace moves {
 
     // ------------- Find the hanging segment -------------
 
+    // Find the two segments whose c is connected to the spin line
     auto prep    = find_spin_segments(line_idx, config);
     auto it_up   = prep.first;
     auto it_down = prep.second;
-
-    auto spin_seg_up   = segment_t{jl[line_idx].tau_Sminus, jl[line_idx].tau_Splus};
+    // The hanging segment if it is in spin up
+    auto spin_seg_up = segment_t{jl[line_idx].tau_Sminus, jl[line_idx].tau_Splus};
+    // The hanging segment if it is in spin down
     auto spin_seg_down = segment_t{jl[line_idx].tau_Splus, jl[line_idx].tau_Sminus};
 
     making_full_line = *it_up == spin_seg_up and *it_down == spin_seg_down;
@@ -33,7 +35,7 @@ namespace moves {
     if (making_full_line) {
       LOG("Making full line.");
       // Randomly choose one of the ways of making a full line
-      if (rng(1) == 0) {
+      if (rng(2) == 0) {
         spin_seg   = spin_seg_up;
         orig_color = 0;
         dest_color = 1;
@@ -87,15 +89,14 @@ namespace moves {
         ln_trace_ratio -= K_overlap(config.seglists[c], spin_seg.tau_c, spin_seg.tau_cdag, wdata.K, orig_color, c);
         // "antisegment" - careful with order
         ln_trace_ratio -= K_overlap(config.seglists[c], spin_seg.tau_cdag, spin_seg.tau_c, wdata.K, dest_color, c);
-        if (making_full_line)
-          ln_trace_ratio += K_overlap(config.seglists[c], tau_t::beta(), tau_t::zero(), wdata.K, dest_color, c);
       }
       // Correct for the interactions of the removed operators with themselves
       ln_trace_ratio -= real(wdata.K(double(spin_seg.tau_c - spin_seg.tau_cdag))(orig_color, orig_color));
       ln_trace_ratio -= real(wdata.K(double(spin_seg.tau_c - spin_seg.tau_cdag))(dest_color, dest_color));
+      ln_trace_ratio -= 2 * real(wdata.K(double(spin_seg.length()))(orig_color, dest_color));
     }
     double trace_ratio = std::exp(ln_trace_ratio);
-    trace_ratio /= -real(wdata.Jperp(double(spin_seg.tau_c - spin_seg.tau_cdag))(0, 0)) / 2;
+    trace_ratio /= -(real(wdata.Jperp(double(spin_seg.tau_c - spin_seg.tau_cdag))(0, 0)) / 2);
 
     // ------------  Det ratio  ---------------
 
@@ -104,11 +105,9 @@ namespace moves {
     // ------------  Proposition ratio ------------
 
     tau_t new_seg_length = making_full_line ? tau_t::beta() : dsl[dest_left_idx].tau_c - dsl[dest_right_idx].tau_cdag;
-    double future_number_seg = making_full_line ? 1 : double(dsl.size()) + 1;
-    double prop_ratio        = (double(wdata.n_color) * future_number_seg * new_seg_length * new_seg_length / 2)
-       / double(config.Jperp_list.size());
-    if (making_full_line) prop_ratio /= 4; // Account for two ways of making a full line,
-    // and absence of time swapping in reverse move
+    double future_number_seg = making_full_line ? 1 : double(dsl.size()) - 1;
+    double prop_ratio        = double(config.Jperp_list.size())
+       / (double(wdata.n_color) * future_number_seg * new_seg_length * new_seg_length / 2);
 
     LOG("trace_ratio  = {}, prop_ratio = {}, det_ratio = {}", trace_ratio, prop_ratio, det_ratio);
 
