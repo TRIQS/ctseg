@@ -1,6 +1,7 @@
 #pragma once
 #include "../work_data.hpp"
 #include "../configuration.hpp"
+#include "../invariants.hpp"
 
 namespace moves {
   class insert_spin_segment {

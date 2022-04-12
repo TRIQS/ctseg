@@ -18,6 +18,7 @@
  * CTSEG. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 #include "./g_f_tau.hpp"
+#include "../logs.hpp"
 
 namespace measures {
 
@@ -33,6 +34,9 @@ namespace measures {
   // -------------------------------------
 
   void g_f_tau::accumulate(double s) {
+
+    LOG("\n =================== MEASURE G(tau) ================ \n");
+
     Z += s;
 
     for (auto [bl_idx, det] : itertools::enumerate(wdata.dets)) {

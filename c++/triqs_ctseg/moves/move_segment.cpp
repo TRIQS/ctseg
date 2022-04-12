@@ -60,6 +60,23 @@ namespace moves {
 
     double ln_trace_ratio =
        (need_flip ? -1 : 1) * (wdata.mu(destination_color) - wdata.mu(origin_color)) * double(origin_segment.length());
+
+    if (wdata.has_Dt) {
+      tau_t tau_c, tau_cdag;
+      if (need_flip) {
+        tau_c    = origin_segment.tau_c;
+        tau_cdag = origin_segment.tau_cdag;
+      } else {
+        tau_c    = origin_segment.tau_cdag;
+        tau_cdag = origin_segment.tau_c;
+      }
+      for (auto const &[c, slist] : itertools::enumerate(config.seglists)) {
+        ln_trace_ratio += K_overlap(slist, tau_c, tau_cdag, wdata.K, destination_color, c);
+        ln_trace_ratio -= K_overlap(slist, tau_c, tau_cdag, wdata.K, origin_color, c);
+      }
+      ln_trace_ratio -= real(wdata.K(double(origin_segment.length()))(origin_color, origin_color));
+      ln_trace_ratio -= real(wdata.K(double(origin_segment.length()))(destination_color, destination_color));
+    }
     double trace_ratio = std::exp(ln_trace_ratio);
 
     // ------------  Det ratio  ---------------

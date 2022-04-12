@@ -36,11 +36,6 @@ struct configuration_t {
   [[nodiscard]] int n_color() const { return seglists.size(); }
 };
 
-// ------------------- Invariants ---------------------------
-
-// FIXME : separate files
-void check_invariant(configuration_t const &config, std::vector<det_t> const &dets);
-
 // ------------------- Functions to manipulate config --------------------------
 
 // Comparison of segments. Returns 1 if s1 is left of s2 (we order segments by decreasing time).

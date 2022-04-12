@@ -88,18 +88,22 @@ namespace moves {
 
     double initial_sign = config_sign(config, wdata.dets);
     LOG("Initial sign is {}. Initial configuration: {}", initial_sign, config);
+
     // Insert the times into the det
     wdata.dets[color].complete_operation();
+
     // Insert the segment in an ordered list
     auto &sl         = config.seglists[color];
     auto prop_seg_it = std::upper_bound(sl.begin(), sl.end(), prop_seg);
     sl.insert(prop_seg_it, prop_seg);
+
+    // Check invariant
+    if constexpr (check_invariants or ctseg_debug) check_invariant(config, wdata.dets);
+
     double final_sign = config_sign(config, wdata.dets);
     double sign_ratio = final_sign / initial_sign;
     LOG("Final sign is {}", final_sign);
 
-    // Check invariant
-    if constexpr (check_invariants or ctseg_debug) check_invariant(config, wdata.dets);
     ALWAYS_EXPECTS((sign_ratio * det_sign == 1.0),
                    "Error: move has produced negative sign! Det sign is {} and additional sign is {}. Config: ",
                    det_sign, sign_ratio, config);
