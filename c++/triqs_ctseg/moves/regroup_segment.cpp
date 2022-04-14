@@ -52,8 +52,6 @@ namespace moves {
       if (c != color) { ln_trace_ratio += -wdata.U(color, c) * overlap(config.seglists[c], inserted_seg); }
       if (wdata.has_Dt) {
         ln_trace_ratio -= K_overlap(config.seglists[c], right_seg.tau_c, left_seg.tau_cdag, wdata.K, color, c);
-        if (making_full_line and c != color)
-          ln_trace_ratio += K_overlap(config.seglists[c], tau_t::beta(), tau_t::zero(), wdata.K, color, c);
       }
     }
     if (wdata.has_Dt)

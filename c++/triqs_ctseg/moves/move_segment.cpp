@@ -19,8 +19,9 @@ namespace moves {
 
     need_flip = false;
 
-    double current_density = density(config.seglists[origin_color]);
-    if (rng() < current_density / wdata.beta) {
+    //double current_density = density(config.seglists[origin_color]);
+    //if (rng() < current_density / wdata.beta) {
+    if (rng(2) == 0) {
       need_flip = true;
       sl        = flip(config.seglists[origin_color]);
       dsl       = flip(config.seglists[destination_color]);
@@ -64,11 +65,11 @@ namespace moves {
     if (wdata.has_Dt) {
       tau_t tau_c, tau_cdag;
       if (need_flip) {
-        tau_c    = origin_segment.tau_c;
-        tau_cdag = origin_segment.tau_cdag;
-      } else {
         tau_c    = origin_segment.tau_cdag;
         tau_cdag = origin_segment.tau_c;
+      } else {
+        tau_c    = origin_segment.tau_c;
+        tau_cdag = origin_segment.tau_cdag;
       }
       for (auto const &[c, slist] : itertools::enumerate(config.seglists)) {
         ln_trace_ratio += K_overlap(slist, tau_c, tau_cdag, wdata.K, destination_color, c);
@@ -76,6 +77,7 @@ namespace moves {
       }
       ln_trace_ratio -= real(wdata.K(double(origin_segment.length()))(origin_color, origin_color));
       ln_trace_ratio -= real(wdata.K(double(origin_segment.length()))(destination_color, destination_color));
+      ln_trace_ratio += 2 * real(wdata.K(double(origin_segment.length()))(origin_color, destination_color));
     }
     double trace_ratio = std::exp(ln_trace_ratio);
 
@@ -116,12 +118,13 @@ namespace moves {
 
     // ------------  Proposition ratio ------------
 
-    double future_dest_density = density(dsl) + origin_segment.length();
-    double density_ratio       = (wdata.beta - future_dest_density) / (wdata.beta - current_density);
-    if (need_flip) {
-      future_dest_density = wdata.beta - future_dest_density;
-      density_ratio       = future_dest_density / current_density;
-    }
+    // double future_dest_density = density(dsl) + origin_segment.length();
+    // double density_ratio       = (wdata.beta - future_dest_density) / (wdata.beta - current_density);
+    // if (need_flip) {
+    //   future_dest_density = wdata.beta - future_dest_density;
+    //   density_ratio       = future_dest_density / current_density;
+    // }
+    double density_ratio = 1;
 
     double prop_ratio = density_ratio * int(sl.size()) / (int(dsl.size()) + 1);
 

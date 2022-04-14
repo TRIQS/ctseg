@@ -77,7 +77,7 @@ namespace moves {
       // Add interactions of the inserted operators with themselves
       ln_trace_ratio -= real(wdata.K(double(spin_seg.length()))(orig_color, orig_color));
       ln_trace_ratio -= real(wdata.K(double(spin_seg.length()))(dest_color, dest_color));
-      ln_trace_ratio -= 2 * real(wdata.K(double(spin_seg.length()))(orig_color, dest_color));
+      ln_trace_ratio += 2 * real(wdata.K(double(spin_seg.length()))(orig_color, dest_color));
     }
     double trace_ratio = std::exp(ln_trace_ratio);
     trace_ratio *= -(real(wdata.Jperp(double(spin_seg.length()))(0, 0)) / 2);

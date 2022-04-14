@@ -37,7 +37,7 @@ double overlap_seg(segment_t const &seg1, segment_t const &seg2) {
   else {
     tau_t tau_start = std::min(seg1.tau_c, seg2.tau_c);
     tau_t tau_end   = std::max(seg1.tau_cdag, seg2.tau_cdag);
-    return double(tau_start - tau_end); // FIXME: overlap of two full lines
+    return double(tau_start - tau_end);
   };
 };
 

@@ -29,6 +29,6 @@ namespace measures {
     densities = mpi::all_reduce(densities, c);
     densities /= (Z * wdata.beta);
     results.densities = densities;
-    SPDLOG_INFO("Density {}", densities);
+    if (c.rank() == 0) SPDLOG_INFO("Density {}", densities);
   }
 } // namespace measures

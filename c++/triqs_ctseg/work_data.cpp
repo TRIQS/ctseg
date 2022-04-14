@@ -80,19 +80,18 @@ work_data_t::work_data_t(params_t const &p, inputs_t const &inputs, mpi::communi
   // ................  Determinants .....................
 
   delta = map([](gf_const_view<imtime> d) { return real(d); }, inputs.delta);
-  if (c.rank() == 0) {
-    for (auto const &bl : range(delta.size())) {
-      if (!is_gf_real(delta[bl], 1e-10)) {
+  for (auto const &bl : range(delta.size())) {
+    if (!is_gf_real(delta[bl], 1e-10)) {
+      if (c.rank() == 0) {
         spdlog::info("WARNING: The Delta(tau) block number {} is not real in tau space", bl);
         spdlog::info("WARNING: max(Im[Delta(tau)]) = {}", max_element(abs(imag(delta[bl].data()))));
         spdlog::info("WARNING: Disregarding the imaginary component in the calculation.");
       }
-      dets.emplace_back(delta_block_adaptor{real(delta[bl])}, p.det_init_size);
-      dets.back().set_singular_threshold(p.det_singular_threshold);
-      dets.back().set_n_operations_before_check(p.det_n_operations_before_check);
-      dets.back().set_precision_warning(p.det_precision_warning);
-      dets.back().set_precision_error(p.det_precision_error);
     }
+    dets.emplace_back(delta_block_adaptor{real(delta[bl])}, p.det_init_size);
+    dets.back().set_singular_threshold(p.det_singular_threshold);
+    dets.back().set_n_operations_before_check(p.det_n_operations_before_check);
+    dets.back().set_precision_warning(p.det_precision_warning);
+    dets.back().set_precision_error(p.det_precision_error);
   }
-
 } // work_data constructor

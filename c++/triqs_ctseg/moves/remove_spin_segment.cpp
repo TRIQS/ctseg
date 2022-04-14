@@ -91,12 +91,12 @@ namespace moves {
         ln_trace_ratio -= K_overlap(config.seglists[c], spin_seg.tau_cdag, spin_seg.tau_c, wdata.K, dest_color, c);
       }
       // Correct for the interactions of the removed operators with themselves
-      ln_trace_ratio -= real(wdata.K(double(spin_seg.tau_c - spin_seg.tau_cdag))(orig_color, orig_color));
-      ln_trace_ratio -= real(wdata.K(double(spin_seg.tau_c - spin_seg.tau_cdag))(dest_color, dest_color));
-      ln_trace_ratio -= 2 * real(wdata.K(double(spin_seg.length()))(orig_color, dest_color));
+      ln_trace_ratio -= real(wdata.K(double(spin_seg.length()))(orig_color, orig_color));
+      ln_trace_ratio -= real(wdata.K(double(spin_seg.length()))(dest_color, dest_color));
+      ln_trace_ratio += 2 * real(wdata.K(double(spin_seg.length()))(orig_color, dest_color));
     }
     double trace_ratio = std::exp(ln_trace_ratio);
-    trace_ratio /= -(real(wdata.Jperp(double(spin_seg.tau_c - spin_seg.tau_cdag))(0, 0)) / 2);
+    trace_ratio /= -(real(wdata.Jperp(double(spin_seg.length()))(0, 0)) / 2);
 
     // ------------  Det ratio  ---------------
 
