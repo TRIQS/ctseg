@@ -2,18 +2,18 @@
 #include <triqs/test_tools/gfs.hpp>
 #include <triqs_ctseg/solver_core.hpp>
 
-TEST(CtHybSpin, Anderson) {
+TEST(CTSEG, J_perp) {
   // Start the mpi
   mpi::communicator world;
 
-  double beta         = 20.0;
-  double U            = 2.0;
-  double mu           = 1.0;
+  double beta         = 10.0;
+  double U            = 4.0;
+  double mu           = 2.0;
   double epsilon      = 0.3;
   int n_cycles        = 10000;
   int n_warmup_cycles = 1000;
   int length_cycle    = 50;
-  int random_seed     = 23488 + 28 * world.rank();
+  int random_seed     = 23488;
   int n_iw            = 5000;
 
   // Prepare the parameters
@@ -39,25 +39,22 @@ TEST(CtHybSpin, Anderson) {
   param_solve.measure_gt  = true;
   param_solve.measure_nnt = false;
   // Moves
-  param_solve.move_insert_segment      = true;
-  param_solve.move_remove_segment      = true;
-  param_solve.move_split_segment       = true;
-  param_solve.move_regroup_segment     = true;
-  param_solve.move_move_segment        = true;
-  param_solve.move_insert_spin_segment = true;
-  param_solve.move_remove_spin_segment = true;
-  param_solve.move_swap_spin_lines     = true;
-  // Moves for test purposes - do not use
-  param_solve.move_insert_segment_v2  = false;
-  param_solve.move_remove_segment_v2  = false;
-  param_solve.move_split_segment_v2   = false;
-  param_solve.move_regroup_segment_v2 = false;
+  param_solve.move_insert_segment       = true;
+  param_solve.move_remove_segment       = true;
+  param_solve.move_split_segment        = true;
+  param_solve.move_regroup_segment      = true;
+  param_solve.move_move_segment         = true;
+  param_solve.move_insert_spin_segment  = true;
+  param_solve.move_remove_spin_segment  = true;
+  param_solve.move_split_spin_segment   = true;
+  param_solve.move_regroup_spin_segment = true;
+  param_solve.move_swap_spin_lines      = true;
 
   // Prepare delta
   nda::clef::placeholder<0> om_;
   auto delta_w   = gf<imfreq>({beta, Fermion, n_iw}, {1, 1});
   auto delta_tau = gf<imtime>({beta, Fermion, param_constructor.n_tau}, {1, 1});
-  delta_w(om_) << 1.0 / (om_ - epsilon);
+  delta_w(om_) << 1.0 / (om_ - epsilon) + 1.0 / (om_ + epsilon);
   delta_tau()          = fourier(delta_w);
   ctqmc.Delta_tau()[0] = delta_tau;
   ctqmc.Delta_tau()[1] = delta_tau;
@@ -65,9 +62,9 @@ TEST(CtHybSpin, Anderson) {
   // Prepare j_perp interaction
   double l  = 1.0; // electron boson coupling
   double w0 = 1.0; // screening frequency
-  auto D0w  = gf<imfreq>({beta, Boson, n_iw}, {1, 1});
-  D0w(om_) << 2 * l * l * w0 / (om_ * om_ - w0 * w0);
-  ctqmc.Jperp_tau() = fourier(D0w);
+  auto J0w  = gf<imfreq>({beta, Boson, n_iw}, {1, 1});
+  J0w(om_) << 4 * l * l * w0 / (om_ * om_ - w0 * w0);
+  ctqmc.Jperp_tau() = fourier(J0w);
 
   // Solve!!
   ctqmc.solve(param_solve);

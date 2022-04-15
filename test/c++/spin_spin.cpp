@@ -2,14 +2,14 @@
 #include <triqs/test_tools/gfs.hpp>
 #include <triqs_ctseg/solver_core.hpp>
 
-TEST(CTSEG, Dynamical_U) {
+TEST(CTSEG, Spin_Spin) {
   // Start the mpi
   mpi::communicator world;
 
-  double beta         = 20.0;
-  double U            = 2.0;
-  double mu           = 1.0;
-  double epsilon      = 0.2;
+  double beta         = 10.0;
+  double U            = 4.0;
+  double mu           = 2.0;
+  double epsilon      = 0.3;
   int n_cycles        = 10000;
   int n_warmup_cycles = 1000;
   int length_cycle    = 50;
@@ -39,43 +39,51 @@ TEST(CTSEG, Dynamical_U) {
   param_solve.measure_gt  = true;
   param_solve.measure_nnt = false;
   // Moves
-  param_solve.move_insert_segment  = true;
-  param_solve.move_remove_segment  = true;
-  param_solve.move_split_segment   = true;
-  param_solve.move_regroup_segment = true;
-  param_solve.move_move_segment    = true;
+  param_solve.move_insert_segment       = true;
+  param_solve.move_remove_segment       = true;
+  param_solve.move_split_segment        = true;
+  param_solve.move_regroup_segment      = true;
+  param_solve.move_move_segment         = true;
+  param_solve.move_insert_spin_segment  = true;
+  param_solve.move_remove_spin_segment  = true;
+  param_solve.move_split_spin_segment   = true;
+  param_solve.move_regroup_spin_segment = true;
+  param_solve.move_swap_spin_lines      = true;
 
   // Prepare delta
   nda::clef::placeholder<0> om_;
   auto delta_w   = gf<imfreq>({beta, Fermion, n_iw}, {1, 1});
   auto delta_tau = gf<imtime>({beta, Fermion, param_constructor.n_tau}, {1, 1});
-  delta_w(om_) << 1.0 / (om_ - epsilon);
+  delta_w(om_) << 1.0 / (om_ - epsilon) + 1.0 / (om_ + epsilon);
   delta_tau()          = fourier(delta_w);
   ctqmc.Delta_tau()[0] = delta_tau;
   ctqmc.Delta_tau()[1] = delta_tau;
 
-  // Prepare dynamical interaction
+  // Prepare spin-spin interaction
   double l  = 1.0; // electron boson coupling
   double w0 = 1.0; // screening frequency
+  auto J0w  = gf<imfreq>({beta, Boson, n_iw}, {1, 1});
   auto D0w  = gf<imfreq>({beta, Boson, n_iw}, {1, 1});
   auto D0t  = gf<imtime>({beta, Boson, param_constructor.n_tau}, {1, 1});
+  J0w(om_) << 4 * l * l * w0 / (om_ * om_ - w0 * w0);
   D0w(om_) << 2 * l * l * w0 / (om_ * om_ - w0 * w0);
   D0t()                                = fourier(D0w);
-  ctqmc.D0_tau().data()(range(), 0, 0) = D0t.data()(range(), 0, 0);
+  ctqmc.D0_tau().data()(range(), 0, 0) = -D0t.data()(range(), 0, 0);
   ctqmc.D0_tau().data()(range(), 0, 1) = D0t.data()(range(), 0, 0);
   ctqmc.D0_tau().data()(range(), 1, 0) = D0t.data()(range(), 0, 0);
-  ctqmc.D0_tau().data()(range(), 1, 1) = D0t.data()(range(), 0, 0);
+  ctqmc.D0_tau().data()(range(), 1, 1) = -D0t.data()(range(), 0, 0);
+  ctqmc.Jperp_tau()                    = fourier(J0w);
 
   // Solve!!
   ctqmc.solve(param_solve);
 
   // Save the results
   if (world.rank() == 0) {
-    h5::file G_file("dynamical_U.out.h5", 'w');
+    h5::file G_file("spin_spin.out.h5", 'w');
     h5_write(G_file, "(ctqmc.G_tau()[0])", ctqmc.results.G_tau()[0]);
   }
   if (world.rank() == 0) {
-    h5::file G_file("dynamical_U.ref.h5", 'r');
+    h5::file G_file("spin_spin.ref.h5", 'r');
     gf<imtime> g;
     h5_read(G_file, "(ctqmc.G_tau()[0])", g);
     EXPECT_GF_NEAR(g, ctqmc.results.G_tau()[0]);

@@ -6,17 +6,7 @@ endforeach()
 
 # List of all tests
 set(all_tests
-  basic/ct_seg_single_bath
-  basic/ct_seg_single_bath_move_move
-  basic/ct_seg_single_bath_improved_est
-  basic/ct_seg_single_bath_retint
-  basic/ct_seg_single_bath_spinspin
-  basic/ct_seg_single_bath_spinspin_move_move
-  basic/ct_seg_multiorb
-  offdiag/offdiag_ctseg
-  offdiag/offdiag_ctseg_4_colors
-  spinboson/spinspin_subohmic
-  vertex/ct_seg_single_bath_vertex
+  ./spin_spin
 )
 
 foreach(test ${all_tests})

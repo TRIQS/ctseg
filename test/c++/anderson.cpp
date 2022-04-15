@@ -2,7 +2,7 @@
 #include <triqs/test_tools/gfs.hpp>
 #include <triqs_ctseg/solver_core.hpp>
 
-TEST(CtHybSpin, Anderson) {
+TEST(CTSEG, Anderson) {
   // Start the mpi
   mpi::communicator world;
 
@@ -10,10 +10,10 @@ TEST(CtHybSpin, Anderson) {
   double U            = 1.0;
   double mu           = 0.5;
   double epsilon      = 0.2;
-  int n_cycles        = 10000 / world.size();
+  int n_cycles        = 10000;
   int n_warmup_cycles = 1000;
   int length_cycle    = 50;
-  int random_seed     = 23488 + 28 * world.rank();
+  int random_seed     = 23488;
   int n_iw            = 1000;
 
   // Prepare the parameters
@@ -42,11 +42,6 @@ TEST(CtHybSpin, Anderson) {
   param_solve.move_split_segment   = true;
   param_solve.move_regroup_segment = true;
   param_solve.move_move_segment    = true;
-  // Moves for test purposes - do not use
-  param_solve.move_insert_segment_v2  = false;
-  param_solve.move_remove_segment_v2  = false;
-  param_solve.move_split_segment_v2   = false;
-  param_solve.move_regroup_segment_v2 = false;
 
   // Prepare delta
   nda::clef::placeholder<0> om_;
@@ -57,7 +52,7 @@ TEST(CtHybSpin, Anderson) {
   ctqmc.Delta_tau()[0] = delta_tau;
   ctqmc.Delta_tau()[1] = delta_tau;
 
-  // Solve!!
+  // Solve
   ctqmc.solve(param_solve);
 
   // Save the results
