@@ -21,13 +21,23 @@ namespace moves {
     if (prop_failed) return 0;
 
     // ----------- Trace ratio -----------
+    // Correct for the overlap between the two modified segments
+    auto &sl_up       = config.seglists[0];
+    auto &sl_down     = config.seglists[1];
+    auto old_seg_up   = sl_up[idx_c_up];
+    auto old_seg_down = sl_down[idx_c_down];
+    auto new_seg_up   = segment_t{tau_up, old_seg_up.tau_cdag};
+    auto new_seg_down = segment_t{tau_down, old_seg_down.tau_cdag};
+    ln_trace_ratio += -wdata.U(0, 1)
+       * (overlap_seg(new_seg_up, new_seg_down) + overlap_seg(old_seg_up, old_seg_down)
+          - overlap_seg(new_seg_up, old_seg_down) - overlap_seg(new_seg_down, old_seg_up));
+
     // Correct for the dynamical interaction between the two operators that have been moved
     if (wdata.has_Dt) {
-      auto &sl_up   = config.seglists[0];
-      auto &sl_down = config.seglists[1];
       ln_trace_ratio -= real(wdata.K(double(tau_up - sl_down[idx_c_down].tau_c))(0, 1));
       ln_trace_ratio -= real(wdata.K(double(tau_down - sl_up[idx_c_up].tau_c))(0, 1));
       ln_trace_ratio += real(wdata.K(double(tau_down - tau_up))(0, 1));
+      ln_trace_ratio += real(wdata.K(double(sl_up[idx_c_up].tau_c - sl_down[idx_c_down].tau_c))(0, 1));
     }
 
     double trace_ratio = std::exp(ln_trace_ratio);
@@ -35,9 +45,6 @@ namespace moves {
     prop_ratio /= (double(config.Jperp_list.size()) + 1);
 
     // ----------- Det ratio -----------
-
-    auto &sl_up      = config.seglists[0];
-    auto &sl_down    = config.seglists[1];
     double det_ratio = 1;
 
     // Spin up
@@ -121,7 +128,7 @@ namespace moves {
     // Check invariant
     if constexpr (check_invariants or ctseg_debug) check_invariant(config, wdata.dets);
     ALWAYS_EXPECTS((sign_ratio * det_sign == 1.0),
-                   "Error: move has produced negative sign! Det sign is {} and additional sign is {}. Config: ",
+                   "Error: move has produced negative sign! Det sign is {} and additional sign is {}. Config: {} ",
                    det_sign, sign_ratio, config);
     LOG("Configuration is {}", config);
 
@@ -148,20 +155,12 @@ namespace moves {
     auto result      = std::tuple<long, long, tau_t, bool>{0, 0, tau_t::zero(), true};
 
     // --------- Eliminate cases where move is impossible ---------
-    if (sl.empty()) {
-      LOG("Spin up is empty, cannot regroup spin.");
+    if (sl.empty() or dsl.empty()) {
+      LOG("Line is empty, cannot regroup spin.");
       return result;
     }
-    if (is_full_line(sl[0])) {
-      LOG("Spin up is full line, cannot regroup spin.");
-      return result;
-    }
-    if (dsl.empty()) {
-      LOG("Spin down is empty, cannot regroup spin.");
-      return result;
-    }
-    if (is_full_line(dsl[0])) {
-      LOG("Spin down is full line, cannot regroup spin.");
+    if (is_full_line(sl[0]) or is_full_line(dsl[0])) {
+      LOG("Line is full, cannot regroup spin.");
       return result;
     }
 
@@ -177,10 +176,14 @@ namespace moves {
     // -------- Propose new position for the c ---------
 
     // Determine window in which the c can be moved
-    auto idx_left       = (idx_c == 0) ? sl.size() - 1 : idx_c - 1;
-    tau_t wtau_left     = sl[idx_left].tau_cdag;
-    tau_t wtau_right    = sl[idx_c].tau_cdag;
-    tau_t window_length = (idx_left == idx_c) ? tau_t::beta() : wtau_left - wtau_right;
+    auto idx_left    = (idx_c == 0) ? sl.size() - 1 : idx_c - 1;
+    tau_t wtau_left  = sl[idx_left].tau_cdag;
+    tau_t wtau_right = sl[idx_c].tau_cdag;
+    if (idx_c == idx_left) {
+      wtau_left  = tau_t::beta();
+      wtau_right = tau_t::zero();
+    }
+    tau_t window_length = wtau_left - wtau_right;
 
     // Find the cdag in opposite spin that are within the window
     auto cdag_list = cdag_in_window(wtau_left, wtau_right, dsl);
@@ -199,17 +202,22 @@ namespace moves {
     LOG("Spin {}: moving c from {} to {}.", spin, tau_c, tau_c_new);
 
     // -------- Trace ratio ---------
+    ln_trace_ratio += wdata.mu(color) * (double(new_seg.length()) - double(sl[idx_c].length()));
+    LOG("Spin {}: ln trace ratio = {}", spin, ln_trace_ratio);
     for (auto const &[c, slc] : itertools::enumerate(config.seglists)) {
       if (c != color) {
         ln_trace_ratio += -wdata.U(c, color) * overlap(slc, new_seg);
         ln_trace_ratio -= -wdata.U(c, color) * overlap(slc, sl[idx_c]);
       }
-      ln_trace_ratio +=
-         K_overlap(slc, tau_c_new, true, wdata.K, c, color) - K_overlap(slc, tau_c, true, wdata.K, c, color);
+      if (wdata.has_Dt) {
+        ln_trace_ratio += K_overlap(slc, tau_c_new, true, wdata.K, c, color);
+        ln_trace_ratio -= K_overlap(slc, tau_c, true, wdata.K, c, color);
+      }
     }
+    if (wdata.has_Dt) ln_trace_ratio -= real(wdata.K(double(tau_c_new - tau_c))(color, color));
 
     // --------- Prop ratio ---------
-    prop_ratio *= (double(sl.size()) * cdag_list.size()) / window_length;
+    prop_ratio *= double(sl.size()) * cdag_list.size() / window_length;
 
     std::get<0>(result) = idx_c;
     std::get<1>(result) = idx_cdag;

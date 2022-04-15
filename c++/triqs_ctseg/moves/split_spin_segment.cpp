@@ -31,22 +31,29 @@ namespace moves {
     std::tie(idx_c_down, idx_cdag_up, tau_down) = propose(1); // spin down
 
     // ----------- Trace ratio ----------
+    // Correct for the overlap between the two modified segments
+    auto &sl_up       = config.seglists[0];
+    auto &sl_down     = config.seglists[1];
+    auto old_seg_up   = sl_up[idx_c_up];
+    auto old_seg_down = sl_down[idx_c_down];
+    auto new_seg_up   = segment_t{tau_up, old_seg_up.tau_cdag};
+    auto new_seg_down = segment_t{tau_down, old_seg_down.tau_cdag};
+    ln_trace_ratio += -wdata.U(0, 1)
+       * (overlap_seg(new_seg_up, new_seg_down) + overlap_seg(old_seg_up, old_seg_down)
+          - overlap_seg(new_seg_up, old_seg_down) - overlap_seg(new_seg_down, old_seg_up));
+
     // Correct for the dynamical interaction between the two operators that have been moved
     if (wdata.has_Dt) {
-      auto &sl_up   = config.seglists[0];
-      auto &sl_down = config.seglists[1];
       ln_trace_ratio -= real(wdata.K(double(tau_up - sl_down[idx_c_down].tau_c))(0, 1));
       ln_trace_ratio -= real(wdata.K(double(tau_down - sl_up[idx_c_up].tau_c))(0, 1));
       ln_trace_ratio += real(wdata.K(double(tau_down - tau_up))(0, 1));
+      ln_trace_ratio += real(wdata.K(double(sl_up[idx_c_up].tau_c - sl_down[idx_c_down].tau_c))(0, 1));
     }
     double trace_ratio = std::exp(ln_trace_ratio);
     trace_ratio /= -real(wdata.Jperp(double(line.tau_Splus - line.tau_Sminus))(0, 0)) / 2;
     prop_ratio *= jl.size();
 
     // ----------- Det ratio -----------
-
-    auto &sl_up      = config.seglists[0];
-    auto &sl_down    = config.seglists[1];
     double det_ratio = 1;
 
     // Spin up
@@ -176,10 +183,14 @@ namespace moves {
     // -------- Propose new position for the c ---------
     // Determine window in which the c will be moved
 
-    auto idx_left       = (idx_c == 0) ? sl.size() - 1 : idx_c - 1;
-    tau_t wtau_left     = sl[idx_left].tau_cdag;
-    tau_t wtau_right    = sl[idx_c].tau_cdag;
-    tau_t window_length = (idx_left == idx_c) ? tau_t::beta() : wtau_left - wtau_right;
+    auto idx_left    = (idx_c == 0) ? sl.size() - 1 : idx_c - 1;
+    tau_t wtau_left  = sl[idx_left].tau_cdag;
+    tau_t wtau_right = sl[idx_c].tau_cdag;
+    if (idx_c == idx_left) {
+      wtau_left  = tau_t::beta();
+      wtau_right = tau_t::zero();
+    }
+    tau_t window_length = wtau_left - wtau_right;
     // Choose random time in window
     tau_t dt        = tau_t::random(rng, window_length);
     tau_t tau_c_new = sl[idx_left].tau_cdag - dt;
@@ -188,14 +199,18 @@ namespace moves {
     auto new_seg = segment_t{tau_c_new, sl[idx_c].tau_cdag};
 
     // -------- Trace ratio ---------
+    ln_trace_ratio += wdata.mu(color) * (double(new_seg.length()) - double(sl[idx_c].length()));
     for (auto const &[c, slc] : itertools::enumerate(config.seglists)) {
       if (c != color) {
         ln_trace_ratio += -wdata.U(c, color) * overlap(slc, new_seg);
         ln_trace_ratio -= -wdata.U(c, color) * overlap(slc, sl[idx_c]);
       }
-      ln_trace_ratio +=
-         K_overlap(slc, tau_c_new, true, wdata.K, c, color) - K_overlap(slc, tau_c, true, wdata.K, c, color);
+      if (wdata.has_Dt) {
+        ln_trace_ratio += K_overlap(slc, tau_c_new, true, wdata.K, c, color);
+        ln_trace_ratio -= K_overlap(slc, tau_c, true, wdata.K, c, color);
+      }
     }
+    if (wdata.has_Dt) ln_trace_ratio -= real(wdata.K(double(tau_c_new - tau_c))(color, color));
 
     // --------- Prop ratio ---------
     prop_ratio *= window_length / (double(sl.size()) * cdag_in_window(wtau_left, wtau_right, dsl).size());

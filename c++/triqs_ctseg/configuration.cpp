@@ -30,8 +30,14 @@ std::vector<segment_t>::const_iterator find_segment_left(std::vector<segment_t> 
 
 // ---------------------------
 
-// Overlap between two non-cyclic segments.
+// Overlap between two (possibly cyclic) segments.
 double overlap_seg(segment_t const &seg1, segment_t const &seg2) {
+  if (is_cyclic(seg1))
+    return overlap_seg(segment_t{tau_t::beta(), seg1.tau_cdag}, seg2)
+       + overlap_seg(segment_t{seg1.tau_c, tau_t::zero()}, seg2);
+  if (is_cyclic(seg2))
+    return overlap_seg(seg1, segment_t{tau_t::beta(), seg2.tau_cdag})
+       + overlap_seg(seg1, segment_t{seg2.tau_c, tau_t::zero()});
   if (seg1.tau_cdag >= seg2.tau_c or seg2.tau_cdag >= seg1.tau_c)
     return 0;
   else {
@@ -236,6 +242,13 @@ std::vector<long> cdag_in_window(tau_t const &wtau_left, tau_t const &wtau_right
                                  std::vector<segment_t> const &seglist) {
   std::vector<long> found_indices;
   if (seglist.empty()) return found_indices; // should never happen, but protect
+  if (wtau_left < wtau_right) {
+    auto left_list  = cdag_in_window(tau_t::beta(), wtau_right, seglist);
+    auto right_list = cdag_in_window(wtau_left, tau_t::zero(), seglist);
+    found_indices   = left_list;
+    for (auto const &[i, idx] : itertools::enumerate(right_list)) found_indices.push_back(right_list[i]);
+    return found_indices;
+  }
   found_indices.reserve(seglist.size());
   for (auto it = find_segment_left(seglist, segment_t{wtau_left, wtau_left});
        it->tau_cdag > wtau_right and it != --seglist.end(); ++it) {
@@ -246,6 +259,29 @@ std::vector<long> cdag_in_window(tau_t const &wtau_left, tau_t const &wtau_right
     found_indices.push_back(seglist.size() - 1);
   return found_indices;
 }
+
+/*
+// Simpler implementation for test purposes
+
+// Find the indices of the segments whose cdag are in ]wtau_left,wtau_right[
+std::vector<long> cdag_in_window(tau_t const &wtau_left, tau_t const &wtau_right,
+                                 std::vector<segment_t> const &seglist) {
+  std::vector<long> found_indices;
+  if (wtau_left < wtau_right) {
+    auto left_list  = cdag_in_window(tau_t::beta(), wtau_right, seglist);
+    auto right_list = cdag_in_window(wtau_left, tau_t::zero(), seglist);
+    found_indices   = left_list;
+    for (auto const &[i, idx] : itertools::enumerate(right_list)) found_indices.push_back(right_list[i]);
+    return found_indices;
+  }
+  if (seglist.empty()) return found_indices; // should never happen, but protect
+  found_indices.reserve(seglist.size());
+  for (auto const &[i, seg] : itertools::enumerate(seglist)) {
+    if (seg.tau_cdag < wtau_left and seg.tau_cdag > wtau_right) found_indices.push_back(i);
+  }
+  return found_indices;
+}
+*/
 
 // ---------------------------
 
