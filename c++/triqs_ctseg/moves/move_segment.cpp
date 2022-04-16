@@ -9,18 +9,18 @@ namespace moves {
 
     // ------------ Choice of segment and colors --------------
     // Select origin color
-    origin_color = rng(wdata.n_color);
+    origin_color = rng(config.n_color());
     LOG("Moving from color {}", origin_color);
 
     // Select destination color
-    destination_color = rng(wdata.n_color - 1);
+    destination_color = rng(config.n_color() - 1);
     if (destination_color >= origin_color) ++destination_color;
     LOG("Moving to color {}", destination_color);
 
     need_flip = false;
 
     //double current_density = density(config.seglists[origin_color]);
-    //if (rng() < current_density / wdata.beta) {
+    //if (rng() < current_density / double(tau_t::beta())) {
     if (rng(2) == 0) {
       need_flip = true;
       sl        = flip(config.seglists[origin_color]);
@@ -119,9 +119,9 @@ namespace moves {
     // ------------  Proposition ratio ------------
 
     // double future_dest_density = density(dsl) + origin_segment.length();
-    // double density_ratio       = (wdata.beta - future_dest_density) / (wdata.beta - current_density);
+    // double density_ratio       = (double(tau_t::beta()) - future_dest_density) / (double(tau_t::beta()) - current_density);
     // if (need_flip) {
-    //   future_dest_density = wdata.beta - future_dest_density;
+    //   future_dest_density = double(tau_t::beta()) - future_dest_density;
     //   density_ratio       = future_dest_density / current_density;
     // }
     double density_ratio = 1;

@@ -9,7 +9,7 @@ namespace moves {
 
     // ------------ Choice of segment --------------
     // Select color
-    color    = rng(wdata.n_color);
+    color    = rng(config.n_color());
     auto &sl = config.seglists[color];
     LOG("Splitting at color {}", color);
 
@@ -46,7 +46,7 @@ namespace moves {
 
     // ------------  Trace ratio  -------------
     double ln_trace_ratio = -wdata.mu(color) * removed_segment.length();
-    for (auto c : range(wdata.n_color)) {
+    for (auto c : range(config.n_color())) {
       if (c != color) { ln_trace_ratio -= -wdata.U(color, c) * overlap(config.seglists[c], removed_segment); }
       if (wdata.has_Dt) { ln_trace_ratio += K_overlap(config.seglists[c], tau_right, tau_left, wdata.K, color, c); }
     }

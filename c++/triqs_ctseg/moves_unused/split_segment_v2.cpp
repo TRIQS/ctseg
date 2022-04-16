@@ -9,7 +9,7 @@ namespace moves {
     LOG("\n =================== ATTEMPT INSERT ================ \n");
 
     // Select insertion color
-    color = rng(wdata.n_color);
+    color = rng(config.n_color());
     LOG("Inserting at color {}", color);
     need_flip = false;
 
@@ -64,7 +64,7 @@ namespace moves {
 
     double trace_sign     = need_flip ? -1 : 1;
     double ln_trace_ratio = trace_sign * wdata.mu(color) * prop_seg.length();
-    for (auto c : range(wdata.n_color)) {
+    for (auto c : range(config.n_color())) {
       if (c != color) { ln_trace_ratio += -trace_sign * wdata.U(color, c) * overlap(config.seglists[c], prop_seg); }
       if (wdata.has_Dt)
         ln_trace_ratio += (c == color ? 1 : trace_sign)

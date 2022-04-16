@@ -9,7 +9,7 @@ namespace moves {
 
     // ------------ Choice of segment --------------
     // Select color
-    color    = rng(wdata.n_color);
+    color    = rng(config.n_color());
     auto &sl = config.seglists[color];
     LOG("Regrouping at color {}", color);
 
@@ -48,7 +48,7 @@ namespace moves {
     // ------------  Trace ratio  -------------
 
     double ln_trace_ratio = wdata.mu(color) * inserted_seg.length();
-    for (auto c : range(wdata.n_color)) {
+    for (auto c : range(config.n_color())) {
       if (c != color) { ln_trace_ratio += -wdata.U(color, c) * overlap(config.seglists[c], inserted_seg); }
       if (wdata.has_Dt) {
         ln_trace_ratio -= K_overlap(config.seglists[c], right_seg.tau_c, left_seg.tau_cdag, wdata.K, color, c);

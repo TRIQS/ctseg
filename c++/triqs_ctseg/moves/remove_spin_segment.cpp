@@ -85,7 +85,7 @@ namespace moves {
 
     double ln_trace_ratio = (wdata.mu(dest_color) - wdata.mu(orig_color)) * spin_seg.length();
     if (wdata.has_Dt) {
-      for (auto c : range(wdata.n_color)) {
+      for (auto c : range(config.n_color())) {
         ln_trace_ratio -= K_overlap(config.seglists[c], spin_seg.tau_c, spin_seg.tau_cdag, wdata.K, orig_color, c);
         // "antisegment" - careful with order
         ln_trace_ratio -= K_overlap(config.seglists[c], spin_seg.tau_cdag, spin_seg.tau_c, wdata.K, dest_color, c);
@@ -107,7 +107,7 @@ namespace moves {
     tau_t new_seg_length = making_full_line ? tau_t::beta() : dsl[dest_left_idx].tau_c - dsl[dest_right_idx].tau_cdag;
     double future_number_seg = making_full_line ? 1 : double(dsl.size()) - 1;
     double prop_ratio        = double(config.Jperp_list.size())
-       / (double(wdata.n_color) * future_number_seg * new_seg_length * new_seg_length / 2);
+       / (double(config.n_color()) * future_number_seg * new_seg_length * new_seg_length / 2);
 
     LOG("trace_ratio  = {}, prop_ratio = {}, det_ratio = {}", trace_ratio, prop_ratio, det_ratio);
 

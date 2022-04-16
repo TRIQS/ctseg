@@ -30,7 +30,7 @@ namespace moves {
     LOG("\n =================== ATTEMPT INSERT/SPLIT ================ \n");
 
     // Select insertion color
-    color    = rng(wdata.n_color);
+    color    = rng(config.n_color());
     auto &sl = config.seglists[color];
     LOG("Inserting/splitting at color {}", color);
 
@@ -66,7 +66,7 @@ namespace moves {
 
       // ------------  Trace ratio  -------------
       double ln_trace_ratio = 0;
-      for (auto c : range(wdata.n_color)) {
+      for (auto c : range(config.n_color())) {
         if (c != color) {
           ln_trace_ratio -= -wdata.U(color, c) * overlap(config.seglists[c], removed_segment, wdata.fac);
           ln_trace_ratio -= wdata.mu(c) * removed_segment.length();
@@ -124,7 +124,7 @@ namespace moves {
 
       // ------------  Trace ratio  -------------
       double ln_trace_ratio = 0;
-      for (auto c : range(wdata.n_color)) {
+      for (auto c : range(config.n_color())) {
         if (c != color) {
           ln_trace_ratio += -wdata.U(color, c) * overlap(config.seglists[c], proposed_segment, wdata.fac);
           ln_trace_ratio += wdata.mu(c) * proposed_segment_length;

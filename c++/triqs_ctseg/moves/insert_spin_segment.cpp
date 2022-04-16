@@ -15,15 +15,15 @@ namespace moves {
 
   double insert_spin_segment::attempt() {
 
-    ALWAYS_EXPECTS((wdata.n_color == 2), "Insert spin segment only implemented for n_color = 2, but here n_color = {}",
-                   wdata.n_color);
+    ALWAYS_EXPECTS((config.n_color() == 2),
+                   "Insert spin segment only implemented for n_color = 2, but here n_color = {}", config.n_color());
 
     LOG("\n =================== ATTEMPT INSERT SPIN ================ \n");
 
     // ------------ Choice of segments --------------
 
     // Select spin insertion color
-    orig_color = rng(wdata.n_color);
+    orig_color = rng(config.n_color());
     auto &sl   = config.seglists[orig_color];
     LOG("Inserting spin: splitting at color {}", orig_color);
 
@@ -88,7 +88,7 @@ namespace moves {
 
     // ------------  Proposition ratio ------------
 
-    double prop_ratio = (double(wdata.n_color) * sl.size() * prop_seg.length() * prop_seg.length() / 2)
+    double prop_ratio = (double(config.n_color()) * sl.size() * prop_seg.length() * prop_seg.length() / 2)
        / double(config.Jperp_list.size() + 1);
 
     LOG("trace_ratio  = {}, prop_ratio = {}, det_ratio = {}", trace_ratio, prop_ratio, det_ratio);
