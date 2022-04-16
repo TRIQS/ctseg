@@ -59,6 +59,12 @@ std::vector<std::tuple<tau_t, int, bool>> make_time_ordered_op_list(configuratio
 // Find index of first segment starting left of seg.tau_c.
 std::vector<segment_t>::const_iterator find_segment_left(std::vector<segment_t> const &seglist, segment_t const &seg);
 
+// Find density in seglist at time tau.
+double n_tau(tau_t const &tau, std::vector<segment_t> const &seglist);
+
+// Check whether time is in segment.
+bool tau_in_seg(tau_t const &tau, segment_t const &seg);
+
 // Overlap between two non-cyclic segments.
 double overlap_seg(segment_t const &seg1, segment_t const &seg2);
 
