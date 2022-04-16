@@ -17,7 +17,7 @@ namespace measures {
     beta    = p.beta;
     n_color = config.n_color();
 
-    q_tau   = gf<imtime>({beta, Boson, p.n_tau}, {wdata.n_color, wdata.n_color});
+    q_tau   = gf<imtime>({beta, Boson, p.n_tau}, {n_color, n_color});
     q_tau() = 0;
   }
 

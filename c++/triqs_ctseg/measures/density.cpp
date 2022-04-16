@@ -17,7 +17,7 @@ namespace measures {
     Z += s;
     for (auto const &[c, seglist] : itertools::enumerate(config.seglists)) {
       double sum = 0;
-      for (auto &seg : seglist) sum += double(seg.tau_c - seg.tau_cdag); // NB : take the cyclic - and cast to double
+      for (auto &seg : seglist) sum += double(seg.length()); // accounts for cyclicity
       densities[c] += s * sum;
     }
   }
@@ -27,7 +27,7 @@ namespace measures {
   void density::collect_results(mpi::communicator const &c) {
     Z         = mpi::all_reduce(Z, c);
     densities = mpi::all_reduce(densities, c);
-    densities /= (Z * wdata.beta);
+    densities /= (Z * tau_t::beta());
     results.densities = densities;
     if (c.rank() == 0) SPDLOG_INFO("Density {}", densities);
   }
