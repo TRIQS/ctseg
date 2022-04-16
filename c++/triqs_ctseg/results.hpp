@@ -17,6 +17,9 @@ struct results_t {
   /// Dynamical interaction kernel K(tau)
   gf<imtime> K_tau;
 
+  /// Dynamical interaction kernel Kprime(tau)
+  gf<imtime> Kprime_tau;
+
   /// Single-particle Green's function :math:`F(\tau)` in imaginary time.
   std::optional<g_tau_t> F_tau;
 
@@ -29,9 +32,8 @@ struct results_t {
   /// Perturbation order histogram
   std::optional<triqs::stat::histogram> perturbation_order_histo_Delta;
 
- /// Perturbation order histogram
+  /// Perturbation order histogram
   std::optional<triqs::stat::histogram> perturbation_order_histo_Jperp;
-
 };
 
 /// writes all containers to hdf5 file

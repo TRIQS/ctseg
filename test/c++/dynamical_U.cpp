@@ -20,11 +20,10 @@ TEST(CTSEG, Dynamical_U) {
   constr_params_t param_constructor;
   solve_params_t param_solve;
 
-  param_constructor.beta        = beta;
-  param_constructor.gf_struct   = {{"up", 1}, {"down", 1}};
-  param_constructor.n_tau       = 20001;
-  param_constructor.n_tau_k     = 20001;
-  param_constructor.n_tau_jperp = 20001;
+  param_constructor.beta      = beta;
+  param_constructor.gf_struct = {{"up", 1}, {"down", 1}};
+  param_constructor.n_tau     = 20001;
+  param_constructor.n_tau_k   = 20001;
 
   // Create solver instance
   solver_core ctqmc(param_constructor);

@@ -1,5 +1,6 @@
 #include "configuration.hpp"
 #include "logs.hpp"
+#include <iomanip>
 
 // Make a list of time ordered (decreasing) operators
 
@@ -26,7 +27,28 @@ std::vector<std::tuple<tau_t, int, bool>> make_time_ordered_op_list(configuratio
 std::vector<segment_t>::const_iterator find_segment_left(std::vector<segment_t> const &seglist, segment_t const &seg) {
   auto seg_iter = std::upper_bound(seglist.begin(), seglist.end(), seg);
   return (seg_iter == seglist.begin()) ? seg_iter : --seg_iter;
-};
+}
+
+// ---------------------------
+
+// Find density in seglist to the right of time tau.
+double n_tau(tau_t const &tau, std::vector<segment_t> const &seglist) {
+  if (seglist.empty()) return 0.0;
+  auto it = find_segment_left(seglist, segment_t{tau, tau});
+  if (tau_in_seg(tau, *it) or tau_in_seg(tau, seglist.back())) return 1.0;
+  return 0.0;
+}
+
+// ---------------------------
+
+// Check whether time is in segment [tau_c,tau_cdag[.
+bool tau_in_seg(tau_t const &tau, segment_t const &seg) {
+  if (is_cyclic(seg))
+    return tau_in_seg(tau, segment_t{tau_t::beta(), seg.tau_cdag})
+       or tau_in_seg(tau, segment_t{seg.tau_c, tau_t::zero()});
+  if (tau <= seg.tau_c and tau > seg.tau_cdag) return true;
+  return false;
+}
 
 // ---------------------------
 
@@ -125,8 +147,9 @@ double K_overlap(std::vector<segment_t> const &seglist, tau_t const &tau, bool i
                  int c1, int c2) {
   if (seglist.empty()) return 0;
   double result = 0;
+  // The order of the times is important for the measure of F
   for (auto seg_in_list : seglist) {
-    result += real(K(double(tau - seg_in_list.tau_c))(c1, c2) - K(double(tau - seg_in_list.tau_cdag))(c1, c2));
+    result += real(K(double(seg_in_list.tau_c - tau))(c1, c2) - K(double(seg_in_list.tau_cdag - tau))(c1, c2));
   }
   return is_c ? result : -result;
 }

@@ -64,7 +64,6 @@ Snew = ctseg_new.SolverCore(beta=beta,
                             gf_struct=[['down', 1], ['up', 1]],
                             n_tau=n_tau,
                             n_tau_k=n_tau_k,
-                            n_tau_jperp=n_tau_k
                             )
 
 Snew.Delta_tau << Fourier(delta)

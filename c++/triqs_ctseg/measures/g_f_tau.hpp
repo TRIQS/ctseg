@@ -1,27 +1,7 @@
-/*******************************************************************************
- * CTSEG: TRIQS hybridization-expansion segment solver
- *
- * Copyright (C) 2013-2018 by T. Ayral, H. Hafermann, P. Delange, M. Ferrero, O.
- *Parcollet
- *
- * CTSEG is free software: you can redistribute it and/or modify it under the
- * terms of the GNU General Public License as published by the Free Software
- * Foundation, either version 3 of the License, or (at your option) any later
- * version.
- *
- * CTSEG is distributed in the hope that it will be useful, but WITHOUT ANY
- * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
- * details.
- *
- * You should have received a copy of the GNU General Public License along with
- * CTSEG. If not, see <http://www.gnu.org/licenses/>.
- ******************************************************************************/
 #pragma once
 #include "../configuration.hpp"
 #include "../work_data.hpp"
 #include "../results.hpp"
-//#include "../precompute_fprefactor.hpp"
 
 namespace measures {
 
@@ -31,11 +11,11 @@ namespace measures {
     configuration_t const &config;
     results_t &results;
     double beta;
+    bool measure_ft;
+    gf_struct_t gf_struct;
 
     block_gf<imtime> g_tau;
-
-    // The prefactor of integrals
-    //std::shared_ptr<precompute_fprefactor> fprefactor;
+    block_gf<imtime> f_tau;
 
     double Z;
 
@@ -43,5 +23,7 @@ namespace measures {
 
     void accumulate(double s);
     void collect_results(mpi::communicator const &c);
+    double fprefactor(long const &block, std::pair<tau_t, long> const &y);
   };
+
 } // namespace measures

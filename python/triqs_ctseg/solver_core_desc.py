@@ -43,6 +43,11 @@ c.add_member(c_name = "K_tau",
              read_only= True,
              doc = r"""Dynamical interaction kernel K(tau)""")
 
+c.add_member(c_name = "Kprime_tau",
+             c_type = "gf<triqs::mesh::imtime>",
+             read_only= True,
+             doc = r"""Dynamical interaction kernel Kprime(tau)""")
+
 c.add_member(c_name = "F_tau",
              c_type = "std::optional<g_tau_t>",
              read_only= True,
@@ -97,8 +102,6 @@ c.add_constructor("""(**constr_params_t)""", doc = r"""
 | n_tau          | int                     | 10001   | Number of time slices for $Delta(\tau)$/$G(\tau)$/$F(\tau)$  |
 +----------------+-------------------------+---------+--------------------------------------------------------------+
 | n_tau_k        | int                     | 10001   | Number of time slices for $K(\tau)$                          |
-+----------------+-------------------------+---------+--------------------------------------------------------------+
-| n_tau_jperp    | int                     | 10001   | Number of time slices for $J_\perp(\tau)$                    |
 +----------------+-------------------------+---------+--------------------------------------------------------------+
 """)
 
@@ -156,7 +159,9 @@ c.add_method("""void solve (**solve_params_t)""",
 +---------------------------------------+---------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
 | measure_perturbation_order_histograms | bool                | true                                    | Whether to measure the perturbation order histograms (Order in Delta, and Jperp)                                  |
 +---------------------------------------+---------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
-| measure_gt                            | bool                | true                                    | Whether to measure G(tau) (see [[measure_gt]])                                                                    |
+| measure_gt                            | bool                | true                                    | Whether to measure G(tau) (see [[measure_g_f_tau]])                                                               |
++---------------------------------------+---------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
+| measure_ft                            | bool                | true                                    | Whether to measure F(tau) (see [[measure_g_f_tau]])                                                               |
 +---------------------------------------+---------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
 | measure_n                             | bool                | true                                    | Whether to measure density (see [[measure_density]])                                                              |
 +---------------------------------------+---------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
@@ -316,7 +321,12 @@ c.add_member(c_name = "measure_perturbation_order_histograms",
 c.add_member(c_name = "measure_gt",
              c_type = "bool",
              initializer = """ true """,
-             doc = r"""Whether to measure G(tau) (see [[measure_gt]])""")
+             doc = r"""Whether to measure G(tau) (see [[measure_g_f_tau]])""")
+
+c.add_member(c_name = "measure_ft",
+             c_type = "bool",
+             initializer = """ true """,
+             doc = r"""Whether to measure F(tau) (see [[measure_g_f_tau]])""")
 
 c.add_member(c_name = "measure_n",
              c_type = "bool",
@@ -389,11 +399,6 @@ c.add_member(c_name = "n_tau_k",
              c_type = "int",
              initializer = """ 10001 """,
              doc = r"""Number of time slices for $K(\tau)$""")
-
-c.add_member(c_name = "n_tau_jperp",
-             c_type = "int",
-             initializer = """ 10001 """,
-             doc = r"""Number of time slices for $J_\perp(\tau)$""")
 
 module.add_converter(c)
 

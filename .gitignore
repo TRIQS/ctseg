@@ -3,9 +3,12 @@ doc/reference
 .*.swo
 .*.swp
 build
+build_san
 .cache
 core*
 .vscode
 trash
+CMakeFiles
+.gitignore
 
 

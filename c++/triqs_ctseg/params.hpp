@@ -17,9 +17,6 @@ struct constr_params_t {
 
   /// Number of time slices for $K(\tau)$
   int n_tau_k = 10001;
-
-  /// Number of time slices for $J_\perp(\tau)$
-  int n_tau_jperp = 10001;
 };
 
 //---------------------------------------------
@@ -83,7 +80,7 @@ struct solve_params_t {
   /// Whether to perform the move swap spin lines
   bool move_swap_spin_lines = false;
 
-  // -----------
+  // ----------- /!\ testing only -------
 
   /// Whether to perform the move insert segment
   bool move_insert_segment_v2 = false;
@@ -102,8 +99,11 @@ struct solve_params_t {
   /// Whether to measure the perturbation order histograms (Order in Delta, and Jperp)
   bool measure_perturbation_order_histograms = true;
 
-  /// Whether to measure G(tau) (see [[measure_gt]])
+  /// Whether to measure G(tau) (see [[measure_g_f_tau]])
   bool measure_gt = true;
+
+  /// Whether to measure F(tau) (see [[measure_g_f_tau]])
+  bool measure_ft = false;
 
   /// Whether to measure density (see [[measure_density]])
   bool measure_n = true;
@@ -139,4 +139,10 @@ struct solve_params_t {
 struct params_t : constr_params_t, solve_params_t {
   params_t(constr_params_t const &constr_params_, solve_params_t const &solve_params_)
      : constr_params_t{constr_params_}, solve_params_t{solve_params_} {}
+};
+
+inline int count_colors(gf_struct_t const &gf_struct) {
+  int n = 0;
+  for (auto const &[bl_name, bl_size] : gf_struct) { n += bl_size; }
+  return n;
 };
