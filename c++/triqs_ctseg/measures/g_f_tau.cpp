@@ -14,6 +14,7 @@ namespace measures {
     f_tau   = block_gf<imtime>{triqs::mesh::imtime{beta, Fermion, p.n_tau}, p.gf_struct};
     g_tau() = 0;
     f_tau() = 0;
+    Z       = 0;
   }
 
   // -------------------------------------
