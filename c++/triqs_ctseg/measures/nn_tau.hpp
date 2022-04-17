@@ -15,7 +15,7 @@ namespace measures {
 
     gf<imtime> q_tau;
 
-    double Z;
+    double Z = 0;
     int n_color;
 
     nn_tau(params_t const &params, work_data_t const &wdata, configuration_t const &config, results_t &results);
