@@ -19,7 +19,7 @@ n_warmup_cycles = 10000
 n_cycles = 300000
 measure_gt = True
 measure_n = True
-measure_nnt = False
+measure_nnt = True
 
 dynamical_U = True
 spin = True
@@ -80,7 +80,11 @@ if dynamical_U:
     Snew.D0_tau << 0.25*J**2*D0
 
 Snew.solve(h_int=H, **p)
+
+print(Snew.results.nn_tau.data)
+
 if mpi.is_master_node():
     with h5.HDFArchive("py_spin_spin.out.h5", 'w') as A:
         A['G_tau'] = Snew.results.G_tau
-    h5diff("py_spin_spin.out.h5", "py_spin_spin.ref.h5")
+        A['nn_tau'] = Snew.results.nn_tau
+    #h5diff("py_spin_spin.out.h5", "py_spin_spin.ref.h5")

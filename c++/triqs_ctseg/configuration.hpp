@@ -52,10 +52,6 @@ inline bool is_cyclic(segment_t const &seg) { return seg.tau_cdag > seg.tau_c; }
 // Check whether segment is a full line.
 inline bool is_full_line(segment_t const &seg) { return seg.tau_c - seg.tau_cdag == tau_t::beta(); }
 
-// Make a list of time ordered (decreasing) operators
-// vector of (time, color, is_dagger)
-std::vector<std::tuple<tau_t, int, bool>> make_time_ordered_op_list(configuration_t const &config);
-
 // Find index of first segment starting left of seg.tau_c.
 std::vector<segment_t>::const_iterator find_segment_left(std::vector<segment_t> const &seglist, segment_t const &seg);
 
@@ -88,8 +84,7 @@ double K_overlap(std::vector<segment_t> const &seglist, tau_t const &tau, bool i
 // Length occupied by all segments for a given color
 double density(std::vector<segment_t> const &seglist);
 
-// Find the state at tau = 0 or beta
-std::vector<bool> boundary_state(configuration_t const &config);
+int n_at_boundary(configuration_t const &config, int color);
 
 // Find segments corresponding to bosonic line
 std::pair<std::vector<segment_t>::const_iterator, std::vector<segment_t>::const_iterator>

@@ -1,6 +1,7 @@
 #include "./nn_tau.hpp"
 #include "../logs.hpp"
 
+// FIXME : move this to TRIQS ...
 namespace triqs::mesh {
 
   template <typename Mesh, typename T> typename Mesh::index_t closest_mesh_pt_index(Mesh const &m, T const &x) {
@@ -23,37 +24,41 @@ namespace measures {
 
   // -------------------------------------
 
+  // FIXME mv to nda
+  inline static range::all_t nda_all = range::all_t{};
+
   void nn_tau::accumulate(double s) {
 
     LOG("\n =================== MEASURE NN(tau) ================ \n");
 
     Z += s;
 
-    // I take the whole configuration and make a time ordered list of operators.
-    auto t_ordered_op_list = make_time_ordered_op_list(config);
-
-    auto zero = tau_t::zero();
-    t_ordered_op_list.emplace_back(zero, 0, false); // add the point 0 to make it easier later
-
-    // the state at 0 or beta
-    auto state_at_0   = boundary_state(config);
-    auto state_at_tau = state_at_0;
-    nda::matrix<double> nn_mat(n_color, n_color);
-
-    long idx1 = q_tau.mesh().size();
-
-    for (auto const &[tau2, color, dagger] : t_ordered_op_list) {
-
-      long idx2 = closest_mesh_pt_index(this->q_tau.mesh(), tau2);
-
+    // <n_a(tau) n_b(0) >
+    for (int b = 0; b < n_color; ++b) {
+      if (n_at_boundary(config, b) == 0) continue; // nb = 0, nothing to accumulate
       for (int a = 0; a < n_color; ++a)
-        for (int b = 0; b < n_color; ++b) nn_mat(a, b) += int(state_at_tau[a]) * int(state_at_0[b]);
+        for (auto const &seg : config.seglists[a]) {
 
-      ALWAYS_EXPECTS(idx2 <= idx1, "Error at {} \n idx1 = {}, idx2 = {}, ", tau2, idx1, idx2);
-      for (long u = idx1 - 1; u >= idx2; --u) q_tau.data()(u, nda::ellipsis{}) += nn_mat;
+	  // position of c cdag of the segment, as an integer index in the mesh
+          auto u_idx_c    = closest_mesh_pt_index(q_tau.mesh(), seg.tau_c);
+          auto u_idx_cdag = closest_mesh_pt_index(q_tau.mesh(), seg.tau_cdag);
 
-      state_at_tau[color] = not state_at_tau[color]; // cross a C or a C dagger ...
-      idx1                = idx2;
+          auto d    = q_tau.data()(nda_all, a, b); // a view of the data for fixed a,b
+          // add + s to the data. NB : id1 > id2
+          auto fill = [s, d](long u_idx1, long u_idx2) {
+            ALWAYS_EXPECTS((u_idx1 >= u_idx2), "error", 1);
+            for (auto u = u_idx1; u >= u_idx2; --u) d(u) += s;
+          };
+
+          // Execute with 2 cases : cyclic segment or not
+          if (not is_cyclic(seg)) {
+            fill(u_idx_c, u_idx_cdag);
+          } else { // cyclic segment
+            ALWAYS_EXPECTS((u_idx_cdag >= u_idx_c), "eee", 1);
+            fill(u_idx_c, 0);
+            fill(q_tau.mesh().size(), u_idx_cdag);
+          }
+        }
     }
   }
 
@@ -64,7 +69,7 @@ namespace measures {
     Z = mpi::all_reduce(Z, c);
 
     q_tau = mpi::all_reduce(q_tau, c);
-    q_tau = q_tau / (-beta * Z * q_tau.mesh().delta());
+    q_tau = q_tau / Z; //(beta * Z * q_tau.mesh().delta());
 
     // FIXME : do I need this ??
     // Fix the point at zero and beta, for each block

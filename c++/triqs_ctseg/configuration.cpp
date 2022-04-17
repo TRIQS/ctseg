@@ -2,25 +2,6 @@
 #include "logs.hpp"
 #include <iomanip>
 
-// Make a list of time ordered (decreasing) operators
-
-std::vector<std::tuple<tau_t, int, bool>> make_time_ordered_op_list(configuration_t const &config) {
-
-  std::vector<std::tuple<tau_t, int, bool>> result;
-
-  result.reserve(config.seglists.size()
-                 * config.seglists[0].size()); // optional : simple heuristics to reserve some space
-
-  for (auto const &[color, seglist] : itertools::enumerate(config.seglists))
-    for (auto const &seg : seglist) {
-      result.emplace_back(seg.tau_c, color, false);
-      result.emplace_back(seg.tau_cdag, color, true);
-    }
-
-  std::sort(std::begin(result), std::end(result), std::greater{});
-  return result;
-}
-
 // ---------------------------
 
 // Find index of first segment starting left of seg.tau_c.
@@ -164,13 +145,10 @@ double density(std::vector<segment_t> const &seglist) {
 }
 // ---------------------------
 
-// Find the state at tau = 0 or beta
-std::vector<bool> boundary_state(configuration_t const &config) {
-  int N = config.n_color();
-  std::vector<bool> res(N);
-  for (auto const &[c, sl] : itertools::enumerate(config.seglists))
-    res[c] = (sl.empty() ? false : is_cyclic(sl.back()) or is_full_line(sl.back()));
-  return res;
+int n_at_boundary(configuration_t const &config, int color) { 
+  auto const & sl = config.seglists[color];
+  if (sl.empty()) return 0;
+  return (is_cyclic(sl.back()) or is_full_line(sl.back())) ? 1 : 0;
 }
 
 // ---------------------------
