@@ -30,7 +30,7 @@ namespace measures {
       for (int b = 0; b < n_color; ++b) {
         for (auto const &sa : config.seglists[a]) {
           for (auto const &sb : config.seglists[b]) //
-            nn(a, b) += s * overlap_seg(sa, sb);
+            nn(a, b) += s * overlap(sa, sb);
         }
       }
   }

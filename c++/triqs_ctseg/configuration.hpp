@@ -94,10 +94,10 @@ inline bool disjoint(segment_t const &s1, segment_t const &s2) {
 }
 
 // Check whether time is in segment.
-bool tau_in_seg(tau_t const &tau, segment_t const &seg);
+//bool tau_in_seg(tau_t const &tau, segment_t const &seg);
 
 // Overlap between two non-cyclic segments.
-double overlap_seg(segment_t const &seg1, segment_t const &seg2);
+double overlap(segment_t const &s1, segment_t const &s2);
 
 // ------------------- Functions to manipulate std::vector<segment_t> --------------------------
 

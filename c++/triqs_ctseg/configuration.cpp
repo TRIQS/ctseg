@@ -2,18 +2,43 @@
 #include "logs.hpp"
 #include <iomanip>
 
-// ---------------------------
+// ------------------- Functions to manipulate segments --------------------------
 
 // Check whether time is in segment [tau_c,tau_cdag[.
 bool tau_in_seg(tau_t const &tau, segment_t const &seg) {
   // if the segment is cyclic, we check if tau in the 2 parts
   if (is_cyclic(seg))
-    return tau_in_seg(tau, {tau_t::beta(), seg.tau_cdag})
-       or tau_in_seg(tau, {seg.tau_c, tau_t::zero()});
+    return tau_in_seg(tau, {tau_t::beta(), seg.tau_cdag}) or tau_in_seg(tau, {seg.tau_c, tau_t::zero()});
   return (tau <= seg.tau_c and tau > seg.tau_cdag); // ! decreasing time order
 }
 
 // ---------------------------
+
+// Split a cyclic segment into 2 segment, attached to beta and 0
+std::pair<segment_t, segment_t> split_cyclic_segment(segment_t const &s) {
+  return {{tau_t::beta(), s.tau_cdag}, {s.tau_c, tau_t::zero()}};
+}
+
+// ---------------------------
+
+// Overlap between two (possibly cyclic) segments.
+double overlap(segment_t const &s1, segment_t const &s2) {
+  // first treat the cyclic case
+  if (is_cyclic(s1)) { 
+    auto [sl,sr] = split_cyclic_segment(s1);
+    return overlap(sl, s2) + overlap(sr, s2);
+    //return overlap(segment_t{tau_t::beta(), s1.tau_cdag}, s2) + overlap(segment_t{s1.tau_c, tau_t::zero()}, s2);
+  }
+  if (is_cyclic(s2)) return overlap(s2, s1); // s1 is not cyclic any more
+  //return overlap(s1, segment_t{tau_t::beta(), s2.tau_cdag}) + overlap(s1, segment_t{s2.tau_c, tau_t::zero()});
+  if (s1.tau_cdag >= s2.tau_c or s2.tau_cdag >= s1.tau_c) return 0;
+  // last case
+  tau_t tau_start = std::min(s1.tau_c, s2.tau_c);
+  tau_t tau_end   = std::max(s1.tau_cdag, s2.tau_cdag);
+  return double(tau_start - tau_end);
+};
+
+// ------------------- Functions to manipulate std::vector<segment_t> --------
 
 // Find index of first segment starting left of seg.tau_c.
 vec_seg_iter_t find_segment_left(std::vector<segment_t> const &seglist, segment_t const &seg) {
@@ -30,26 +55,6 @@ double n_tau(tau_t const &tau, std::vector<segment_t> const &seglist) {
   if (tau_in_seg(tau, *it) or tau_in_seg(tau, seglist.back())) return 1.0;
   return 0.0;
 }
-
-
-// ---------------------------
-
-// Overlap between two (possibly cyclic) segments.
-double overlap_seg(segment_t const &seg1, segment_t const &seg2) {
-  if (is_cyclic(seg1))
-    return overlap_seg(segment_t{tau_t::beta(), seg1.tau_cdag}, seg2)
-       + overlap_seg(segment_t{seg1.tau_c, tau_t::zero()}, seg2);
-  if (is_cyclic(seg2))
-    return overlap_seg(seg1, segment_t{tau_t::beta(), seg2.tau_cdag})
-       + overlap_seg(seg1, segment_t{seg2.tau_c, tau_t::zero()});
-  if (seg1.tau_cdag >= seg2.tau_c or seg2.tau_cdag >= seg1.tau_c)
-    return 0;
-  else {
-    tau_t tau_start = std::min(seg1.tau_c, seg2.tau_c);
-    tau_t tau_end   = std::max(seg1.tau_cdag, seg2.tau_cdag);
-    return double(tau_start - tau_end);
-  };
-};
 
 // ---------------------------
 
@@ -68,13 +73,13 @@ double overlap(std::vector<segment_t> const &seglist, segment_t const &seg) {
   auto last_seg = seglist.back();
   // In case last segment is cyclic, split it and compute its overlap with seg
   if (is_cyclic(last_seg))
-    result += overlap_seg(seg, segment_t{beta, last_seg.tau_cdag}) + overlap_seg(seg, segment_t{last_seg.tau_c, zero});
+    result += overlap(seg, segment_t{beta, last_seg.tau_cdag}) + overlap(seg, segment_t{last_seg.tau_c, zero});
   else
-    result += overlap_seg(seg, last_seg);
+    result += overlap(seg, last_seg);
 
   // Compute overlap of seg with the remainder of seglist
   for (auto it = find_segment_left(seglist, seg); it->tau_c > seg.tau_cdag && it != --seglist.end(); ++it) //
-    result += overlap_seg(*it, seg);
+    result += overlap(*it, seg);
   return result;
 };
 
@@ -147,8 +152,7 @@ int n_at_boundary(configuration_t const &config, int color) {
 // ---------------------------
 
 // Find segments corresponding to bosonic line
-std::pair<vec_seg_iter_t, vec_seg_iter_t>
-find_spin_segments(int line_idx, configuration_t const &config) {
+std::pair<vec_seg_iter_t, vec_seg_iter_t> find_spin_segments(int line_idx, configuration_t const &config) {
   auto const &line    = config.Jperp_list[line_idx];
   auto const &sl_up   = config.seglists[0];
   auto const &sl_down = config.seglists[1];

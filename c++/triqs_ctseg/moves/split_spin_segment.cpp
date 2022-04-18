@@ -39,8 +39,8 @@ namespace moves {
     auto new_seg_up   = segment_t{tau_up, old_seg_up.tau_cdag};
     auto new_seg_down = segment_t{tau_down, old_seg_down.tau_cdag};
     ln_trace_ratio += -wdata.U(0, 1)
-       * (overlap_seg(new_seg_up, new_seg_down) + overlap_seg(old_seg_up, old_seg_down)
-          - overlap_seg(new_seg_up, old_seg_down) - overlap_seg(new_seg_down, old_seg_up));
+       * (overlap(new_seg_up, new_seg_down) + overlap(old_seg_up, old_seg_down)
+          - overlap(new_seg_up, old_seg_down) - overlap(new_seg_down, old_seg_up));
 
     // Correct for the dynamical interaction between the two operators that have been moved
     if (wdata.has_Dt) {
