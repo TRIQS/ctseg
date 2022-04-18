@@ -158,43 +158,19 @@ std::vector<long> cdag_in_window(tau_t const &wtau_left, tau_t const &wtau_right
     left_list.insert(left_list.end(), right_list.begin(), right_list.end());
     return left_list;
   }
-  // FIXME : REREAD ???
   std::vector<long> found_indices;
   found_indices.reserve(seglist.size());
-  for (auto it = find_segment_left(seglist, segment_t{wtau_left, wtau_left});
-       it->tau_cdag > wtau_right and it != --seglist.end(); ++it) {
+  auto last = seglist.end() - 1;
+  auto it   = find_segment_left(seglist, segment_t{wtau_left, wtau_left});
+  for (; it->tau_cdag > wtau_right and it != last; ++it)
     if (it->tau_cdag < wtau_left) found_indices.push_back(std::distance(seglist.cbegin(), it));
-  }
+
   // Check separately for last segment (may be cyclic)
   if (seglist.back().tau_cdag < wtau_left and seglist.back().tau_cdag > wtau_right)
     found_indices.push_back(seglist.size() - 1);
   return found_indices;
 }
-
 // FIXME : do we have TESTS ???
-
-/*
-// Simpler implementation for test purposes
-
-// Find the indices of the segments whose cdag are in ]wtau_left,wtau_right[
-std::vector<long> cdag_in_window(tau_t const &wtau_left, tau_t const &wtau_right,
-                                 std::vector<segment_t> const &seglist) {
-  std::vector<long> found_indices;
-  if (wtau_left < wtau_right) {
-    auto left_list  = cdag_in_window(tau_t::beta(), wtau_right, seglist);
-    auto right_list = cdag_in_window(wtau_left, tau_t::zero(), seglist);
-    found_indices   = left_list;
-    for (auto const &[i, idx] : itertools::enumerate(right_list)) found_indices.push_back(right_list[i]);
-    return found_indices;
-  }
-  if (seglist.empty()) return found_indices; // should never happen, but protect
-  found_indices.reserve(seglist.size());
-  for (auto const &[i, seg] : itertools::enumerate(seglist)) {
-    if (seg.tau_cdag < wtau_left and seg.tau_cdag > wtau_right) found_indices.push_back(i);
-  }
-  return found_indices;
-}
-*/
 
 // ---------------------------
 
@@ -237,7 +213,6 @@ int n_at_boundary(configuration_t const &config, int color) {
 
 // ---------------------------
 
-// Find segments corresponding to bosonic line
 std::pair<vec_seg_iter_t, vec_seg_iter_t> find_spin_segments(int line_idx, configuration_t const &config) {
   auto const &line    = config.Jperp_list[line_idx];
   auto const &sl_up   = config.seglists[0];
@@ -253,7 +228,6 @@ std::pair<vec_seg_iter_t, vec_seg_iter_t> find_spin_segments(int line_idx, confi
 
 // ---------------------------
 
-// Sign of a configuration
 double config_sign(configuration_t const &config, std::vector<det_t> const &dets) {
   double sign = 1.0;
   // For every color we compute the sign of the permutation that takes
@@ -298,7 +272,6 @@ double config_sign(configuration_t const &config, std::vector<det_t> const &dets
 
 // ---------------------------
 
-// Print config
 std::ostream &operator<<(std::ostream &out, configuration_t const &config) {
   for (auto const &[c, sl] : itertools::enumerate(config.seglists)) {
     out << '\n';
