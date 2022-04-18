@@ -29,6 +29,7 @@ void h5_write(h5::group h5group, std::string subgroup_name, results_t const &c) 
   h5_write(grp, "K_tau", c.K_tau);
   h5_write(grp, "Kprime_tau", c.Kprime_tau);
   h5_write(grp, "nn_tau", c.nn_tau);
+  h5_write(grp, "nn_static", c.nn_static);
   h5_write(grp, "densities", c.densities);
 }
 
@@ -43,5 +44,6 @@ void h5_read(h5::group h5group, std::string subgroup_name, results_t &c) {
   h5_read(grp, "K_tau", c.K_tau);
   h5_read(grp, "Kprime_tau", c.Kprime_tau);
   h5_read(grp, "nn_tau", c.nn_tau);
+  h5_read(grp, "nn_static", c.nn_static);
   h5_read(grp, "densities", c.densities);
 }

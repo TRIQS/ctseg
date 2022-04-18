@@ -26,6 +26,9 @@ struct results_t {
   /// <n_a(tau) n_b(0)>
   std::optional<gf<imtime>> nn_tau;
 
+  /// <n_a n_b>
+  std::optional<nda::matrix<double>> nn_static;
+
   /// Density per color. FIXME : optional ??
   nda::array<double, 1> densities;
 

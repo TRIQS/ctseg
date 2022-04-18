@@ -15,6 +15,7 @@ module.add_include("triqs_ctseg/solver_core.hpp")
 module.add_preamble("""
 #include <cpp2py/converters/optional.hpp>
 #include <cpp2py/converters/pair.hpp>
+#include <cpp2py/converters/std_array.hpp>
 #include <cpp2py/converters/string.hpp>
 #include <cpp2py/converters/vector.hpp>
 #include <nda_py/cpp2py_converters.hpp>
@@ -57,6 +58,11 @@ c.add_member(c_name = "nn_tau",
              c_type = "std::optional<gf<imtime>>",
              read_only= True,
              doc = r"""<n_a(tau) n_b(0)>""")
+
+c.add_member(c_name = "nn_static",
+             c_type = "std::optional<nda::matrix<double>>",
+             read_only= True,
+             doc = r"""<n_a n_b>""")
 
 c.add_member(c_name = "densities",
              c_type = "nda::array<double, 1>",
@@ -161,7 +167,7 @@ c.add_method("""void solve (**solve_params_t)""",
 +---------------------------------------+---------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
 | measure_gt                            | bool                | true                                    | Whether to measure G(tau) (see [[measure_g_f_tau]])                                                               |
 +---------------------------------------+---------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
-| measure_ft                            | bool                | true                                    | Whether to measure F(tau) (see [[measure_g_f_tau]])                                                               |
+| measure_ft                            | bool                | false                                   | Whether to measure F(tau) (see [[measure_g_f_tau]])                                                               |
 +---------------------------------------+---------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
 | measure_n                             | bool                | true                                    | Whether to measure density (see [[measure_density]])                                                              |
 +---------------------------------------+---------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
@@ -325,7 +331,7 @@ c.add_member(c_name = "measure_gt",
 
 c.add_member(c_name = "measure_ft",
              c_type = "bool",
-             initializer = """ true """,
+             initializer = """ false """,
              doc = r"""Whether to measure F(tau) (see [[measure_g_f_tau]])""")
 
 c.add_member(c_name = "measure_n",
