@@ -48,7 +48,7 @@ namespace moves {
     }
 
     // Reject if chosen segment overlaps with destination color
-    if (not is_insertable(dsl, origin_segment)) {
+    if (not is_insertable_into(origin_segment, dsl)) {
       LOG("Space is occupied in destination color.");
       return 0;
     }

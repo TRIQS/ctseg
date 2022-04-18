@@ -60,7 +60,7 @@ namespace moves {
     LOG("Inserting spins in segment at position {}, at tau_left = {}, tau_right = {}", prop_seg_idx, tau_left,
         tau_right);
 
-    if (not is_insertable(dsl, spin_seg)) {
+    if (not is_insertable_into(spin_seg, dsl)) {
       LOG("ABORT : Space is occupied on other line.");
       return 0;
     }

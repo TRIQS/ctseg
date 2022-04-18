@@ -68,7 +68,7 @@ int n_tau(tau_t const &tau, std::vector<segment_t> const &seglist) {
 }
 
 // ---------------------------
-
+#if 0
 // Flip seglist
 std::vector<segment_t> flip(std::vector<segment_t> const &sl) {
   if (sl.empty()) // Flipped seglist is full line
@@ -89,11 +89,12 @@ std::vector<segment_t> flip(std::vector<segment_t> const &sl) {
   } // loop over segs
   return fsl;
 }
+#endif
 
 // Flip seglist
 // FIXME : Recheck and merge
 // do not break the if loop with the condition ...
-std::vector<segment_t> flip2(std::vector<segment_t> const &sl) {
+std::vector<segment_t> flip(std::vector<segment_t> const &sl) {
   if (sl.empty()) // Flipped seglist is full line
     return {segment_t::full_line()};
 
@@ -143,26 +144,68 @@ double overlap(std::vector<segment_t> const &seglist, segment_t const &seg) {
 
 // ---------------------------
 
+// Checks if two segments are completely disjoint. s2 might be cyclic, not s1
+inline bool disjoint(segment_t const &s1, segment_t const &s2) {
+  if (is_cyclic(s2)) {
+    auto [sl, sr] = split_cyclic_segment(s2);
+    return disjoint(s1, sl) and disjoint(s1, sr);
+  }
+  return s1.tau_cdag > s2.tau_c or s2.tau_cdag > s1.tau_c; // symmetric s1 s2
+}
+// ---------------------------
+#if 0
 // Checks if segment is movable to a given color
 bool is_insertable(std::vector<segment_t> const &seglist, segment_t const &seg) {
-  bool result = true;
-  if (seglist.empty()) return result;
-  auto beta = seg.tau_c.beta();
-  auto zero = seg.tau_c.zero();
+  if (seglist.empty()) return true;
   // If seg is cyclic, split it
-  if (is_cyclic(seg))
-    return is_insertable(seglist, segment_t{beta, seg.tau_cdag}) and is_insertable(seglist, segment_t{seg.tau_c, zero});
+  if (is_cyclic(seg)) {
+    auto [sl, sr] = split_cyclic_segment(seg);
+    return is_insertable(seglist, sl) and is_insertable(seglist, sr);
+  }
+  bool ok = true;
   // In case last segment in list is cyclic, split it and check its overlap with seg
   if (is_cyclic(seglist.back())) {
-    result = result and disjoint(seg, segment_t{beta, seglist.back().tau_cdag})
-       and disjoint(seg, segment_t{seglist.back().tau_c, zero});
+    auto [sl, sr] = split_cyclic_segment(seglist.back());
+    ok            = disjoint(seg, sl) and disjoint(seg, sr);
   } else
-    result = result and disjoint(seg, seglist.back());
+    ok = disjoint(seg, seglist.back());
+  if (not ok) return false;
+
   // Check overlap of seg with the remainder of seglist
   for (auto it = find_segment_left(seglist, seg); it->tau_c >= seg.tau_cdag and it != --seglist.end(); ++it) {
-    result = result and disjoint(*it, seg);
+    if (not disjoint(seg, *it)) return false;
   }
-  return result;
+  return true;
+}
+#endif
+
+// ---------------------------
+
+// Checks if segment is movable to a given color
+bool is_insertable_into(segment_t const &seg, std::vector<segment_t> const &seglist) {
+  if (seglist.empty()) return true;
+
+  // If seg is cyclic, split it
+  if (is_cyclic(seg)) {
+    auto [sl, sr] = split_cyclic_segment(seg);
+    return is_insertable_into(sl, seglist) and is_insertable_into(sr, seglist);
+  }
+
+  // R is the iterator on the segment strictly after seg or end.
+  // L the segment before or begin
+  // Then the segment is insertable iif it does not overlap with L not with R (if not end)
+  // Proof : it overlaps with any segment before of equal L iff it does with L
+  //         it overlaps with any segment after of equal L iif it does with R
+  // see all cases.
+  // 1-  L------       R-----  : s in [L,R]
+  //           s------
+  auto R = std::upper_bound(seglist.begin(), seglist.end(), seg);
+  auto L = (R == seglist.begin()) ? R : R - 1;
+  if (not disjoint(seg, *L)) return false;
+  if (R != seglist.end() and not disjoint(seg, *R)) return false;
+  // We must recheck the last segment as it may be cyclic (it might also have been R, in which case it is superfluous but ok)
+  if (not disjoint(seg, seglist.back())) return false;
+  return true;
 }
 
 // ---------------------------
@@ -172,11 +215,12 @@ bool is_insertable(std::vector<segment_t> const &seglist, segment_t const &seg) 
 // Contribution of the dynamical interaction kernel K to the overlap between a segment and a list of segments.
 double K_overlap(std::vector<segment_t> const &seglist, tau_t const &tau_c, tau_t const &tau_cdag,
                  gf<imtime, matrix_valued> const &K, int c1, int c2) {
-  if (seglist.empty()) return 0;
+
+  // seglist empty covered by the loop
   double result = 0;
-  for (auto seg_in_list : seglist) {
-    result += real(K(double(tau_c - seg_in_list.tau_c))(c1, c2) + K(double(tau_cdag - seg_in_list.tau_cdag))(c1, c2)
-                   - K(double(tau_cdag - seg_in_list.tau_c))(c1, c2) - K(double(tau_c - seg_in_list.tau_cdag))(c1, c2));
+  for (auto const &s : seglist) {
+    result += real(K(double(tau_c - s.tau_c))(c1, c2) + K(double(tau_cdag - s.tau_cdag))(c1, c2)
+                   - K(double(tau_cdag - s.tau_c))(c1, c2) - K(double(tau_c - s.tau_cdag))(c1, c2));
   }
   return result;
 }
@@ -187,7 +231,6 @@ double K_overlap(std::vector<segment_t> const &seglist, tau_t const &tau_c, tau_
 // Contribution of the dynamical interaction kernel K to the overlap between an operator and a list of segments.
 double K_overlap(std::vector<segment_t> const &seglist, tau_t const &tau, bool is_c, gf<imtime, matrix_valued> const &K,
                  int c1, int c2) {
-  if (seglist.empty()) return 0;
   double result = 0;
   // The order of the times is important for the measure of F
   for (auto const &s : seglist) {
@@ -270,15 +313,17 @@ double config_sign(configuration_t const &config, std::vector<det_t> const &dets
 // Find the indices of the segments whose cdag are in ]wtau_left,wtau_right[
 std::vector<long> cdag_in_window(tau_t const &wtau_left, tau_t const &wtau_right,
                                  std::vector<segment_t> const &seglist) {
-  std::vector<long> found_indices;
-  if (seglist.empty()) return found_indices; // should never happen, but protect
+  if (seglist.empty()) return {}; // should never happen, but protect
+
   if (wtau_left < wtau_right) {
     auto left_list  = cdag_in_window(tau_t::beta(), wtau_right, seglist);
     auto right_list = cdag_in_window(wtau_left, tau_t::zero(), seglist);
-    found_indices   = left_list;
-    for (auto const &[i, idx] : itertools::enumerate(right_list)) found_indices.push_back(right_list[i]);
-    return found_indices;
+    // concatenate
+    left_list.insert(left_list.end(), right_list.begin(), right_list.end());
+    return left_list;
   }
+  // FIXME : REREAD ???
+  std::vector<long> found_indices;
   found_indices.reserve(seglist.size());
   for (auto it = find_segment_left(seglist, segment_t{wtau_left, wtau_left});
        it->tau_cdag > wtau_right and it != --seglist.end(); ++it) {

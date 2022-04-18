@@ -117,7 +117,7 @@ double overlap(std::vector<segment_t> const &seglist, segment_t const &seg);
 // Checks if segment seg can be inserted into the list, i.e. without
 // overlap with other segment.
 // FIXME : rename ??
-bool is_insertable(std::vector<segment_t> const &seglist, segment_t const &seg);
+bool is_insertable_into(segment_t const &seg, std::vector<segment_t> const &seglist);
 
 // FIXME : Comment. Parameters ?
 // Contribution of the dynamical interaction kernel K to the overlap between a segment and a list of segments.
