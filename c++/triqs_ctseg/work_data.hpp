@@ -1,5 +1,4 @@
 #pragma once
-//#include "types.hpp"
 #include <mpi/mpi.hpp>
 #include <triqs/mc_tools/random_generator.hpp>
 #include <triqs/det_manip.hpp>
@@ -8,7 +7,6 @@
 #include "inputs.hpp"
 #include "util.hpp"
 #include "dets.hpp"
-//#include "debug/invariants.hpp"
 
 // ---------------------------------------------------
 /// Working data

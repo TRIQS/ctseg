@@ -2,6 +2,8 @@
 #include <triqs/test_tools/gfs.hpp>
 #include <triqs_ctseg/solver_core.hpp>
 
+using triqs::operators::n;
+
 TEST(CTSEG, Anderson) {
   // Start the mpi
   mpi::communicator world;

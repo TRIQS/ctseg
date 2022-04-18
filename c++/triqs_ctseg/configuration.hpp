@@ -1,8 +1,5 @@
 #pragma once
 #include <vector>
-//#include "params.hpp"
-#include "types.hpp"
-
 #include "dets.hpp"
 #include "tau_t.hpp"
 

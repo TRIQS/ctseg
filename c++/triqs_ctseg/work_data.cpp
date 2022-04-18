@@ -6,7 +6,6 @@
 #include "logs.hpp"
 #include "spdlog/common.h"
 #include "spdlog/spdlog.h"
-#include "triqs_ctseg/types.hpp"
 
 work_data_t::work_data_t(params_t const &p, inputs_t const &inputs, mpi::communicator c) {
 

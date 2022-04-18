@@ -2,6 +2,7 @@
 #include <triqs/test_tools/gfs.hpp>
 #include <triqs_ctseg/solver_core.hpp>
 
+using triqs::operators::n;
 TEST(CTSEG, Dynamical_U) {
   // Start the mpi
   mpi::communicator world;

@@ -1,6 +1,5 @@
 #pragma once
 #include <vector>
-#include "types.hpp"
 #include "configuration.hpp"
 
 void check_invariant(configuration_t const &config, std::vector<det_t> const &dets);

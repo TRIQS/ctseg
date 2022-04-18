@@ -1,6 +1,8 @@
 #pragma once
 
-#include "./types.hpp"
+#include <triqs/gfs.hpp>
+#include <triqs/operators/many_body_operator.hpp>
+using namespace triqs::gfs;
 
 // Parameters for the solver construction
 
@@ -25,7 +27,7 @@ struct constr_params_t {
 struct solve_params_t {
 
   /// local Hamiltonian
-  Op h_int;
+  triqs::operators::many_body_operator h_int;
 
   /// Number of QMC cycles
   int n_cycles;

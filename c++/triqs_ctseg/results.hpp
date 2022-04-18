@@ -1,7 +1,9 @@
 #pragma once
 #include <optional>
-#include "types.hpp"
 #include <triqs/stat/histograms.hpp>
+#include <triqs/gfs.hpp>
+
+using namespace triqs::gfs;
 
 // One-particle Green's function types
 using g_tau_t = block_gf<imtime, matrix_valued>;
