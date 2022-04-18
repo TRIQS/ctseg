@@ -29,10 +29,8 @@ double overlap(segment_t const &s1, segment_t const &s2) {
   if (is_cyclic(s1)) {
     auto [sl, sr] = split_cyclic_segment(s1);
     return overlap(sl, s2) + overlap(sr, s2);
-    //return overlap(segment_t{tau_t::beta(), s1.tau_cdag}, s2) + overlap(segment_t{s1.tau_c, tau_t::zero()}, s2);
   }
   if (is_cyclic(s2)) return overlap(s2, s1); // s1 is not cyclic any more
-  //return overlap(s1, segment_t{tau_t::beta(), s2.tau_cdag}) + overlap(s1, segment_t{s2.tau_c, tau_t::zero()});
   if (s1.tau_cdag >= s2.tau_c or s2.tau_cdag >= s1.tau_c) return 0;
   // last case
   tau_t tau_start = std::min(s1.tau_c, s2.tau_c);
@@ -51,15 +49,6 @@ vec_seg_iter_t find_segment_left(std::vector<segment_t> const &seglist, segment_
 }
 // ---------------------------
 
-//// Length occupied by all segments for a given color
-//double density(std::vector<segment_t> const &seglist) {
-//if (seglist.empty()) return 0;
-//double result = 0;
-//for (auto const &seg : seglist) result += double(seg.tau_c - seg.tau_cdag);
-//return result;
-//}
-// ---------------------------
-
 // Find density in seglist to the right of time tau.
 int n_tau(tau_t const &tau, std::vector<segment_t> const &seglist) {
   if (seglist.empty()) return 0;
@@ -68,32 +57,7 @@ int n_tau(tau_t const &tau, std::vector<segment_t> const &seglist) {
 }
 
 // ---------------------------
-#if 0
 // Flip seglist
-std::vector<segment_t> flip(std::vector<segment_t> const &sl) {
-  if (sl.empty()) // Flipped seglist is full line
-    return {segment_t{tau_t::beta(), tau_t::zero()}};
-  if (sl.size() == 1 and is_full_line(sl[0])) // Do nothing: flipped config empty
-    return {};
-  // else Swap c and cdag
-  auto fsl = std::vector<segment_t>{};
-  fsl.reserve(sl.size() + 1);
-  for (auto i : range(sl.size())) {
-    if (is_cyclic(sl.back())) {
-      long ind = (i == 0) ? long(sl.size()) - 1 : i - 1;
-      fsl.emplace_back(segment_t{sl[ind].tau_cdag, sl[i].tau_c, sl[ind].J_cdag, sl[i].J_c});
-    } else {
-      long ind = (i == sl.size() - 1) ? 0 : i + 1;
-      fsl.emplace_back(segment_t{sl[i].tau_cdag, sl[ind].tau_c, sl[i].J_cdag, sl[ind].J_c});
-    }
-  } // loop over segs
-  return fsl;
-}
-#endif
-
-// Flip seglist
-// FIXME : Recheck and merge
-// do not break the if loop with the condition ...
 std::vector<segment_t> flip(std::vector<segment_t> const &sl) {
   if (sl.empty()) // Flipped seglist is full line
     return {segment_t::full_line()};
@@ -152,33 +116,6 @@ inline bool disjoint(segment_t const &s1, segment_t const &s2) {
   }
   return s1.tau_cdag > s2.tau_c or s2.tau_cdag > s1.tau_c; // symmetric s1 s2
 }
-// ---------------------------
-#if 0
-// Checks if segment is movable to a given color
-bool is_insertable(std::vector<segment_t> const &seglist, segment_t const &seg) {
-  if (seglist.empty()) return true;
-  // If seg is cyclic, split it
-  if (is_cyclic(seg)) {
-    auto [sl, sr] = split_cyclic_segment(seg);
-    return is_insertable(seglist, sl) and is_insertable(seglist, sr);
-  }
-  bool ok = true;
-  // In case last segment in list is cyclic, split it and check its overlap with seg
-  if (is_cyclic(seglist.back())) {
-    auto [sl, sr] = split_cyclic_segment(seglist.back());
-    ok            = disjoint(seg, sl) and disjoint(seg, sr);
-  } else
-    ok = disjoint(seg, seglist.back());
-  if (not ok) return false;
-
-  // Check overlap of seg with the remainder of seglist
-  for (auto it = find_segment_left(seglist, seg); it->tau_c >= seg.tau_cdag and it != --seglist.end(); ++it) {
-    if (not disjoint(seg, *it)) return false;
-  }
-  return true;
-}
-#endif
-
 // ---------------------------
 
 // Checks if segment is movable to a given color
