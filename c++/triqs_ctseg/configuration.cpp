@@ -4,8 +4,19 @@
 
 // ---------------------------
 
+// Check whether time is in segment [tau_c,tau_cdag[.
+bool tau_in_seg(tau_t const &tau, segment_t const &seg) {
+  // if the segment is cyclic, we check if tau in the 2 parts
+  if (is_cyclic(seg))
+    return tau_in_seg(tau, {tau_t::beta(), seg.tau_cdag})
+       or tau_in_seg(tau, {seg.tau_c, tau_t::zero()});
+  return (tau <= seg.tau_c and tau > seg.tau_cdag); // ! decreasing time order
+}
+
+// ---------------------------
+
 // Find index of first segment starting left of seg.tau_c.
-std::vector<segment_t>::const_iterator find_segment_left(std::vector<segment_t> const &seglist, segment_t const &seg) {
+vec_seg_iter_t find_segment_left(std::vector<segment_t> const &seglist, segment_t const &seg) {
   auto seg_iter = std::upper_bound(seglist.begin(), seglist.end(), seg);
   return (seg_iter == seglist.begin()) ? seg_iter : --seg_iter;
 }
@@ -20,16 +31,6 @@ double n_tau(tau_t const &tau, std::vector<segment_t> const &seglist) {
   return 0.0;
 }
 
-// ---------------------------
-
-// Check whether time is in segment [tau_c,tau_cdag[.
-bool tau_in_seg(tau_t const &tau, segment_t const &seg) {
-  if (is_cyclic(seg))
-    return tau_in_seg(tau, segment_t{tau_t::beta(), seg.tau_cdag})
-       or tau_in_seg(tau, segment_t{seg.tau_c, tau_t::zero()});
-  if (tau <= seg.tau_c and tau > seg.tau_cdag) return true;
-  return false;
-}
 
 // ---------------------------
 
@@ -49,14 +50,6 @@ double overlap_seg(segment_t const &seg1, segment_t const &seg2) {
     return double(tau_start - tau_end);
   };
 };
-
-// ---------------------------
-
-// Checks if two segments are completely disjoint (accounting for boundaries)
-bool disjoint(segment_t seg1, segment_t seg2) {
-  if (seg1.tau_cdag > seg2.tau_c or seg2.tau_cdag > seg1.tau_c) return true;
-  return false;
-}
 
 // ---------------------------
 
@@ -145,8 +138,8 @@ double density(std::vector<segment_t> const &seglist) {
 }
 // ---------------------------
 
-int n_at_boundary(configuration_t const &config, int color) { 
-  auto const & sl = config.seglists[color];
+int n_at_boundary(configuration_t const &config, int color) {
+  auto const &sl = config.seglists[color];
   if (sl.empty()) return 0;
   return (is_cyclic(sl.back()) or is_full_line(sl.back())) ? 1 : 0;
 }
@@ -154,7 +147,7 @@ int n_at_boundary(configuration_t const &config, int color) {
 // ---------------------------
 
 // Find segments corresponding to bosonic line
-std::pair<std::vector<segment_t>::const_iterator, std::vector<segment_t>::const_iterator>
+std::pair<vec_seg_iter_t, vec_seg_iter_t>
 find_spin_segments(int line_idx, configuration_t const &config) {
   auto const &line    = config.Jperp_list[line_idx];
   auto const &sl_up   = config.seglists[0];
@@ -166,28 +159,60 @@ find_spin_segments(int line_idx, configuration_t const &config) {
   auto c_down  = segment_t{line.tau_Splus, line.tau_Splus};
   auto it_down = std::lower_bound(sl_down.cbegin(), sl_down.cend(), c_down);
   return std::make_pair(it_up, it_down);
+
+  // FIXME : Simplif
+  // In spin up line, the c connected to the J line is a at tau_Sminus
+  //auto it_up = std::lower_bound(sl_up.cbegin(), sl_up.cend(), segment_t{line.tau_Sminus, line.tau_Sminus});
+  // In spin down line, the c connected to the J line is a at tau_Splus
+  //auto it_down = std::lower_bound(sl_down.cbegin(), sl_down.cend(), segment_t{line.tau_Splus, line.tau_Splus});
+  //return {it_up, it_down};
 }
 
 // ---------------------------
 
 // Flip seglist
 std::vector<segment_t> flip(std::vector<segment_t> const &sl) {
+  if (sl.empty()) // Flipped seglist is full line
+    return {segment_t{tau_t::beta(), tau_t::zero()}};
+  if (sl.size() == 1 and is_full_line(sl[0])) // Do nothing: flipped config empty
+    return {};
+  // else Swap c and cdag
   auto fsl = std::vector<segment_t>{};
   fsl.reserve(sl.size() + 1);
+  for (auto i : range(sl.size())) {
+    if (is_cyclic(sl.back())) {
+      long ind = (i == 0) ? long(sl.size()) - 1 : i - 1;
+      fsl.emplace_back(segment_t{sl[ind].tau_cdag, sl[i].tau_c, sl[ind].J_cdag, sl[i].J_c});
+    } else {
+      long ind = (i == sl.size() - 1) ? 0 : i + 1;
+      fsl.emplace_back(segment_t{sl[i].tau_cdag, sl[ind].tau_c, sl[i].J_cdag, sl[ind].J_c});
+    }
+  } // loop over segs
+  return fsl;
+}
+
+// Flip seglist
+// FIXME : Recheck and merge
+// do not break the if loop with the condition ...
+std::vector<segment_t> flip2(std::vector<segment_t> const &sl) {
   if (sl.empty()) // Flipped seglist is full line
-    fsl.emplace_back(segment_t{tau_t::beta(), tau_t::zero()});
-  else if (sl.size() == 1 and is_full_line(sl[0])) { // Do nothing: flipped config empty
-  } else {                                           // Swap c and cdag
-    for (auto i : range(sl.size())) {
-      if (is_cyclic(sl.back())) {
-        long ind = (i == 0) ? long(sl.size()) - 1 : i - 1;
-        fsl.emplace_back(segment_t{sl[ind].tau_cdag, sl[i].tau_c, sl[ind].J_cdag, sl[i].J_c});
-      } else {
-        long ind = (i == sl.size() - 1) ? 0 : i + 1;
-        fsl.emplace_back(segment_t{sl[i].tau_cdag, sl[ind].tau_c, sl[i].J_cdag, sl[ind].J_c});
-      }
-    } // loop over segs
-  }   // general case
+    return {segment_t::full_line()};
+
+  if (sl.size() == 1 and is_full_line(sl[0])) // Do nothing: flipped config empty
+    return {};
+
+  long N   = sl.size();
+  auto fsl = std::vector<segment_t>(N); // NB must be () here, not {} !
+  if (is_cyclic(sl.back()))
+    for (auto i : range(N)) {
+      long ind = (i == 0) ? N - 1 : i - 1;
+      fsl[i]   = segment_t{sl[ind].tau_cdag, sl[i].tau_c, sl[ind].J_cdag, sl[i].J_c};
+    }
+  else
+    for (auto i : range(N)) {
+      long ind = (i == N - 1) ? 0 : i + 1;
+      fsl[i]   = segment_t{sl[i].tau_cdag, sl[ind].tau_c, sl[i].J_cdag, sl[ind].J_c};
+    }
   return fsl;
 }
 

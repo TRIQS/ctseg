@@ -1,5 +1,6 @@
 #include "invariants.hpp"
 #include "logs.hpp"
+#include "util.hpp"
 
 void check_invariant(configuration_t const &config, std::vector<det_t> const &dets) {
   check_segments(config);
