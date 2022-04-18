@@ -103,17 +103,17 @@ double overlap(segment_t const &s1, segment_t const &s2);
 
 // Total lenght of segment
 // FIXME : rename total_length ???
-double density(std::vector<segment_t> const &seglist);
+//double density(std::vector<segment_t> const &seglist);
 
-// Find density in seglist at time tau.
-double n_tau(tau_t const &tau, std::vector<segment_t> const &seglist);
-
-// Find index of first segment starting left of seg.tau_c.
-vec_seg_iter_t find_segment_left(std::vector<segment_t> const &seglist, segment_t const &seg);
+// Find density (0 or 1) in seglist at time tau.
+int n_tau(tau_t const &tau, std::vector<segment_t> const &seglist);
 
 // FIXME : reverse order ...
 // Overlap between segment and a list of segments.
 double overlap(std::vector<segment_t> const &seglist, segment_t const &seg);
+
+// Find index of first segment starting left of seg.tau_c.
+//vec_seg_iter_t find_segment_left(std::vector<segment_t> const &seglist, segment_t const &seg);
 
 // Checks if segment seg can be inserted into the list, i.e. without
 // overlap with other segment.

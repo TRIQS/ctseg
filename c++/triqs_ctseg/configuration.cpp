@@ -40,21 +40,30 @@ double overlap(segment_t const &s1, segment_t const &s2) {
 
 // ------------------- Functions to manipulate std::vector<segment_t> --------
 
+// FIXME : I really don't get this --seg_iter !!
 // Find index of first segment starting left of seg.tau_c.
 vec_seg_iter_t find_segment_left(std::vector<segment_t> const &seglist, segment_t const &seg) {
   auto seg_iter = std::upper_bound(seglist.begin(), seglist.end(), seg);
   return (seg_iter == seglist.begin()) ? seg_iter : --seg_iter;
 }
+// ---------------------------
 
+//// Length occupied by all segments for a given color
+//double density(std::vector<segment_t> const &seglist) {
+  //if (seglist.empty()) return 0;
+  //double result = 0;
+  //for (auto const &seg : seglist) result += double(seg.tau_c - seg.tau_cdag);
+  //return result;
+//}
 // ---------------------------
 
 // Find density in seglist to the right of time tau.
-double n_tau(tau_t const &tau, std::vector<segment_t> const &seglist) {
-  if (seglist.empty()) return 0.0;
+int n_tau(tau_t const &tau, std::vector<segment_t> const &seglist) {
+  if (seglist.empty()) return 0;
   auto it = find_segment_left(seglist, segment_t{tau, tau});
-  if (tau_in_seg(tau, *it) or tau_in_seg(tau, seglist.back())) return 1.0;
-  return 0.0;
+  return (tau_in_seg(tau, *it) or tau_in_seg(tau, seglist.back())) ? 1 : 0;
 }
+
 
 // ---------------------------
 
@@ -62,18 +71,19 @@ double n_tau(tau_t const &tau, std::vector<segment_t> const &seglist) {
 double overlap(std::vector<segment_t> const &seglist, segment_t const &seg) {
   if (seglist.empty()) return 0;
 
-  auto beta = seg.tau_c.beta();
-  auto zero = seg.tau_c.zero();
-
   // If seg is cyclic, split it
-  if (is_cyclic(seg))
-    return overlap(seglist, segment_t{beta, seg.tau_cdag}) + overlap(seglist, segment_t{seg.tau_c, zero});
+  if (is_cyclic(seg)) { 
+    auto [sl,sr] = split_cyclic_segment(seg);
+    return overlap(seglist, sl) + overlap(seglist, sr);
+  }
   double result = 0;
   // Isolate last segment
   auto last_seg = seglist.back();
   // In case last segment is cyclic, split it and compute its overlap with seg
-  if (is_cyclic(last_seg))
-    result += overlap(seg, segment_t{beta, last_seg.tau_cdag}) + overlap(seg, segment_t{last_seg.tau_c, zero});
+  if (is_cyclic(last_seg)) { 
+    auto [sl,sr] = split_cyclic_segment(last_seg);
+    result += overlap(seg, sl) + overlap(seg, sr);
+  }
   else
     result += overlap(seg, last_seg);
 
@@ -82,6 +92,7 @@ double overlap(std::vector<segment_t> const &seglist, segment_t const &seg) {
     result += overlap(*it, seg);
   return result;
 };
+
 
 // ---------------------------
 
@@ -132,16 +143,8 @@ double K_overlap(std::vector<segment_t> const &seglist, tau_t const &tau, bool i
   }
   return is_c ? result : -result;
 }
-// ---------------------------
 
-// Length occupied by all segments for a given color
-double density(std::vector<segment_t> const &seglist) {
-  if (seglist.empty()) return 0;
-  double result = 0;
-  for (auto const &seg : seglist) result += double(seg.tau_c - seg.tau_cdag);
-  return result;
-}
-// ---------------------------
+// ------------------- Functions to manipulate std::vector<segment_t> --------
 
 int n_at_boundary(configuration_t const &config, int color) {
   auto const &sl = config.seglists[color];
