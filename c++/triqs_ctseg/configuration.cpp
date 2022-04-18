@@ -4,19 +4,21 @@
 
 // ===================  Functions to manipulate segments ===================
 
-// Check whether time is in segment [tau_c,tau_cdag[.
-bool tau_in_seg(tau_t const &tau, segment_t const &seg) {
-  // if the segment is cyclic, we check if tau in the 2 parts
-  if (is_cyclic(seg))
-    return tau_in_seg(tau, {tau_t::beta(), seg.tau_cdag}) or tau_in_seg(tau, {seg.tau_c, tau_t::zero()});
-  return (tau <= seg.tau_c and tau > seg.tau_cdag); // ! decreasing time order
+// Split a cyclic segment into 2 segment, attached to beta and 0
+std::pair<segment_t, segment_t> split_cyclic_segment(segment_t const &s) {
+  return {{tau_t::beta(), s.tau_cdag}, {s.tau_c, tau_t::zero()}};
 }
 
 // ---------------------------
 
-// Split a cyclic segment into 2 segment, attached to beta and 0
-std::pair<segment_t, segment_t> split_cyclic_segment(segment_t const &s) {
-  return {{tau_t::beta(), s.tau_cdag}, {s.tau_c, tau_t::zero()}};
+// Check whether time is in segment [tau_c,tau_cdag[.
+bool tau_in_seg(tau_t const &tau, segment_t const &seg) {
+  // if the segment is cyclic, we check if tau in the 2 parts
+  if (is_cyclic(seg)) {
+    auto [sl, sr] = split_cyclic_segment(seg);
+    return tau_in_seg(tau, sl) or tau_in_seg(tau, sr);
+  }
+  return (tau <= seg.tau_c and tau > seg.tau_cdag); // ! decreasing time order
 }
 
 // ---------------------------
@@ -40,11 +42,10 @@ double overlap(segment_t const &s1, segment_t const &s2) {
 
 // =================== Functions to manipulate std::vector<segment_t> ========
 
-// FIXME : I really don't get this --seg_iter !!
-// it is first_segment_left_OR_BEGIN !
-// Find index of first segment starting left of seg.tau_c.
+// Find the closest segment on the left of seg.
+// If there is none, returns the first on the right
+// the list shoud not be empty
 vec_seg_iter_t find_segment_left(std::vector<segment_t> const &seglist, segment_t const &seg) {
-  // hopefully the list is not empty
   auto seg_iter = std::upper_bound(seglist.begin(), seglist.end(), seg);
   return (seg_iter == seglist.begin()) ? seg_iter : --seg_iter;
 }
@@ -63,10 +64,6 @@ vec_seg_iter_t find_segment_left(std::vector<segment_t> const &seglist, segment_
 int n_tau(tau_t const &tau, std::vector<segment_t> const &seglist) {
   if (seglist.empty()) return 0;
   auto it = find_segment_left(seglist, segment_t{tau, tau});
-  // ?????
-  // auto it = std::upper_bound(seglist.begin(), seglist.end(), seg);
-  // return tau_in_seg(tau, *it);
-
   return (tau_in_seg(tau, *it) or tau_in_seg(tau, seglist.back())) ? 1 : 0;
 }
 
@@ -119,32 +116,30 @@ std::vector<segment_t> flip2(std::vector<segment_t> const &sl) {
 }
 
 // ---------------------------
+
 // Overlap between segment and a list of segments.
 double overlap(std::vector<segment_t> const &seglist, segment_t const &seg) {
   if (seglist.empty()) return 0;
-
-  // If seg is cyclic, split it
-  if (is_cyclic(seg)) { 
-    auto [sl,sr] = split_cyclic_segment(seg);
+  // If seg is cyclic, need to split it because of the condition in the for later
+  if (is_cyclic(seg)) {
+    auto [sl, sr] = split_cyclic_segment(seg);
     return overlap(seglist, sl) + overlap(seglist, sr);
   }
+
+  // Compute overlap with all segments
   double result = 0;
-  // Isolate last segment
-  auto last_seg = seglist.back();
-  // In case last segment is cyclic, split it and compute its overlap with seg
-  if (is_cyclic(last_seg)) { 
-    auto [sl,sr] = split_cyclic_segment(last_seg);
-    result += overlap(seg, sl) + overlap(seg, sr);
-  }
-  else
-    result += overlap(seg, last_seg);
-
-  // Compute overlap of seg with the remainder of seglist
-  for (auto it = find_segment_left(seglist, seg); it->tau_c > seg.tau_cdag && it != --seglist.end(); ++it) //
+  // R is the iterator on the segment strictly after seg or end.
+  // L the segment before or begin
+  auto R    = std::upper_bound(seglist.begin(), seglist.end(), seg);
+  auto L    = (R == seglist.begin()) ? R : R - 1;
+  auto last = seglist.end() - 1;
+  for (auto it = L; it != last and it->tau_c > seg.tau_cdag; ++it) //
     result += overlap(*it, seg);
-  return result;
-};
 
+  result += overlap(*last, seg); // the last can be cyclic, hence be unreached due to it->tau_c condition
+  // nb : overlap is ok to call on cyclic segment
+  return result;
+}
 
 // ---------------------------
 

@@ -88,11 +88,6 @@ inline bool is_cyclic(segment_t const &seg) { return seg.tau_cdag > seg.tau_c; }
 // Check whether segment is a full line.
 inline bool is_full_line(segment_t const &seg) { return seg == segment_t::full_line(); }
 
-// FIXME : cpp only 
-// Checks if two segments are completely disjoint (accounting for boundaries)
-inline bool disjoint(segment_t const &s1, segment_t const &s2) {
-  return s1.tau_cdag > s2.tau_c or s2.tau_cdag > s1.tau_c; // symmetric s1 s2
-}
 
 // Check whether time is in segment.
 //bool tau_in_seg(tau_t const &tau, segment_t const &seg);
@@ -106,7 +101,7 @@ double overlap(segment_t const &s1, segment_t const &s2);
 // FIXME : rename total_length ???
 //double density(std::vector<segment_t> const &seglist);
 
-// Find density (0 or 1) in seglist at time tau.
+// Find density (0 or 1)in seglist to the right of time tau.
 int n_tau(tau_t const &tau, std::vector<segment_t> const &seglist);
 
 // Flip config
