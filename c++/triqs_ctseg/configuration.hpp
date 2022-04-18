@@ -110,6 +110,10 @@ double overlap(std::vector<segment_t> const &seglist, segment_t const &seg);
 // overlap with other segment.
 bool is_insertable_into(segment_t const &seg, std::vector<segment_t> const &seglist);
 
+// Find the indices of the segments whose cdag are in ]wtau_left,wtau_right[
+std::vector<long> cdag_in_window(tau_t const &wtau_left, tau_t const &wtau_right,
+                                 std::vector<segment_t> const &seglist);
+
 // FIXME : Comment. Parameters ?
 // Contribution of the dynamical interaction kernel K to the overlap between a segment and a list of segments.
 double K_overlap(std::vector<segment_t> const &seglist, tau_t const &tau_c, tau_t const &tau_cdag,
@@ -130,10 +134,6 @@ std::pair<vec_seg_iter_t, vec_seg_iter_t> find_spin_segments(int line_idx, confi
 
 // Sign of a config
 double config_sign(configuration_t const &config, std::vector<det_t> const &dets);
-
-// Find the indices of the segments whose cdag are in ]wtau_left,wtau_right[
-std::vector<long> cdag_in_window(tau_t const &wtau_left, tau_t const &wtau_right,
-                                 std::vector<segment_t> const &seglist);
 
 // ----------- DEBUG code --------------
 
