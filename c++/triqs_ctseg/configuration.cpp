@@ -180,11 +180,13 @@ std::vector<long> cdag_in_window(tau_t const &wtau_left, tau_t const &wtau_right
 double K_overlap(std::vector<segment_t> const &seglist, tau_t const &tau_c, tau_t const &tau_cdag,
                  gf<imtime, matrix_valued> const &K, int c1, int c2) {
 
+  auto Ks = slice_target_to_scalar(K, c1, c2);
+  
   // seglist empty covered by the loop
   double result = 0;
   for (auto const &s : seglist) {
-    result += real(K(double(tau_c - s.tau_c))(c1, c2) + K(double(tau_cdag - s.tau_cdag))(c1, c2)
-                   - K(double(tau_cdag - s.tau_c))(c1, c2) - K(double(tau_c - s.tau_cdag))(c1, c2));
+    result += real(Ks(double(tau_c - s.tau_c)) + Ks(double(tau_cdag - s.tau_cdag)) - Ks(double(tau_cdag - s.tau_c))
+                   - Ks(double(tau_c - s.tau_cdag)));
   }
   return result;
 }
@@ -195,10 +197,12 @@ double K_overlap(std::vector<segment_t> const &seglist, tau_t const &tau_c, tau_
 // Contribution of the dynamical interaction kernel K to the overlap between an operator and a list of segments.
 double K_overlap(std::vector<segment_t> const &seglist, tau_t const &tau, bool is_c, gf<imtime, matrix_valued> const &K,
                  int c1, int c2) {
+  auto Ks = slice_target_to_scalar(K, c1, c2);
+  
   double result = 0;
   // The order of the times is important for the measure of F
   for (auto const &s : seglist) {
-    result += real(K(double(s.tau_c - tau))(c1, c2) - K(double(s.tau_cdag - tau))(c1, c2));
+    result += real(Ks(double(s.tau_c - tau)) - Ks(double(s.tau_cdag - tau)));
   }
   return is_c ? result : -result;
 }
