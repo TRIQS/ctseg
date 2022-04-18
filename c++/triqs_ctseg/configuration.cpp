@@ -2,7 +2,7 @@
 #include "logs.hpp"
 #include <iomanip>
 
-// ------------------- Functions to manipulate segments --------------------------
+// ===================  Functions to manipulate segments ===================
 
 // Check whether time is in segment [tau_c,tau_cdag[.
 bool tau_in_seg(tau_t const &tau, segment_t const &seg) {
@@ -24,8 +24,8 @@ std::pair<segment_t, segment_t> split_cyclic_segment(segment_t const &s) {
 // Overlap between two (possibly cyclic) segments.
 double overlap(segment_t const &s1, segment_t const &s2) {
   // first treat the cyclic case
-  if (is_cyclic(s1)) { 
-    auto [sl,sr] = split_cyclic_segment(s1);
+  if (is_cyclic(s1)) {
+    auto [sl, sr] = split_cyclic_segment(s1);
     return overlap(sl, s2) + overlap(sr, s2);
     //return overlap(segment_t{tau_t::beta(), s1.tau_cdag}, s2) + overlap(segment_t{s1.tau_c, tau_t::zero()}, s2);
   }
@@ -38,11 +38,13 @@ double overlap(segment_t const &s1, segment_t const &s2) {
   return double(tau_start - tau_end);
 };
 
-// ------------------- Functions to manipulate std::vector<segment_t> --------
+// =================== Functions to manipulate std::vector<segment_t> ========
 
 // FIXME : I really don't get this --seg_iter !!
+// it is first_segment_left_OR_BEGIN !
 // Find index of first segment starting left of seg.tau_c.
 vec_seg_iter_t find_segment_left(std::vector<segment_t> const &seglist, segment_t const &seg) {
+  // hopefully the list is not empty
   auto seg_iter = std::upper_bound(seglist.begin(), seglist.end(), seg);
   return (seg_iter == seglist.begin()) ? seg_iter : --seg_iter;
 }
@@ -50,10 +52,10 @@ vec_seg_iter_t find_segment_left(std::vector<segment_t> const &seglist, segment_
 
 //// Length occupied by all segments for a given color
 //double density(std::vector<segment_t> const &seglist) {
-  //if (seglist.empty()) return 0;
-  //double result = 0;
-  //for (auto const &seg : seglist) result += double(seg.tau_c - seg.tau_cdag);
-  //return result;
+//if (seglist.empty()) return 0;
+//double result = 0;
+//for (auto const &seg : seglist) result += double(seg.tau_c - seg.tau_cdag);
+//return result;
 //}
 // ---------------------------
 
@@ -61,12 +63,62 @@ vec_seg_iter_t find_segment_left(std::vector<segment_t> const &seglist, segment_
 int n_tau(tau_t const &tau, std::vector<segment_t> const &seglist) {
   if (seglist.empty()) return 0;
   auto it = find_segment_left(seglist, segment_t{tau, tau});
+  // ?????
+  // auto it = std::upper_bound(seglist.begin(), seglist.end(), seg);
+  // return tau_in_seg(tau, *it);
+
   return (tau_in_seg(tau, *it) or tau_in_seg(tau, seglist.back())) ? 1 : 0;
 }
 
-
 // ---------------------------
 
+// Flip seglist
+std::vector<segment_t> flip(std::vector<segment_t> const &sl) {
+  if (sl.empty()) // Flipped seglist is full line
+    return {segment_t{tau_t::beta(), tau_t::zero()}};
+  if (sl.size() == 1 and is_full_line(sl[0])) // Do nothing: flipped config empty
+    return {};
+  // else Swap c and cdag
+  auto fsl = std::vector<segment_t>{};
+  fsl.reserve(sl.size() + 1);
+  for (auto i : range(sl.size())) {
+    if (is_cyclic(sl.back())) {
+      long ind = (i == 0) ? long(sl.size()) - 1 : i - 1;
+      fsl.emplace_back(segment_t{sl[ind].tau_cdag, sl[i].tau_c, sl[ind].J_cdag, sl[i].J_c});
+    } else {
+      long ind = (i == sl.size() - 1) ? 0 : i + 1;
+      fsl.emplace_back(segment_t{sl[i].tau_cdag, sl[ind].tau_c, sl[i].J_cdag, sl[ind].J_c});
+    }
+  } // loop over segs
+  return fsl;
+}
+
+// Flip seglist
+// FIXME : Recheck and merge
+// do not break the if loop with the condition ...
+std::vector<segment_t> flip2(std::vector<segment_t> const &sl) {
+  if (sl.empty()) // Flipped seglist is full line
+    return {segment_t::full_line()};
+
+  if (sl.size() == 1 and is_full_line(sl[0])) // Do nothing: flipped config empty
+    return {};
+
+  long N   = sl.size();
+  auto fsl = std::vector<segment_t>(N); // NB must be () here, not {} !
+  if (is_cyclic(sl.back()))
+    for (auto i : range(N)) {
+      long ind = (i == 0) ? N - 1 : i - 1;
+      fsl[i]   = segment_t{sl[ind].tau_cdag, sl[i].tau_c, sl[ind].J_cdag, sl[i].J_c};
+    }
+  else
+    for (auto i : range(N)) {
+      long ind = (i == N - 1) ? 0 : i + 1;
+      fsl[i]   = segment_t{sl[i].tau_cdag, sl[ind].tau_c, sl[i].J_cdag, sl[ind].J_c};
+    }
+  return fsl;
+}
+
+// ---------------------------
 // Overlap between segment and a list of segments.
 double overlap(std::vector<segment_t> const &seglist, segment_t const &seg) {
   if (seglist.empty()) return 0;
@@ -120,6 +172,8 @@ bool is_insertable(std::vector<segment_t> const &seglist, segment_t const &seg) 
 
 // ---------------------------
 
+// FIXME : why not pass a setgment ??
+// FIXME : why not pass a view of K
 // Contribution of the dynamical interaction kernel K to the overlap between a segment and a list of segments.
 double K_overlap(std::vector<segment_t> const &seglist, tau_t const &tau_c, tau_t const &tau_cdag,
                  gf<imtime, matrix_valued> const &K, int c1, int c2) {
@@ -132,19 +186,22 @@ double K_overlap(std::vector<segment_t> const &seglist, tau_t const &tau_c, tau_
   return result;
 }
 
+// ---------------------------
+
+// FIXME : the is_c is a HACK !
 // Contribution of the dynamical interaction kernel K to the overlap between an operator and a list of segments.
 double K_overlap(std::vector<segment_t> const &seglist, tau_t const &tau, bool is_c, gf<imtime, matrix_valued> const &K,
                  int c1, int c2) {
   if (seglist.empty()) return 0;
   double result = 0;
   // The order of the times is important for the measure of F
-  for (auto seg_in_list : seglist) {
-    result += real(K(double(seg_in_list.tau_c - tau))(c1, c2) - K(double(seg_in_list.tau_cdag - tau))(c1, c2));
+  for (auto const &s : seglist) {
+    result += real(K(double(s.tau_c - tau))(c1, c2) - K(double(s.tau_cdag - tau))(c1, c2));
   }
   return is_c ? result : -result;
 }
 
-// ------------------- Functions to manipulate std::vector<segment_t> --------
+// ===================  Functions to manipulate config ===================
 
 int n_at_boundary(configuration_t const &config, int color) {
   auto const &sl = config.seglists[color];
@@ -165,62 +222,7 @@ std::pair<vec_seg_iter_t, vec_seg_iter_t> find_spin_segments(int line_idx, confi
   // In spin down line, the c conneted to the J line is a at tau_Splus
   auto c_down  = segment_t{line.tau_Splus, line.tau_Splus};
   auto it_down = std::lower_bound(sl_down.cbegin(), sl_down.cend(), c_down);
-  return std::make_pair(it_up, it_down);
-
-  // FIXME : Simplif
-  // In spin up line, the c connected to the J line is a at tau_Sminus
-  //auto it_up = std::lower_bound(sl_up.cbegin(), sl_up.cend(), segment_t{line.tau_Sminus, line.tau_Sminus});
-  // In spin down line, the c connected to the J line is a at tau_Splus
-  //auto it_down = std::lower_bound(sl_down.cbegin(), sl_down.cend(), segment_t{line.tau_Splus, line.tau_Splus});
-  //return {it_up, it_down};
-}
-
-// ---------------------------
-
-// Flip seglist
-std::vector<segment_t> flip(std::vector<segment_t> const &sl) {
-  if (sl.empty()) // Flipped seglist is full line
-    return {segment_t{tau_t::beta(), tau_t::zero()}};
-  if (sl.size() == 1 and is_full_line(sl[0])) // Do nothing: flipped config empty
-    return {};
-  // else Swap c and cdag
-  auto fsl = std::vector<segment_t>{};
-  fsl.reserve(sl.size() + 1);
-  for (auto i : range(sl.size())) {
-    if (is_cyclic(sl.back())) {
-      long ind = (i == 0) ? long(sl.size()) - 1 : i - 1;
-      fsl.emplace_back(segment_t{sl[ind].tau_cdag, sl[i].tau_c, sl[ind].J_cdag, sl[i].J_c});
-    } else {
-      long ind = (i == sl.size() - 1) ? 0 : i + 1;
-      fsl.emplace_back(segment_t{sl[i].tau_cdag, sl[ind].tau_c, sl[i].J_cdag, sl[ind].J_c});
-    }
-  } // loop over segs
-  return fsl;
-}
-
-// Flip seglist
-// FIXME : Recheck and merge
-// do not break the if loop with the condition ...
-std::vector<segment_t> flip2(std::vector<segment_t> const &sl) {
-  if (sl.empty()) // Flipped seglist is full line
-    return {segment_t::full_line()};
-
-  if (sl.size() == 1 and is_full_line(sl[0])) // Do nothing: flipped config empty
-    return {};
-
-  long N   = sl.size();
-  auto fsl = std::vector<segment_t>(N); // NB must be () here, not {} !
-  if (is_cyclic(sl.back()))
-    for (auto i : range(N)) {
-      long ind = (i == 0) ? N - 1 : i - 1;
-      fsl[i]   = segment_t{sl[ind].tau_cdag, sl[i].tau_c, sl[ind].J_cdag, sl[i].J_c};
-    }
-  else
-    for (auto i : range(N)) {
-      long ind = (i == N - 1) ? 0 : i + 1;
-      fsl[i]   = segment_t{sl[i].tau_cdag, sl[ind].tau_c, sl[i].J_cdag, sl[ind].J_c};
-    }
-  return fsl;
+  return {it_up, it_down};
 }
 
 // ---------------------------
@@ -292,6 +294,8 @@ std::vector<long> cdag_in_window(tau_t const &wtau_left, tau_t const &wtau_right
     found_indices.push_back(seglist.size() - 1);
   return found_indices;
 }
+
+// FIXME : do we have TESTS ???
 
 /*
 // Simpler implementation for test purposes

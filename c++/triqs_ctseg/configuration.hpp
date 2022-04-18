@@ -69,7 +69,7 @@ struct configuration_t {
   int n_color() const { return seglists.size(); }
 };
 
-// ------------------- Functions to manipulate segments --------------------------
+// ===================  Functions to manipulate segments =================== 
 
 // Comparison of segments. s1 < s2 if s1 is left of s2
 // we order segments by decreasing tau_c (independent of tau_cdag !).
@@ -88,9 +88,10 @@ inline bool is_cyclic(segment_t const &seg) { return seg.tau_cdag > seg.tau_c; }
 // Check whether segment is a full line.
 inline bool is_full_line(segment_t const &seg) { return seg == segment_t::full_line(); }
 
+// FIXME : cpp only 
 // Checks if two segments are completely disjoint (accounting for boundaries)
 inline bool disjoint(segment_t const &s1, segment_t const &s2) {
-  return s1.tau_cdag > s2.tau_c or s2.tau_cdag > s1.tau_c;
+  return s1.tau_cdag > s2.tau_c or s2.tau_cdag > s1.tau_c; // symmetric s1 s2
 }
 
 // Check whether time is in segment.
@@ -99,7 +100,7 @@ inline bool disjoint(segment_t const &s1, segment_t const &s2) {
 // Overlap between two non-cyclic segments.
 double overlap(segment_t const &s1, segment_t const &s2);
 
-// ------------------- Functions to manipulate std::vector<segment_t> --------------------------
+// =================== Functions to manipulate std::vector<segment_t> ========
 
 // Total lenght of segment
 // FIXME : rename total_length ???
@@ -107,6 +108,9 @@ double overlap(segment_t const &s1, segment_t const &s2);
 
 // Find density (0 or 1) in seglist at time tau.
 int n_tau(tau_t const &tau, std::vector<segment_t> const &seglist);
+
+// Flip config
+std::vector<segment_t> flip(std::vector<segment_t> const &sl);
 
 // FIXME : reverse order ...
 // Overlap between segment and a list of segments.
@@ -130,16 +134,13 @@ double K_overlap(std::vector<segment_t> const &seglist, tau_t const &tau_c, tau_
 double K_overlap(std::vector<segment_t> const &seglist, tau_t const &tau, bool is_c, gf<imtime, matrix_valued> const &K,
                  int c1, int c2);
 
-// ------------------- Functions to manipulate config --------------------------
+// ===================  Functions to manipulate config =================== 
 
 // Return the value of n = 0 or 1, for a given color, at tau = beta = 0
 int n_at_boundary(configuration_t const &config, int color);
 
 // Find segments corresponding to bosonic line
 std::pair<vec_seg_iter_t, vec_seg_iter_t> find_spin_segments(int line_idx, configuration_t const &config);
-
-// Flip config
-std::vector<segment_t> flip(std::vector<segment_t> const &sl);
 
 // Sign of a config
 double config_sign(configuration_t const &config, std::vector<det_t> const &dets);
