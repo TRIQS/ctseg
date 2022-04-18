@@ -1,6 +1,5 @@
 #include "configuration.hpp"
 #include "logs.hpp"
-#include <iomanip>
 
 // ===================  Functions to manipulate segments ===================
 
@@ -145,7 +144,7 @@ bool is_insertable_into(segment_t const &seg, std::vector<segment_t> const &segl
   return true;
 }
 // ---------------------------
-
+// FIXME : do we have TESTS ???
 // Find the indices of the segments whose cdag are in ]wtau_left,wtau_right[
 std::vector<long> cdag_in_window(tau_t const &wtau_left, tau_t const &wtau_right,
                                  std::vector<segment_t> const &seglist) {
@@ -170,12 +169,9 @@ std::vector<long> cdag_in_window(tau_t const &wtau_left, tau_t const &wtau_right
     found_indices.push_back(seglist.size() - 1);
   return found_indices;
 }
-// FIXME : do we have TESTS ???
 
 // ---------------------------
 
-// FIXME : why not pass a setgment ??
-// FIXME : why not pass a view of K
 // Contribution of the dynamical interaction kernel K to the overlap between a segment and a list of segments.
 double K_overlap(std::vector<segment_t> const &seglist, tau_t const &tau_c, tau_t const &tau_cdag,
                  gf<imtime, matrix_valued> const &K, int c1, int c2) {

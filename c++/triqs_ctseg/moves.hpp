@@ -11,7 +11,3 @@
 #include "./moves/regroup_spin_segment.hpp"
 #include "./moves/swap_spin_lines.hpp"
 
-#include "./moves_unused/insert_segment_v2.hpp"
-#include "./moves_unused/remove_segment_v2.hpp"
-#include "./moves_unused/split_segment_v2.hpp"
-#include "./moves_unused/regroup_segment_v2.hpp"
