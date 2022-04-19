@@ -12,7 +12,7 @@ work_data_t::work_data_t(params_t const &p, inputs_t const &inputs, mpi::communi
   // Set logger level
   spdlog::set_pattern("%v");
   spdlog::set_level(spdlog::level::info);
-  if constexpr (ctseg_debug) spdlog::set_level(spdlog::level::debug);
+  if constexpr (print_logs) spdlog::set_level(spdlog::level::debug);
 
   double beta = p.beta;
   gf_struct   = p.gf_struct;

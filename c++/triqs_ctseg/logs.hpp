@@ -6,12 +6,12 @@
 static constexpr bool ctseg_debug = true;
 #else
 #define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_INFO
-static constexpr bool ctseg_debug      = false;
+static constexpr bool ctseg_debug = false;
 #endif
-#ifdef CHECK_INVARIANTS
-static constexpr bool check_invariants = true;
+#ifdef PRINT_LOGS
+static constexpr bool print_logs = true;
 #else
-static constexpr bool check_invariants = false;
+static constexpr bool print_logs  = false;
 #endif
 
 #include "spdlog/spdlog.h"
@@ -21,9 +21,9 @@ static constexpr bool check_invariants = false;
 #define LOG(...) SPDLOG_DEBUG(__VA_ARGS__)
 
 // Checked always, even in production
-#define ALWAYS_EXPECTS(Condition,  ...)                                                                   \
+#define ALWAYS_EXPECTS(Condition, ...)                                                                                 \
   if (not(Condition)) {                                                                                                \
     SPDLOG_CRITICAL("Error in function {} in file  {} at line {}", __FUNCTION__, __FILE__, __LINE__);                  \
-    SPDLOG_CRITICAL( __VA_ARGS__);                                                                      \
+    SPDLOG_CRITICAL(__VA_ARGS__);                                                                                      \
     throw std::runtime_error("Assertion Error, cf log");                                                               \
   }

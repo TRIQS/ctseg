@@ -167,7 +167,7 @@ namespace moves {
     LOG("Final sign is {}", final_sign);
 
     // Check invariant
-    if constexpr (check_invariants or ctseg_debug) check_invariant(config, wdata.dets);
+    if constexpr (print_logs or ctseg_debug) check_invariant(config, wdata.dets);
 
     ALWAYS_EXPECTS((sign_ratio * det_sign == 1.0),
                    "Error: move has produced negative sign! Det sign is {} and additional sign is {}. Config: ",

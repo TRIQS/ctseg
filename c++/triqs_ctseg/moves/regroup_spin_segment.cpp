@@ -29,8 +29,8 @@ namespace moves {
     auto new_seg_up   = segment_t{tau_up, old_seg_up.tau_cdag};
     auto new_seg_down = segment_t{tau_down, old_seg_down.tau_cdag};
     ln_trace_ratio += -wdata.U(0, 1)
-       * (overlap(new_seg_up, new_seg_down) + overlap(old_seg_up, old_seg_down)
-          - overlap(new_seg_up, old_seg_down) - overlap(new_seg_down, old_seg_up));
+       * (overlap(new_seg_up, new_seg_down) + overlap(old_seg_up, old_seg_down) - overlap(new_seg_up, old_seg_down)
+          - overlap(new_seg_down, old_seg_up));
 
     // Correct for the dynamical interaction between the two operators that have been moved
     if (wdata.has_Dt) {
@@ -126,7 +126,7 @@ namespace moves {
     LOG("Final sign is {}", final_sign);
 
     // Check invariant
-    if constexpr (check_invariants or ctseg_debug) check_invariant(config, wdata.dets);
+    if constexpr (print_logs or ctseg_debug) check_invariant(config, wdata.dets);
     ALWAYS_EXPECTS((sign_ratio * det_sign == 1.0),
                    "Error: move has produced negative sign! Det sign is {} and additional sign is {}. Config: {} ",
                    det_sign, sign_ratio, config);

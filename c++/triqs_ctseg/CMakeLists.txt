@@ -25,10 +25,10 @@ target_compile_definitions(${PROJECT_NAME}_c PUBLIC
 				$<$<BOOL:${CTSEG_DEBUG_VERIF}>:CTSEG_DEBUG_VERFIC>
 			  )
 
-option(CHECK_INVARIANTS OFF "Check invariants after each move.")
+option(PRINT_LOGS OFF "Print all log messages.")
 
-if(CHECK_INVARIANTS)
-  target_compile_definitions(${PROJECT_NAME}_c PUBLIC CHECK_INVARIANTS)
+if(PRINT_LOGS)
+  target_compile_definitions(${PROJECT_NAME}_c PUBLIC PRINT_LOGS)
 endif()
 
 

@@ -98,7 +98,7 @@ namespace moves {
     sl.insert(prop_seg_it, prop_seg);
 
     // Check invariant
-    if constexpr (check_invariants or ctseg_debug) check_invariant(config, wdata.dets);
+    if constexpr (print_logs or ctseg_debug) check_invariant(config, wdata.dets);
 
     double final_sign = config_sign(config, wdata.dets);
     double sign_ratio = final_sign / initial_sign;
