@@ -3,7 +3,6 @@
 
 // TODO : add non regression test.
 
-
 namespace measures {
 
   nn_static::nn_static(params_t const &p, work_data_t const &wdata, configuration_t const &config, results_t &results)
@@ -18,13 +17,13 @@ namespace measures {
 
   void nn_static::accumulate(double s) {
 
-    LOG("\n =================== MEASURE \int <nn>  ================ \n");
+    LOG("\n =================== MEASURE <nn>  ================ \n");
 
     Z += s;
 
     // FIXME : this is a simple O(n_color^2) algo
-    // If profiling says it is too slow, 
-    // then improve by progressing on the 2 seglists in // 
+    // If profiling says it is too slow,
+    // then improve by progressing on the 2 seglists in //
     // but it is a bit more complex to write
     for (int a = 0; a < n_color; ++a)
       for (int b = 0; b < n_color; ++b) {
@@ -40,7 +39,7 @@ namespace measures {
 
     Z  = mpi::all_reduce(Z, c);
     nn = mpi::all_reduce(nn, c);
-    nn = nn / Z/ beta;
+    nn = nn / Z / beta;
 
     // store the result (not reused later, hence we can move it).
     results.nn_static = std::move(nn);

@@ -39,11 +39,11 @@ namespace measures {
       for (int a = 0; a < n_color; ++a)
         for (auto const &seg : config.seglists[a]) {
 
-	  // position of c cdag of the segment, as an integer index in the mesh
+          // position of c cdag of the segment, as an integer index in the mesh
           auto u_idx_c    = closest_mesh_pt_index(q_tau.mesh(), seg.tau_c);
           auto u_idx_cdag = closest_mesh_pt_index(q_tau.mesh(), seg.tau_cdag);
 
-          auto d    = q_tau.data()(nda_all, a, b); // a view of the data for fixed a,b
+          auto d = q_tau.data()(nda_all, a, b); // a view of the data for fixed a,b
           // add + s to the data. NB : id1 > id2
           auto fill = [s, d](long u_idx1, long u_idx2) {
             ALWAYS_EXPECTS((u_idx1 >= u_idx2), "error", 1);
@@ -56,7 +56,7 @@ namespace measures {
           } else { // cyclic segment
             ALWAYS_EXPECTS((u_idx_cdag >= u_idx_c), "eee", 1);
             fill(u_idx_c, 0);
-            fill(q_tau.mesh().size(), u_idx_cdag);
+            fill(q_tau.mesh().size() - 1, u_idx_cdag);
           }
         }
     }
