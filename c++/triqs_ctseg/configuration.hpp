@@ -129,7 +129,7 @@ double K_overlap(std::vector<segment_t> const &seglist, tau_t const &tau, bool i
 // Sign of a config
 double config_sign(configuration_t const &config, std::vector<det_t> const &dets);
 
-// ===================  PRINTING code ========================
+// ===================  PRINTING ========================
 
 std::ostream &operator<<(std::ostream &out, std::vector<segment_t> const &sl);
 std::ostream &operator<<(std::ostream &out, configuration_t const &config);
