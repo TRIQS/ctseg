@@ -39,8 +39,8 @@ double overlap(segment_t const &s1, segment_t const &s2) {
 
 // =================== Functions to manipulate std::vector<segment_t> ========
 
-// Find the closest segment on the left of seg.
-// If there is none, returns the first on the right
+// Iterator on the closest segment on the left of seg.
+// If there is none, returns the first on the right (or end)
 // the list shoud not be empty
 vec_seg_iter_t find_segment_left(std::vector<segment_t> const &seglist, segment_t const &seg) {
   auto seg_iter = std::upper_bound(seglist.begin(), seglist.end(), seg);
@@ -94,10 +94,8 @@ double overlap(std::vector<segment_t> const &seglist, segment_t const &seg) {
   double result = 0;
   // R is the iterator on the segment strictly after seg or end.
   // L the segment before or begin
-  auto R    = std::upper_bound(seglist.begin(), seglist.end(), seg);
-  auto L    = (R == seglist.begin()) ? R : R - 1;
   auto last = seglist.end() - 1;
-  for (auto it = L; it != last and it->tau_c > seg.tau_cdag; ++it) //
+  for (auto it = find_segment_left(seglist, seg); it != last and it->tau_c > seg.tau_cdag; ++it) //
     result += overlap(*it, seg);
 
   result += overlap(*last, seg); // the last can be cyclic, hence be unreached due to it->tau_c condition
@@ -177,7 +175,7 @@ double K_overlap(std::vector<segment_t> const &seglist, tau_t const &tau_c, tau_
                  gf<imtime, matrix_valued> const &K, int c1, int c2) {
 
   auto Ks = slice_target_to_scalar(K, c1, c2);
-  
+
   // seglist empty covered by the loop
   double result = 0;
   for (auto const &s : seglist) {
@@ -194,7 +192,7 @@ double K_overlap(std::vector<segment_t> const &seglist, tau_t const &tau_c, tau_
 double K_overlap(std::vector<segment_t> const &seglist, tau_t const &tau, bool is_c, gf<imtime, matrix_valued> const &K,
                  int c1, int c2) {
   auto Ks = slice_target_to_scalar(K, c1, c2);
-  
+
   double result = 0;
   // The order of the times is important for the measure of F
   for (auto const &s : seglist) {
