@@ -14,16 +14,26 @@ work_data_t::work_data_t(params_t const &p, inputs_t const &inputs, mpi::communi
   spdlog::set_level(spdlog::level::info);
   if constexpr (print_logs) spdlog::set_level(spdlog::level::debug);
 
+  // .... init data .......
+
   double beta = p.beta;
   gf_struct   = p.gf_struct;
   n_color     = count_colors(gf_struct);
 
+  // compute gf_block_size_partial_sum
+  { // to make acc local
+    long acc = 0;
+    for (auto const &[s, l] : gf_struct) {
+      gf_block_size_partial_sum.push_back(acc);
+      acc += l;
+    }
+  }
+
   // Color dependent chemical potential
   mu = nda::zeros<double>(n_color);
-
   if (p.hartree_shift.size() > 0) {
     ALWAYS_EXPECTS((p.hartree_shift.size() == n_color), "Hartree shift size is not {}", n_color);
-    mu += p.hartree_shift;
+    mu = p.hartree_shift;
   }
 
   // .............. Interactions .................
@@ -49,7 +59,7 @@ work_data_t::work_data_t(params_t const &p, inputs_t const &inputs, mpi::communi
   if (has_Dt) {
     // Compute interaction kernels K(tau), K'(tau) by integrating D(tau)
     K      = gf<imtime>({beta, Boson, p.n_tau_k}, {n_color, n_color});
-    Kprime = gf<imtime>({beta, Boson, p.n_tau_k}, {n_color, n_color});
+    Kprime = K; 
     for (auto c1 : range(n_color)) {
       for (auto c2 : range(n_color)) {
         nda::array<dcomplex, 1> D_data = inputs.d0t.data()(range(), c1, c2);

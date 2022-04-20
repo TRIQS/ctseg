@@ -12,17 +12,18 @@ struct work_data_t {
 
   work_data_t(params_t const &p, inputs_t const &inputs, mpi::communicator c);
 
-  nda::vector<double> mu; // chemical potential per color
   nda::matrix<double> U;  // Uab n_a n_b
   gf_struct_t gf_struct;  // gf_struct of the Green function (input copied)
   int n_color;            // number of color
+  nda::vector<double> mu; // chemical potential per color
+
+  std::vector<long> gf_block_size_partial_sum; // data for block_to_color method
 
   bool has_Dt    = false; // Have D nn term
   bool has_jperp = false; // Have Jperp
   bool rot_inv   = true;  // ???
 
-  // FIXME : real_valued ?? : remove real everywhere ?
-  // Jperp : should be scalar ? or matrix ?
+  // FIXME : Could be real_valued if profiling show some gain
   gf<imtime> K, Kprime, Jperp, Kprime_spin;
 
   // Hybridization function
@@ -32,15 +33,6 @@ struct work_data_t {
   // The determinants
   std::vector<det_t> dets;
 
-  //
-  int block_to_color(long block, long idx) const {
-    int color = 0;
-    for (int i = 0; i <= block; i++) {
-      if (i == block)
-        color += int(idx); // index within the block
-      else
-        color += gf_struct[i].second; // block size
-    }
-    return color;
-  }
+  // map (block, idx) of gf to a color
+  int block_to_color(int block, int idx) const { return gf_block_size_partial_sum[block] + idx; }
 };
