@@ -36,6 +36,8 @@ class tau_t {
 
   /// Not for users. Use the factories
   tau_t(uint64_t n_) : n(n_) {}
+  /// For test only, not for users. Use the factories
+  tau_t(double x) : tau_t{uint64_t((x / _beta) * double(n_max))} {}
 
   /// Comparisons (using integer, so it is safe)
   auto operator<=>(tau_t const &tau) const { return n <=> tau.n; }
@@ -45,13 +47,13 @@ class tau_t {
   explicit operator double() const { return _beta * (double(n) / double(n_max)); }
 
   /// tau_t at tau = beta
-  static tau_t beta() { return {n_max}; }
+  static tau_t beta() { return {uint64_t{n_max}}; }
 
   /// $\tau =0$
-  static tau_t zero() { return {0}; }
+  static tau_t zero() { return {uint64_t{0}}; }
 
   /// Get epsilon, defined as $\epsilon = \beta /N_max$
-  static tau_t epsilon() { return {1}; }
+  static tau_t epsilon() { return {uint64_t{1}}; }
 
   // Get a random point in $]tau1, tau2[$
   static tau_t random(auto &rng, tau_t const &tau1, tau_t const &tau2) {
@@ -95,4 +97,3 @@ inline double operator*(double y, tau_t const &x) { return y * double(x); }
 
 inline double operator/(tau_t const &x, double y) { return double(x) / y; }
 inline double operator/(double y, tau_t const &x) { return y / double(x); }
-
