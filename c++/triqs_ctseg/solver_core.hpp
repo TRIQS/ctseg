@@ -62,4 +62,11 @@ class solver_core {
 
   /// Dynamical density-density interactions $D_0(\tau)$
   gf_view<imtime> D0_tau() { return inputs.d0t; }
+
+  // ---------------h5 -------------------------
+  static std::string hdf5_format() { return "CTSEG_J2"; }
+  friend void h5_write(h5::group h5group, std::string subgroup_name, solver_core const &s);
+  CPP2PY_IGNORE static solver_core h5_read_construct(h5::group h5group, std::string subgroup_name);
 };
+
+

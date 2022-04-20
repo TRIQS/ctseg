@@ -88,4 +88,33 @@ void solver_core::solve(solve_params_t const &solve_params) {
                               triqs::utility::clock_callback(p.max_time));
   CTQMC.collect_results(c);
 
-}; // solve
+} // solve
+
+// -------------- h5 -----------------------
+
+#define STR(x) #x
+#define STRINGIZE(x) STR(x)
+
+// Function that writes the solver_core to hdf5 file
+void h5_write(h5::group h5group, std::string subgroup_name, solver_core const &s) {
+  auto grp = h5group.create_group(subgroup_name);
+  h5_write_attribute(grp, "Format", solver_core::hdf5_format());
+  h5_write_attribute(grp, "TRIQS_GIT_HASH", std::string(STRINGIZE(TRIQS_GIT_HASH)));
+  h5_write_attribute(grp, "CTSEG_GIT_HASH", std::string(STRINGIZE(CTSEG_GIT_HASH)));
+  h5_write(grp, "constr_params", s.constr_params);
+  // FIXME : implement
+  //h5_write(grp, "last_solve_params", s.last_solve_params);
+  h5_write(grp, "inputs", s.inputs);
+  h5_write(grp, "results", s.results);
+}
+
+// Function that read all containers to hdf5 file
+solver_core solver_core::h5_read_construct(h5::group h5group, std::string subgroup_name) {
+  auto grp           = h5group.open_group(subgroup_name);
+  auto constr_params = h5_read<constr_params_t>(grp, "constr_params");
+  auto s             = solver_core{constr_params};
+  //h5_read(grp, "last_solve_params", s.last_solve_params);
+  h5_read(grp, "inputs", s.inputs);
+  h5_read(grp, "results", s.results);
+  return s;
+}

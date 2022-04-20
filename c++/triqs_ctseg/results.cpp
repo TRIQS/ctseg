@@ -31,6 +31,8 @@ void h5_write(h5::group h5group, std::string subgroup_name, results_t const &c) 
   h5_write(grp, "nn_tau", c.nn_tau);
   h5_write(grp, "nn_static", c.nn_static);
   h5_write(grp, "densities", c.densities);
+  h5_write(grp, "perturbation_order_histo_Delta", c.perturbation_order_histo_Delta);
+  h5_write(grp, "perturbation_order_histo_Jperp", c.perturbation_order_histo_Jperp);
 }
 
 //------------------------------------
@@ -46,4 +48,6 @@ void h5_read(h5::group h5group, std::string subgroup_name, results_t &c) {
   h5_read(grp, "nn_tau", c.nn_tau);
   h5_read(grp, "nn_static", c.nn_static);
   h5_read(grp, "densities", c.densities);
+  h5_read(grp, "perturbation_order_histo_Delta", c.perturbation_order_histo_Delta);
+  h5_read(grp, "perturbation_order_histo_Jperp", c.perturbation_order_histo_Jperp);
 }

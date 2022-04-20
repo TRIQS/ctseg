@@ -149,3 +149,9 @@ inline int count_colors(gf_struct_t const &gf_struct) {
   for (auto const &[bl_name, bl_size] : gf_struct) { n += bl_size; }
   return n;
 };
+
+/// writes all containers to hdf5 file
+void h5_write(h5::group h5group, std::string subgroup_name, constr_params_t const &c);
+
+/// reads all containers to hdf5 file
+void h5_read(h5::group h5group, std::string subgroup_name, constr_params_t &c);
