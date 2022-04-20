@@ -12,7 +12,7 @@ namespace moves {
     // Internal data
     int color = 0;
     segment_t prop_seg;
-    int prop_seg_idx;
+    long prop_seg_idx;
     double det_sign;
 
     public:

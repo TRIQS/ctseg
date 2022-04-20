@@ -17,6 +17,8 @@ namespace moves {
     // Select insertion window [wtau_left,wtau_right]
     tau_t wtau_left = tau_t::beta(), wtau_right = tau_t::zero();
 
+    // If sl.empty, no segment, we have the window. otherwise,
+    // we pick up one segment at random
     if (not sl.empty()) {
       if (is_full_line(sl.back())) {
         LOG("Full line, cannot insert.");
@@ -29,46 +31,58 @@ namespace moves {
       wtau_right = sl[is_last_segment ? 0 : seg_idx + 1].tau_c; // wtau_right is c of next segment, possibly cyclic
     }
 
+    // We now have the insertion window [wtau_left,wtau_right]
+    // Warning : it can be cyclic !
     LOG("Insertion window is wtau_left = {}, wtau_right = {}", wtau_left, wtau_right);
-    tau_t window_length = sl.empty() ? tau_t::beta() : wtau_left - wtau_right;
+    tau_t window_length = wtau_left - wtau_right;
 
     // Choose two random times in insertion window
     auto dt1 = tau_t::random(rng, window_length);
     auto dt2 = tau_t::random(rng, window_length);
     if (dt1 == dt2) {
-      LOG("Generated equal times");
+      LOG("insert_segment: generated equal times. Rejecting");
       return 0;
     }
-    if (dt1 > dt2 and !sl.empty()) std::swap(dt1, dt2); // if inserting into an empty line, two ways to insert
-    prop_seg = segment_t{wtau_left - dt1, wtau_left - dt2};
+    // we ensure that dt1 < dt2.
+    // except for an empty line because :  BEWARE in the reverse move.
+    // 1- in non empty line, we insert a segment in a void so a [c cdag]
+    // 2- in an empty line, we can insert [c cdag] or [cdag c]
+    if (dt1 > dt2 and not sl.empty()) std::swap(dt1, dt2); // if inserting into an empty line, two ways to insert
 
+    // Here is the segment we propose to insert
+    prop_seg = segment_t{wtau_left - dt1, wtau_left - dt2};
     LOG("Inserting segment with c at {}, cdag at {}", prop_seg.tau_c, prop_seg.tau_cdag);
 
     // ------------  Trace ratio  -------------
-    double ln_trace_ratio = wdata.mu(color) * prop_seg.length();
+    double ln_trace_ratio = wdata.mu(color) * prop_seg.length(); // chemical potential
+    // Now the
     for (auto c : range(config.n_color())) {
-      if (c != color) { ln_trace_ratio += -wdata.U(color, c) * overlap(config.seglists[c], prop_seg); }
+      if (c != color) ln_trace_ratio += -wdata.U(color, c) * overlap(config.seglists[c], prop_seg);
       if (wdata.has_Dt)
         ln_trace_ratio += K_overlap(config.seglists[c], prop_seg.tau_c, prop_seg.tau_cdag, wdata.K, color, c);
     }
     if (wdata.has_Dt)
       ln_trace_ratio +=
-         -real(wdata.K(double(prop_seg.tau_c - prop_seg.tau_cdag))(color, color)); // Correct double counting
+         -real(wdata.K(double(prop_seg.length()))(color, color)); // Correct double counting
     double trace_ratio = std::exp(ln_trace_ratio);
 
     // ------------  Det ratio  ---------------
     auto &D             = wdata.dets[color];
     auto det_c_time     = [&](long i) { return D.get_y(i).first; };
     auto det_cdag_time  = [&](long i) { return D.get_x(i).first; };
-    long det_index_c    = lower_bound(det_c_time, D.size(), prop_seg.tau_c);
-    long det_index_cdag = lower_bound(det_cdag_time, D.size(), prop_seg.tau_cdag);
+    long det_idx_c    = lower_bound(det_c_time, D.size(), prop_seg.tau_c);
+    long det_idx_cdag = lower_bound(det_cdag_time, D.size(), prop_seg.tau_cdag);
+    
     // We insert tau_cdag as a line (first index) and tau_c as a column (second index).
-    auto det_ratio = D.try_insert(det_index_cdag, det_index_c, {prop_seg.tau_cdag, 0}, {prop_seg.tau_c, 0});
+    auto det_ratio = D.try_insert(det_idx_cdag, det_idx_c, {prop_seg.tau_cdag, 0}, {prop_seg.tau_c, 0});
 
     // ------------  Proposition ratio ------------
 
-    double current_number_intervals = std::max(1.0, double(sl.size()));
-    double future_number_segments   = double(sl.size()) + 1;
+    double current_number_intervals = std::max(long(1), long(sl.size()));
+    double future_number_segments   = sl.size() + 1;
+    // T direct  = 1 / current_number_intervals * 1/window_length^2 * 
+    //                * (2 iif not empty as the proba to get the dt1, dt2 coupled is x 2)
+    // T inverse = 1 / future_number_segments
     double prop_ratio =
        (current_number_intervals * window_length * window_length / (sl.empty() ? 1 : 2)) / future_number_segments;
     // Account for absence of time swapping when inserting into empty line.
@@ -77,6 +91,7 @@ namespace moves {
 
     double prod = trace_ratio * det_ratio * prop_ratio;
     det_sign    = (det_ratio > 0) ? 1.0 : -1.0;
+    
     return (std::isfinite(prod) ? prod : det_sign);
   }
 
@@ -94,8 +109,7 @@ namespace moves {
 
     // Insert the segment in an ordered list
     auto &sl         = config.seglists[color];
-    auto prop_seg_it = std::upper_bound(sl.begin(), sl.end(), prop_seg);
-    sl.insert(prop_seg_it, prop_seg);
+    sl.insert(std::upper_bound(sl.begin(), sl.end(), prop_seg), prop_seg);
 
     // Check invariant
     if constexpr (print_logs or ctseg_debug) check_invariant(config, wdata.dets);

@@ -40,6 +40,8 @@ work_data_t::work_data_t(params_t const &p, inputs_t const &inputs, mpi::communi
   // Extract the U from the operator
   auto U_full = triqs::operators::utils::dict_to_matrix(triqs::operators::utils::extract_U_dict2(p.h_int), p.gf_struct);
   U           = nda::matrix<double>{real(U_full)};
+  // We ensure that U(a, a) is 0, which must be true
+  for (int a = 0; a < U.extent(0); ++a) ALWAYS_EXPECTS((abs(U(a, a)) < 1.e-15), "Internal Error. U diag non zero");
 
   // Do we have D(tau) and J_perp(tau)? Yes, unless the data is 0
   has_Dt    = max_element(abs(inputs.d0t.data())) > 1.e-13;
@@ -59,7 +61,7 @@ work_data_t::work_data_t(params_t const &p, inputs_t const &inputs, mpi::communi
   if (has_Dt) {
     // Compute interaction kernels K(tau), K'(tau) by integrating D(tau)
     K      = gf<imtime>({beta, Boson, p.n_tau_k}, {n_color, n_color});
-    Kprime = K; 
+    Kprime = K;
     for (auto c1 : range(n_color)) {
       for (auto c2 : range(n_color)) {
         nda::array<dcomplex, 1> D_data = inputs.d0t.data()(range(), c1, c2);
