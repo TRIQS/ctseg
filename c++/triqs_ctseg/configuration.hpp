@@ -10,7 +10,7 @@
 // The configuration is made of n_color ordered list of segments
 
 // NB : all the time ordering are in DECREASING order,
-// in agreement with the usual convertion
+// in agreement with the usual convention
 
 // --------------- Segment ----------------------
 //
@@ -19,7 +19,7 @@
 //
 // Some segments are aligned between 2 colors, corresponding to a S^+, S^- operators
 // The S operators will not be linked to Delta, the hybridization, but to J lines
-// This information is stored also in the segment (J_c, J_cdag field).
+// This information is stored also each segments (J_c, J_cdag field) for convenience
 //
 // Special case : full lines.
 // When a line has no operator, we need to take into account 2 states : empty or full
@@ -93,7 +93,8 @@ double overlap(segment_t const &s1, segment_t const &s2);
 // lower_bound : find segment at tau if present or the first after tau
 vec_seg_iter_t find_segment(std::vector<segment_t> const &seglist, tau_t const &tau);
 
-// Return the value of n = 0 or 1, for a given color, at tau = beta = 0
+// Value of n (= 0 or 1) at tau = beta = 0
+// 1 iif there is a cyclic segment or a full line
 int n_at_boundary(std::vector<segment_t> const &seglist);
 
 // Find density (0 or 1)in seglist to the right of time tau.
@@ -128,7 +129,7 @@ double K_overlap(std::vector<segment_t> const &seglist, tau_t const &tau, bool i
 // Sign of a config
 double config_sign(configuration_t const &config, std::vector<det_t> const &dets);
 
-// ----------- DEBUG code --------------
+// ===================  PRINTING code ========================
 
-// Print config
+std::ostream &operator<<(std::ostream &out, std::vector<segment_t> const &sl);
 std::ostream &operator<<(std::ostream &out, configuration_t const &config);

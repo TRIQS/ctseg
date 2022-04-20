@@ -17,6 +17,29 @@ segment_t S(auto x, auto y) { return {make_tau(x), make_tau(y)}; }
 
 // ------------------------------
 
+TEST(segment, overlap) {
+  tau_t::set_beta(beta);
+  EXPECT_NEAR(overlap(S(3,2), S(2.5, 1.5)), 0.5, precision);
+  // noncyclic, cyclic
+  EXPECT_NEAR(overlap(S(3,2), S(2.5, 10)), 0.5, precision);
+  // cyclic, noncyclic
+  EXPECT_NEAR(overlap(S(2.5, 10), S(3,2)), 0.5, precision);
+}
+
+// ------------------------------
+
+TEST(segment, flip) {
+  tau_t::set_beta(beta);
+  auto v    = vs_t{S(4, 3), S(2, 1)};
+  auto vf    = vs_t{S(3 ,2), S(1, 4)};
+  //std::cout  << flip(v) << std::endl;
+  //std::cout  << vf << std::endl;
+  EXPECT_EQ(flip(v), vf);
+  EXPECT_EQ(flip(flip(v)), v);
+}
+
+// ------------------------------
+
 TEST(segment, find) {
   tau_t::set_beta(beta);
 

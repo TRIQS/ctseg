@@ -8,6 +8,18 @@ std::pair<segment_t, segment_t> split_cyclic_segment(segment_t const &s) {
   return {{tau_t::beta(), s.tau_cdag}, {s.tau_c, tau_t::zero()}};
 }
 
+// -------------- internal -------------
+
+// Checks if two segments are completely disjoint. 
+// !! s2 might be cyclic, not s1
+bool disjoint(segment_t const &s1, segment_t const &s2) {
+  if (is_cyclic(s2)) {
+    auto [sl, sr] = split_cyclic_segment(s2);
+    return disjoint(s1, sl) and disjoint(s1, sr);
+  }
+  return s1.tau_cdag > s2.tau_c or s2.tau_cdag > s1.tau_c; // symmetric s1 s2
+}
+
 // ---------------------------
 
 // Check whether time is in segment [tau_c,tau_cdag[.
@@ -30,14 +42,26 @@ double overlap(segment_t const &s1, segment_t const &s2) {
     return overlap(sl, s2) + overlap(sr, s2);
   }
   if (is_cyclic(s2)) return overlap(s2, s1); // s1 is not cyclic any more
+  // [c1 cd1]                            [c1 cd1]
+  //          [c2 cd2]   OR    [c2 cd2]
   if (s1.tau_cdag >= s2.tau_c or s2.tau_cdag >= s1.tau_c) return 0;
   // last case
-  tau_t tau_start = std::min(s1.tau_c, s2.tau_c);
-  tau_t tau_end   = std::max(s1.tau_cdag, s2.tau_cdag);
+  // [c1     cd1]                   [c1 cd1]
+  //     [c2      cd2]      [c2            cd2]
+  tau_t tau_start = std::min(s1.tau_c, s2.tau_c);       // ! most RIGHT as ordered by >  !
+  tau_t tau_end   = std::max(s1.tau_cdag, s2.tau_cdag); // most LEFT
+  assert(tau_start >= tau_end);
   return double(tau_start - tau_end);
 };
 
 // =================== Functions to manipulate std::vector<segment_t> ========
+
+vec_seg_iter_t find_segment(std::vector<segment_t> const &seglist, tau_t const &tau) {
+  // comparison is s.tau > tau as in the tau_t comparison
+  return std::lower_bound(seglist.begin(), seglist.end(), tau, [](auto &&s, auto &&t) { return s.tau_c > t; });
+}
+
+// ------------ internal ---------------
 
 // Iterator on the closest segment on the left of seg.
 // If there is none, returns the first on the right (or end)
@@ -46,6 +70,14 @@ vec_seg_iter_t find_segment_left(std::vector<segment_t> const &seglist, segment_
   auto seg_iter = std::upper_bound(seglist.begin(), seglist.end(), seg);
   return (seg_iter == seglist.begin()) ? seg_iter : --seg_iter;
 }
+
+// ---------------------------
+
+int n_at_boundary(std::vector<segment_t> const &sl) {
+  if (sl.empty()) return 0;
+  return (is_cyclic(sl.back()) or is_full_line(sl.back())) ? 1 : 0;
+}
+
 // ---------------------------
 
 // Find density in seglist to the right of time tau.
@@ -92,27 +124,17 @@ double overlap(std::vector<segment_t> const &seglist, segment_t const &seg) {
 
   // Compute overlap with all segments
   double result = 0;
-  // R is the iterator on the segment strictly after seg or end.
-  // L the segment before or begin
+  // first loop on all segment but the last one
   auto last = seglist.end() - 1;
   for (auto it = find_segment_left(seglist, seg); it != last and it->tau_c > seg.tau_cdag; ++it) //
     result += overlap(*it, seg);
 
-  result += overlap(*last, seg); // the last can be cyclic, hence be unreached due to it->tau_c condition
+  // the last can be cyclic, hence be unreached due to it->tau_c condition
   // nb : overlap is ok to call on cyclic segment
+  result += overlap(*last, seg); 
   return result;
 }
 
-// ---------------------------
-
-// Checks if two segments are completely disjoint. s2 might be cyclic, not s1
-inline bool disjoint(segment_t const &s1, segment_t const &s2) {
-  if (is_cyclic(s2)) {
-    auto [sl, sr] = split_cyclic_segment(s2);
-    return disjoint(s1, sl) and disjoint(s1, sr);
-  }
-  return s1.tau_cdag > s2.tau_c or s2.tau_cdag > s1.tau_c; // symmetric s1 s2
-}
 // ---------------------------
 
 // Checks if segment is movable to a given color
@@ -199,21 +221,6 @@ double K_overlap(std::vector<segment_t> const &seglist, tau_t const &tau, bool i
   return is_c ? result : -result;
 }
 
-// ---------------------------
-
-// FIXME TEST
-// lower_bound : find segment at tau if present or the first after tau
-vec_seg_iter_t find_segment(std::vector<segment_t> const &seglist, tau_t const &tau) {
-  return std::lower_bound(seglist.cbegin(), seglist.cend(), tau, [](auto &&s, auto &&t) { return s.tau_c > t; });
-}
-
-// ---------------------------
-
-int n_at_boundary(std::vector<segment_t> const &sl) {
-  if (sl.empty()) return 0;
-  return (is_cyclic(sl.back()) or is_full_line(sl.back())) ? 1 : 0;
-}
-
 // ===================  Functions to manipulate config ===================
 
 double config_sign(configuration_t const &config, std::vector<det_t> const &dets) {
@@ -256,6 +263,16 @@ double config_sign(configuration_t const &config, std::vector<det_t> const &dets
 
     }
   } */
+}
+
+// ===================  PRINTING ========================
+
+std::ostream &operator<<(std::ostream &out, std::vector<segment_t> const &sl) {
+  out << '\n';
+  for (auto const &[i, seg] : itertools::enumerate(sl))
+    out << ". Position " << i << " : [ J:" << seg.J_c << " " << seg.tau_c << ", " << seg.tau_cdag << " J:" << seg.J_cdag
+        << "]\n";
+  return out;
 }
 
 // ---------------------------
