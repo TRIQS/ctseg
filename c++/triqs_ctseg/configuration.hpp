@@ -85,14 +85,16 @@ inline bool is_cyclic(segment_t const &seg) { return seg.tau_cdag > seg.tau_c; }
 // Check whether segment is a full line.
 inline bool is_full_line(segment_t const &seg) { return seg == segment_t::full_line(); }
 
-
-// Check whether time is in segment.
-//bool tau_in_seg(tau_t const &tau, segment_t const &seg);
-
 // Overlap between two non-cyclic segments.
 double overlap(segment_t const &s1, segment_t const &s2);
 
 // =================== Functions to manipulate std::vector<segment_t> ========
+
+// lower_bound : find segment at tau if present or the first after tau
+vec_seg_iter_t find_segment(std::vector<segment_t> const &seglist, tau_t const &tau);
+
+// Return the value of n = 0 or 1, for a given color, at tau = beta = 0
+int n_at_boundary(std::vector<segment_t> const &seglist);
 
 // Find density (0 or 1)in seglist to the right of time tau.
 int n_tau(tau_t const &tau, std::vector<segment_t> const &seglist);
@@ -122,12 +124,6 @@ double K_overlap(std::vector<segment_t> const &seglist, tau_t const &tau, bool i
                  int c1, int c2);
 
 // ===================  Functions to manipulate config =================== 
-
-// Return the value of n = 0 or 1, for a given color, at tau = beta = 0
-int n_at_boundary(configuration_t const &config, int color);
-
-// Find segments corresponding to bosonic line
-std::pair<vec_seg_iter_t, vec_seg_iter_t> find_spin_segments(int line_idx, configuration_t const &config);
 
 // Sign of a config
 double config_sign(configuration_t const &config, std::vector<det_t> const &dets);

@@ -35,7 +35,7 @@ namespace measures {
 
     // <n_a(tau) n_b(0) >
     for (int b = 0; b < n_color; ++b) {
-      if (n_at_boundary(config, b) == 0) continue; // nb = 0, nothing to accumulate
+      if (n_at_boundary(config.seglists[b]) == 0) continue; // nb = 0, nothing to accumulate
       for (int a = 0; a < n_color; ++a)
         for (auto const &seg : config.seglists[a]) {
 

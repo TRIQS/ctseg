@@ -22,11 +22,12 @@ namespace moves {
     // ------------- Find the hanging segment -------------
 
     // Find the two segments whose c is connected to the spin line
-    auto prep    = find_spin_segments(line_idx, config);
-    auto it_up   = prep.first;
-    auto it_down = prep.second;
+    auto it_up   = find_segment(config.seglists[0], config.Jperp_list[line_idx].tau_Sminus);
+    auto it_down = find_segment(config.seglists[1], config.Jperp_list[line_idx].tau_Splus);
+
     // The hanging segment if it is in spin up
     auto spin_seg_up = segment_t{jl[line_idx].tau_Sminus, jl[line_idx].tau_Splus};
+   
     // The hanging segment if it is in spin down
     auto spin_seg_down = segment_t{jl[line_idx].tau_Splus, jl[line_idx].tau_Sminus};
 

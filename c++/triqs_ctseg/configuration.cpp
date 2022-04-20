@@ -195,36 +195,26 @@ double K_overlap(std::vector<segment_t> const &seglist, tau_t const &tau, bool i
 
   double result = 0;
   // The order of the times is important for the measure of F
-  for (auto const &s : seglist) {
-    result += real(Ks(double(s.tau_c - tau)) - Ks(double(s.tau_cdag - tau)));
-  }
+  for (auto const &s : seglist) { result += real(Ks(double(s.tau_c - tau)) - Ks(double(s.tau_cdag - tau))); }
   return is_c ? result : -result;
 }
 
-// ===================  Functions to manipulate config ===================
+// ---------------------------
 
-int n_at_boundary(configuration_t const &config, int color) {
-  auto const &sl = config.seglists[color];
+// FIXME TEST
+// lower_bound : find segment at tau if present or the first after tau
+vec_seg_iter_t find_segment(std::vector<segment_t> const &seglist, tau_t const &tau) {
+  return std::lower_bound(seglist.cbegin(), seglist.cend(), tau, [](auto &&s, auto &&t) { return s.tau_c > t; });
+}
+
+// ---------------------------
+
+int n_at_boundary(std::vector<segment_t> const &sl) {
   if (sl.empty()) return 0;
   return (is_cyclic(sl.back()) or is_full_line(sl.back())) ? 1 : 0;
 }
 
-// ---------------------------
-
-std::pair<vec_seg_iter_t, vec_seg_iter_t> find_spin_segments(int line_idx, configuration_t const &config) {
-  auto const &line    = config.Jperp_list[line_idx];
-  auto const &sl_up   = config.seglists[0];
-  auto const &sl_down = config.seglists[1];
-  // In spin up line, the c conneted to the J line is a at tau_Sminus
-  auto c_up  = segment_t{line.tau_Sminus, line.tau_Sminus};
-  auto it_up = std::lower_bound(sl_up.cbegin(), sl_up.cend(), c_up);
-  // In spin down line, the c conneted to the J line is a at tau_Splus
-  auto c_down  = segment_t{line.tau_Splus, line.tau_Splus};
-  auto it_down = std::lower_bound(sl_down.cbegin(), sl_down.cend(), c_down);
-  return {it_up, it_down};
-}
-
-// ---------------------------
+// ===================  Functions to manipulate config ===================
 
 double config_sign(configuration_t const &config, std::vector<det_t> const &dets) {
   double sign = 1.0;
