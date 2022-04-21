@@ -88,6 +88,9 @@ inline bool is_full_line(segment_t const &seg) { return seg == segment_t::full_l
 // Overlap between two non-cyclic segments.
 double overlap(segment_t const &s1, segment_t const &s2);
 
+// Flip a segment. J are set to default
+inline segment_t flip (segment_t const & s) { return {s.tau_cdag, s.tau_c};}
+
 // =================== Functions to manipulate std::vector<segment_t> ========
 
 // lower_bound : find segment at tau if present or the first after tau

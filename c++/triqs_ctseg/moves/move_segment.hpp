@@ -11,12 +11,11 @@ namespace moves {
     triqs::mc_tools::random_generator &rng;
 
     // Internal data
-    int origin_color, destination_color;
+    bool flipped; // whether we flip an antisegment
+    int origin_color, dest_color;
     segment_t origin_segment;
-    int origin_index;
-    std::vector<segment_t>::const_iterator destination_it;
+    long origin_index, dest_index;
     double det_sign;
-    bool need_flip;
     std::vector<segment_t> sl, dsl;
 
     public:
