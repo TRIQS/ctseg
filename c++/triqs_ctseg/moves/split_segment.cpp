@@ -19,32 +19,30 @@ namespace moves {
     }
 
     // Select segment to split
-    prop_seg_idx        = rng(sl.size());
-    prop_seg            = sl[prop_seg_idx];
+    prop_seg_idx    = rng(sl.size());
+    auto prop_seg   = sl[prop_seg_idx];
     splitting_full_line = is_full_line(prop_seg);
     if (splitting_full_line) LOG("Splitting full line.");
 
     // Select splitting points (tau_left,tau_right)
-    tau_t dt1 = tau_t::random(rng, prop_seg.length());
-    tau_t dt2 = tau_t::random(rng, prop_seg.length());
+    auto dt1 = tau_t::random(rng, prop_seg.length());
+    auto dt2 = tau_t::random(rng, prop_seg.length());
     if (dt1 == dt2) {
       LOG("Generated equal times");
       return 0;
     }
-    if (dt1 > dt2 and !splitting_full_line)
-      std::swap(dt1, dt2); // If splitting a full line, the order of tau_left and tau_right is not fixed
-    tau_left             = prop_seg.tau_c - dt1; // dt1 < dt2
-    tau_right            = prop_seg.tau_c - dt2;
-    auto removed_segment = segment_t{tau_left, tau_right}; // "antisegment" : careful with order of c, cdag
-    // Check whether the splitting of a cyclic segment produces a new segment at the beginning of seglist
-    // (useful for config update and dets)
-    bool segment_overboard = is_cyclic(prop_seg) and !is_cyclic(segment_t{tau_right, prop_seg.tau_cdag});
-    // Index of the rightmost of the two produced segments (the one to the left is always at prop_seg_idx)
-    right_seg_idx = (splitting_full_line or segment_overboard) ? 0 : prop_seg_idx + 1;
+    // If splitting a full line, the order of tau_left and tau_right is not fixed
+    if (dt1 > dt2 and not splitting_full_line) std::swap(dt1, dt2);
+
+    tau_left  = prop_seg.tau_c - dt1; // dt1 < dt2
+    tau_right = prop_seg.tau_c - dt2;
 
     LOG("Splitting at position {} : adding c at {}, cdag at {}", prop_seg_idx, tau_right, tau_left);
 
     // ------------  Trace ratio  -------------
+
+    auto removed_segment = segment_t{tau_left, tau_right}; // "antisegment" : careful with order of c, cdag
+
     double ln_trace_ratio = -wdata.mu(color) * removed_segment.length();
     for (auto c : range(config.n_color())) {
       if (c != color) { ln_trace_ratio -= -wdata.U(color, c) * overlap(config.seglists[c], removed_segment); }
@@ -64,7 +62,9 @@ namespace moves {
     // ------------  Proposition ratio ------------
 
     double current_number_segments = sl.size();
-    double future_number_intervals = splitting_full_line ? 1 : double(sl.size()) + 1.0;
+    double future_number_intervals = splitting_full_line ? 1 : sl.size() + 1;
+    // T direct 1/  # segment  1/ len(prop_seg) ^2 * (2 iif !full line)
+    // T inverse : 1/ # interval
     double prop_ratio =
        (current_number_segments * prop_seg.length() * prop_seg.length() / (splitting_full_line ? 1 : 2))
        / (future_number_intervals);
@@ -91,15 +91,18 @@ namespace moves {
     // Split the segment
     auto &sl = config.seglists[color];
     if (splitting_full_line) {
-      auto new_segment = segment_t{tau_right, tau_left};
-      sl[prop_seg_idx] = new_segment;
+      sl[prop_seg_idx] = segment_t{tau_right, tau_left};
     } else {
+      auto prop_seg  = sl[prop_seg_idx];
       auto new_seg_left  = segment_t{prop_seg.tau_c, tau_left, prop_seg.J_c, false};
       auto new_seg_right = segment_t{tau_right, prop_seg.tau_cdag, false, prop_seg.J_cdag};
       // Update the proposed segment
       sl[prop_seg_idx] = new_seg_left;
-      // Insert a new segment
-      sl.insert(sl.begin() + right_seg_idx, new_seg_right);
+      // Insert the new seg at the right
+      // if the splitting of a cyclic segment produces a non cyclic one, i.e. at the front, we need to insert it at the 
+      // front of the list
+      bool insert_at_front = is_cyclic(prop_seg) and not is_cyclic(new_seg_right);
+      sl.insert(sl.begin() + (insert_at_front ? 0 : prop_seg_idx + 1), new_seg_right);
     }
 
     double final_sign = config_sign(config, wdata.dets);
