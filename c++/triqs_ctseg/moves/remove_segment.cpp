@@ -48,13 +48,9 @@ namespace moves {
 
     // ------------  Det ratio  ---------------
     // same code as in insert. In Insert, it is a true bound, does not insert at same time
-    auto &D            = wdata.dets[color];
-    auto det_c_time    = [&](long i) { return D.get_y(i).first; };
-    auto det_cdag_time = [&](long i) { return D.get_x(i).first; };
-    long det_idx_c     = lower_bound(det_c_time, D.size(), prop_seg.tau_c);
-    long det_idx_cdag  = lower_bound(det_cdag_time, D.size(), prop_seg.tau_cdag);
-
-    auto det_ratio = D.try_remove(det_idx_cdag, det_idx_c);
+    auto &D        = wdata.dets[color];
+    auto det_ratio = D.try_remove(det_lower_bound_x(D, prop_seg.tau_cdag), //
+                                  det_lower_bound_y(D, prop_seg.tau_c));
 
     // ------------  Proposition ratio ------------
 

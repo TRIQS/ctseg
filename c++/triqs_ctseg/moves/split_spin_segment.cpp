@@ -57,21 +57,16 @@ namespace moves {
     double det_ratio = 1;
 
     // Spin up
-    auto &D_up             = wdata.dets[0];
-    auto det_c_time_up     = [&](long i) { return D_up.get_y(i).first; };
-    auto det_cdag_time_up  = [&](long i) { return D_up.get_x(i).first; };
-    long det_index_c_up    = lower_bound(det_c_time_up, D_up.size(), tau_up);
-    long det_index_cdag_up = lower_bound(det_cdag_time_up, D_up.size(), sl_up[idx_cdag_up].tau_cdag);
-    det_ratio *= D_up.try_insert(det_index_cdag_up, det_index_c_up, {sl_up[idx_cdag_up].tau_cdag, 0}, {tau_up, 0});
+    auto &D_up = wdata.dets[0];
+    det_ratio *= D_up.try_insert(det_lower_bound_x(D_up, sl_up[idx_cdag_up].tau_cdag), //
+                                 det_lower_bound_y(D_up, tau_up),                      //
+                                 {sl_up[idx_cdag_up].tau_cdag, 0}, {tau_up, 0});
 
     // Spin down
     auto &D_down             = wdata.dets[1];
-    auto det_c_time_down     = [&](long i) { return D_down.get_y(i).first; };
-    auto det_cdag_time_down  = [&](long i) { return D_down.get_x(i).first; };
-    auto det_index_c_down    = lower_bound(det_c_time_down, D_down.size(), tau_down);
-    auto det_index_cdag_down = lower_bound(det_cdag_time_down, D_down.size(), sl_down[idx_cdag_down].tau_cdag);
-    det_ratio *=
-       D_down.try_insert(det_index_cdag_down, det_index_c_down, {sl_down[idx_cdag_down].tau_cdag, 0}, {tau_down, 0});
+    det_ratio *= D_down.try_insert(det_lower_bound_x(D_down, sl_down[idx_cdag_down].tau_cdag),
+                                   det_lower_bound_y(D_down, tau_down), //
+                                   {sl_down[idx_cdag_down].tau_cdag, 0}, {tau_down, 0});
 
     LOG("trace_ratio  = {}, prop_ratio = {}, det_ratio = {}", trace_ratio, prop_ratio, det_ratio);
 

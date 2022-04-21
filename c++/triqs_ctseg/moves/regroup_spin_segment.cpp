@@ -48,20 +48,14 @@ namespace moves {
     double det_ratio = 1;
 
     // Spin up
-    auto &D_up             = wdata.dets[0];
-    auto det_c_time_up     = [&](long i) { return D_up.get_y(i).first; };
-    auto det_cdag_time_up  = [&](long i) { return D_up.get_x(i).first; };
-    long det_index_c_up    = lower_bound(det_c_time_up, D_up.size(), sl_up[idx_c_up].tau_c);
-    long det_index_cdag_up = lower_bound(det_cdag_time_up, D_up.size(), sl_up[idx_cdag_up].tau_cdag);
-    det_ratio *= D_up.try_remove(det_index_cdag_up, det_index_c_up);
+    auto &D_up = wdata.dets[0];
+    det_ratio *= D_up.try_remove(det_lower_bound_x(D_up, sl_up[idx_cdag_up].tau_cdag),
+                                 det_lower_bound_y(D_up, sl_up[idx_c_up].tau_c));
 
     // Spin down
-    auto &D_down             = wdata.dets[1];
-    auto det_c_time_down     = [&](long i) { return D_down.get_y(i).first; };
-    auto det_cdag_time_down  = [&](long i) { return D_down.get_x(i).first; };
-    auto det_index_c_down    = lower_bound(det_c_time_down, D_down.size(), sl_down[idx_c_down].tau_c);
-    auto det_index_cdag_down = lower_bound(det_cdag_time_down, D_down.size(), sl_down[idx_cdag_down].tau_cdag);
-    det_ratio *= D_down.try_remove(det_index_cdag_down, det_index_c_down);
+    auto &D_down = wdata.dets[1];
+    det_ratio *= D_down.try_remove(det_lower_bound_x(D_down, sl_down[idx_cdag_down].tau_cdag),
+                                   det_lower_bound_y(D_down, sl_down[idx_c_down].tau_c));
 
     LOG("trace_ratio  = {}, prop_ratio = {}, det_ratio = {}", trace_ratio, prop_ratio, det_ratio);
 

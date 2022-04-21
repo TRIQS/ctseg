@@ -67,14 +67,11 @@ namespace moves {
     double trace_ratio = std::exp(ln_trace_ratio);
 
     // ------------  Det ratio  ---------------
-    auto &D             = wdata.dets[color];
-    auto det_c_time     = [&](long i) { return D.get_y(i).first; };
-    auto det_cdag_time  = [&](long i) { return D.get_x(i).first; };
-    long det_idx_c    = lower_bound(det_c_time, D.size(), prop_seg.tau_c);
-    long det_idx_cdag = lower_bound(det_cdag_time, D.size(), prop_seg.tau_cdag);
-    
-    // We insert tau_cdag as a line (first index) and tau_c as a column (second index).
-    auto det_ratio = D.try_insert(det_idx_cdag, det_idx_c, {prop_seg.tau_cdag, 0}, {prop_seg.tau_c, 0});
+    //  insert tau_cdag as a line (first index) and tau_c as a column (second index).
+    auto &D            = wdata.dets[color];
+    auto det_ratio = D.try_insert(det_lower_bound_x(D, prop_seg.tau_cdag), //
+                                  det_lower_bound_y(D, prop_seg.tau_c),    //
+                                  {prop_seg.tau_cdag, 0}, {prop_seg.tau_c, 0});
 
     // ------------  Proposition ratio ------------
 

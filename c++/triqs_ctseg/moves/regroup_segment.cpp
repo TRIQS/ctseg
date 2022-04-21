@@ -60,13 +60,10 @@ namespace moves {
     double trace_ratio = std::exp(ln_trace_ratio);
 
     // ------------  Det ratio  ---------------
-    auto &D             = wdata.dets[color];
-    auto det_c_time     = [&](long i) { return D.get_y(i).first; };
-    auto det_cdag_time  = [&](long i) { return D.get_x(i).first; };
-    long det_index_c    = lower_bound(det_c_time, D.size(), sl[right_seg_idx].tau_c);
-    long det_index_cdag = lower_bound(det_cdag_time, D.size(), sl[left_seg_idx].tau_cdag);
     // We remove a cdag (first index) from the left segment and a c (second index) from the right segment.
-    auto det_ratio = D.try_remove(det_index_cdag, det_index_c);
+    auto &D        = wdata.dets[color];
+    auto det_ratio = D.try_remove(det_lower_bound_x(D, sl[left_seg_idx].tau_cdag), //
+                                  det_lower_bound_y(D, sl[right_seg_idx].tau_c));
 
     // ------------  Proposition ratio ------------
 
