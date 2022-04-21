@@ -95,7 +95,7 @@ namespace moves {
 
     // ------------  Proposition ratio ------------
 
-    double prop_ratio    = int(sl.size()) / (int(dsl.size()) + 1);
+    double prop_ratio    = double(sl.size()) / (dsl.size() + 1);
 
     LOG("trace_ratio  = {}, prop_ratio = {}, det_ratio = {}", trace_ratio, prop_ratio, det_ratio);
 
