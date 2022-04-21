@@ -18,7 +18,7 @@ TEST(CTSEG, J_perp) {
   int random_seed     = 23488;
   int n_iw            = 5000;
   int n_tau           = 10001;
-  double precision    = 1.e-13;
+  double precision    = 1.e-12;
 
   // Prepare the parameters
   constr_params_t param_constructor;

@@ -68,4 +68,4 @@ if mpi.is_master_node():
         A['nn_tau'] = Solver.results.nn_tau
         A['nn'] = Solver.results.nn_static
         A['densities'] = Solver.results.densities
-    h5diff("py_spin_spin.out.h5", "py_spin_spin.ref.h5", precision=1e-13)
+    h5diff("py_spin_spin.out.h5", "py_spin_spin.ref.h5", precision=1e-9) #13)
