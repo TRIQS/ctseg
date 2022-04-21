@@ -102,29 +102,12 @@ namespace moves {
     sl_down[idx_c_down].J_c       = false;
     sl_down[idx_cdag_down].J_cdag = false;
 
-    // Fix segment ordering
-    auto new_seg_up = sl_up[idx_c_up];
-    if (is_cyclic(new_seg_up) and !is_cyclic(old_seg_up)) {
-      sl_up.erase(sl_up.begin() + idx_c_up);
-      sl_up.insert(sl_up.end(), new_seg_up);
-    }
-    if (!is_cyclic(new_seg_up) and is_cyclic(old_seg_up)) {
-      sl_up.erase(sl_up.begin() + idx_c_up);
-      sl_up.insert(sl_up.begin(), new_seg_up);
-    }
-    auto new_seg_down = sl_down[idx_c_down];
-    if (is_cyclic(new_seg_down) and !is_cyclic(old_seg_down)) {
-      sl_down.erase(sl_down.begin() + idx_c_down);
-      sl_down.insert(sl_down.end(), new_seg_down);
-    }
-    if (!is_cyclic(new_seg_down) and is_cyclic(old_seg_down)) {
-      sl_down.erase(sl_down.begin() + idx_c_down);
-      sl_down.insert(sl_down.begin(), new_seg_down);
-    }
-
+    fix_ordering_first_last(sl_up);
+    fix_ordering_first_last(sl_down);
+    
     // Remove Jperp line
     auto &jl = config.Jperp_list;
-    jl.erase(jl.begin() + line_idx);
+    jl.erase(begin(jl) + line_idx);
 
     // Compute sign
     double final_sign = config_sign(config, wdata.dets);

@@ -89,7 +89,18 @@ inline bool is_full_line(segment_t const &seg) { return seg == segment_t::full_l
 double overlap(segment_t const &s1, segment_t const &s2);
 
 // Flip a segment. J are set to default
-inline segment_t flip (segment_t const & s) { return {s.tau_cdag, s.tau_c};}
+inline segment_t flip(segment_t const &s) { return {s.tau_cdag, s.tau_c}; }
+
+// Fix the list after a change of operator c time in some move
+// to restore the invariants
+// 1 -if first segment is cyclic (c has move beyond beta),  put it at end
+// 2- if last segment is such that its tau is > tau of first (c has moved beyond 0), put it first
+// Only useful when # segments > 1
+inline void fix_ordering_first_last(std::vector<segment_t> &sl) {
+  if (sl.size() <= 1) return;
+  if (is_cyclic(sl[0])) std::rotate(begin(sl), begin(sl) + 1, end(sl));
+  if (sl.back().tau_c > sl[0].tau_c) std::rotate(begin(sl), end(sl) - 1, end(sl));
+}
 
 // =================== Functions to manipulate std::vector<segment_t> ========
 

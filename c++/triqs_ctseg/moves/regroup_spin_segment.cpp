@@ -78,10 +78,10 @@ namespace moves {
     wdata.dets[1].complete_operation();
 
     // Update the segments
-    auto &sl_up               = config.seglists[0];
-    auto &sl_down             = config.seglists[1];
-    auto old_seg_up           = sl_up[idx_c_up];
-    auto old_seg_down         = sl_down[idx_c_down];
+    auto &sl_up   = config.seglists[0];
+    auto &sl_down = config.seglists[1];
+
+    // Update tau_c
     sl_up[idx_c_up].tau_c     = tau_up;
     sl_down[idx_c_down].tau_c = tau_down;
 
@@ -91,25 +91,8 @@ namespace moves {
     sl_down[idx_c_down].J_c       = true;
     sl_up[idx_cdag_up].J_cdag     = true;
 
-    // Fix segment ordering
-    auto new_seg_up = sl_up[idx_c_up];
-    if (is_cyclic(new_seg_up) and !is_cyclic(old_seg_up)) {
-      sl_up.erase(sl_up.begin() + idx_c_up);
-      sl_up.insert(sl_up.end(), new_seg_up);
-    }
-    if (!is_cyclic(new_seg_up) and is_cyclic(old_seg_up)) {
-      sl_up.erase(sl_up.begin() + idx_c_up);
-      sl_up.insert(sl_up.begin(), new_seg_up);
-    }
-    auto new_seg_down = sl_down[idx_c_down];
-    if (is_cyclic(new_seg_down) and !is_cyclic(old_seg_down)) {
-      sl_down.erase(sl_down.begin() + idx_c_down);
-      sl_down.insert(sl_down.end(), new_seg_down);
-    }
-    if (!is_cyclic(new_seg_down) and is_cyclic(old_seg_down)) {
-      sl_down.erase(sl_down.begin() + idx_c_down);
-      sl_down.insert(sl_down.begin(), new_seg_down);
-    }
+    fix_ordering_first_last(sl_up);
+    fix_ordering_first_last(sl_down);
 
     // Add spin line
     config.Jperp_list.push_back(jperp_line_t{tau_up, tau_down});
