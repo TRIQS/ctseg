@@ -10,7 +10,7 @@ std::pair<segment_t, segment_t> split_cyclic_segment(segment_t const &s) {
 
 // -------------- internal -------------
 
-// Checks if two segments are completely disjoint. 
+// Checks if two segments are completely disjoint.
 // !! s2 might be cyclic, not s1
 bool disjoint(segment_t const &s1, segment_t const &s2) {
   if (is_cyclic(s2)) {
@@ -131,13 +131,13 @@ double overlap(std::vector<segment_t> const &seglist, segment_t const &seg) {
 
   // the last can be cyclic, hence be unreached due to it->tau_c condition
   // nb : overlap is ok to call on cyclic segment
-  result += overlap(*last, seg); 
+  result += overlap(*last, seg);
   return result;
 }
 
 // ---------------------------
 
-// Checks if segment is movable to a given color
+// Checks if segment is insertable to a given color
 bool is_insertable_into(segment_t const &seg, std::vector<segment_t> const &seglist) {
   if (seglist.empty()) return true;
 

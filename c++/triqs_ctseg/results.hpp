@@ -5,16 +5,12 @@
 
 using namespace triqs::gfs;
 
-// One-particle Green's function types
-using g_tau_t = block_gf<imtime, matrix_valued>;
-using g_iw_t  = block_gf<imfreq, matrix_valued>;
-
 // Gather all the results on the CTQMC
 struct results_t {
 
   /// Single-particle Green's function :math:`G(\tau)` in imaginary time.
-  //std::optional<g_tau_t> g_tau;
-  g_tau_t G_tau;
+  //std::optional<block_gf<imtime>> g_tau;
+  block_gf<imtime> G_tau;
 
   /// Dynamical interaction kernel K(tau)
   gf<imtime> K_tau;
@@ -23,7 +19,7 @@ struct results_t {
   gf<imtime> Kprime_tau;
 
   /// Single-particle Green's function :math:`F(\tau)` in imaginary time.
-  std::optional<g_tau_t> F_tau;
+  std::optional<block_gf<imtime>> F_tau;
 
   /// <n_a(tau) n_b(0)>
   std::optional<gf<imtime>> nn_tau;

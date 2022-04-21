@@ -15,14 +15,8 @@ n_tau = 2051
 n_tau_k = 2001
 n_iw = 1025
 length_cycle = 50
-n_warmup_cycles = 10000
-n_cycles = 300000
-measure_gt = True
-measure_n = True
-measure_nnt = True
-
-dynamical_U = True
-spin = True
+n_warmup_cycles = 1000
+n_cycles = 10000
 
 with h5.HDFArchive("ctint.ref.h5", 'r') as Af:
     g0 = Af["dmft_loop/i_001/S/G0_iw/up"]
@@ -42,31 +36,19 @@ p = {}
 p["length_cycle"] = length_cycle
 p["n_warmup_cycles"] = n_warmup_cycles
 p["n_cycles"] = n_cycles
-p["measure_gt"] = measure_gt
-p["measure_n"] = measure_n
-p["measure_nnt"] = measure_nnt
+p["measure_nnt"] = True
+p["measure_nn"] = True
+p["measure_ft"] = True
 p["hartree_shift"] = [mu, mu]
 
-p["move_insert_segment"] = True
-p["move_remove_segment"] = True
-p["move_split_segment"] = True
-p["move_regroup_segment"] = True
-p["move_move_segment"] = True
-p["move_insert_spin_segment"] = True
-p["move_remove_spin_segment"] = True
-p["move_split_spin_segment"] = True
-p["move_regroup_spin_segment"] = True
-p["move_swap_spin_lines"] = True
-
-
 # Solver!
-Snew = ctseg_new.SolverCore(beta=beta,
-                            gf_struct=[['down', 1], ['up', 1]],
-                            n_tau=n_tau,
-                            n_tau_k=n_tau_k,
-                            )
+Solver = ctseg_new.SolverCore(beta=beta,
+                              gf_struct=[['down', 1], ['up', 1]],
+                              n_tau=n_tau,
+                              n_tau_k=n_tau_k,
+                              )
 
-Snew.Delta_tau << Fourier(delta)
+Solver.Delta_tau << Fourier(delta)
 
 D0 = GfImTime(indices=[0, 1], beta=beta,
               statistic='Boson', n_points=n_tau_k)
@@ -74,17 +56,16 @@ D0[0, 0] = -Q_tau[0, 0]
 D0[1, 1] = -Q_tau[0, 0]
 D0[0, 1] = Q_tau[0, 0]
 D0[1, 0] = Q_tau[0, 0]
-if spin:
-    Snew.Jperp_tau << -J**2*Q_tau
-if dynamical_U:
-    Snew.D0_tau << 0.25*J**2*D0
+Solver.Jperp_tau << -J**2*Q_tau
+Solver.D0_tau << 0.25*J**2*D0
 
-Snew.solve(h_int=H, **p)
-
-print(Snew.results.nn_tau.data)
+Solver.solve(h_int=H, **p)
 
 if mpi.is_master_node():
     with h5.HDFArchive("py_spin_spin.out.h5", 'w') as A:
-        A['G_tau'] = Snew.results.G_tau
-        A['nn_tau'] = Snew.results.nn_tau
-    #h5diff("py_spin_spin.out.h5", "py_spin_spin.ref.h5")
+        A['G_tau'] = Solver.results.G_tau
+        A['F_tau'] = Solver.results.F_tau
+        A['nn_tau'] = Solver.results.nn_tau
+        A['nn'] = Solver.results.nn_static
+        A['densities'] = Solver.results.densities
+    h5diff("py_spin_spin.out.h5", "py_spin_spin.ref.h5", precision=1e-13)

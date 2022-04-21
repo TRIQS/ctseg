@@ -6,7 +6,7 @@ endforeach()
 
 # List of all tests
 set(all_tests
-  ./spin_spin
+  ./py_spin_spin
 )
 
 foreach(test ${all_tests})

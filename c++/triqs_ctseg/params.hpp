@@ -59,42 +59,28 @@ struct solve_params_t {
   bool move_remove_segment = true;
 
   /// Whether to perform the move move segment
-  bool move_move_segment = false;
+  bool move_move_segment = true;
 
   /// Whether to perform the move split segment
-  bool move_split_segment = false;
+  bool move_split_segment = true;
 
   /// Whether to perform the move group into spin segment
-  bool move_regroup_segment = false;
+  bool move_regroup_segment = true;
 
   /// Whether to perform the move insert spin segment
-  bool move_insert_spin_segment = false;
+  bool move_insert_spin_segment = true;
 
   /// Whether to perform the move remove spin segment
-  bool move_remove_spin_segment = false;
+  bool move_remove_spin_segment = true;
 
   /// Whether to perform the move insert spin segment
-  bool move_split_spin_segment = false;
+  bool move_split_spin_segment = true;
 
   /// Whether to perform the move remove spin segment
-  bool move_regroup_spin_segment = false;
+  bool move_regroup_spin_segment = true;
 
   /// Whether to perform the move swap spin lines
-  bool move_swap_spin_lines = false;
-
-  // ----------- /!\ testing only -------
-
-  /// Whether to perform the move insert segment
-  bool move_insert_segment_v2 = false;
-
-  /// Whether to perform the move remove segment
-  bool move_remove_segment_v2 = false;
-
-  /// Whether to perform the move split segment
-  bool move_split_segment_v2 = false;
-
-  /// Whether to perform the move group into spin segment
-  bool move_regroup_segment_v2 = false;
+  bool move_swap_spin_lines = true;
 
   // -------- Measure control --------------
 
@@ -133,8 +119,6 @@ struct solve_params_t {
 
   /// Bound for the determinant matrix being singular, abs(det) > singular_threshold. If <0, it is !isnormal(abs(det))
   double det_singular_threshold = -1;
-
-  //solve_params_t(){};
 };
 
 /// A struct combining both constr_params_t and solve_params_t
@@ -143,7 +127,7 @@ struct params_t : constr_params_t, solve_params_t {
      : constr_params_t{constr_params_}, solve_params_t{solve_params_} {}
 };
 
-/// Get the number of colors from the gf_struct. 
+/// Get the number of colors from the gf_struct.
 inline int count_colors(gf_struct_t const &gf_struct) {
   int n = 0;
   for (auto const &[bl_name, bl_size] : gf_struct) { n += bl_size; }
