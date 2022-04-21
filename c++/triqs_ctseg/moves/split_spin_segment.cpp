@@ -23,7 +23,7 @@ namespace moves {
     LOG("Splitting S_plus at {}, S_minus at {}", line.tau_Splus, line.tau_Sminus);
 
     ln_trace_ratio = 0;
-    prop_ratio     = 1;
+    prop_ratio     = jl.size();
 
     // ----------- Propose move in each color ----------
 
@@ -38,20 +38,21 @@ namespace moves {
     auto old_seg_dn = sl_dn[idx_c_dn];
     auto new_seg_up = segment_t{tau_up, old_seg_up.tau_cdag};
     auto new_seg_dn = segment_t{tau_dn, old_seg_dn.tau_cdag};
+
     ln_trace_ratio += -wdata.U(0, 1)
        * (overlap(new_seg_up, new_seg_dn) + overlap(old_seg_up, old_seg_dn) - //
           overlap(new_seg_up, old_seg_dn) - overlap(new_seg_dn, old_seg_up));
 
     // Correct for the dynamical interaction between the two operators that have been moved
     if (wdata.has_Dt) {
-      ln_trace_ratio -= real(wdata.K(double(tau_up - sl_dn[idx_c_dn].tau_c))(0, 1));
-      ln_trace_ratio -= real(wdata.K(double(tau_dn - sl_up[idx_c_up].tau_c))(0, 1));
+      ln_trace_ratio -= real(wdata.K(double(tau_up - old_seg_dn.tau_c))(0, 1));
+      ln_trace_ratio -= real(wdata.K(double(tau_dn - old_seg_up.tau_c))(0, 1));
       ln_trace_ratio += real(wdata.K(double(tau_dn - tau_up))(0, 1));
-      ln_trace_ratio += real(wdata.K(double(sl_up[idx_c_up].tau_c - sl_dn[idx_c_dn].tau_c))(0, 1));
+      ln_trace_ratio += real(wdata.K(double(old_seg_up.tau_c - old_seg_dn.tau_c))(0, 1));
     }
+
     double trace_ratio = std::exp(ln_trace_ratio);
     trace_ratio /= -real(wdata.Jperp(double(line.tau_Splus - line.tau_Sminus))(0, 0)) / 2;
-    prop_ratio *= jl.size();
 
     // ----------- Det ratio -----------
     double det_ratio = 1;
@@ -145,27 +146,29 @@ namespace moves {
 
     // In spin up   color, the c connected to the J line is a at tau_Sminus
     // In spin down color, the c connected to the J line is a at tau_Splus
-    long idx_c  = lower_bound(sl, (color == 0 ? line.tau_Sminus : line.tau_Splus)) - sl.cbegin();
-    tau_t tau_c = sl[idx_c].tau_c;
+    long idx_c = lower_bound(sl, (color == 0 ? line.tau_Sminus : line.tau_Splus)) - sl.cbegin();
+    auto tau_c = sl[idx_c].tau_c;
 
     // ---------- Find the cdag in opposite color -----------
 
+    // FIXME : ok, the vector is always of size 1 ...
     auto idx_cdag = cdag_in_window(tau_c + tau_t::epsilon(), tau_c - tau_t::epsilon(), dsl).back();
 
     // -------- Propose new position for the c ---------
-    // Determine window in which the c will be moved
 
-    auto idx_left    = (idx_c == 0) ? sl.size() - 1 : idx_c - 1;
-    tau_t wtau_left  = sl[idx_left].tau_cdag;
-    tau_t wtau_right = sl[idx_c].tau_cdag;
-    if (idx_c == idx_left) {
+    // Determine window in which the c will be moved
+    auto idx_left   = (idx_c == 0) ? sl.size() - 1 : idx_c - 1;
+    auto wtau_left  = sl[idx_left].tau_cdag;
+    auto wtau_right = sl[idx_c].tau_cdag;
+    if (idx_c == idx_left) { // only one segment ...
       wtau_left  = tau_t::beta();
       wtau_right = tau_t::zero();
     }
     tau_t window_length = wtau_left - wtau_right;
-    // Choose random time in window
-    tau_t dt        = tau_t::random(rng, window_length);
-    tau_t tau_c_new = sl[idx_left].tau_cdag - dt;
+
+    // Choose random time in window left-right (possibly cyclic)
+    auto dt        = tau_t::random(rng, window_length);
+    auto tau_c_new = sl[idx_left].tau_cdag - dt;
 
     LOG("Spin {}: moving c at position {} from {} to {}.", (color == 0) ? "up" : "down", idx_c, tau_c, tau_c_new);
     auto new_seg = segment_t{tau_c_new, sl[idx_c].tau_cdag};

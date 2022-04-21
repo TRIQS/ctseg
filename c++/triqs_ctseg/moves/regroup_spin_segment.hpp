@@ -13,7 +13,6 @@ namespace moves {
     long idx_c_up, idx_cdag_dn, idx_c_dn, idx_cdag_up;
     tau_t tau_up, tau_dn;
     double ln_trace_ratio, prop_ratio, det_sign;
-    bool prop_failed;
     std::tuple<long, long, tau_t, bool> propose(int color);
 
     public:

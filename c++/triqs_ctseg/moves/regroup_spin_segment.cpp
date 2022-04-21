@@ -7,14 +7,13 @@ namespace moves {
 
   double regroup_spin_segment::attempt() {
 
-    prop_failed = false;
-
     LOG("\n =================== ATTEMPT REGROUP SPIN ================ \n");
 
     ln_trace_ratio = 0;
-    prop_ratio     = 1;
+    prop_ratio     = 1 / (double(config.Jperp_list.size()) + 1);
 
     // ----------- Propose move in each color ----------
+    bool prop_failed;
     std::tie(idx_c_up, idx_cdag_dn, tau_up, prop_failed) = propose(0); // spin up
     if (prop_failed) return 0;
     std::tie(idx_c_dn, idx_cdag_up, tau_dn, prop_failed) = propose(1); // spin down
@@ -28,21 +27,21 @@ namespace moves {
     auto old_seg_dn = sl_dn[idx_c_dn];
     auto new_seg_up = segment_t{tau_up, old_seg_up.tau_cdag};
     auto new_seg_dn = segment_t{tau_dn, old_seg_dn.tau_cdag};
+
     ln_trace_ratio += -wdata.U(0, 1)
        * (overlap(new_seg_up, new_seg_dn) + overlap(old_seg_up, old_seg_dn) //
           - overlap(new_seg_up, old_seg_dn) - overlap(new_seg_dn, old_seg_up));
 
     // Correct for the dynamical interaction between the two operators that have been moved
     if (wdata.has_Dt) {
-      ln_trace_ratio -= real(wdata.K(double(tau_up - sl_dn[idx_c_dn].tau_c))(0, 1));
-      ln_trace_ratio -= real(wdata.K(double(tau_dn - sl_up[idx_c_up].tau_c))(0, 1));
+      ln_trace_ratio -= real(wdata.K(double(tau_up - old_seg_dn.tau_c))(0, 1));
+      ln_trace_ratio -= real(wdata.K(double(tau_dn - old_seg_up.tau_c))(0, 1));
       ln_trace_ratio += real(wdata.K(double(tau_dn - tau_up))(0, 1));
-      ln_trace_ratio += real(wdata.K(double(sl_up[idx_c_up].tau_c - sl_dn[idx_c_dn].tau_c))(0, 1));
+      ln_trace_ratio += real(wdata.K(double(old_seg_up.tau_c - old_seg_dn.tau_c))(0, 1));
     }
 
     double trace_ratio = std::exp(ln_trace_ratio);
     trace_ratio *= -real(wdata.Jperp(double(tau_up - tau_dn))(0, 0)) / 2;
-    prop_ratio /= (double(config.Jperp_list.size()) + 1);
 
     // ----------- Det ratio -----------
     double det_ratio = 1;
@@ -125,10 +124,9 @@ namespace moves {
 
   std::tuple<long, long, tau_t, bool> regroup_spin_segment::propose(int color) {
 
-    auto &sl         = config.seglists[color];
-    int other_color  = 1 - color;
-    auto &dsl        = config.seglists[other_color];
-    std::string spin = (color == 0) ? "up" : "down";
+    auto &sl        = config.seglists[color];
+    int other_color = 1 - color;
+    auto &dsl       = config.seglists[other_color];
 
     // --------- Eliminate cases where move is impossible ---------
     if (sl.empty() or dsl.empty()) {
@@ -141,25 +139,27 @@ namespace moves {
     }
 
     // --------- Randomly choose a c operator -----------
+
     auto idx_c = rng(sl.size());
-    LOG("Spin {}: regrouping c at position {}.", spin, idx_c);
+    LOG("Spin {}: regrouping c at position {}.", (color == 0) ? "up" : "down", idx_c);
     if (sl[idx_c].J_c) {
       LOG("Spin {}: cannot regroup because c is connected to a spin line.", spin);
       return {0, 0, tau_t::zero(), true};
     }
-    tau_t tau_c = sl[idx_c].tau_c;
+
+    auto tau_c = sl[idx_c].tau_c;
 
     // -------- Propose new position for the c ---------
 
     // Determine window in which the c can be moved
     auto idx_left    = (idx_c == 0) ? sl.size() - 1 : idx_c - 1;
-    tau_t wtau_left  = sl[idx_left].tau_cdag;
-    tau_t wtau_right = sl[idx_c].tau_cdag;
+    auto wtau_left  = sl[idx_left].tau_cdag;
+    auto wtau_right = sl[idx_c].tau_cdag;
     if (idx_c == idx_left) {
       wtau_left  = tau_t::beta();
       wtau_right = tau_t::zero();
     }
-    tau_t window_length = wtau_left - wtau_right;
+    auto window_length = wtau_left - wtau_right;
 
     // Find the cdag in opposite spin that are within the window
     auto cdag_list = cdag_in_window(wtau_left, wtau_right, dsl);
@@ -173,10 +173,11 @@ namespace moves {
       LOG("Spin {}: cannot regroup because chosen cdag is connected to a spin line.", spin);
       return {0, 0, tau_t::zero(), true};
     }
-    tau_t tau_c_new = dsl[idx_cdag].tau_cdag;
+    auto tau_c_new = dsl[idx_cdag].tau_cdag;
     auto new_seg    = segment_t{tau_c_new, sl[idx_c].tau_cdag};
     LOG("Spin {}: moving c from {} to {}.", spin, tau_c, tau_c_new);
 
+    // FIXME FACTOR ? 
     // -------- Trace ratio ---------
     ln_trace_ratio += wdata.mu(color) * (double(new_seg.length()) - double(sl[idx_c].length()));
     LOG("Spin {}: ln trace ratio = {}", spin, ln_trace_ratio);
