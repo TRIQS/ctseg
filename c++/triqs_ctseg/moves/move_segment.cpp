@@ -17,10 +17,6 @@ namespace moves {
     if (dest_color >= origin_color) ++dest_color; // little trick to select another color
     LOG("Moving to color {}", dest_color);
 
-    // A variant based on density ?
-    //double current_density = density(config.seglists[origin_color]);
-    //if (rng() < current_density / double(tau_t::beta())) {
-
     // Do we want to move an antisegment ?
     flipped = (rng(2) == 0);
 
@@ -99,14 +95,7 @@ namespace moves {
 
     // ------------  Proposition ratio ------------
 
-    // double future_dest_density = density(dsl) + origin_segment.length();
-    // double density_ratio       = (double(tau_t::beta()) - future_dest_density) / (double(tau_t::beta()) - current_density);
-    // if (flipped) {
-    //   future_dest_density = double(tau_t::beta()) - future_dest_density;
-    //   density_ratio       = future_dest_density / current_density;
-    // }
-    double density_ratio = 1;
-    double prop_ratio    = density_ratio * int(sl.size()) / (int(dsl.size()) + 1);
+    double prop_ratio    = int(sl.size()) / (int(dsl.size()) + 1);
 
     LOG("trace_ratio  = {}, prop_ratio = {}, det_ratio = {}", trace_ratio, prop_ratio, det_ratio);
 
