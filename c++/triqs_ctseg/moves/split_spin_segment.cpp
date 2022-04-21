@@ -188,7 +188,7 @@ namespace moves {
     if (wdata.has_Dt) ln_trace_ratio -= real(wdata.K(double(tau_c_new - tau_c))(color, color));
 
     // --------- Prop ratio ---------
-    // T direct  =
+    // T direct  = 1/window_length  
     // T inverse =
     prop_ratio *= window_length / (double(sl.size()) * cdag_in_window(wtau_left, wtau_right, dsl).size());
 

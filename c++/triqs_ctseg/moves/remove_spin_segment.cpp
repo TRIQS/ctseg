@@ -71,8 +71,8 @@ namespace moves {
     }
 
     auto &dsl      = config.seglists[dest_color];
-    dest_right_idx = std::distance(dsl.cbegin(), dest_it);
-    dest_left_idx  = (dest_right_idx == 0) ? int(dsl.size()) - 1 : dest_right_idx - 1;
+    dest_right_idx = dest_it - dsl.cbegin();
+    dest_left_idx  = (dest_right_idx == 0) ? long(dsl.size()) - 1 : dest_right_idx - 1;
 
     // ------------- Check if space is free -------------
 
@@ -107,6 +107,10 @@ namespace moves {
 
     tau_t new_seg_length = making_full_line ? tau_t::beta() : dsl[dest_left_idx].tau_c - dsl[dest_right_idx].tau_cdag;
     double future_number_seg = making_full_line ? 1 : double(dsl.size()) - 1;
+   
+    // T direct  = 1 / #Jperp * (full_line ? 1/2 : 1)  /// because if full_line, rng(2) above !
+    // T inverse =  1/ (# color * #seg in future * new_seg_len^2) * (future_full_line ? 1 : 2)
+    // the (splitting_full_line ...) simplify to a ratio of 2
     double prop_ratio        = double(config.Jperp_list.size())
        / (double(config.n_color()) * future_number_seg * new_seg_length * new_seg_length / 2);
 

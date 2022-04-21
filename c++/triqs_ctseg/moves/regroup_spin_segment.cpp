@@ -143,7 +143,7 @@ namespace moves {
     auto idx_c = rng(sl.size());
     LOG("Spin {}: regrouping c at position {}.", (color == 0) ? "up" : "down", idx_c);
     if (sl[idx_c].J_c) {
-      LOG("Spin {}: cannot regroup because c is connected to a spin line.", spin);
+      LOG("Spin {}: cannot regroup because c is connected to a spin line.", (color == 0) ? "up" : "down");
       return {0, 0, tau_t::zero(), true};
     }
 
@@ -164,23 +164,23 @@ namespace moves {
     // Find the cdag in opposite spin that are within the window
     auto cdag_list = cdag_in_window(wtau_left, wtau_right, dsl);
     if (cdag_list.empty()) {
-      LOG("Spin {}: cannot regroup because there are no suitable cdag operators.", spin);
+      LOG("Spin {}: cannot regroup because there are no suitable cdag operators.", (color == 0) ? "up" : "down");
       return {0, 0, tau_t::zero(), true};
     }
     // Choose one of them randomly
     auto idx_cdag = cdag_list[rng(cdag_list.size())];
     if (dsl[idx_cdag].J_cdag) {
-      LOG("Spin {}: cannot regroup because chosen cdag is connected to a spin line.", spin);
+      LOG("Spin {}: cannot regroup because chosen cdag is connected to a spin line.", (color == 0) ? "up" : "down");
       return {0, 0, tau_t::zero(), true};
     }
     auto tau_c_new = dsl[idx_cdag].tau_cdag;
     auto new_seg    = segment_t{tau_c_new, sl[idx_c].tau_cdag};
-    LOG("Spin {}: moving c from {} to {}.", spin, tau_c, tau_c_new);
+    LOG("Spin {}: moving c from {} to {}.", (color == 0) ? "up" : "down", tau_c, tau_c_new);
 
     // FIXME FACTOR ? 
     // -------- Trace ratio ---------
     ln_trace_ratio += wdata.mu(color) * (double(new_seg.length()) - double(sl[idx_c].length()));
-    LOG("Spin {}: ln trace ratio = {}", spin, ln_trace_ratio);
+    LOG("Spin {}: ln trace ratio = {}", (color == 0) ? "up" : "down", ln_trace_ratio);
     for (auto const &[c, slc] : itertools::enumerate(config.seglists)) {
       if (c != color) {
         ln_trace_ratio += -wdata.U(c, color) * overlap(slc, new_seg);

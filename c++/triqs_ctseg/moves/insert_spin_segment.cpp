@@ -4,14 +4,14 @@
 
 namespace moves {
 
-  /*   insert_spin_segment::insert_spin_segment(work_data_t &data_, configuration_t &config_,
+     insert_spin_segment::insert_spin_segment(work_data_t &data_, configuration_t &config_,
                                            triqs::mc_tools::random_generator &rng_)
      : wdata(data_), config(config_), rng(rng_) {
     ALWAYS_EXPECTS(config.n_color() == 2, "spin add/remove move only implemented for n_color == 2, got {}",
                    config.n_color());
   }
 
-  // -------------------------------------------------- */
+  // -------------------------------------------------- 
 
   double insert_spin_segment::attempt() {
 
@@ -43,8 +43,8 @@ namespace moves {
     splitting_full_line = is_full_line(prop_seg);
     if (splitting_full_line) LOG("Inserting spin from full line.");
 
-    tau_t dt1 = tau_t::random(rng, prop_seg.length());
-    tau_t dt2 = tau_t::random(rng, prop_seg.length());
+    auto dt1 = tau_t::random(rng, prop_seg.length());
+    auto dt2 = tau_t::random(rng, prop_seg.length());
 
     if (dt1 == dt2) { // Almost never, but protect
       LOG("ABORT : Generated equal times");
@@ -52,7 +52,7 @@ namespace moves {
     }
 
     // If splitting a full line, the order of tau_left and tau_right is not fixed
-    if (dt1 > dt2 and !splitting_full_line) std::swap(dt1, dt2);
+    if (dt1 > dt2 and not splitting_full_line) std::swap(dt1, dt2);
 
     tau_left  = prop_seg.tau_c - dt1; // dt1 < dt2
     tau_right = prop_seg.tau_c - dt2;
@@ -75,9 +75,10 @@ namespace moves {
         ln_trace_ratio += K_overlap(slist, spin_seg.tau_c, spin_seg.tau_cdag, wdata.K, dest_color, c);
       }
       // Add interactions of the inserted operators with themselves
-      ln_trace_ratio -= real(wdata.K(double(spin_seg.length()))(orig_color, orig_color));
-      ln_trace_ratio -= real(wdata.K(double(spin_seg.length()))(dest_color, dest_color));
-      ln_trace_ratio += 2 * real(wdata.K(double(spin_seg.length()))(orig_color, dest_color));
+      auto Kl = wdata.K(double(spin_seg.length())); // matrix
+      ln_trace_ratio -= real(Kl(orig_color, orig_color));
+      ln_trace_ratio -= real(Kl(dest_color, dest_color));
+      ln_trace_ratio += 2 * real(Kl(orig_color, dest_color));
     }
     double trace_ratio = std::exp(ln_trace_ratio);
     trace_ratio *= -(real(wdata.Jperp(double(spin_seg.length()))(0, 0)) / 2);
@@ -88,6 +89,10 @@ namespace moves {
 
     // ------------  Proposition ratio ------------
 
+    // T direct -> 1/ length(prop_seg) ^2  1/ ncolor 1/ sl.size  * (splitting_full_line ?  1 : 2) 
+    //                                   # The last because of the swap we have 2 ways to get to the same (dt1, dt2) except in full line case 
+    // T inverse -> 1/ Jperlist size in new config * (splitting_full_line ? 1/2 : 1)  # see reverse move
+    // the (splitting_full_line ...) simplify to a ratio of 2
     double prop_ratio = (double(config.n_color()) * sl.size() * prop_seg.length() * prop_seg.length() / 2)
        / double(config.Jperp_list.size() + 1);
 
@@ -109,23 +114,20 @@ namespace moves {
 
     // Split segment at origin
     if (splitting_full_line) {
-      auto new_segment = segment_t{tau_right, tau_left, true, true};
-      sl[prop_seg_idx] = new_segment;
+      sl[prop_seg_idx] = segment_t{tau_right, tau_left, true, true};
     } else {
       auto new_seg_left      = segment_t{prop_seg.tau_c, tau_left, prop_seg.J_c, true};
       auto new_seg_right     = segment_t{tau_right, prop_seg.tau_cdag, true, prop_seg.J_cdag};
-      bool segment_overboard = is_cyclic(prop_seg) and !is_cyclic(new_seg_right);
-      // Index of the rightmost of the two produced segments (the one to the left is always at prop_seg_idx)
-      int right_seg_idx = segment_overboard ? 0 : prop_seg_idx + 1;
       // Update the proposed segment
       sl[prop_seg_idx] = new_seg_left;
       // Insert a new segment
-      sl.insert(sl.begin() + right_seg_idx, new_seg_right);
+      // cf split_segment. the new_seg_right need to be insert at front if it is part of a cyclic segment and is not cyclic itself
+      bool insert_at_front = is_cyclic(prop_seg) and not is_cyclic(new_seg_right);
+      sl.insert(begin(sl) + (insert_at_front ? 0 : prop_seg_idx + 1), new_seg_right);
     }
 
     // Insert segment at destination
-    auto spin_seg_it = std::upper_bound(dsl.begin(), dsl.end(), spin_seg);
-    dsl.insert(spin_seg_it, spin_seg);
+    dsl.insert(std::upper_bound(begin(dsl), end(dsl), spin_seg), spin_seg);
 
     // Insert Jperp line
     auto &jl = config.Jperp_list;
