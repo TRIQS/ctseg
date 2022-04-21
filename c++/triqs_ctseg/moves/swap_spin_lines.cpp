@@ -19,17 +19,20 @@ namespace moves {
 
     first_line_idx  = rng(jl.size());
     second_line_idx = rng(jl.size() - 1);
-    if (second_line_idx >= first_line_idx) ++second_line_idx;
+    if (second_line_idx >= first_line_idx) ++second_line_idx; // trick to select second_line_idx ! = first_line_idx
 
     auto &l1 = jl[first_line_idx];
     auto &l2 = jl[second_line_idx];
 
     // ------------  Trace ratio  -------------
 
-    double J_current = real(wdata.Jperp(double(l1.tau_Sminus - l1.tau_Splus))(0, 0))
-       * real(wdata.Jperp(double(l2.tau_Sminus - l2.tau_Splus))(0, 0));
-    double J_future = real(wdata.Jperp(double(l1.tau_Sminus - l2.tau_Splus))(0, 0))
-       * real(wdata.Jperp(double(l2.tau_Sminus - l1.tau_Splus))(0, 0));
+    double J_current =                                                 //
+       real(wdata.Jperp(double(l1.tau_Sminus - l1.tau_Splus))(0, 0)) * //
+       real(wdata.Jperp(double(l2.tau_Sminus - l2.tau_Splus))(0, 0));
+
+    double J_future =                                                  //
+       real(wdata.Jperp(double(l1.tau_Sminus - l2.tau_Splus))(0, 0)) * //
+       real(wdata.Jperp(double(l2.tau_Sminus - l1.tau_Splus))(0, 0));
 
     double trace_ratio = J_future / J_current;
 
@@ -46,6 +49,8 @@ namespace moves {
     double prod = trace_ratio * det_ratio * prop_ratio;
     return (std::isfinite(prod) ? prod : 1);
   }
+
+  // --------------------------------------------
 
   double swap_spin_lines::accept() {
 
