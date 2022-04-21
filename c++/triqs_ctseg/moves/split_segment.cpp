@@ -55,8 +55,8 @@ namespace moves {
     double trace_ratio = std::exp(ln_trace_ratio);
 
     // ------------  Det ratio  ---------------
-    
-    auto &D             = wdata.dets[color];
+
+    auto &D        = wdata.dets[color];
     auto det_ratio = D.try_insert(det_lower_bound_x(D, tau_left),  //
                                   det_lower_bound_y(D, tau_right), //
                                   {tau_left, 0}, {tau_right, 0});

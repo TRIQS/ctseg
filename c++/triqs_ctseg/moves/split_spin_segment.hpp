@@ -10,8 +10,8 @@ namespace moves {
     triqs::mc_tools::random_generator &rng;
 
     // Internal dataseg;
-    long line_idx, idx_c_up, idx_c_down, idx_cdag_up, idx_cdag_down;
-    tau_t tau_up, tau_down;
+    long line_idx, idx_c_up, idx_c_dn, idx_cdag_up, idx_cdag_dn;
+    tau_t tau_up, tau_dn;
     double ln_trace_ratio, prop_ratio, det_sign;
     std::tuple<long, long, tau_t> propose(int color);
 

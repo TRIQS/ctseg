@@ -27,7 +27,7 @@ namespace moves {
 
     // The hanging segment if it is in spin up
     auto spin_seg_up = segment_t{jl[line_idx].tau_Sminus, jl[line_idx].tau_Splus};
-   
+
     // The hanging segment if it is in spin down
     auto spin_seg_down = segment_t{jl[line_idx].tau_Splus, jl[line_idx].tau_Sminus};
 

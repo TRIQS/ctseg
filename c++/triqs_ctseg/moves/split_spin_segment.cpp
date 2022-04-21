@@ -27,30 +27,27 @@ namespace moves {
 
     // ----------- Propose move in each color ----------
 
-    std::tie(idx_c_up, idx_cdag_down, tau_up)   = propose(0); // spin up
-    std::tie(idx_c_down, idx_cdag_up, tau_down) = propose(1); // spin down
+    std::tie(idx_c_up, idx_cdag_dn, tau_up) = propose(0); // spin up
+    std::tie(idx_c_dn, idx_cdag_up, tau_dn) = propose(1); // spin down
 
     // ----------- Trace ratio ----------
     // Correct for the overlap between the two modified segments
-    auto &sl_up       = config.seglists[0];
-    auto &sl_down     = config.seglists[1];
-    auto old_seg_up   = sl_up[idx_c_up];
-    auto old_seg_down = sl_down[idx_c_down];
-    auto new_seg_up   = segment_t{tau_up, old_seg_up.tau_cdag};
-    auto new_seg_down = segment_t{tau_down, old_seg_down.tau_cdag};
+    auto &sl_up     = config.seglists[0];
+    auto &sl_dn     = config.seglists[1];
+    auto old_seg_up = sl_up[idx_c_up];
+    auto old_seg_dn = sl_dn[idx_c_dn];
+    auto new_seg_up = segment_t{tau_up, old_seg_up.tau_cdag};
+    auto new_seg_dn = segment_t{tau_dn, old_seg_dn.tau_cdag};
     ln_trace_ratio += -wdata.U(0, 1)
-       * (                                    //
-          overlap(new_seg_up, new_seg_down)   //
-          + overlap(old_seg_up, old_seg_down) //
-          - overlap(new_seg_up, old_seg_down) //
-          - overlap(new_seg_down, old_seg_up));
+       * (overlap(new_seg_up, new_seg_dn) + overlap(old_seg_up, old_seg_dn) - //
+          overlap(new_seg_up, old_seg_dn) - overlap(new_seg_dn, old_seg_up));
 
     // Correct for the dynamical interaction between the two operators that have been moved
     if (wdata.has_Dt) {
-      ln_trace_ratio -= real(wdata.K(double(tau_up - sl_down[idx_c_down].tau_c))(0, 1));
-      ln_trace_ratio -= real(wdata.K(double(tau_down - sl_up[idx_c_up].tau_c))(0, 1));
-      ln_trace_ratio += real(wdata.K(double(tau_down - tau_up))(0, 1));
-      ln_trace_ratio += real(wdata.K(double(sl_up[idx_c_up].tau_c - sl_down[idx_c_down].tau_c))(0, 1));
+      ln_trace_ratio -= real(wdata.K(double(tau_up - sl_dn[idx_c_dn].tau_c))(0, 1));
+      ln_trace_ratio -= real(wdata.K(double(tau_dn - sl_up[idx_c_up].tau_c))(0, 1));
+      ln_trace_ratio += real(wdata.K(double(tau_dn - tau_up))(0, 1));
+      ln_trace_ratio += real(wdata.K(double(sl_up[idx_c_up].tau_c - sl_dn[idx_c_dn].tau_c))(0, 1));
     }
     double trace_ratio = std::exp(ln_trace_ratio);
     trace_ratio /= -real(wdata.Jperp(double(line.tau_Splus - line.tau_Sminus))(0, 0)) / 2;
@@ -66,10 +63,10 @@ namespace moves {
                                  {sl_up[idx_cdag_up].tau_cdag, 0}, {tau_up, 0});
 
     // Spin down
-    auto &D_down = wdata.dets[1];
-    det_ratio *= D_down.try_insert(det_lower_bound_x(D_down, sl_down[idx_cdag_down].tau_cdag),
-                                   det_lower_bound_y(D_down, tau_down), //
-                                   {sl_down[idx_cdag_down].tau_cdag, 0}, {tau_down, 0});
+    auto &D_dn = wdata.dets[1];
+    det_ratio *=
+       D_dn.try_insert(det_lower_bound_x(D_dn, sl_dn[idx_cdag_dn].tau_cdag), det_lower_bound_y(D_dn, tau_dn), //
+                       {sl_dn[idx_cdag_dn].tau_cdag, 0}, {tau_dn, 0});
 
     LOG("trace_ratio  = {}, prop_ratio = {}, det_ratio = {}", trace_ratio, prop_ratio, det_ratio);
 
@@ -92,21 +89,21 @@ namespace moves {
     wdata.dets[1].complete_operation();
 
     // Update the segments
-    auto &sl_up   = config.seglists[0];
-    auto &sl_down = config.seglists[1];
+    auto &sl_up = config.seglists[0];
+    auto &sl_dn = config.seglists[1];
 
-    sl_up[idx_c_up].tau_c     = tau_up;
-    sl_down[idx_c_down].tau_c = tau_down;
+    sl_up[idx_c_up].tau_c = tau_up;
+    sl_dn[idx_c_dn].tau_c = tau_dn;
 
     // Update spin tags
-    sl_up[idx_c_up].J_c           = false;
-    sl_up[idx_cdag_up].J_cdag     = false;
-    sl_down[idx_c_down].J_c       = false;
-    sl_down[idx_cdag_down].J_cdag = false;
+    sl_up[idx_c_up].J_c       = false;
+    sl_up[idx_cdag_up].J_cdag = false;
+    sl_dn[idx_c_dn].J_c       = false;
+    sl_dn[idx_cdag_dn].J_cdag = false;
 
     fix_ordering_first_last(sl_up);
-    fix_ordering_first_last(sl_down);
-    
+    fix_ordering_first_last(sl_dn);
+
     // Remove Jperp line
     auto &jl = config.Jperp_list;
     jl.erase(begin(jl) + line_idx);

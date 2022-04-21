@@ -67,7 +67,7 @@ namespace moves {
 
     // ------------  Det ratio  ---------------
     //  insert tau_cdag as a line (first index) and tau_c as a column (second index).
-    auto &D            = wdata.dets[color];
+    auto &D        = wdata.dets[color];
     auto det_ratio = D.try_insert(det_lower_bound_x(D, prop_seg.tau_cdag), //
                                   det_lower_bound_y(D, prop_seg.tau_c),    //
                                   {prop_seg.tau_cdag, 0}, {prop_seg.tau_c, 0});
