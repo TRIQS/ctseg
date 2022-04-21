@@ -39,7 +39,10 @@ namespace moves {
     auto new_seg_up   = segment_t{tau_up, old_seg_up.tau_cdag};
     auto new_seg_down = segment_t{tau_down, old_seg_down.tau_cdag};
     ln_trace_ratio += -wdata.U(0, 1)
-       * (overlap(new_seg_up, new_seg_down) + overlap(old_seg_up, old_seg_down) - overlap(new_seg_up, old_seg_down)
+       * (                                    //
+          overlap(new_seg_up, new_seg_down)   //
+          + overlap(old_seg_up, old_seg_down) //
+          - overlap(new_seg_up, old_seg_down) //
           - overlap(new_seg_down, old_seg_up));
 
     // Correct for the dynamical interaction between the two operators that have been moved
@@ -63,7 +66,7 @@ namespace moves {
                                  {sl_up[idx_cdag_up].tau_cdag, 0}, {tau_up, 0});
 
     // Spin down
-    auto &D_down             = wdata.dets[1];
+    auto &D_down = wdata.dets[1];
     det_ratio *= D_down.try_insert(det_lower_bound_x(D_down, sl_down[idx_cdag_down].tau_cdag),
                                    det_lower_bound_y(D_down, tau_down), //
                                    {sl_down[idx_cdag_down].tau_cdag, 0}, {tau_down, 0});
@@ -89,10 +92,9 @@ namespace moves {
     wdata.dets[1].complete_operation();
 
     // Update the segments
-    auto &sl_up               = config.seglists[0];
-    auto &sl_down             = config.seglists[1];
-    auto old_seg_up           = sl_up[idx_c_up];
-    auto old_seg_down         = sl_down[idx_c_down];
+    auto &sl_up   = config.seglists[0];
+    auto &sl_down = config.seglists[1];
+
     sl_up[idx_c_up].tau_c     = tau_up;
     sl_down[idx_c_down].tau_c = tau_down;
 
@@ -137,11 +139,10 @@ namespace moves {
 
   std::tuple<long, long, tau_t> split_spin_segment::propose(int color) {
 
-    auto &line       = config.Jperp_list[line_idx];
-    int other_color  = 1 - color;
-    std::string spin = (color == 0) ? "up" : "down";
-    auto &sl         = config.seglists[color];
-    auto &dsl        = config.seglists[other_color];
+    auto &line      = config.Jperp_list[line_idx];
+    int other_color = 1 - color;
+    auto &sl        = config.seglists[color];
+    auto &dsl       = config.seglists[other_color];
 
     // --------- Find the c connected to the chosen spin line ----------
 
@@ -151,6 +152,7 @@ namespace moves {
     tau_t tau_c = sl[idx_c].tau_c;
 
     // ---------- Find the cdag in opposite color -----------
+
     auto idx_cdag = cdag_in_window(tau_c + tau_t::epsilon(), tau_c - tau_t::epsilon(), dsl).back();
 
     // -------- Propose new position for the c ---------
@@ -186,8 +188,10 @@ namespace moves {
     if (wdata.has_Dt) ln_trace_ratio -= real(wdata.K(double(tau_c_new - tau_c))(color, color));
 
     // --------- Prop ratio ---------
+    // T direct  =
+    // T inverse =
     prop_ratio *= window_length / (double(sl.size()) * cdag_in_window(wtau_left, wtau_right, dsl).size());
 
-    return std::make_tuple(idx_c, idx_cdag, tau_c_new);
+    return {idx_c, idx_cdag, tau_c_new};
   }
 }; // namespace moves

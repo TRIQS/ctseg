@@ -29,8 +29,8 @@ namespace moves {
     auto new_seg_up   = segment_t{tau_up, old_seg_up.tau_cdag};
     auto new_seg_down = segment_t{tau_down, old_seg_down.tau_cdag};
     ln_trace_ratio += -wdata.U(0, 1)
-       * (overlap(new_seg_up, new_seg_down) + overlap(old_seg_up, old_seg_down) - overlap(new_seg_up, old_seg_down)
-          - overlap(new_seg_down, old_seg_up));
+       * (overlap(new_seg_up, new_seg_down) + overlap(old_seg_up, old_seg_down) //
+          - overlap(new_seg_up, old_seg_down) - overlap(new_seg_down, old_seg_up));
 
     // Correct for the dynamical interaction between the two operators that have been moved
     if (wdata.has_Dt) {
@@ -129,16 +129,15 @@ namespace moves {
     int other_color  = 1 - color;
     auto &dsl        = config.seglists[other_color];
     std::string spin = (color == 0) ? "up" : "down";
-    auto result      = std::tuple<long, long, tau_t, bool>{0, 0, tau_t::zero(), true};
 
     // --------- Eliminate cases where move is impossible ---------
     if (sl.empty() or dsl.empty()) {
       LOG("Line is empty, cannot regroup spin.");
-      return result;
+      return {0, 0, tau_t::zero(), true};
     }
     if (is_full_line(sl[0]) or is_full_line(dsl[0])) {
       LOG("Line is full, cannot regroup spin.");
-      return result;
+      return {0, 0, tau_t::zero(), true};
     }
 
     // --------- Randomly choose a c operator -----------
@@ -146,7 +145,7 @@ namespace moves {
     LOG("Spin {}: regrouping c at position {}.", spin, idx_c);
     if (sl[idx_c].J_c) {
       LOG("Spin {}: cannot regroup because c is connected to a spin line.", spin);
-      return result;
+      return {0, 0, tau_t::zero(), true};
     }
     tau_t tau_c = sl[idx_c].tau_c;
 
@@ -166,13 +165,13 @@ namespace moves {
     auto cdag_list = cdag_in_window(wtau_left, wtau_right, dsl);
     if (cdag_list.empty()) {
       LOG("Spin {}: cannot regroup because there are no suitable cdag operators.", spin);
-      return result;
+      return {0, 0, tau_t::zero(), true};
     }
     // Choose one of them randomly
     auto idx_cdag = cdag_list[rng(cdag_list.size())];
     if (dsl[idx_cdag].J_cdag) {
       LOG("Spin {}: cannot regroup because chosen cdag is connected to a spin line.", spin);
-      return result;
+      return {0, 0, tau_t::zero(), true};
     }
     tau_t tau_c_new = dsl[idx_cdag].tau_cdag;
     auto new_seg    = segment_t{tau_c_new, sl[idx_c].tau_cdag};
@@ -196,11 +195,7 @@ namespace moves {
     // --------- Prop ratio ---------
     prop_ratio *= double(sl.size()) * cdag_list.size() / window_length;
 
-    std::get<0>(result) = idx_c;
-    std::get<1>(result) = idx_cdag;
-    std::get<2>(result) = tau_c_new;
-    std::get<3>(result) = false;
-    return result;
+    return {idx_c, idx_cdag, tau_c_new, false};
   }
 
 }; // namespace moves

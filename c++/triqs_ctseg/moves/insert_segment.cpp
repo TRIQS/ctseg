@@ -76,7 +76,7 @@ namespace moves {
 
     double current_number_intervals = std::max(long(1), long(sl.size()));
     double future_number_segments   = sl.size() + 1;
-    // T direct  = 1 / current_number_intervals * 1/window_length^2 * 
+    // T direct  = 1 / current_number_intervals * 1/window_length^2 *
     //                * (2 iif not empty as the proba to get the dt1, dt2 coupled is x 2)
     // T inverse = 1 / future_number_segments
     double prop_ratio =
@@ -87,7 +87,7 @@ namespace moves {
 
     double prod = trace_ratio * det_ratio * prop_ratio;
     det_sign    = (det_ratio > 0) ? 1.0 : -1.0;
-    
+
     return (std::isfinite(prod) ? prod : det_sign);
   }
 
@@ -104,7 +104,7 @@ namespace moves {
     wdata.dets[color].complete_operation();
 
     // Insert the segment in an ordered list
-    auto &sl         = config.seglists[color];
+    auto &sl = config.seglists[color];
     sl.insert(std::upper_bound(sl.begin(), sl.end(), prop_seg), prop_seg);
 
     // Check invariant
