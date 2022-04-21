@@ -40,17 +40,17 @@ TEST(segment, flip) {
 
 // ------------------------------
 
-TEST(segment, find) {
+TEST(segment, lower_bound) {
   tau_t::set_beta(beta);
 
   auto tau1 = make_tau(3);
   auto v    = vs_t{S(tau1, 2.5), S(2, 1)};
 
-  EXPECT_EQ(find_segment(v, tau1) - v.begin(), 0);
+  EXPECT_EQ(lower_bound(v, tau1) - v.begin(), 0);
 
-  EXPECT_EQ(find_segment(v, tau_t{2.0}) - v.begin(), 1);
-  EXPECT_EQ(find_segment(v, tau_t{2.1}) - v.begin(), 1);
-  EXPECT_EQ(find_segment(v, tau_t{1.9}) - v.begin(), 2);
+  EXPECT_EQ(lower_bound(v, tau_t{2.0}) - v.begin(), 1);
+  EXPECT_EQ(lower_bound(v, tau_t{2.1}) - v.begin(), 1);
+  EXPECT_EQ(lower_bound(v, tau_t{1.9}) - v.begin(), 2);
 }
 
 // ------------------------------

@@ -161,15 +161,10 @@ namespace moves {
     auto &dsl        = config.seglists[other_color];
 
     // --------- Find the c connected to the chosen spin line ----------
-    segment_t seg_c;
-    if (color == 0)
-      // In spin up color, the c conneted to the J line is a at tau_Sminus
-      seg_c = segment_t{line.tau_Sminus, line.tau_Sminus};
-    else
-      // In spin down color, the c conneted to the J line is a at tau_Splus
-      seg_c = segment_t{line.tau_Splus, line.tau_Splus};
-    auto it_c   = std::lower_bound(sl.cbegin(), sl.cend(), seg_c);
-    auto idx_c  = std::distance(sl.cbegin(), it_c);
+
+    // In spin up   color, the c connected to the J line is a at tau_Sminus
+    // In spin down color, the c connected to the J line is a at tau_Splus
+    long idx_c  = lower_bound(sl, (color == 0 ? line.tau_Sminus : line.tau_Splus)) - sl.cbegin();
     tau_t tau_c = sl[idx_c].tau_c;
 
     // ---------- Find the cdag in opposite color -----------
@@ -190,7 +185,7 @@ namespace moves {
     tau_t dt        = tau_t::random(rng, window_length);
     tau_t tau_c_new = sl[idx_left].tau_cdag - dt;
 
-    LOG("Spin {}: moving c at position {} from {} to {}.", spin, idx_c, tau_c, tau_c_new);
+    LOG("Spin {}: moving c at position {} from {} to {}.", (color == 0) ? "up" : "down", idx_c, tau_c, tau_c_new);
     auto new_seg = segment_t{tau_c_new, sl[idx_c].tau_cdag};
 
     // -------- Trace ratio ---------

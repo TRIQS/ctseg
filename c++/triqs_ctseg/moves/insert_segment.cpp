@@ -62,8 +62,7 @@ namespace moves {
         ln_trace_ratio += K_overlap(config.seglists[c], prop_seg.tau_c, prop_seg.tau_cdag, wdata.K, color, c);
     }
     if (wdata.has_Dt)
-      ln_trace_ratio +=
-         -real(wdata.K(double(prop_seg.length()))(color, color)); // Correct double counting
+      ln_trace_ratio += -real(wdata.K(double(prop_seg.length()))(color, color)); // Correct double counting
     double trace_ratio = std::exp(ln_trace_ratio);
 
     // ------------  Det ratio  ---------------

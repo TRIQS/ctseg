@@ -56,7 +56,7 @@ double overlap(segment_t const &s1, segment_t const &s2) {
 
 // =================== Functions to manipulate std::vector<segment_t> ========
 
-vec_seg_iter_t find_segment(std::vector<segment_t> const &seglist, tau_t const &tau) {
+vec_seg_iter_t lower_bound(std::vector<segment_t> const &seglist, tau_t const &tau) {
   // comparison is s.tau > tau as in the tau_t comparison
   return std::lower_bound(seglist.begin(), seglist.end(), tau, [](auto &&s, auto &&t) { return s.tau_c > t; });
 }

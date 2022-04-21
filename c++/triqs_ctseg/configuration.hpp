@@ -66,7 +66,7 @@ struct configuration_t {
   int n_color() const { return seglists.size(); }
 };
 
-// ===================  Functions to manipulate segments =================== 
+// ===================  Functions to manipulate segments ===================
 
 // Comparison of segments. s1 < s2 if s1 is left of s2
 // we order segments by decreasing tau_c (independent of tau_cdag !).
@@ -94,7 +94,7 @@ inline segment_t flip (segment_t const & s) { return {s.tau_cdag, s.tau_c};}
 // =================== Functions to manipulate std::vector<segment_t> ========
 
 // lower_bound : find segment at tau if present or the first after tau
-vec_seg_iter_t find_segment(std::vector<segment_t> const &seglist, tau_t const &tau);
+vec_seg_iter_t lower_bound(std::vector<segment_t> const &seglist, tau_t const &tau);
 
 // Value of n (= 0 or 1) at tau = beta = 0
 // 1 iif there is a cyclic segment or a full line
@@ -127,7 +127,7 @@ double K_overlap(std::vector<segment_t> const &seglist, tau_t const &tau_c, tau_
 double K_overlap(std::vector<segment_t> const &seglist, tau_t const &tau, bool is_c, gf<imtime, matrix_valued> const &K,
                  int c1, int c2);
 
-// ===================  Functions to manipulate config =================== 
+// ===================  Functions to manipulate config ===================
 
 // Sign of a config
 double config_sign(configuration_t const &config, std::vector<det_t> const &dets);
