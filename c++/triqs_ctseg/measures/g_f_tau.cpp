@@ -26,19 +26,23 @@ namespace measures {
     Z += s;
 
     for (auto [bl_idx, det] : itertools::enumerate(wdata.dets)) {
-      foreach (det, [&, &block = bl_idx](auto const &x, auto const &y, auto const &M) {
-        auto &g = g_tau[block];
-        // beta-periodicity is implicit in the argument, just fix the sign properly
-        auto val  = (y.first >= x.first ? s : -s) * M;
-        auto dtau = double(y.first - x.first);
-        g[closest_mesh_pt(dtau)](y.second, x.second) += val;
-
-        if (measure_ft) {
-          auto &f = f_tau[block];
-          f[closest_mesh_pt(dtau)](y.second, x.second) += val * fprefactor(block, y);
+      long N  = det.size();
+      auto &g = g_tau[bl_idx];
+      auto &f = f_tau[bl_idx];
+      for (long id_y : range(N)) {
+        auto y        = det.get_y(id_y);
+        double f_fact = 0;
+        if (measure_ft) f_fact = fprefactor(bl_idx, y);
+        for (long id_x : range(N)) {
+          auto x    = det.get_x(id_x);
+          auto Minv = det.inverse_matrix(id_y, id_x);
+          // beta-periodicity is implicit in the argument, just fix the sign properly
+          auto val  = (y.first >= x.first ? s : -s) * Minv;
+          auto dtau = double(y.first - x.first);
+          g[closest_mesh_pt(dtau)](y.second, x.second) += val;
+          if (measure_ft) f[closest_mesh_pt(dtau)](y.second, x.second) += val * f_fact; 
         }
-      })
-        ;
+      }
     }
   }
 
@@ -70,6 +74,8 @@ namespace measures {
       results.F_tau = std::move(f_tau);
     }
   }
+
+  // -------------------------------------
 
   double g_f_tau::fprefactor(long const &block, std::pair<tau_t, long> const &y) {
     int color    = wdata.block_to_color(block, y.second);
