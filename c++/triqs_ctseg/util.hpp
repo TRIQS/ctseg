@@ -18,9 +18,9 @@ long lower_bound(auto f, long N, auto const &value) {
 }
 
 // If we have an ordered det_manip d, we get the lower_bound index for x
-long det_lower_bound_x(auto const & d, auto const & x) { 
+long det_lower_bound_x(auto const &d, auto const &x) {
   return lower_bound([&d](long i) { return d.get_x(i).first; }, d.size(), x);
 }
-long det_lower_bound_y(auto const & d, auto const & y) { 
+long det_lower_bound_y(auto const &d, auto const &y) {
   return lower_bound([&d](long i) { return d.get_y(i).first; }, d.size(), y);
 }

@@ -5,4 +5,3 @@
 #include "./measures/nn_static.hpp"
 #include "./measures/density.hpp"
 #include "./measures/perturbation_order_histo.hpp"
-

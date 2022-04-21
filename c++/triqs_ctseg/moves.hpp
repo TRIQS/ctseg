@@ -10,4 +10,3 @@
 #include "./moves/split_spin_segment.hpp"
 #include "./moves/regroup_spin_segment.hpp"
 #include "./moves/swap_spin_lines.hpp"
-

@@ -19,8 +19,8 @@ namespace moves {
     }
 
     // Select segment to split
-    prop_seg_idx    = rng(sl.size());
-    auto prop_seg   = sl[prop_seg_idx];
+    prop_seg_idx        = rng(sl.size());
+    auto prop_seg       = sl[prop_seg_idx];
     splitting_full_line = is_full_line(prop_seg);
     if (splitting_full_line) LOG("Splitting full line.");
 
@@ -93,13 +93,13 @@ namespace moves {
     if (splitting_full_line) {
       sl[prop_seg_idx] = segment_t{tau_right, tau_left};
     } else {
-      auto prop_seg  = sl[prop_seg_idx];
+      auto prop_seg      = sl[prop_seg_idx];
       auto new_seg_left  = segment_t{prop_seg.tau_c, tau_left, prop_seg.J_c, false};
       auto new_seg_right = segment_t{tau_right, prop_seg.tau_cdag, false, prop_seg.J_cdag};
       // Update the proposed segment
       sl[prop_seg_idx] = new_seg_left;
       // Insert the new seg at the right
-      // if the splitting of a cyclic segment produces a non cyclic one, i.e. at the front, we need to insert it at the 
+      // if the splitting of a cyclic segment produces a non cyclic one, i.e. at the front, we need to insert it at the
       // front of the list
       bool insert_at_front = is_cyclic(prop_seg) and not is_cyclic(new_seg_right);
       sl.insert(sl.begin() + (insert_at_front ? 0 : prop_seg_idx + 1), new_seg_right);

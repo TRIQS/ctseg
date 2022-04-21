@@ -152,7 +152,7 @@ namespace moves {
     // -------- Propose new position for the c ---------
 
     // Determine window in which the c can be moved
-    auto idx_left    = (idx_c == 0) ? sl.size() - 1 : idx_c - 1;
+    auto idx_left   = (idx_c == 0) ? sl.size() - 1 : idx_c - 1;
     auto wtau_left  = sl[idx_left].tau_cdag;
     auto wtau_right = sl[idx_c].tau_cdag;
     if (idx_c == idx_left) {
@@ -174,10 +174,10 @@ namespace moves {
       return {0, 0, tau_t::zero(), true};
     }
     auto tau_c_new = dsl[idx_cdag].tau_cdag;
-    auto new_seg    = segment_t{tau_c_new, sl[idx_c].tau_cdag};
+    auto new_seg   = segment_t{tau_c_new, sl[idx_c].tau_cdag};
     LOG("Spin {}: moving c from {} to {}.", (color == 0) ? "up" : "down", tau_c, tau_c_new);
 
-    // FIXME FACTOR ? 
+    // FIXME FACTOR ?
     // -------- Trace ratio ---------
     ln_trace_ratio += wdata.mu(color) * (double(new_seg.length()) - double(sl[idx_c].length()));
     LOG("Spin {}: ln trace ratio = {}", (color == 0) ? "up" : "down", ln_trace_ratio);

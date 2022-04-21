@@ -21,5 +21,3 @@ struct delta_block_adaptor {
 };
 
 using det_t = triqs::det_manip::det_manip<delta_block_adaptor>;
-
-

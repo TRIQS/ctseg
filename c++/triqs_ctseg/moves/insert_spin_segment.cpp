@@ -4,14 +4,14 @@
 
 namespace moves {
 
-     insert_spin_segment::insert_spin_segment(work_data_t &data_, configuration_t &config_,
+  insert_spin_segment::insert_spin_segment(work_data_t &data_, configuration_t &config_,
                                            triqs::mc_tools::random_generator &rng_)
      : wdata(data_), config(config_), rng(rng_) {
     ALWAYS_EXPECTS(config.n_color() == 2, "spin add/remove move only implemented for n_color == 2, got {}",
                    config.n_color());
   }
 
-  // -------------------------------------------------- 
+  // --------------------------------------------------
 
   double insert_spin_segment::attempt() {
 
@@ -89,8 +89,8 @@ namespace moves {
 
     // ------------  Proposition ratio ------------
 
-    // T direct -> 1/ length(prop_seg) ^2  1/ ncolor 1/ sl.size  * (splitting_full_line ?  1 : 2) 
-    //                                   # The last because of the swap we have 2 ways to get to the same (dt1, dt2) except in full line case 
+    // T direct -> 1/ length(prop_seg) ^2  1/ ncolor 1/ sl.size  * (splitting_full_line ?  1 : 2)
+    //                                   # The last because of the swap we have 2 ways to get to the same (dt1, dt2) except in full line case
     // T inverse -> 1/ Jperlist size in new config * (splitting_full_line ? 1/2 : 1)  # see reverse move
     // the (splitting_full_line ...) simplify to a ratio of 2
     double prop_ratio = (double(config.n_color()) * sl.size() * prop_seg.length() * prop_seg.length() / 2)
@@ -116,8 +116,8 @@ namespace moves {
     if (splitting_full_line) {
       sl[prop_seg_idx] = segment_t{tau_right, tau_left, true, true};
     } else {
-      auto new_seg_left      = segment_t{prop_seg.tau_c, tau_left, prop_seg.J_c, true};
-      auto new_seg_right     = segment_t{tau_right, prop_seg.tau_cdag, true, prop_seg.J_cdag};
+      auto new_seg_left  = segment_t{prop_seg.tau_c, tau_left, prop_seg.J_c, true};
+      auto new_seg_right = segment_t{tau_right, prop_seg.tau_cdag, true, prop_seg.J_cdag};
       // Update the proposed segment
       sl[prop_seg_idx] = new_seg_left;
       // Insert a new segment

@@ -55,7 +55,8 @@ namespace moves {
       }
     }
     if (wdata.has_Dt)
-      ln_trace_ratio -= real(wdata.K(double(right_seg.tau_c - left_seg.tau_cdag))(color, color)); // Correct double counting
+      ln_trace_ratio -=
+         real(wdata.K(double(right_seg.tau_c - left_seg.tau_cdag))(color, color)); // Correct double counting
 
     double trace_ratio = std::exp(ln_trace_ratio);
 

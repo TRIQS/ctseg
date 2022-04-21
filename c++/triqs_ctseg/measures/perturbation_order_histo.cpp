@@ -16,7 +16,8 @@ namespace measures {
   void perturbation_order_histo::accumulate(double) {
 
     // For the config, compute the number of segments
-    long n_segments = std::accumulate(begin(config.seglists), end(config.seglists), 0, [](long r, auto &&v) { return r + v.size(); });
+    long n_segments =
+       std::accumulate(begin(config.seglists), end(config.seglists), 0, [](long r, auto &&v) { return r + v.size(); });
     long n_Splusminus = 2 * config.Jperp_list.size();
     long delta_order =
        n_segments - n_Splusminus; // half # of c, cdag operators  = (2 * n_segments - 2* n_Splusminus) /2

@@ -68,5 +68,3 @@ class solver_core {
   friend void h5_write(h5::group h5group, std::string subgroup_name, solver_core const &s);
   CPP2PY_IGNORE static solver_core h5_read_construct(h5::group h5group, std::string subgroup_name);
 };
-
-
