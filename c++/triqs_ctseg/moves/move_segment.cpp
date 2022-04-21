@@ -80,10 +80,10 @@ namespace moves {
 
     // ------------  Det ratio  ---------------
 
-    auto compute_det_ratio = [](auto &D_orig, auto &D_dest, segment_t const &seg_orig) {
-      return D_dest.try_insert(det_lower_bound_x(D_dest, seg_orig.tau_cdag), det_lower_bound_y(D_dest, seg_orig.tau_c),
-                               {seg_orig.tau_cdag, 0}, {seg_orig.tau_c, 0})
-         * D_orig.try_remove(det_lower_bound_x(D_orig, seg_orig.tau_cdag), det_lower_bound_y(D_orig, seg_orig.tau_c));
+    auto compute_det_ratio = [](auto &D_orig, auto &D_dest, segment_t const &seg) {
+      return D_dest.try_insert(det_lower_bound_x(D_dest, seg.tau_cdag), det_lower_bound_y(D_dest, seg.tau_c),
+                               {seg.tau_cdag, 0}, {seg.tau_c, 0})
+         * D_orig.try_remove(det_lower_bound_x(D_orig, seg.tau_cdag), det_lower_bound_y(D_orig, seg.tau_c));
     };
 
     // Times are ordered in det. We insert tau_cdag as a line (first index) and tau_c as a column.
@@ -93,7 +93,7 @@ namespace moves {
       det_ratio = compute_det_ratio(wdata.dets[origin_color], wdata.dets[dest_color],
                                     (flipped ? flip(origin_segment) : origin_segment));
 
-    // ------------  Proposition ratio ------------
+    // ------------  Proposition ratio -----------
 
     double prop_ratio = double(sl.size()) / (dsl.size() + 1);
 

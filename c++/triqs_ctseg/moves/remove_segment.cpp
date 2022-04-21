@@ -58,14 +58,13 @@ namespace moves {
     double future_number_intervals = std::max(1, int(sl.size()) - 1);
     // Insertion window for the reverse move insert_segment
     // initialise at (beta,0)
-    tau_t wtau_left = tau_t::beta(), wtau_right = tau_t::zero();
+    auto tau_left = tau_t::beta(), tau_right = tau_t::zero();
     if (current_number_segments != 1) {
       // Find left, right, with cyclicity
-      long N     = sl.size();
-      wtau_right = sl[(prop_seg_idx + 1) % N].tau_c;
-      wtau_left  = sl[(prop_seg_idx + N - 1) % N].tau_cdag;
+      tau_right = sl[modulo(prop_seg_idx + 1, sl.size())].tau_c;
+      tau_left  = sl[modulo(prop_seg_idx - 1, sl.size())].tau_cdag;
     }
-    tau_t window_length = wtau_left - wtau_right;
+    auto window_length = double(tau_left - tau_right);
 
     double prop_ratio = current_number_segments
        / (future_number_intervals * window_length * window_length / (current_number_segments == 1 ? 1 : 2));

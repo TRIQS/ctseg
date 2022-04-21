@@ -14,8 +14,8 @@ namespace moves {
     auto &sl = config.seglists[color];
     LOG("Inserting at color {}", color);
 
-    // Select insertion window [wtau_left,wtau_right]
-    tau_t wtau_left = tau_t::beta(), wtau_right = tau_t::zero();
+    // Select insertion window [tau_left,tau_right]
+    tau_t tau_left = tau_t::beta(), tau_right = tau_t::zero();
 
     // If sl.empty, no segment, we have the window. otherwise,
     // we pick up one segment at random
@@ -25,16 +25,15 @@ namespace moves {
         return 0;
       }
       // Randomly choose one existing segment
-      long seg_idx         = rng(sl.size());
-      wtau_left            = sl[seg_idx].tau_cdag; // wtau_left is cdag of this segment
-      bool is_last_segment = seg_idx == sl.size() - 1;
-      wtau_right = sl[is_last_segment ? 0 : seg_idx + 1].tau_c; // wtau_right is c of next segment, possibly cyclic
+      long seg_idx = rng(sl.size());
+      tau_left    = sl[seg_idx].tau_cdag;                     // tau_left is cdag of this segment
+      tau_right   = sl[modulo(seg_idx + 1, sl.size())].tau_c; // tau_right is c of next segment, possibly cyclic
     }
 
-    // We now have the insertion window [wtau_left,wtau_right]
+    // We now have the insertion window [tau_left,tau_right]
     // Warning : it can be cyclic !
-    LOG("Insertion window is wtau_left = {}, wtau_right = {}", wtau_left, wtau_right);
-    tau_t window_length = wtau_left - wtau_right;
+    LOG("Insertion window is tau_left = {}, tau_right = {}", tau_left, tau_right);
+    tau_t window_length = tau_left - tau_right;
 
     // Choose two random times in insertion window
     auto dt1 = tau_t::random(rng, window_length);
@@ -50,7 +49,7 @@ namespace moves {
     if (dt1 > dt2 and not sl.empty()) std::swap(dt1, dt2); // if inserting into an empty line, two ways to insert
 
     // Here is the segment we propose to insert
-    prop_seg = segment_t{wtau_left - dt1, wtau_left - dt2};
+    prop_seg = segment_t{tau_left - dt1, tau_left - dt2};
     LOG("Inserting segment with c at {}, cdag at {}", prop_seg.tau_c, prop_seg.tau_cdag);
 
     // ------------  Trace ratio  -------------

@@ -1,5 +1,7 @@
 #pragma once
 
+inline long modulo(long i, long N) { return (i + N)%N;}
+
 // Same as std::lower_bound, but i-th element of vector is returned by f[i]
 // f is called on 0:N strictly
 long lower_bound(auto f, long N, auto const &value) {

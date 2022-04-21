@@ -159,7 +159,6 @@ namespace moves {
       wtau_left  = tau_t::beta();
       wtau_right = tau_t::zero();
     }
-    auto window_length = wtau_left - wtau_right;
 
     // Find the cdag in opposite spin that are within the window
     auto cdag_list = cdag_in_window(wtau_left, wtau_right, dsl);
@@ -177,7 +176,6 @@ namespace moves {
     auto new_seg   = segment_t{tau_c_new, sl[idx_c].tau_cdag};
     LOG("Spin {}: moving c from {} to {}.", (color == 0) ? "up" : "down", tau_c, tau_c_new);
 
-    // FIXME FACTOR ?
     // -------- Trace ratio ---------
     ln_trace_ratio += wdata.mu(color) * (double(new_seg.length()) - double(sl[idx_c].length()));
     LOG("Spin {}: ln trace ratio = {}", (color == 0) ? "up" : "down", ln_trace_ratio);
@@ -194,6 +192,7 @@ namespace moves {
     if (wdata.has_Dt) ln_trace_ratio -= real(wdata.K(double(tau_c_new - tau_c))(color, color));
 
     // --------- Prop ratio ---------
+    auto window_length = double(wtau_left - wtau_right);
     prop_ratio *= double(sl.size()) * cdag_list.size() / window_length;
 
     return {idx_c, idx_cdag, tau_c_new, false};

@@ -72,7 +72,7 @@ namespace moves {
 
     auto &dsl      = config.seglists[dest_color];
     dest_right_idx = dest_it - dsl.cbegin();
-    dest_left_idx  = (dest_right_idx == 0) ? long(dsl.size()) - 1 : dest_right_idx - 1;
+    dest_left_idx  = modulo(dest_right_idx - 1, dsl.size());
 
     // ------------- Check if space is free -------------
 
