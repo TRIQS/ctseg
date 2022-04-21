@@ -9,3 +9,14 @@ Basic moves
 - split_segment/ regroup_segment
 
 
+Spin moves
+-------------
+
+- insert/remove spin segment
+
+- split/regroup spin segment
+
+- swap_spin_lines
+
+
+

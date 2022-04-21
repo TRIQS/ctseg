@@ -71,11 +71,6 @@ namespace measures {
     q_tau = mpi::all_reduce(q_tau, c);
     q_tau = q_tau / Z; //(beta * Z * q_tau.mesh().delta());
 
-    // FIXME : do I need this ??
-    // Fix the point at zero and beta, for each block
-    //q_tau[0] *= 2;
-    //q_tau[q_tau.mesh().size() - 1] *= 2;
-
     // store the result (not reused later, hence we can move it).
     results.nn_tau = std::move(q_tau);
   }
