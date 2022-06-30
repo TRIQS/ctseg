@@ -26,8 +26,8 @@ namespace moves {
       }
       // Randomly choose one existing segment
       long seg_idx = rng(sl.size());
-      tau_left    = sl[seg_idx].tau_cdag;                     // tau_left is cdag of this segment
-      tau_right   = sl[modulo(seg_idx + 1, sl.size())].tau_c; // tau_right is c of next segment, possibly cyclic
+      tau_left     = sl[seg_idx].tau_cdag;                     // tau_left is cdag of this segment
+      tau_right    = sl[modulo(seg_idx + 1, sl.size())].tau_c; // tau_right is c of next segment, possibly cyclic
     }
 
     // We now have the insertion window [tau_left,tau_right]
@@ -113,9 +113,11 @@ namespace moves {
     double sign_ratio = final_sign / initial_sign;
     LOG("Final sign is {}", final_sign);
 
-    ALWAYS_EXPECTS((sign_ratio * det_sign == 1.0),
-                   "Error: move has produced negative sign! Det sign is {} and additional sign is {}. Config: ",
-                   det_sign, sign_ratio, config);
+    // ALWAYS_EXPECTS((sign_ratio * det_sign == 1.0),
+    //                "Error: move has produced negative sign! Det sign is {} and additional sign is {}. Config: ",
+    //                det_sign, sign_ratio, config);
+    if (sign_ratio * det_sign == -1.0) spdlog::info("WARNING: move produced negative sign!");
+
     LOG("Configuration is {}", config);
 
     return sign_ratio;
