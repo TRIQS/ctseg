@@ -12,6 +12,8 @@ namespace measures {
     configuration_t const &config;
     results_t &results;
     double beta;
+    double dtau;
+    int ntau;
 
     gf<imtime> q_tau;
 

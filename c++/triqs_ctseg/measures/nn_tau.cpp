@@ -16,9 +16,11 @@ namespace measures {
      : wdata{wdata}, config{config}, results{results} {
 
     beta    = p.beta;
+    ntau    = p.n_tau_k;
+    dtau    = p.beta / (ntau - 1);
     n_color = config.n_color();
 
-    q_tau   = gf<imtime>({beta, Boson, p.n_tau}, {n_color, n_color});
+    q_tau   = gf<imtime>({beta, Boson, p.n_tau_k}, {n_color, n_color});
     q_tau() = 0;
   }
 
@@ -39,9 +41,10 @@ namespace measures {
       for (int a = 0; a < n_color; ++a)
         for (auto const &seg : config.seglists[a]) {
 
-          // position of c cdag of the segment, as an integer index in the mesh
-          auto u_idx_c    = closest_mesh_pt_index(q_tau.mesh(), seg.tau_c);
-          auto u_idx_cdag = closest_mesh_pt_index(q_tau.mesh(), seg.tau_cdag);
+          // find closest mesh point to the right of c
+          int u_idx_c = (seg.tau_c == tau_t::beta()) ? ntau - 1 : std::floor(seg.tau_c / dtau);
+          // find closest mesh point to the left of cdag
+          int u_idx_cdag = std::ceil(seg.tau_cdag / dtau);
 
           auto d = q_tau.data()(nda_all, a, b); // a view of the data for fixed a,b
           // add + s to the data. NB : id1 > id2
@@ -52,11 +55,11 @@ namespace measures {
 
           // Execute with 2 cases : cyclic segment or not
           if (not is_cyclic(seg)) {
-            fill(u_idx_c, u_idx_cdag);
+            if (u_idx_c >= u_idx_cdag) fill(u_idx_c, u_idx_cdag);
           } else { // cyclic segment
             ALWAYS_EXPECTS((u_idx_cdag >= u_idx_c), "eee", 1);
             fill(u_idx_c, 0);
-            fill(q_tau.mesh().size() - 1, u_idx_cdag);
+            fill(ntau - 1, u_idx_cdag);
           }
         }
     }
