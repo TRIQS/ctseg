@@ -10,5 +10,6 @@ core*
 trash
 CMakeFiles
 .gitignore
+test/local_test
 
 
