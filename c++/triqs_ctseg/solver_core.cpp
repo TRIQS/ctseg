@@ -80,6 +80,7 @@ void solver_core::solve(solve_params_t const &solve_params) {
   if (p.measure_n) CTQMC.add_measure(measures::density{p, wdata, config, results}, "Density");
   if (p.measure_nn) CTQMC.add_measure(measures::nn_static{p, wdata, config, results}, "nn(0)");
   if (p.measure_nnt) CTQMC.add_measure(measures::nn_tau{p, wdata, config, results}, "nn(tau)");
+  if (p.measure_sperpt) CTQMC.add_measure(measures::sperp_tau{p, wdata, config, results}, "<s_x s_x>(tau)");
   if (p.measure_perturbation_order_histograms)
     CTQMC.add_measure(measures::perturbation_order_histo{p, wdata, config, results}, "Perturbation orders");
 

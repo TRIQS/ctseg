@@ -102,6 +102,9 @@ struct solve_params_t {
   /// Whether to measure langle n(tau)n(0)rangle (see [[measure_nnt]])
   bool measure_nnt = false;
 
+  /// Whether to measure langle s_x(tau)s_x(0)rangle (see [[measure_sperp_tau]])
+  bool measure_sperpt = false;
+
   /// Hartree shift of the chem pot
   nda::vector<double> hartree_shift = nda::vector<double>{};
 

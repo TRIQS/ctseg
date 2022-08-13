@@ -24,6 +24,9 @@ struct results_t {
   /// <n_a(tau) n_b(0)>
   std::optional<gf<imtime>> nn_tau;
 
+  /// <s_x(tau) s_x(0)>
+  std::optional<gf<imtime>> sperp_tau;
+
   /// <n_a n_b>
   std::optional<nda::matrix<double>> nn_static;
 
