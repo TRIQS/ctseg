@@ -29,32 +29,6 @@ namespace measures {
       ss_tau[closest_mesh_pt(dtau1)] += 0.5 / (real(wdata.Jperp(dtau1)(0, 0)));
       ss_tau[closest_mesh_pt(dtau2)] += 0.5 / (real(wdata.Jperp(dtau2)(0, 0)));
     }
-
-#if 0
-    auto N_lines = config.Jperp_list.size();
-
-    for (auto const &[i, line1] : itertools::enumerate(config.Jperp_list)) {
-      for (auto const &[j, line2] : itertools::enumerate(config.Jperp_list)) {
-        auto Jperp_list_loc         = config.Jperp_list;
-        Jperp_list_loc[i].tau_Splus = config.Jperp_list[j].tau_Splus;
-        Jperp_list_loc[j].tau_Splus = config.Jperp_list[i].tau_Splus;
-        auto t11                    = double(line1.tau_Splus - line1.tau_Sminus);
-        auto t22                    = double(line2.tau_Splus - line2.tau_Sminus);
-        auto t12                    = double(line1.tau_Splus - line2.tau_Sminus);
-        auto t21                    = double(line2.tau_Splus - line1.tau_Sminus);
-        auto w_mod                  = real(wdata.Jperp(t12)(0, 0)) * real(wdata.Jperp(t21)(0, 0))
-           / (real(wdata.Jperp(t11)(0, 0)) * real(wdata.Jperp(t22)(0, 0)));
-
-        for (auto const &[k, line] : itertools::enumerate(Jperp_list_loc)) {
-          auto dtau1 = double(line.tau_Splus - line.tau_Sminus);
-          auto dtau2 = double(line.tau_Sminus - line.tau_Splus);
-          ss_tau[closest_mesh_pt(dtau1)] += w_mod * 0.5 / (real(wdata.Jperp(dtau1)(0, 0)) * N_lines * N_lines);
-          ss_tau[closest_mesh_pt(dtau2)] += w_mod * 0.5 / (real(wdata.Jperp(dtau2)(0, 0)) * N_lines * N_lines);
-        }
-      }
-    }
-#endif
-
   }
 
   // -------------------------------------
