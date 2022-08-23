@@ -26,8 +26,8 @@ namespace measures {
     for (auto const &[k, line] : itertools::enumerate(config.Jperp_list)) {
       auto dtau1 = double(line.tau_Splus - line.tau_Sminus);
       auto dtau2 = double(line.tau_Sminus - line.tau_Splus);
-      ss_tau[closest_mesh_pt(dtau1)] += 0.5 / (real(wdata.Jperp(dtau1)(0, 0)));
-      ss_tau[closest_mesh_pt(dtau2)] += 0.5 / (real(wdata.Jperp(dtau2)(0, 0)));
+      ss_tau[closest_mesh_pt(dtau1)] += 0.5*s / (real(wdata.Jperp(dtau1)(0, 0)));
+      ss_tau[closest_mesh_pt(dtau2)] += 0.5*s / (real(wdata.Jperp(dtau2)(0, 0)));
     }
   }
 
