@@ -27,6 +27,9 @@ struct results_t {
   /// <s_x(tau) s_x(0)>
   std::optional<gf<imtime>> sperp_tau;
 
+  /// <s_x(tau) s_x(0)> with N^2 samples
+  std::optional<gf<imtime>> sperp_tau2;
+
   /// <n_a n_b>
   std::optional<nda::matrix<double>> nn_static;
 

@@ -64,6 +64,11 @@ c.add_member(c_name = "sperp_tau",
              read_only= True,
              doc = r"""<s_x(tau) s_x(0)>""")
 
+c.add_member(c_name = "sperp_tau2",
+             c_type = "std::optional<gf<imtime>>",
+             read_only= True,
+             doc = r"""<s_x(tau) s_x(0)> with N^2 samples""")
+
 c.add_member(c_name = "nn_static",
              c_type = "std::optional<nda::matrix<double>>",
              read_only= True,
@@ -173,6 +178,8 @@ c.add_method("""void solve (**solve_params_t)""",
 | measure_nnt                           | bool                                 | false                                   | Whether to measure langle n(tau)n(0)rangle (see [[measure_nnt]])                                                  |
 +---------------------------------------+--------------------------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
 | measure_sperpt                        | bool                                 | false                                   | Whether to measure langle s_x(tau)s_x(0)rangle (see [[measure_sperp_tau]])                                        |
++---------------------------------------+--------------------------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
+| measure_sperpt2                       | bool                                 | false                                   | Whether to measure langle s_x(tau)s_x(0)rangle using N^2 measurements (see [[measure_sperp_tau2]])                |
 +---------------------------------------+--------------------------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
 | hartree_shift                         | nda::vector<double>                  | nda::vector<double>{}                   | Hartree shift of the chem pot                                                                                     |
 +---------------------------------------+--------------------------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
@@ -336,6 +343,11 @@ c.add_member(c_name = "measure_sperpt",
              c_type = "bool",
              initializer = """ false """,
              doc = r"""Whether to measure langle s_x(tau)s_x(0)rangle (see [[measure_sperp_tau]])""")
+
+c.add_member(c_name = "measure_sperpt2",
+             c_type = "bool",
+             initializer = """ false """,
+             doc = r"""Whether to measure langle s_x(tau)s_x(0)rangle using N^2 measurements (see [[measure_sperp_tau2]])""")
 
 c.add_member(c_name = "hartree_shift",
              c_type = "nda::vector<double>",
