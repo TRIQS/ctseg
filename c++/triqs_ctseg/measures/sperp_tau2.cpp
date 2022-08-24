@@ -24,14 +24,16 @@ namespace measures {
     LOG("\n =================== MEASURE < S_x S_x > (tau) = 0.5*<S_plus S_minus + S_minus S_plus> (tau) with N^2 terms ================ \n");
 
     double ratio = 0.0;
-    Z += s; // first term in denominator coming from original segments
+    double Z_C = 0.0;
+    auto N_C = 1.0 + double(config.Jperp_list.size())*(double(config.Jperp_list.size())-1);
+    Z_C += s;
 
     for (auto const &[k1, line1] : itertools::enumerate(config.Jperp_list)) {
       
       // compute terms in numerator coming from original segments
       auto dtau11 = double(line1.tau_Splus - line1.tau_Sminus);
       auto r11 = real(wdata.Jperp(dtau11)(0, 0));
-      ss_tau2[closest_mesh_pt(dtau11)] +=  0.5*s/r11;
+      ss_tau2[closest_mesh_pt(dtau11)] += s/(N_C*r11);
 
       for (auto const &[k2, line2] : itertools::enumerate(config.Jperp_list)) {
             
@@ -46,24 +48,30 @@ namespace measures {
           auto r12 = real(wdata.Jperp(dtau12)(0, 0));
           auto r21 = real(wdata.Jperp(dtau21)(0, 0));
           ratio = r12*r21/(r11*r22);
-          Z += s*ratio;
+          Z_C += 2.0*s*ratio;
 
           // now compute the reimagined terms in the numerator
-          ss_tau2[closest_mesh_pt(dtau12)] += 0.5*s*ratio/r12;
-          ss_tau2[closest_mesh_pt(dtau21)] += 0.5*s*ratio/r21;
-        
+          ss_tau2[closest_mesh_pt(dtau12)] += s*ratio/r12;
+          ss_tau2[closest_mesh_pt(dtau21)] += s*ratio/r21;
+
           for (auto const &[k3, line3] : itertools::enumerate(config.Jperp_list)) {
 
             if(k3 != k1 && k3 != k2) {
 
               auto dtau33 = double(line3.tau_Splus - line3.tau_Sminus);
-              ss_tau2[closest_mesh_pt(dtau33)] +=  0.5*s*ratio/(real(wdata.Jperp(dtau33)(0, 0)));
+              ss_tau2[closest_mesh_pt(dtau33)] +=  2.0*s*ratio/(N_C*real(wdata.Jperp(dtau33)(0, 0)));
 
             }
           }
         }
       }
+
+      Z += Z_C/N_C;
+
     }
+
+
+
   }   
 
   // -------------------------------------
