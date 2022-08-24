@@ -27,7 +27,6 @@ struct work_data_t {
   gf<imtime> K, Kprime, Jperp, Kprime_spin;
 
   // Hybridization function
-  using delta_target_t = matrix_real_valued;
   block_gf<imtime, delta_target_t> delta;
 
   // The determinants
