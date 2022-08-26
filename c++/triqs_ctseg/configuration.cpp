@@ -201,8 +201,8 @@ double K_overlap(std::vector<segment_t> const &seglist, tau_t const &tau_c, tau_
   // seglist empty covered by the loop
   double result = 0;
   for (auto const &s : seglist) {
-    result += real(Ks(double(tau_c - s.tau_c)) + Ks(double(tau_cdag - s.tau_cdag)) - Ks(double(tau_cdag - s.tau_c))
-                   - Ks(double(tau_c - s.tau_cdag)));
+    result += real(Ks[closest_mesh_pt(double(tau_c - s.tau_c))] + Ks[closest_mesh_pt(double(tau_cdag - s.tau_cdag))]
+                   - Ks[closest_mesh_pt(double(tau_cdag - s.tau_c))] - Ks[closest_mesh_pt(double(tau_c - s.tau_cdag))]);
   }
   return result;
 }
@@ -217,7 +217,9 @@ double K_overlap(std::vector<segment_t> const &seglist, tau_t const &tau, bool i
 
   double result = 0;
   // The order of the times is important for the measure of F
-  for (auto const &s : seglist) { result += real(Ks(double(s.tau_c - tau)) - Ks(double(s.tau_cdag - tau))); }
+  for (auto const &s : seglist) {
+    result += real(Ks[closest_mesh_pt(double(s.tau_c - tau))] - Ks[closest_mesh_pt(double(s.tau_cdag - tau))]);
+  }
   return is_c ? result : -result;
 }
 
