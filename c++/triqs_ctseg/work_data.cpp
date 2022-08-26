@@ -56,11 +56,11 @@ work_data_t::work_data_t(params_t const &p, inputs_t const &inputs, mpi::communi
   // For numerical integration of the D0 and Jperp
   auto ramp = nda::zeros<double>(p.n_tau_k);
   for (auto n : range(p.n_tau_k)) { ramp(n) = n * beta / (p.n_tau_k - 1); }
-  int n_tau_interp = 100001;
+  int n_tau_interp = 10000001;
 
   // Dynamical interactions
   auto K_coarse      = gf<imtime>({beta, Boson, p.n_tau_k}, {n_color, n_color});
-  auto Kprime_coarse = K;
+  auto Kprime_coarse = K_coarse;
   if (has_Dt) {
     // Compute interaction kernels K(tau), K'(tau) by integrating D(tau)
     for (auto c1 : range(n_color)) {
