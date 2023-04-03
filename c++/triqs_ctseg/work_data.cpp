@@ -64,7 +64,7 @@ work_data_t::work_data_t(params_t const &p, inputs_t const &inputs, mpi::communi
     Kprime = K;
     for (auto c1 : range(n_color)) {
       for (auto c2 : range(n_color)) {
-        nda::array<dcomplex, 1> D_data = inputs.d0t.data()(range(), c1, c2);
+        nda::array<dcomplex, 1> D_data = inputs.d0t.data()(range::all, c1, c2);
         auto first_integral            = nda::zeros<dcomplex>(p.n_tau_k);
         auto second_integral           = nda::zeros<dcomplex>(p.n_tau_k);
         // Trapezoidal integration
@@ -76,8 +76,8 @@ work_data_t::work_data_t(params_t const &p, inputs_t const &inputs, mpi::communi
         first_integral *= beta / (p.n_tau_k - 1);
         second_integral *= (beta / (p.n_tau_k - 1)) * (beta / (p.n_tau_k - 1));
         // Enforce K(0) = K(beta) = 0
-        Kprime.data()(range(), c1, c2) = first_integral - second_integral(p.n_tau_k - 1) / beta;
-        K.data()(range(), c1, c2)      = second_integral - ramp * second_integral(p.n_tau_k - 1) / beta;
+        Kprime.data()(range::all, c1, c2) = first_integral - second_integral(p.n_tau_k - 1) / beta;
+        K.data()(range::all, c1, c2)      = second_integral - ramp * second_integral(p.n_tau_k - 1) / beta;
         // Renormalize U and mu
         if (c1 != c2) U(c1, c2) -= real(2 * Kprime.data()(0, c1, c2));
       }
@@ -94,7 +94,7 @@ work_data_t::work_data_t(params_t const &p, inputs_t const &inputs, mpi::communi
       Kprime_spin = gf<imtime>({beta, Boson, p.n_tau_k}, {n_color, n_color}); // used in computation of F(tau)
       // Integrate Jperp to obtain the S_z.S_z part of K'(tau) (called Kprime_spin)
       auto Kprime_J                  = Jperp;
-      nda::array<dcomplex, 1> J_data = Jperp.data()(range(), 0, 0);
+      nda::array<dcomplex, 1> J_data = Jperp.data()(range::all, 0, 0);
       auto first_integral            = nda::zeros<dcomplex>(p.n_tau_k);
       // Trapezoidal integration
       for (int i = 1; i < J_data.size(); ++i) {
@@ -103,17 +103,17 @@ work_data_t::work_data_t(params_t const &p, inputs_t const &inputs, mpi::communi
       // Noramlize by bin size
       first_integral *= beta / (p.n_tau_k - 1);
       // Enforce Kprime_J(beta/2) = 0
-      Kprime_J.data()(range(), 0, 0) = first_integral - first_integral((p.n_tau_k - 1) / 2);
+      Kprime_J.data()(range::all, 0, 0) = first_integral - first_integral((p.n_tau_k - 1) / 2);
       // Kprime_spin = +/- Kprime_J depending on color
       for (auto c1 : range(n_color)) {
         for (auto c2 : range(n_color)) {
-          Kprime_spin.data()(range(), c1, c2) = (c1 == c2 ? 1 : -1) * Kprime_J.data()(range(), 0, 0) / 4;
+          Kprime_spin.data()(range::all, c1, c2) = (c1 == c2 ? 1 : -1) * Kprime_J.data()(range::all, 0, 0) / 4;
         }
       }
       auto Kprime_0 = gf<imtime>({beta, Boson, p.n_tau_k}, {n_color, n_color});
       Kprime_0      = Kprime - Kprime_spin;
       // The "remainder" Kprime_0 must be color-independent for there to be rotational invariance
-      if (max_element(abs(Kprime_0.data()(range(), 0, 0) - Kprime_0.data()(range(), 0, 1))) > 1.e-13) rot_inv = false;
+      if (max_element(abs(Kprime_0.data()(range::all, 0, 0) - Kprime_0.data()(range::all, 0, 1))) > 1.e-13) rot_inv = false;
     }
   }
 
