@@ -84,6 +84,11 @@ c.add_member(c_name = "perturbation_order_histo_Jperp",
              read_only= True,
              doc = r"""Perturbation order histogram""")
 
+c.add_member(c_name = "sign",
+             c_type = "double",
+             read_only= True,
+             doc = r"""Average sign""")
+
 module.add_class(c)
 
 # The class solver_core
@@ -167,6 +172,8 @@ c.add_method("""void solve (**solve_params_t)""",
 | measure_ft                            | bool                                 | false                                   | Whether to measure F(tau) (see [[measure_g_f_tau]])                                                               |
 +---------------------------------------+--------------------------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
 | measure_n                             | bool                                 | true                                    | Whether to measure density (see [[measure_density]])                                                              |
++---------------------------------------+--------------------------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
+| measure_sign                          | bool                                 | true                                    | Whether to measure sign (see [[measure_sign]])                                                                    |
 +---------------------------------------+--------------------------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
 | measure_nn                            | bool                                 | false                                   | Whether to measure <nn> (see [[measure_nn]])                                                                      |
 +---------------------------------------+--------------------------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
@@ -321,6 +328,11 @@ c.add_member(c_name = "measure_n",
              c_type = "bool",
              initializer = """ true """,
              doc = r"""Whether to measure density (see [[measure_density]])""")
+
+c.add_member(c_name = "measure_sign",
+             c_type = "bool",
+             initializer = """ true """,
+             doc = r"""Whether to measure sign (see [[measure_sign]])""")
 
 c.add_member(c_name = "measure_nn",
              c_type = "bool",

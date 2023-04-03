@@ -96,6 +96,9 @@ struct solve_params_t {
   /// Whether to measure density (see [[measure_density]])
   bool measure_n = true;
 
+  /// Whether to measure sign (see [[measure_sign]])
+  bool measure_sign = true;
+
   /// Whether to measure <nn> (see [[measure_nn]])
   bool measure_nn = false;
 

@@ -25,6 +25,7 @@ void h5_write(h5::group h5group, std::string subgroup_name, results_t const &c) 
   h5::group grp = subgroup_name.empty() ? h5group : h5group.create_group(subgroup_name);
 
   h5_write(grp, "G_tau", c.G_tau);
+  h5_write(grp, "sign", c.sign);
   h5_write(grp, "F_tau", c.F_tau);
   h5_write(grp, "K_tau", c.K_tau);
   h5_write(grp, "Kprime_tau", c.Kprime_tau);
@@ -43,6 +44,7 @@ void h5_read(h5::group h5group, std::string subgroup_name, results_t &c) {
   h5::group grp = subgroup_name.empty() ? h5group : h5group.open_group(subgroup_name);
 
   h5_read(grp, "G_tau", c.G_tau);
+  h5_read(grp, "sign", c.sign);
   h5_read(grp, "F_tau", c.F_tau);
   h5_read(grp, "K_tau", c.K_tau);
   h5_read(grp, "Kprime_tau", c.Kprime_tau);

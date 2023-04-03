@@ -38,6 +38,9 @@ struct results_t {
 
   /// Perturbation order histogram
   std::optional<triqs::stat::histogram> perturbation_order_histo_Jperp;
+
+  /// Average sign 
+  double sign;
 };
 
 /// writes all containers to hdf5 file

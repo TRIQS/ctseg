@@ -21,7 +21,8 @@ struct work_data_t {
 
   bool has_Dt    = false; // Have D nn term
   bool has_jperp = false; // Have Jperp
-  bool rot_inv   = true;  // ???
+  bool rot_inv   = true;  // Is the spin-spin interaction rotationally invariant? 
+  bool minus_sign = false; // Has a move ever produced a negative sign?
 
   // FIXME : Could be real_valued if profiling show some gain
   gf<imtime> K, Kprime, Jperp, Kprime_spin;

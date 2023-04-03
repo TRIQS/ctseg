@@ -5,4 +5,5 @@
 #include "./measures/sperp_tau.hpp"
 #include "./measures/nn_static.hpp"
 #include "./measures/density.hpp"
+#include "./measures/sign.hpp"
 #include "./measures/perturbation_order_histo.hpp"
