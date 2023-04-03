@@ -115,10 +115,8 @@ namespace moves {
 
     // Check invariant
     if constexpr (print_logs or ctseg_debug) check_invariant(config, wdata.dets);
-    // ALWAYS_EXPECTS((sign_ratio * det_sign == 1.0),
-    //                "Error: move has produced negative sign! Det sign is {} and additional sign is {}. Config: ",
-    //                det_sign, sign_ratio, config);
-    if (sign_ratio * det_sign == -1.0) spdlog::info("WARNING: move produced negative sign!");
+
+    if (sign_ratio * det_sign == -1.0) wdata.minus_sign = true;
     LOG("Configuration is {}", config);
 
     return sign_ratio;
