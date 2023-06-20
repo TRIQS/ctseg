@@ -55,11 +55,14 @@ void solver_core::solve(solve_params_t const &solve_params) {
   // initialize moves
   if (p.move_empty_full_line) CTQMC.add_move(moves::empty_full_line{wdata, config, CTQMC.get_rng()}, "empty");
   if (p.move_fill_empty_line) CTQMC.add_move(moves::fill_empty_line{wdata, config, CTQMC.get_rng()}, "fill");
-  if (p.move_insert_segment) CTQMC.add_move(moves::insert_segment{wdata, config, CTQMC.get_rng()}, "insert");
-  if (p.move_remove_segment) CTQMC.add_move(moves::remove_segment{wdata, config, CTQMC.get_rng()}, "remove");
-  if (p.move_move_segment) CTQMC.add_move(moves::move_segment{wdata, config, CTQMC.get_rng()}, "move");
-  if (p.move_split_segment) CTQMC.add_move(moves::split_segment{wdata, config, CTQMC.get_rng()}, "split");
-  if (p.move_regroup_segment) CTQMC.add_move(moves::regroup_segment{wdata, config, CTQMC.get_rng()}, "regroup");
+
+  if (wdata.has_delta) {
+    if (p.move_insert_segment) CTQMC.add_move(moves::insert_segment{wdata, config, CTQMC.get_rng()}, "insert");
+    if (p.move_remove_segment) CTQMC.add_move(moves::remove_segment{wdata, config, CTQMC.get_rng()}, "remove");
+    if (p.move_move_segment) CTQMC.add_move(moves::move_segment{wdata, config, CTQMC.get_rng()}, "move");
+    if (p.move_split_segment) CTQMC.add_move(moves::split_segment{wdata, config, CTQMC.get_rng()}, "split");
+    if (p.move_regroup_segment) CTQMC.add_move(moves::regroup_segment{wdata, config, CTQMC.get_rng()}, "regroup");
+  }
 
   if (wdata.has_jperp) {
     if (p.move_insert_spin_segment)
@@ -78,7 +81,7 @@ void solver_core::solve(solve_params_t const &solve_params) {
   }
 
   // initialize measurements
-  if (p.measure_gt) CTQMC.add_measure(measures::g_f_tau{p, wdata, config, results}, "G(tau)");
+  if (p.measure_gt and wdata.has_delta) CTQMC.add_measure(measures::g_f_tau{p, wdata, config, results}, "G(tau)");
   if (p.measure_n) CTQMC.add_measure(measures::density{p, wdata, config, results}, "Density");
   if (p.measure_sign) CTQMC.add_measure(measures::sign{p, wdata, config, results}, "Sign");
   if (p.measure_nn) CTQMC.add_measure(measures::nn_static{p, wdata, config, results}, "nn(0)");

@@ -113,7 +113,8 @@ work_data_t::work_data_t(params_t const &p, inputs_t const &inputs, mpi::communi
       auto Kprime_0 = gf<imtime>({beta, Boson, p.n_tau_k}, {n_color, n_color});
       Kprime_0      = Kprime - Kprime_spin;
       // The "remainder" Kprime_0 must be color-independent for there to be rotational invariance
-      if (max_element(abs(Kprime_0.data()(range::all, 0, 0) - Kprime_0.data()(range::all, 0, 1))) > 1.e-13) rot_inv = false;
+      if (max_element(abs(Kprime_0.data()(range::all, 0, 0) - Kprime_0.data()(range::all, 0, 1))) > 1.e-13)
+        rot_inv = false;
     }
   }
 
@@ -126,8 +127,14 @@ work_data_t::work_data_t(params_t const &p, inputs_t const &inputs, mpi::communi
   }
 
   // ................  Determinants .....................
-
-  delta = map([](gf_const_view<imtime> d) { return real(d); }, inputs.delta);
+  for (auto const &bl : range(delta.size())) {
+      if (max_element(abs(inputs.delta[bl].data())) > 1.e-13) has_delta = true;
+  }
+  if (not has_delta) {
+    ALWAYS_EXPECTS(has_jperp, "Error : both J_perp(tau) and Delta(tau) are 0: there is nothing to expand.");
+    spdlog::info("Delta(tau) is 0, running only spin moves.");
+  }
+  delta     = map([](gf_const_view<imtime> d) { return real(d); }, inputs.delta);
   for (auto const &bl : range(delta.size())) {
     if (!is_gf_real(delta[bl], 1e-10)) {
       if (c.rank() == 0) {

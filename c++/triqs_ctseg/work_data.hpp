@@ -19,6 +19,7 @@ struct work_data_t {
 
   std::vector<long> gf_block_size_partial_sum; // data for block_to_color method
 
+  bool has_delta = false; // There is a non-zero hybridization term
   bool has_Dt    = false; // Have D nn term
   bool has_jperp = false; // Have Jperp
   bool rot_inv   = true;  // Is the spin-spin interaction rotationally invariant? 
