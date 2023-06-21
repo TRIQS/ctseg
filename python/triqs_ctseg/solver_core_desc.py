@@ -35,17 +35,17 @@ c = class_(
 )
 
 c.add_member(c_name = "G_tau",
-             c_type = "block_gf<triqs::mesh::imtime>",
+             c_type = "block_gf<imtime>",
              read_only= True,
              doc = r"""""")
 
 c.add_member(c_name = "K_tau",
-             c_type = "gf<triqs::mesh::imtime>",
+             c_type = "gf<imtime>",
              read_only= True,
              doc = r"""Dynamical interaction kernel K(tau)""")
 
 c.add_member(c_name = "Kprime_tau",
-             c_type = "gf<triqs::mesh::imtime>",
+             c_type = "gf<imtime>",
              read_only= True,
              doc = r"""Dynamical interaction kernel Kprime(tau)""")
 
@@ -108,17 +108,17 @@ c.add_constructor("""(**constr_params_t)""", doc = r"""
 
 
 
-+----------------+-------------------------+---------+--------------------------------------------------------------+
-| Parameter Name | Type                    | Default | Documentation                                                |
-+================+=========================+=========+==============================================================+
-| beta           | double                  | --      | Inverse temperature                                          |
-+----------------+-------------------------+---------+--------------------------------------------------------------+
-| gf_struct      | triqs::gfs::gf_struct_t | --      | Structure of the GF (names, sizes of blocks)                 |
-+----------------+-------------------------+---------+--------------------------------------------------------------+
-| n_tau          | int                     | 10001   | Number of time slices for $Delta(\tau)$/$G(\tau)$/$F(\tau)$  |
-+----------------+-------------------------+---------+--------------------------------------------------------------+
-| n_tau_k        | int                     | 10001   | Number of time slices for $K(\tau)$                          |
-+----------------+-------------------------+---------+--------------------------------------------------------------+
++----------------+-------------+---------+--------------------------------------------------------------+
+| Parameter Name | Type        | Default | Documentation                                                |
++================+=============+=========+==============================================================+
+| beta           | double      | --      | Inverse temperature                                          |
++----------------+-------------+---------+--------------------------------------------------------------+
+| gf_struct      | gf_struct_t | --      | Structure of the GF (names, sizes of blocks)                 |
++----------------+-------------+---------+--------------------------------------------------------------+
+| n_tau          | int         | 10001   | Number of time slices for $Delta(\tau)$/$G(\tau)$/$F(\tau)$  |
++----------------+-------------+---------+--------------------------------------------------------------+
+| n_tau_k        | int         | 10001   | Number of time slices for $K(\tau)$                          |
++----------------+-------------+---------+--------------------------------------------------------------+
 """)
 
 c.add_method("""void solve (**solve_params_t)""",
@@ -165,6 +165,10 @@ c.add_method("""void solve (**solve_params_t)""",
 +---------------------------------------+--------------------------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
 | move_swap_spin_lines                  | bool                                 | true                                    | Whether to perform the move swap spin lines                                                                       |
 +---------------------------------------+--------------------------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
+| move_empty_full_line                  | bool                                 | true                                    | Whether to perform the move empty full line                                                                       |
++---------------------------------------+--------------------------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
+| move_fill_empty_line                  | bool                                 | true                                    | Whether to perform the move fill empty line                                                                       |
++---------------------------------------+--------------------------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
 | measure_perturbation_order_histograms | bool                                 | true                                    | Whether to measure the perturbation order histograms (Order in Delta, and Jperp)                                  |
 +---------------------------------------+--------------------------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
 | measure_gt                            | bool                                 | true                                    | Whether to measure G(tau) (see [[measure_g_f_tau]])                                                               |
@@ -200,15 +204,15 @@ c.add_method("""std::string hdf5_format ()""",
              doc = r"""""")
 
 c.add_property(name = "Delta_tau",
-               getter = cfunction("block_gf_view<triqs::mesh::imtime> Delta_tau ()"),
+               getter = cfunction("block_gf_view<imtime> Delta_tau ()"),
                doc = r"""Hybridization function $\Delta^\sigma_{ab}(\tau)$""")
 
 c.add_property(name = "Jperp_tau",
-               getter = cfunction("gf_view<triqs::mesh::imtime> Jperp_tau ()"),
+               getter = cfunction("gf_view<imtime> Jperp_tau ()"),
                doc = r"""Dynamical spin-spin interactions $\mathcal{J}_\perp(\tau)$""")
 
 c.add_property(name = "D0_tau",
-               getter = cfunction("gf_view<triqs::mesh::imtime> D0_tau ()"),
+               getter = cfunction("gf_view<imtime> D0_tau ()"),
                doc = r"""Dynamical density-density interactions $D_0(\tau)$""")
 
 module.add_class(c)
@@ -309,6 +313,16 @@ c.add_member(c_name = "move_swap_spin_lines",
              initializer = """ true """,
              doc = r"""Whether to perform the move swap spin lines""")
 
+c.add_member(c_name = "move_empty_full_line",
+             c_type = "bool",
+             initializer = """ true """,
+             doc = r"""Whether to perform the move empty full line""")
+
+c.add_member(c_name = "move_fill_empty_line",
+             c_type = "bool",
+             initializer = """ true """,
+             doc = r"""Whether to perform the move fill empty line""")
+
 c.add_member(c_name = "measure_perturbation_order_histograms",
              c_type = "bool",
              initializer = """ true """,
@@ -392,7 +406,7 @@ c.add_member(c_name = "beta",
              doc = r"""Inverse temperature""")
 
 c.add_member(c_name = "gf_struct",
-             c_type = "triqs::gfs::gf_struct_t",
+             c_type = "gf_struct_t",
              initializer = """  """,
              doc = r"""Structure of the GF (names, sizes of blocks)""")
 
