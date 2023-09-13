@@ -5,6 +5,8 @@
 #include <cmath>
 #include <assert.h>
 
+#include "logs.hpp"
+
 /**
   * Discretized Imaginary Time dimtime
   * A point in imaginary time, i.e. $\tau \in [0,\beta]$, but defined on a very thin grid.
@@ -79,6 +81,7 @@ class tau_t {
     return out << double(p) << " [tau_t : n = " << p.n << "]";
   }
 };
+template <> struct fmt::formatter<tau_t> : ostream_formatter {};
 
 // ----- arithmetic operations --------
 

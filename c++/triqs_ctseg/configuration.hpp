@@ -2,6 +2,7 @@
 #include <vector>
 #include "dets.hpp"
 #include "tau_t.hpp"
+#include "logs.hpp"
 
 // The MC configuration and associated functions
 
@@ -146,4 +147,6 @@ double config_sign(configuration_t const &config, std::vector<det_t> const &dets
 // ===================  PRINTING ========================
 
 std::ostream &operator<<(std::ostream &out, std::vector<segment_t> const &sl);
+
 std::ostream &operator<<(std::ostream &out, configuration_t const &config);
+template <> struct fmt::formatter<configuration_t> : ostream_formatter {};
