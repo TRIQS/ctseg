@@ -1,15 +1,6 @@
 #include "./nn_tau.hpp"
 #include "../logs.hpp"
 
-// FIXME : move this to TRIQS ...
-namespace triqs::mesh {
-
-  template <typename Mesh, typename T> typename Mesh::index_t closest_mesh_pt_index(Mesh const &m, T const &x) {
-    return closest_point<Mesh, scalar_valued>::invoke(m, closest_mesh_pt(x));
-  }
-
-} // namespace triqs::mesh
-
 namespace measures {
 
   nn_tau::nn_tau(params_t const &p, work_data_t const &wdata, configuration_t const &config, results_t &results)
