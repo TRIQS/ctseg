@@ -165,10 +165,6 @@ c.add_method("""void solve (**solve_params_t)""",
 +---------------------------------------+--------------------------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
 | move_swap_spin_lines                  | bool                                 | true                                    | Whether to perform the move swap spin lines                                                                       |
 +---------------------------------------+--------------------------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
-| move_empty_full_line                  | bool                                 | true                                    | Whether to perform the move empty full line                                                                       |
-+---------------------------------------+--------------------------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
-| move_fill_empty_line                  | bool                                 | true                                    | Whether to perform the move fill empty line                                                                       |
-+---------------------------------------+--------------------------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
 | measure_perturbation_order_histograms | bool                                 | true                                    | Whether to measure the perturbation order histograms (Order in Delta, and Jperp)                                  |
 +---------------------------------------+--------------------------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
 | measure_gt                            | bool                                 | true                                    | Whether to measure G(tau) (see [[measure_g_f_tau]])                                                               |
@@ -312,16 +308,6 @@ c.add_member(c_name = "move_swap_spin_lines",
              c_type = "bool",
              initializer = """ true """,
              doc = r"""Whether to perform the move swap spin lines""")
-
-c.add_member(c_name = "move_empty_full_line",
-             c_type = "bool",
-             initializer = """ true """,
-             doc = r"""Whether to perform the move empty full line""")
-
-c.add_member(c_name = "move_fill_empty_line",
-             c_type = "bool",
-             initializer = """ true """,
-             doc = r"""Whether to perform the move fill empty line""")
 
 c.add_member(c_name = "measure_perturbation_order_histograms",
              c_type = "bool",

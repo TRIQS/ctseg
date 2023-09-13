@@ -45,6 +45,9 @@ void solver_core::solve(solve_params_t const &solve_params) {
 
   work_data_t wdata{p, inputs, c};
   configuration_t config{wdata.n_color};
+  if (not wdata.has_delta) {
+    config.seglists[0].push_back(segment_t::full_line());
+  }
   results.K_tau      = wdata.K;
   results.Kprime_tau = wdata.Kprime;
 
@@ -53,9 +56,6 @@ void solver_core::solve(solve_params_t const &solve_params) {
   auto CTQMC = triqs::mc_tools::mc_generic<double>(p.random_name, p.random_seed, p.verbosity);
 
   // initialize moves
-  if (p.move_empty_full_line) CTQMC.add_move(moves::empty_full_line{wdata, config, CTQMC.get_rng()}, "empty");
-  if (p.move_fill_empty_line) CTQMC.add_move(moves::fill_empty_line{wdata, config, CTQMC.get_rng()}, "fill");
-
   if (wdata.has_delta) {
     if (p.move_insert_segment) CTQMC.add_move(moves::insert_segment{wdata, config, CTQMC.get_rng()}, "insert");
     if (p.move_remove_segment) CTQMC.add_move(moves::remove_segment{wdata, config, CTQMC.get_rng()}, "remove");
@@ -70,18 +70,22 @@ void solver_core::solve(solve_params_t const &solve_params) {
 
     if (p.move_remove_spin_segment)
       CTQMC.add_move(moves::remove_spin_segment{wdata, config, CTQMC.get_rng()}, "spin remove");
+  }
 
+  if (wdata.has_jperp and wdata.has_delta) {
     if (p.move_split_spin_segment)
       CTQMC.add_move(moves::split_spin_segment{wdata, config, CTQMC.get_rng()}, "spin split");
 
     if (p.move_regroup_spin_segment)
       CTQMC.add_move(moves::regroup_spin_segment{wdata, config, CTQMC.get_rng()}, "spin regroup");
+  }
 
+  if (wdata.has_jperp) {
     if (p.move_swap_spin_lines) CTQMC.add_move(moves::swap_spin_lines{wdata, config, CTQMC.get_rng()}, "spin swap");
   }
 
   // initialize measurements
-  if (p.measure_gt and wdata.has_delta) CTQMC.add_measure(measures::g_f_tau{p, wdata, config, results}, "G(tau)");
+  if (p.measure_gt) CTQMC.add_measure(measures::g_f_tau{p, wdata, config, results}, "G(tau)");
   if (p.measure_n) CTQMC.add_measure(measures::density{p, wdata, config, results}, "Density");
   if (p.measure_sign) CTQMC.add_measure(measures::sign{p, wdata, config, results}, "Sign");
   if (p.measure_nn) CTQMC.add_measure(measures::nn_static{p, wdata, config, results}, "nn(0)");

@@ -10,5 +10,3 @@
 #include "./moves/split_spin_segment.hpp"
 #include "./moves/regroup_spin_segment.hpp"
 #include "./moves/swap_spin_lines.hpp"
-#include "./moves/empty_full_line.hpp"
-#include "./moves/fill_empty_line.hpp"

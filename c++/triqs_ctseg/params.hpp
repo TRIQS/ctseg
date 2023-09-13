@@ -82,12 +82,6 @@ struct solve_params_t {
   /// Whether to perform the move swap spin lines
   bool move_swap_spin_lines = true;
 
-  /// Whether to perform the move empty full line
-  bool move_empty_full_line = true;
-
-  /// Whether to perform the move fill empty line
-  bool move_fill_empty_line = true;
-
   // -------- Measure control --------------
 
   /// Whether to measure the perturbation order histograms (Order in Delta, and Jperp)

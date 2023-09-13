@@ -127,14 +127,15 @@ work_data_t::work_data_t(params_t const &p, inputs_t const &inputs, mpi::communi
   }
 
   // ................  Determinants .....................
-  for (auto const &bl : range(delta.size())) {
-      if (max_element(abs(inputs.delta[bl].data())) > 1.e-13) has_delta = true;
+  for (auto const &bl : range(inputs.delta.size())) {
+    if (max_element(abs(inputs.delta[bl].data())) > 1.e-13) has_delta = true;
   }
+
   if (not has_delta) {
     ALWAYS_EXPECTS(has_jperp, "Error : both J_perp(tau) and Delta(tau) are 0: there is nothing to expand.");
-    spdlog::info("Delta(tau) is 0, running only spin moves.");
+    if (c.rank() == 0) { spdlog::info("Delta(tau) is 0, running only spin moves."); }
   }
-  delta     = map([](gf_const_view<imtime> d) { return real(d); }, inputs.delta);
+  delta = map([](gf_const_view<imtime> d) { return real(d); }, inputs.delta);
   for (auto const &bl : range(delta.size())) {
     if (!is_gf_real(delta[bl], 1e-10)) {
       if (c.rank() == 0) {
