@@ -24,7 +24,7 @@ jobs:
     - uses: actions/checkout@v2
 
     - name: Install ubuntu dependencies
-      if: matrix.os == 'ubuntu-20.04'
+      if: matrix.os == 'ubuntu-22.04'
       run: >
         sudo apt-get update &&
         sudo apt-get install lsb-release wget software-properties-common &&
@@ -62,12 +62,17 @@ jobs:
         python3-nbsphinx
 
     - name: Install homebrew dependencies
-      if: matrix.os == 'macos-11'
+      if: matrix.os == 'macos-12'
       run: |
         brew install gcc@11 llvm boost fftw hdf5 open-mpi openblas
         brew install wentzell/triqs/nfft
         pip3 install mako numpy scipy mpi4py
         pip3 install -r requirements.txt
+
+    - name: add clang cxxflags
+      if: ${{ contains(matrix.cxx, 'clang') }}
+      run:
+        echo "CXXFLAGS=-stdlib=libc++" >> $GITHUB_ENV
 
     - name: Build & Install TRIQS
       env:
