@@ -24,7 +24,7 @@ macro(generate_docs header_file)
   )
 endmacro(generate_docs)
 
-generate_docs(${PROJECT_SOURCE_DIR}/doc/reference/common.hpp)
+generate_docs(${PROJECT_SOURCE_DIR}/c++/${PROJECT_NAME}/solver_core.hpp)
 
 # --------------------------------------------------------
 # Build & Run the C++ doc examples and capture the output
@@ -56,7 +56,7 @@ endif()
 add_custom_target(${PROJECT_NAME}_docs_sphinx ALL)
 add_custom_command(
   TARGET ${PROJECT_NAME}_docs_sphinx
-  COMMAND PYTHONPATH=${PROJECT_BINARY_DIR}/python:$ENV{PYTHONPATH} ${SPHINXBUILD_EXECUTABLE} -c . -j8 -b html ${CMAKE_CURRENT_SOURCE_DIR} html
+  COMMAND PYTHONPATH=${PROJECT_BINARY_DIR}/python:$ENV{PYTHONPATH} ${SPHINXBUILD_EXECUTABLE} -j auto -c . -b html ${CMAKE_CURRENT_SOURCE_DIR} html
 )
 
 option(Sphinx_Only "When building the documentation, skip the Python Modules and the generation of C++ Api and example outputs" OFF)
