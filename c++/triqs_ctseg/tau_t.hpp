@@ -39,7 +39,14 @@ class tau_t {
   /// Not for users. Use the factories
   tau_t(uint64_t n_) : n(n_) {}
   /// For test only, not for users. Use the factories
-  tau_t(double x) : tau_t{uint64_t((x / _beta) * double(n_max))} {}
+  tau_t(double x) : n(0) {
+    if ((x > _beta || x < 0)) {
+      throw std::invalid_argument("Time tau must be in the range [0, beta]");
+    } else if (x == _beta)
+      n = n_max;
+    else
+      n = uint64_t((x / _beta) * double(n_max));
+  }
 
   /// Comparisons (using integer, so it is safe)
   auto operator<=>(tau_t const &tau) const { return n <=> tau.n; }
