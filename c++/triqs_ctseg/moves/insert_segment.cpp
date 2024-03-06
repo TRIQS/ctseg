@@ -39,7 +39,7 @@ namespace moves {
     auto dt1 = tau_t::random(rng, window_length);
     auto dt2 = tau_t::random(rng, window_length);
     if (dt1 == dt2) {
-      LOG("insert_segment: generated equal times. Rejecting");
+      LOG("Insert_segment: generated equal times. Rejecting");
       return 0;
     }
     // we ensure that dt1 < dt2.
@@ -66,10 +66,18 @@ namespace moves {
 
     // ------------  Det ratio  ---------------
     //  insert tau_cdag as a line (first index) and tau_c as a column (second index).
-    auto &D        = wdata.dets[color];
+    auto &bl     = wdata.block_number[color];
+    auto &bl_idx = wdata.index_in_block[color];
+    auto &D      = wdata.dets[bl];
+    if (wdata.offdiag_delta) {
+      if (cdag_in_det(prop_seg.tau_cdag, D) or c_in_det(prop_seg.tau_c, D)) {
+        LOG("One of the proposed times already exists in another line of the same block. Rejecting.");
+        return 0;
+      }
+    }
     auto det_ratio = D.try_insert(det_lower_bound_x(D, prop_seg.tau_cdag), //
                                   det_lower_bound_y(D, prop_seg.tau_c),    //
-                                  {prop_seg.tau_cdag, 0}, {prop_seg.tau_c, 0});
+                                  {prop_seg.tau_cdag, bl_idx}, {prop_seg.tau_c, bl_idx});
 
     // ------------  Proposition ratio ------------
 
@@ -96,11 +104,11 @@ namespace moves {
 
     LOG("\n - - - - - ====> ACCEPT - - - - - - - - - - -\n");
 
-    double initial_sign = config_sign(config, wdata.dets);
+    double initial_sign = config_sign(wdata.dets);
     LOG("Initial sign is {}. Initial configuration: {}", initial_sign, config);
 
     // Insert the times into the det
-    wdata.dets[color].complete_operation();
+    wdata.dets[wdata.block_number[color]].complete_operation();
 
     // Insert the segment in an ordered list
     auto &sl = config.seglists[color];
@@ -109,12 +117,12 @@ namespace moves {
     // Check invariant
     if constexpr (print_logs or ctseg_debug) check_invariant(config, wdata.dets);
 
-    double final_sign = config_sign(config, wdata.dets);
+    double final_sign = config_sign(wdata.dets);
     double sign_ratio = final_sign / initial_sign;
     LOG("Final sign is {}", final_sign);
 
     if (sign_ratio * det_sign == -1.0) wdata.minus_sign = true;
-    
+
     LOG("Configuration is {}", config);
 
     return sign_ratio;
@@ -123,6 +131,6 @@ namespace moves {
   //--------------------------------------------------
   void insert_segment::reject() {
     LOG("\n - - - - - ====> REJECT - - - - - - - - - - -\n");
-    wdata.dets[color].reject_last_try();
+    wdata.dets[wdata.block_number[color]].reject_last_try();
   }
 }; // namespace moves

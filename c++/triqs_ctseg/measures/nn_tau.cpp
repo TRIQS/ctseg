@@ -33,9 +33,9 @@ namespace measures {
         for (auto const &seg : config.seglists[a]) {
 
           // find closest mesh point to the right of c
-          int u_idx_c = (seg.tau_c == tau_t::beta()) ? ntau - 1 : std::floor(seg.tau_c / dtau);
+          int u_idx_c = (seg.tau_c == tau_t::beta()) ? ntau - 1 : int(std::floor(seg.tau_c / dtau));
           // find closest mesh point to the left of cdag
-          int u_idx_cdag = std::ceil(seg.tau_cdag / dtau);
+          int u_idx_cdag = int(std::ceil(seg.tau_cdag / dtau));
 
           auto d = q_tau.data()(nda_all, a, b); // a view of the data for fixed a,b
           // add + s to the data. NB : id1 > id2

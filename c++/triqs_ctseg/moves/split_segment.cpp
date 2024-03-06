@@ -53,11 +53,18 @@ namespace moves {
     double trace_ratio = std::exp(ln_trace_ratio);
 
     // ------------  Det ratio  ---------------
-
-    auto &D        = wdata.dets[color];
+    auto &bl     = wdata.block_number[color];
+    auto &bl_idx = wdata.index_in_block[color];
+    auto &D      = wdata.dets[bl];
+    if (wdata.offdiag_delta) {
+      if (cdag_in_det(tau_left, D) or c_in_det(tau_right, D)) {
+        LOG("One of the proposed times already exists in another line of the same block. Rejecting.");
+        return 0;
+      }
+    }
     auto det_ratio = D.try_insert(det_lower_bound_x(D, tau_left),  //
                                   det_lower_bound_y(D, tau_right), //
-                                  {tau_left, 0}, {tau_right, 0});
+                                  {tau_left, bl_idx}, {tau_right, bl_idx});
 
     // ------------  Proposition ratio ------------
 
@@ -83,11 +90,11 @@ namespace moves {
 
     LOG("\n - - - - - ====> ACCEPT - - - - - - - - - - -\n");
 
-    double initial_sign = config_sign(config, wdata.dets);
+    double initial_sign = config_sign(wdata.dets);
     LOG("Initial sign is {}. Initial configuration: {}", initial_sign, config);
 
     // Update the dets
-    wdata.dets[color].complete_operation();
+    wdata.dets[wdata.block_number[color]].complete_operation();
 
     // Split the segment
     auto &sl = config.seglists[color];
@@ -106,7 +113,7 @@ namespace moves {
       sl.insert(sl.begin() + (insert_at_front ? 0 : prop_seg_idx + 1), new_seg_right);
     }
 
-    double final_sign = config_sign(config, wdata.dets);
+    double final_sign = config_sign(wdata.dets);
     double sign_ratio = final_sign / initial_sign;
     LOG("Final sign is {}", final_sign);
 
@@ -123,6 +130,6 @@ namespace moves {
   //--------------------------------------------------
   void split_segment::reject() {
     LOG("\n - - - - - ====> REJECT - - - - - - - - - - -\n");
-    wdata.dets[color].reject_last_try();
+    wdata.dets[wdata.block_number[color]].reject_last_try();
   }
 }; // namespace moves

@@ -62,7 +62,8 @@ namespace moves {
 
     // ------------  Det ratio  ---------------
     // We remove a cdag (first index) from the left segment and a c (second index) from the right segment.
-    auto &D        = wdata.dets[color];
+    auto bl        = wdata.block_number[color];
+    auto &D        = wdata.dets[bl];
     auto det_ratio = D.try_remove(det_lower_bound_x(D, left_seg.tau_cdag), //
                                   det_lower_bound_y(D, right_seg.tau_c));
 
@@ -92,11 +93,11 @@ namespace moves {
 
     LOG("\n - - - - - ====> ACCEPT - - - - - - - - - - -\n");
 
-    double initial_sign = config_sign(config, wdata.dets);
+    double initial_sign = config_sign(wdata.dets);
     LOG("Initial sign is {}. Initial configuration: {}", initial_sign, config);
 
     // Update the dets
-    wdata.dets[color].complete_operation();
+    wdata.dets[wdata.block_number[color]].complete_operation();
 
     // Regroup segments
     auto &sl = config.seglists[color];
@@ -109,7 +110,7 @@ namespace moves {
       sl.erase(sl.begin() + right_seg_idx);
     }
 
-    double final_sign = config_sign(config, wdata.dets);
+    double final_sign = config_sign(wdata.dets);
     double sign_ratio = final_sign / initial_sign;
     LOG("Final sign is {}", final_sign);
 
@@ -125,6 +126,6 @@ namespace moves {
   //--------------------------------------------------
   void regroup_segment::reject() {
     LOG("\n - - - - - ====> REJECT - - - - - - - - - - -\n");
-    wdata.dets[color].reject_last_try();
+    wdata.dets[wdata.block_number[color]].reject_last_try();
   }
 } // namespace moves

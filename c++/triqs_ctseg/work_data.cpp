@@ -24,9 +24,16 @@ work_data_t::work_data_t(params_t const &p, inputs_t const &inputs, mpi::communi
   { // to make acc local
     long acc = 0;
     for (auto const &[s, l] : gf_struct) {
+      if (l > 1) offdiag_delta = true; 
       gf_block_size_partial_sum.push_back(acc);
       acc += l;
     }
+  }
+
+  // Compute color/block conversion tables 
+  for (auto const &color : range(n_color)) {
+    block_number.push_back(find_block_number(color));
+    index_in_block.push_back(find_index_in_block(color));
   }
 
   // Color dependent chemical potential

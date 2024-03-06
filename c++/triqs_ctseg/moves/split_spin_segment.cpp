@@ -83,7 +83,7 @@ namespace moves {
 
     LOG("\n - - - - - ====> ACCEPT - - - - - - - - - - -\n");
 
-    double initial_sign = config_sign(config, wdata.dets);
+    double initial_sign = config_sign(wdata.dets);
     LOG("Initial sign is {}. Initial configuration: {}", initial_sign, config);
 
     // Update the dets
@@ -111,7 +111,7 @@ namespace moves {
     jl.erase(begin(jl) + line_idx);
 
     // Compute sign
-    double final_sign = config_sign(config, wdata.dets);
+    double final_sign = config_sign(wdata.dets);
     double sign_ratio = final_sign / initial_sign;
     LOG("Final sign is {}", final_sign);
 
@@ -119,7 +119,7 @@ namespace moves {
     if constexpr (print_logs or ctseg_debug) check_invariant(config, wdata.dets);
 
     if (sign_ratio * det_sign == -1.0) wdata.minus_sign = true;
-    
+
     LOG("Configuration is {}", config);
 
     return sign_ratio;

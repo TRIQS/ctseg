@@ -223,13 +223,13 @@ double K_overlap(std::vector<segment_t> const &seglist, tau_t const &tau, bool i
 
 // ===================  Functions to manipulate config ===================
 
-double config_sign(configuration_t const &config, std::vector<det_t> const &dets) {
+double config_sign(std::vector<det_t> const &dets) {
   double sign = 1.0;
   // For every color we compute the sign of the permutation that takes
   // [(c_dag c) (c_dag c) (c_dag c) ...] with the cdag in increasing time order
   // to the completely time-ordered list of operators (with increasing time)
-  for (auto c : range(config.n_color())) {
-    auto s = long(dets[c].size());
+  for (auto bl : range(dets.size())) {
+    auto s = long(dets[bl].size());
     if (s != 0) {
       // We first compute the sign of the permutation that takes
       // [(c_dag c) (c_dag c) (c_dag c) ...] with the cdag time-ordered to
@@ -240,7 +240,7 @@ double config_sign(configuration_t const &config, std::vector<det_t> const &dets
       // to the completely time-ordered list of operators
       int idx_c = 0, idx_cdag = 0;
       for (int n = 0; n < 2 * s - 1; ++n) {
-        if (dets[c].get_x(idx_cdag).first < dets[c].get_y(idx_c).first) {
+        if (dets[bl].get_x(idx_cdag).first < dets[bl].get_y(idx_c).first) {
           if (idx_cdag < s - 1) ++idx_cdag;
         } else {
           // Count the number of transpositions

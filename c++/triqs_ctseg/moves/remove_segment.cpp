@@ -48,7 +48,8 @@ namespace moves {
 
     // ------------  Det ratio  ---------------
     // same code as in insert. In Insert, it is a true bound, does not insert at same time
-    auto &D        = wdata.dets[color];
+    auto bl        = wdata.block_number[color];
+    auto &D        = wdata.dets[bl];
     auto det_ratio = D.try_remove(det_lower_bound_x(D, prop_seg.tau_cdag), //
                                   det_lower_bound_y(D, prop_seg.tau_c));
 
@@ -82,17 +83,17 @@ namespace moves {
 
     LOG("\n - - - - - ====> ACCEPT - - - - - - - - - - -\n");
 
-    double initial_sign = config_sign(config, wdata.dets);
+    double initial_sign = config_sign(wdata.dets);
     LOG("Initial sign is {}. Initial configuration: {}", initial_sign, config);
 
     // Update the dets
-    wdata.dets[color].complete_operation();
+    wdata.dets[wdata.block_number[color]].complete_operation();
 
     auto &sl = config.seglists[color];
     // Remove the segment
     sl.erase(sl.begin() + prop_seg_idx);
 
-    double final_sign = config_sign(config, wdata.dets);
+    double final_sign = config_sign(wdata.dets);
     double sign_ratio = initial_sign / final_sign;
     LOG("Final sign is {}", final_sign);
 
@@ -100,7 +101,7 @@ namespace moves {
     if constexpr (print_logs or ctseg_debug) check_invariant(config, wdata.dets);
 
     if (sign_ratio * det_sign == -1.0) wdata.minus_sign = true;
-    
+
     LOG("Configuration is {}", config);
 
     return sign_ratio;
@@ -109,6 +110,6 @@ namespace moves {
   //--------------------------------------------------
   void remove_segment::reject() {
     LOG("\n - - - - - ====> REJECT - - - - - - - - - - -\n");
-    wdata.dets[color].reject_last_try();
+    wdata.dets[wdata.block_number[color]].reject_last_try();
   }
 } // namespace moves

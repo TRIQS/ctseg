@@ -142,7 +142,7 @@ double K_overlap(std::vector<segment_t> const &seglist, tau_t const &tau, bool i
 // ===================  Functions to manipulate config ===================
 
 // Sign of a config
-double config_sign(configuration_t const &config, std::vector<det_t> const &dets);
+double config_sign(std::vector<det_t> const &dets);
 
 // ===================  PRINTING ========================
 

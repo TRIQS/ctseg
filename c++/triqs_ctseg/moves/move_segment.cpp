@@ -17,6 +17,15 @@ namespace moves {
     if (dest_color >= origin_color) ++dest_color; // little trick to select another color
     LOG("Moving to color {}", dest_color);
 
+    // Reject if colors within the same block because no appropriate det_manip function (FIXME)
+    auto const &origin_bl      = wdata.block_number[origin_color];
+    auto const &destination_bl = wdata.block_number[dest_color];
+    auto const &idx_dest       = wdata.index_in_block[dest_color];
+    if (origin_bl == destination_bl) {
+      LOG("Reject: colors are within the same block.");
+      return 0;
+    }
+
     // Do we want to move an antisegment ?
     flipped = (rng(2) == 0);
 
@@ -79,20 +88,23 @@ namespace moves {
     double trace_ratio = std::exp(ln_trace_ratio);
 
     // ------------  Det ratio  ---------------
-
-    auto compute_det_ratio = [](auto &D_orig, auto &D_dest, segment_t const &seg) {
-      return D_dest.try_insert(det_lower_bound_x(D_dest, seg.tau_cdag), det_lower_bound_y(D_dest, seg.tau_c),
-                               {seg.tau_cdag, 0}, {seg.tau_c, 0})
-         * D_orig.try_remove(det_lower_bound_x(D_orig, seg.tau_cdag), det_lower_bound_y(D_orig, seg.tau_c));
-    };
-
     // Times are ordered in det. We insert tau_cdag as a line (first index) and tau_c as a column.
     // c and cdag are inverted if we flip
     double det_ratio = 1;
+    auto seg         = (flipped ? flip(origin_segment) : origin_segment);
+    auto &D_dest     = wdata.dets[destination_bl];
+    auto &D_orig     = wdata.dets[origin_bl];
+    if (wdata.offdiag_delta) {
+      if (cdag_in_det(seg.tau_cdag, D_dest) or c_in_det(seg.tau_c, D_dest)) {
+        LOG("Proposed times already exist in destination block.");
+        return 0;
+      }
+    }
     if (not is_full_line(origin_segment))
-      det_ratio = compute_det_ratio(wdata.dets[origin_color], wdata.dets[dest_color],
-                                    (flipped ? flip(origin_segment) : origin_segment));
-
+      det_ratio = D_dest.try_insert(det_lower_bound_x(D_dest, seg.tau_cdag), det_lower_bound_y(D_dest, seg.tau_c),
+                                    {seg.tau_cdag, idx_dest}, {seg.tau_c, idx_dest})
+         * D_orig.try_remove(det_lower_bound_x(D_orig, seg.tau_cdag), det_lower_bound_y(D_orig, seg.tau_c));
+         
     // ------------  Proposition ratio -----------
 
     double prop_ratio = double(sl.size()) / (dsl.size() + 1);
@@ -110,12 +122,14 @@ namespace moves {
 
     LOG("\n - - - - - ====> ACCEPT - - - - - - - - - - -\n");
 
-    double initial_sign = config_sign(config, wdata.dets);
+    double initial_sign = config_sign(wdata.dets);
     LOG("Initial sign is {}. Initial configuration: {}", initial_sign, config);
 
     // Update the dets
-    wdata.dets[origin_color].complete_operation();
-    wdata.dets[dest_color].complete_operation();
+    auto const &origin_bl      = wdata.block_number[origin_color];
+    auto const &destination_bl = wdata.block_number[dest_color];
+    wdata.dets[origin_bl].complete_operation();
+    wdata.dets[destination_bl].complete_operation();
 
     // Add the segment at destination
     dsl.insert(begin(dsl) + dest_index, origin_segment);
@@ -132,16 +146,15 @@ namespace moves {
     }
     // WARNING : do not use sl, dsl AFTER !
 
-    double final_sign = config_sign(config, wdata.dets);
+    double final_sign = config_sign(wdata.dets);
     double sign_ratio = final_sign / initial_sign;
     LOG("Final sign is {}", final_sign);
 
     // Check invariant
     if constexpr (print_logs or ctseg_debug) check_invariant(config, wdata.dets);
 
-
     if (sign_ratio * det_sign == -1.0) wdata.minus_sign = true;
-    
+
     LOG("Configuration is {}", config);
 
     return sign_ratio;
@@ -150,7 +163,9 @@ namespace moves {
   //--------------------------------------------------
   void move_segment::reject() {
     LOG("\n - - - - - ====> REJECT - - - - - - - - - - -\n");
-    wdata.dets[origin_color].reject_last_try();
-    wdata.dets[dest_color].reject_last_try();
+    auto const &origin_bl      = wdata.block_number[origin_color];
+    auto const &destination_bl = wdata.block_number[dest_color];
+    wdata.dets[origin_bl].reject_last_try();
+    wdata.dets[destination_bl].reject_last_try();
   }
 }; // namespace moves
