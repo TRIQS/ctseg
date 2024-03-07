@@ -103,7 +103,7 @@ namespace moves {
     LOG("Final sign is {}", final_sign);
 
     // Check invariant
-    if constexpr (print_logs or ctseg_debug) check_invariant(config, wdata.dets);
+    if constexpr (print_logs or ctseg_debug) check_invariant(config, wdata);
 
     if (sign_ratio * det_sign == -1.0) wdata.minus_sign = true;
     LOG("Configuration is {}", config);
