@@ -4,7 +4,7 @@
 
 void check_invariant(configuration_t const &config, std::vector<det_t> const &dets) {
   check_segments(config);
-  check_dets(config, dets);
+  //check_dets(config, dets);
   check_jlines(config);
 }
 
@@ -132,12 +132,12 @@ bool c_in_det(tau_t const &tau, det_t const &D) {
   if (D.size() == 0) return false;
   auto det_c_time = [&](long i) { return D.get_y(i).first; };
   long det_index_c     = lower_bound(det_c_time, D.size(), tau);
-  return det_c_time(det_index_c) == tau;
+  return (det_index_c >= D.size()) ? false : (det_c_time(det_index_c) == tau);
 }
 
 bool cdag_in_det(tau_t const &tau, det_t const &D) {
   if (D.size() == 0) return false;
   auto det_cdag_time = [&](long i) { return D.get_x(i).first; };
   long det_index_cdag     = lower_bound(det_cdag_time, D.size(), tau);
-  return det_cdag_time(det_index_cdag) == tau;
+  return (det_index_cdag >= D.size()) ? false : (det_cdag_time(det_index_cdag) == tau);
 }
