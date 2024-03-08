@@ -64,7 +64,7 @@ namespace moves {
     std::swap(l1.tau_Splus, l2.tau_Splus);
 
     // Check invariant
-    if constexpr (print_logs or ctseg_debug) check_invariant(config, wdata.dets);
+    if constexpr (print_logs or ctseg_debug) check_invariant(config, wdata);
     LOG("Configuration is {}", config);
 
     return 1.0;

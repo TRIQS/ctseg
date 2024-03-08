@@ -2,9 +2,9 @@
 #include "logs.hpp"
 #include "util.hpp"
 
-void check_invariant(configuration_t const &config, std::vector<det_t> const &dets) {
+void check_invariant(configuration_t const &config, work_data_t const &wdata) {
   check_segments(config);
-  //check_dets(config, dets);
+  check_dets(config, wdata);
   check_jlines(config);
 }
 
@@ -26,47 +26,50 @@ void check_segments(configuration_t const &config) {
   LOG("Segments OK.");
 }
 
-void check_dets(configuration_t const &config, std::vector<det_t> const &dets) {
-  for (auto c : range(config.n_color())) {
-    auto const &D  = dets[c];
-    auto const &sl = config.seglists[c];
+void check_dets(configuration_t const &config, work_data_t const &wdata) {
+  for (auto bl : range(wdata.dets.size())) {
+    auto const &D  = wdata.dets[bl];
+    auto const n_orb = wdata.gf_struct[bl].second;
     // Times in det must be ordered
     if (D.size() != 0) {
       for (int i = 0; i < D.size() - 1; ++i) {
         ALWAYS_EXPECTS((D.get_x(i).first < D.get_x(i + 1).first),
-                       "Det time order error (cdag) in color {} at position {} in config \n{}", c, i, config);
+                       "Det time order error (cdag) in block {} at position {} in config \n{}", bl, i, config);
         ALWAYS_EXPECTS((D.get_y(i).first < D.get_y(i + 1).first),
-                       "Det time order error (c) in color {} at position {} in config \n{}", c, i, config);
+                       "Det time order error (c) in block {} at position {} in config \n{}", bl, i, config);
       }
     }
     // Each time in det must correspond to a time in a segment
     long n_hyb_c = 0, n_hyb_cdag = 0;
-    if (not sl.empty()) {
-      long det_index_c = 0, det_index_cdag = 0;
-      for (auto const &seg : sl) {
-        if (not seg.J_c and !is_full_line(seg)) {
-          ALWAYS_EXPECTS(D.size() != 0, "Det error, color {}: there is a hybridized c but det is empty. Config: {}", c,
-                         config);
-          auto det_c_time = [&](long i) { return D.get_y(i).first; };
-          det_index_c     = lower_bound(det_c_time, D.size(), seg.tau_c);
-          ALWAYS_EXPECTS(det_c_time(det_index_c) == seg.tau_c,
-                         "Det error, color {}: tau_c = {} is not in det! Config: {}", c, seg.tau_c, config);
-          ++n_hyb_c;
-        }
-        if (not seg.J_cdag and !is_full_line(seg)) {
-          ALWAYS_EXPECTS(D.size() != 0, "Det error, color {}: there is a hybridized cdag but det is empty. Config: {}",
-                         c, config);
-          auto det_cdag_time = [&](long i) { return D.get_x(i).first; };
-          det_index_cdag     = lower_bound(det_cdag_time, D.size(), seg.tau_cdag);
-          ALWAYS_EXPECTS(det_cdag_time(det_index_cdag) == seg.tau_cdag,
-                         "Det error, color {}: tau_cdag = {} is not in det! Config: {}", c, seg.tau_cdag, config);
-          ++n_hyb_cdag;
+    for (auto c : range(n_orb)) {
+      auto const &sl = config.seglists[wdata.block_to_color(bl, c)];
+      if (not sl.empty()) {
+        long det_index_c = 0, det_index_cdag = 0;
+        for (auto const &seg : sl) {
+          if (not seg.J_c and !is_full_line(seg)) {
+            ALWAYS_EXPECTS(D.size() != 0, "Det error, block {}: there is a hybridized c but det is empty. Config: {}", bl,
+                          config);
+            auto det_c_time = [&](long i) { return D.get_y(i).first; };
+            det_index_c     = lower_bound(det_c_time, D.size(), seg.tau_c);
+            ALWAYS_EXPECTS(det_c_time(det_index_c) == seg.tau_c,
+                          "Det error, block {}: tau_c = {} is not in det! Config: {}", bl, seg.tau_c, config);
+            ++n_hyb_c;
+          }
+          if (not seg.J_cdag and !is_full_line(seg)) {
+            ALWAYS_EXPECTS(D.size() != 0, "Det error, block {}: there is a hybridized cdag but det is empty. Config: {}",
+                          bl, config);
+            auto det_cdag_time = [&](long i) { return D.get_x(i).first; };
+            det_index_cdag     = lower_bound(det_cdag_time, D.size(), seg.tau_cdag);
+            ALWAYS_EXPECTS(det_cdag_time(det_index_cdag) == seg.tau_cdag,
+                          "Det error, block {}: tau_cdag = {} is not in det! Config: {}", bl, seg.tau_cdag, config);
+            ++n_hyb_cdag;
+          }
         }
       }
     }
-    ALWAYS_EXPECTS(n_hyb_c == D.size(), "Det error, color {}: missing {} c times in det. Config: {}", c,
+    ALWAYS_EXPECTS(n_hyb_c == D.size(), "Det error, block {}: missing {} c times in det. Config: {}", bl,
                    D.size() - n_hyb_c, config);
-    ALWAYS_EXPECTS(n_hyb_cdag == D.size(), "Det error, color {}: missing {} cdag times in det. Config: {}", c,
+    ALWAYS_EXPECTS(n_hyb_cdag == D.size(), "Det error, block {}: missing {} cdag times in det. Config: {}", bl,
                    D.size() - n_hyb_cdag, config);
   }
   LOG("Dets OK.");

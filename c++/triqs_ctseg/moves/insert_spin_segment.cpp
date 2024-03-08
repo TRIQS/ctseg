@@ -137,7 +137,7 @@ namespace moves {
       jl.push_back(jperp_line_t{spin_seg.tau_cdag, spin_seg.tau_c});
 
     // Check invariant
-    if constexpr (print_logs or ctseg_debug) check_invariant(config, wdata.dets);
+    if constexpr (print_logs or ctseg_debug) check_invariant(config, wdata);
     LOG("Configuration is {}", config);
 
     return 1.0;

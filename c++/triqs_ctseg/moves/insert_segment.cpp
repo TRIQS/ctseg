@@ -115,7 +115,7 @@ namespace moves {
     sl.insert(std::upper_bound(sl.begin(), sl.end(), prop_seg), prop_seg);
 
     // Check invariant
-    if constexpr (print_logs or ctseg_debug) check_invariant(config, wdata.dets);
+    if constexpr (print_logs or ctseg_debug) check_invariant(config, wdata);
 
     double final_sign = config_sign(wdata);
     double sign_ratio = final_sign / initial_sign;
