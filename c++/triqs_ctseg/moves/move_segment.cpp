@@ -104,7 +104,7 @@ namespace moves {
       det_ratio = D_dest.try_insert(det_lower_bound_x(D_dest, seg.tau_cdag), det_lower_bound_y(D_dest, seg.tau_c),
                                     {seg.tau_cdag, idx_dest}, {seg.tau_c, idx_dest})
          * D_orig.try_remove(det_lower_bound_x(D_orig, seg.tau_cdag), det_lower_bound_y(D_orig, seg.tau_c));
-         
+
     // ------------  Proposition ratio -----------
 
     double prop_ratio = double(sl.size()) / (dsl.size() + 1);
@@ -122,7 +122,7 @@ namespace moves {
 
     LOG("\n - - - - - ====> ACCEPT - - - - - - - - - - -\n");
 
-    double initial_sign = config_sign(wdata.dets);
+    double initial_sign = config_sign(wdata);
     LOG("Initial sign is {}. Initial configuration: {}", initial_sign, config);
 
     // Update the dets
@@ -146,7 +146,7 @@ namespace moves {
     }
     // WARNING : do not use sl, dsl AFTER !
 
-    double final_sign = config_sign(wdata.dets);
+    double final_sign = config_sign(wdata);
     double sign_ratio = final_sign / initial_sign;
     LOG("Final sign is {}", final_sign);
 

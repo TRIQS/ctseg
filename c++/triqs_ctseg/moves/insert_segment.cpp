@@ -104,7 +104,7 @@ namespace moves {
 
     LOG("\n - - - - - ====> ACCEPT - - - - - - - - - - -\n");
 
-    double initial_sign = config_sign(wdata.dets);
+    double initial_sign = config_sign(wdata);
     LOG("Initial sign is {}. Initial configuration: {}", initial_sign, config);
 
     // Insert the times into the det
@@ -117,7 +117,7 @@ namespace moves {
     // Check invariant
     if constexpr (print_logs or ctseg_debug) check_invariant(config, wdata.dets);
 
-    double final_sign = config_sign(wdata.dets);
+    double final_sign = config_sign(wdata);
     double sign_ratio = final_sign / initial_sign;
     LOG("Final sign is {}", final_sign);
 

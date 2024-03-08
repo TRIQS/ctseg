@@ -3,6 +3,7 @@
 #include "dets.hpp"
 #include "tau_t.hpp"
 #include "logs.hpp"
+#include "work_data.hpp"
 
 // The MC configuration and associated functions
 
@@ -142,7 +143,7 @@ double K_overlap(std::vector<segment_t> const &seglist, tau_t const &tau, bool i
 // ===================  Functions to manipulate config ===================
 
 // Sign of a config
-double config_sign(std::vector<det_t> const &dets);
+double config_sign(work_data_t const &wdata);
 
 // ===================  PRINTING ========================
 
