@@ -1,4 +1,5 @@
-# dimer test from github.com/triqs/benchmarks/dimer
+# Two impurity sites coupled to two bath sites.
+# Delta(tau) has off-diagonal components. Can be compared to ED reference dimer_pyed.ref.h5
 
 from triqs.gf import Gf, BlockGf, MeshImFreq, fit_hermitian_tail, iOmega_n, inverse, Fourier
 from triqs.gf.tools import make_zero_tail
@@ -89,19 +90,20 @@ for name, g0 in Delta:
     S.Delta_tau[name] << make_gf_from_fourier(Delta[name], S.Delta_tau.mesh, tail).real
 
 # --------- Solve! ----------
-n_cycles = int(1e+5)
 solve_params = {
     'h_int': h_int,
-    'hartree_shift': [0.0, 0.0, 0.1, 0.1],
+    'hartree_shift': [0.0, -0.1, 0.1, 0.0],
     'n_warmup_cycles': 5000,
-    'n_cycles': n_cycles,
+    'n_cycles': 100000,
     'length_cycle': 100,
 }
 S.solve(**solve_params)
 
-# if mpi.is_master_node():
-#     with h5.HDFArchive("dimer.out.h5", 'w') as A:
-#         A['G_tau'] = S.results.G_tau
-#     h5diff("dimer.out.h5", "dimer.ref.h5", precision=1e-9)
+if mpi.is_master_node():
+    with h5.HDFArchive("dimer.out.h5", 'w') as A:
+        A['G_tau'] = S.results.G_tau
+
+# --------- Compare to reference ----------      
+    h5diff("dimer.out.h5", "dimer.ref.h5", precision=1e-9)
     
 

@@ -7,7 +7,9 @@ endforeach()
 # List of all tests
 set(all_tests
   ./py_spin_spin
-  ./dimer.py
+  ./two_orbitals
+  ./multiorb
+  ./dimer
 )
 
 foreach(test ${all_tests})
