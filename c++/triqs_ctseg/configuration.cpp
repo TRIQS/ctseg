@@ -193,6 +193,7 @@ std::vector<long> cdag_in_window(tau_t const &wtau_left, tau_t const &wtau_right
 // ---------------------------
 
 // Contribution of the dynamical interaction kernel K to the overlap between a segment and a list of segments.
+// Computes the sum of the s_a s_b K(tau_a - tau_b) where s_a is 1 for cdag and - 1 for c
 double K_overlap(std::vector<segment_t> const &seglist, tau_t const &tau_c, tau_t const &tau_cdag,
                  gf<imtime, matrix_valued> const &K, int c1, int c2) {
 
@@ -209,8 +210,8 @@ double K_overlap(std::vector<segment_t> const &seglist, tau_t const &tau_c, tau_
 
 // ---------------------------
 
-// FIXME : the is_c is a HACK !
 // Contribution of the dynamical interaction kernel K to the overlap between an operator and a list of segments.
+// Computes the sum of the s_a s_b K(tau_a - tau_b) where s_a is 1 for cdag and - 1 for c
 double K_overlap(std::vector<segment_t> const &seglist, tau_t const &tau, bool is_c, gf<imtime, matrix_valued> const &K,
                  int c1, int c2) {
   auto Ks = slice_target_to_scalar(K, c1, c2);
@@ -219,83 +220,6 @@ double K_overlap(std::vector<segment_t> const &seglist, tau_t const &tau, bool i
   // The order of the times is important for the measure of F
   for (auto const &s : seglist) { result += real(Ks(double(s.tau_c - tau)) - Ks(double(s.tau_cdag - tau))); }
   return is_c ? result : -result;
-}
-
-// ===================  Functions to manipulate config ===================
-
-double config_sign(work_data_t const &wdata) {
-  double sign      = 1.0;
-  auto const &dets = wdata.dets;
-  // For every block we compute the sign of the permutation that takes
-  // [(c_dag c) (c_dag c) (c_dag c) ...] with the cdag and c in increasing time order
-  // (the reference order of the det) to the completely time-and-color-ordered list
-  //  of operators (the order that makes the trace positive)
-  for (auto bl : range(dets.size())) {
-    auto s              = long(dets[bl].size());
-    auto n_colors_in_bl = wdata.gf_struct[bl].second;
-    std::vector<int> number_c_before(n_colors_in_bl, 0);
-    std::vector<int> number_cdag_before(n_colors_in_bl, 0);
-    if (s != 0) {
-      // We first compute the sign of the permutation that takes
-      // [(c_dag c) (c_dag c) (c_dag c) ...] with the c and c_dag time-ordered to
-      // [(c_dag c_dag ... cdag)(c c ... c)] with the c and c_dag time-ordered
-      if ((s * (s - 1) / 2) % 2 == 1) {
-        sign *= -1;
-      }
-      // We then compute the sign of the permutation that color-orders the c ...
-      for (int n = 0; n < s; ++n) {
-        auto c_color               = dets[bl].get_y(n).second;
-        int n_higher_colors_before = 0;
-        for (int k = c_color + 1; k < n_colors_in_bl; k++) { n_higher_colors_before += number_c_before[k]; }
-        if (n_higher_colors_before % 2 == 1) sign *= -1;
-        number_c_before[c_color]++;
-      }
-      // ... the sign of the permutation that color-orders the c_dag ...
-      for (int n = 0; n < s; ++n) {
-        auto cdag_color            = dets[bl].get_x(n).second;
-        int n_higher_colors_before = 0;
-        for (int k = cdag_color + 1; k < n_colors_in_bl; k++) n_higher_colors_before += number_cdag_before[k];
-        if (n_higher_colors_before % 2 == 1) sign *= -1;
-        number_cdag_before[cdag_color]++;
-      }
-      // ... and the sign of the permutation that assembles the operators by color.
-      int nb_transp = 0;
-      auto nb_ops_per_color = number_c_before;
-      for (int k = 0; k < n_colors_in_bl; ++k) {
-        for (int l = k + 1; l < n_colors_in_bl; ++l) { nb_transp += nb_ops_per_color[k] * nb_ops_per_color[l]; }
-      }
-      if (nb_transp % 2 == 1) sign *= -1;
-      // Finally, we compute the sign of the permutation that takes
-      // [Color 0 : (c_dag c_dag ... cdag)(c c ... c) ... Color n: (c_dag c_dag ... cdag)(c c ... c)]
-      // with the c and c_dag time-ordered within each color to the completely time-and-color-ordered
-      // list of operators. In practice, we compute the sign of the time ordering for each color,
-      // ignoring the other colors.
-      for (int k = 0; k < n_colors_in_bl; ++k) {
-        int cdag_to_jump = 0;
-        int idx_c = s - 1, idx_cdag = s - 1;
-        while (idx_c >= 0) {
-          auto color_c = dets[bl].get_y(idx_c).second;
-          auto time_c  = dets[bl].get_y(idx_c).first;
-          if (color_c == k) {
-            auto color_cdag = dets[bl].get_x(idx_cdag).second;
-            auto time_cdag  = dets[bl].get_x(idx_cdag).first;
-            bool stop       = (color_cdag == k) and (time_cdag < time_c);
-            while (idx_cdag >= 0 and !stop) {
-              color_cdag = dets[bl].get_x(idx_cdag).second;
-              time_cdag  = dets[bl].get_x(idx_cdag).first;
-              if ((color_cdag == k) and (time_cdag > time_c)) cdag_to_jump++;
-              stop = (color_cdag == k) and (time_cdag < time_c);
-              stop = (stop or idx_cdag == 0);
-              if (!stop) idx_cdag--;
-            }
-            if (cdag_to_jump % 2 == 1) sign *= -1;
-          }
-          idx_c--;
-        }
-      }
-    }
-  }
-  return sign;
 }
 
 // ===================  PRINTING ========================
@@ -323,3 +247,4 @@ std::ostream &operator<<(std::ostream &out, configuration_t const &config) {
   }
   return out;
 }
+

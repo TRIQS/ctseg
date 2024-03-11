@@ -1,22 +1,3 @@
-/*******************************************************************************
- * CTSeg: a Toolbox for Research in Interacting Quantum Systems
- *
- * Copyright (C) 2013-2018 by T. Ayral, H. Hafermann, P. Delange, M. Ferrero, O.
- *Parcollet Copyright (C) 2019 Simons Foundation author: N. Wentzell
- *
- * CTSEG is free software: you can redistribute it and/or modify it under the
- * terms of the GNU General Public License as published by the Free Software
- * Foundation, either version 3 of the License, or (at your option) any later
- * version.
- *
- * CTSEG is distributed in the hope that it will be useful, but WITHOUT ANY
- * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
- * details.
- *
- * You should have received a copy of the GNU General Public License along with
- * CTSEG. If not, see <http://www.gnu.org/licenses/>.
- ******************************************************************************/
 #pragma once
 
 #include <optional>
@@ -28,6 +9,7 @@
 /// Main solver class
 class solver_core {
 
+  // Inverse temperature
   double beta;
 
   // Keep the construction parameter
@@ -39,12 +21,11 @@ class solver_core {
   // The set of inputs
   inputs_t inputs;
 
+  // mpi communicator
   mpi::communicator c;
-  // FIXME  Why here ??
-  //double percent_done_, average_sign_;
 
   public:
-  // The set of results. Will be passed to measure and init by them
+  // The set of results. Will be passed to measures and initialized by them.
   results_t results;
 
   CPP2PY_ARG_AS_DICT solver_core(constr_params_t const &p);

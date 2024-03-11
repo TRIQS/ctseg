@@ -90,7 +90,7 @@ namespace moves {
 
     LOG("\n - - - - - ====> ACCEPT - - - - - - - - - - -\n");
 
-    double initial_sign = config_sign(wdata);
+    double initial_sign = trace_sign(wdata);
     LOG("Initial sign is {}. Initial configuration: {}", initial_sign, config);
 
     // Update the dets
@@ -113,7 +113,7 @@ namespace moves {
       sl.insert(sl.begin() + (insert_at_front ? 0 : prop_seg_idx + 1), new_seg_right);
     }
 
-    double final_sign = config_sign(wdata);
+    double final_sign = trace_sign(wdata);
     double sign_ratio = final_sign / initial_sign;
     LOG("Final sign is {}", final_sign);
 

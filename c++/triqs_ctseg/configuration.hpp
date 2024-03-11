@@ -1,31 +1,32 @@
 #pragma once
 #include <vector>
-#include "dets.hpp"
 #include "tau_t.hpp"
 #include "logs.hpp"
+#include "dets.hpp"
 #include "work_data.hpp"
 
-// The MC configuration and associated functions
-
-// ------------------- Data structures -------------------
-
-// The configuration is made of n_color ordered list of segments
-
+// The MC configuration and associated functions.
 // NB : all the time ordering are in DECREASING order,
 // in agreement with the usual convention
 
-// --------------- Segment ----------------------
+// ================= Data structures =================
+
+// The configuration is made of n_color ordered lists of segments
+// and (if needed) a list of J_perp lines. 
+
+// --------------- Segment -------------------
 //
-// A segment represent a couple (c, cdag), at given times in [0, beta]
-// cyclic segment if of the form  [ cdag c], ordinary non cyclic [c cdag]
+// A segment represents a couple (c, cdag), at given tau_t times in [0, beta]
+// Segment is cyclic if tau_c < tau_cdag, non-cyclic otherwise. 
 //
 // Some segments are aligned between 2 colors, corresponding to a S^+, S^- operators
-// The S operators will not be linked to Delta, the hybridization, but to J lines
-// This information is stored also each segments (J_c, J_cdag field) for convenience
+// The S operators will not be linked to Delta, the hybridization, but to Jperp lines.
+// The segment stores two booleans (J_c, J_cdag) that indicate whether its operators are 
+// linked to J_perp lines. 
 //
 // Special case : full lines.
-// When a line has no operator, we need to take into account 2 states : empty or full
-// The full line case is coded as a [beta, 0] segment, as it naturally yields the correct overlap
+// When a line has no operator, we need to take into account 2 states : empty or full.
+// The full line case is encoded as a [beta, 0] segment, as it naturally yields the correct overlap.
 // This special case will however need to be treated separately in moves
 //
 struct segment_t {
@@ -43,19 +44,20 @@ struct segment_t {
 // simple alias
 using vec_seg_iter_t = std::vector<segment_t>::const_iterator;
 
-// Stores a couple of S+, S-
-// FIXME : need to store the color, which is today just 0,1
+// ----------------- J_perp line -------------------
+// Stores the times of a couple (S+, S-)
+// Note: J_perp expansion only implemented for single orbital 
+// (two colors, spin up and spin down). 
 struct jperp_line_t {
   tau_t tau_Sminus, tau_Splus; // times of the S-, S+
 };
 
 // --------------- Configuration ----------------------
-//
-// The configuration is a list of of segments for each color.
-
+// The configuration is a list of of segments for each color, 
+// and a list of J_perp lines.
 struct configuration_t {
   // A list of segments for each color.
-  // NB ORDERED on tau_c of segments, with decreasing order.
+  // NB: ordered in DECREASING time order of the tau_c.
   std::vector<std::vector<segment_t>> seglists;
 
   // List of Jperp lines, NOT ordered.
@@ -93,17 +95,6 @@ double overlap(segment_t const &s1, segment_t const &s2);
 // Flip a segment. J are set to default
 inline segment_t flip(segment_t const &s) { return {s.tau_cdag, s.tau_c}; }
 
-// Fix the list after a change of operator c time in some move
-// to restore the invariants
-// 1 -if first segment is cyclic (c has move beyond beta),  put it at end
-// 2- if last segment is such that its tau is > tau of first (c has moved beyond 0), put it first
-// Only useful when # segments > 1
-inline void fix_ordering_first_last(std::vector<segment_t> &sl) {
-  if (sl.size() <= 1) return;
-  if (is_cyclic(sl[0])) std::rotate(begin(sl), begin(sl) + 1, end(sl));
-  if (sl.back().tau_c > sl[0].tau_c) std::rotate(begin(sl), end(sl) - 1, end(sl));
-}
-
 // =================== Functions to manipulate std::vector<segment_t> ========
 
 // lower_bound : find segment at tau if present or the first after tau
@@ -130,20 +121,25 @@ bool is_insertable_into(segment_t const &seg, std::vector<segment_t> const &segl
 std::vector<long> cdag_in_window(tau_t const &wtau_left, tau_t const &wtau_right,
                                  std::vector<segment_t> const &seglist);
 
-// FIXME : Comment. Parameters ?
+// Fix the list after a change of operator c time in some move
+// to restore the invariants
+// 1 -if first segment is cyclic (c has move beyond beta),  put it at end
+// 2- if last segment is such that its tau is > tau of first (c has moved beyond 0), put it first
+// Only useful when # segments > 1
+inline void fix_ordering_first_last(std::vector<segment_t> &sl) {
+  if (sl.size() <= 1) return;
+  if (is_cyclic(sl[0])) std::rotate(begin(sl), begin(sl) + 1, end(sl));
+  if (sl.back().tau_c > sl[0].tau_c) std::rotate(begin(sl), end(sl) - 1, end(sl));
+}
+
 // Contribution of the dynamical interaction kernel K to the overlap between a segment and a list of segments.
+// Computes the sum of the s_a s_b K(tau_a - tau_b) where s_a is 1 for cdag and - 1 for c
 double K_overlap(std::vector<segment_t> const &seglist, tau_t const &tau_c, tau_t const &tau_cdag,
                  gf<imtime, matrix_valued> const &K, int c1, int c2);
 
-// FIXME : Comment. Parameters ?
 // Contribution of the dynamical interaction kernel K to the overlap between an operator and a list of segments.
 double K_overlap(std::vector<segment_t> const &seglist, tau_t const &tau, bool is_c, gf<imtime, matrix_valued> const &K,
                  int c1, int c2);
-
-// ===================  Functions to manipulate config ===================
-
-// Sign of a config
-double config_sign(work_data_t const &wdata);
 
 // ===================  PRINTING ========================
 

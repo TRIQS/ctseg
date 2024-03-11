@@ -8,16 +8,16 @@
 #include "logs.hpp"
 
 /**
-  * Discretized Imaginary Time dimtime
+  * Discretized Imaginary Time type tau_t.
   * A point in imaginary time, i.e. $\tau \in [0,\beta]$, but defined on a very thin grid.
   *
   * * Regular type.
   *
-  * * **Rationale**: the position in the segment is given by an uint64_t,
-  *   i.e. a very long integer.
-  *   This allows exact comparisons, which notoriously dangerous on floating point number.
+  * * **Rationale**: the position in the segment is given by an uint64_t, i.e. a very long integer.
+  *   This allows exact comparisons, which are notoriously dangerous on floating point number.
   *
   */
+
 class tau_t {
 
   /// Inverse temperature associated with all $\tau$ points
@@ -58,7 +58,7 @@ class tau_t {
   /// tau_t at tau = beta
   static tau_t beta() { return {uint64_t{n_max}}; }
 
-  /// $\tau =0$
+  /// $\tau = 0$
   static tau_t zero() { return {uint64_t{0}}; }
 
   /// Get epsilon, defined as $\epsilon = \beta /N_max$

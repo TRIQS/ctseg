@@ -5,11 +5,10 @@
 
 using namespace triqs::gfs;
 
-// Gather all the results on the CTQMC
+// Gather all the results of the CTQMC
 struct results_t {
 
-  /// Single-particle Green's function :math:`G(\tau)` in imaginary time.
-  //std::optional<block_gf<imtime>> g_tau;
+  /// Single-particle Green's function :math:`G(\tau)`.
   block_gf<imtime> G_tau;
 
   /// Dynamical interaction kernel K(tau)
@@ -18,7 +17,7 @@ struct results_t {
   /// Dynamical interaction kernel Kprime(tau)
   gf<imtime> Kprime_tau;
 
-  /// Single-particle Green's function :math:`F(\tau)` in imaginary time.
+  /// Self-energy improved estimator :math:`F(\tau)`.
   std::optional<block_gf<imtime>> F_tau;
 
   /// <n_a(tau) n_b(0)>
@@ -30,7 +29,7 @@ struct results_t {
   /// <n_a n_b>
   std::optional<nda::matrix<double>> nn_static;
 
-  /// Density per color. FIXME : optional ??
+  /// Density per color. 
   nda::array<double, 1> densities;
 
   /// Perturbation order histogram

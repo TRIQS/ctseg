@@ -17,8 +17,8 @@ namespace moves {
     // Select insertion window [tau_left,tau_right]
     tau_t tau_left = tau_t::beta(), tau_right = tau_t::zero();
 
-    // If sl.empty, no segment, we have the window. otherwise,
-    // we pick up one segment at random
+    // If sl.empty, no segment, we have the window.
+    // Otherwise, we pick up one segment at random
     if (not sl.empty()) {
       if (is_full_line(sl.back())) {
         LOG("Full line, cannot insert.");
@@ -42,10 +42,10 @@ namespace moves {
       LOG("Insert_segment: generated equal times. Rejecting");
       return 0;
     }
-    // we ensure that dt1 < dt2.
-    // except for an empty line because :  BEWARE in the reverse move.
+    // We ensure that dt1 < dt2, unless inserting in empty line because :
     // 1- in non empty line, we insert a segment in a void so a [c cdag]
     // 2- in an empty line, we can insert [c cdag] or [cdag c]
+    // BEWARE in the reverse move.
     if (dt1 > dt2 and not sl.empty()) std::swap(dt1, dt2); // if inserting into an empty line, two ways to insert
 
     // Here is the segment we propose to insert
@@ -54,7 +54,7 @@ namespace moves {
 
     // ------------  Trace ratio  -------------
     double ln_trace_ratio = wdata.mu(color) * prop_seg.length(); // chemical potential
-    // Now the
+    // Overlaps
     for (auto c : range(config.n_color())) {
       if (c != color) ln_trace_ratio += -wdata.U(color, c) * overlap(config.seglists[c], prop_seg);
       if (wdata.has_Dt)
@@ -104,7 +104,7 @@ namespace moves {
 
     LOG("\n - - - - - ====> ACCEPT - - - - - - - - - - -\n");
 
-    double initial_sign = config_sign(wdata);
+    double initial_sign = trace_sign(wdata);
     LOG("Initial sign is {}. Initial configuration: {}", initial_sign, config);
 
     // Insert the times into the det
@@ -117,7 +117,7 @@ namespace moves {
     // Check invariant
     if constexpr (print_logs or ctseg_debug) check_invariant(config, wdata);
 
-    double final_sign = config_sign(wdata);
+    double final_sign = trace_sign(wdata);
     double sign_ratio = final_sign / initial_sign;
     LOG("Final sign is {}", final_sign);
 
