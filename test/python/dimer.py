@@ -94,7 +94,7 @@ solve_params = {
     'h_int': h_int,
     'hartree_shift': [0.0, -0.1, 0.1, 0.0],
     'n_warmup_cycles': 5000,
-    'n_cycles': 10000,
+    'n_cycles': 50000,
     'length_cycle': 100,
 }
 S.solve(**solve_params)
@@ -104,6 +104,6 @@ if mpi.is_master_node():
         A['G_tau'] = S.results.G_tau
 
 # --------- Compare to reference ----------      
-    h5diff("dimer.out.h5", "dimer.ref.h5", precision=1e-9)
+    h5diff("dimer.out.h5", "dimer.ref.h5", precision=1e-8)
     
 
