@@ -73,4 +73,4 @@ if mpi.is_master_node():
         A['G_tau'] = S.results.G_tau
 
 # --------- Compare to reference ----------      
-    h5diff("dimer.out.h5", "dimer.ref.h5", precision=1e-9)
+    h5diff("multiorb.out.h5", "multiorb.ref.h5", precision=1e-9)

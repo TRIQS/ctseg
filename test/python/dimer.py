@@ -94,7 +94,7 @@ solve_params = {
     'h_int': h_int,
     'hartree_shift': [0.0, -0.1, 0.1, 0.0],
     'n_warmup_cycles': 5000,
-    'n_cycles': 100000,
+    'n_cycles': 10000,
     'length_cycle': 100,
 }
 S.solve(**solve_params)
