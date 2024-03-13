@@ -38,6 +38,9 @@ struct results_t {
   /// Perturbation order histogram
   std::optional<triqs::stat::histogram> perturbation_order_histo_Jperp;
 
+  /// State histogram
+  std::optional<nda::vector<double>> state_hist;
+
   /// Average sign 
   double sign;
 };
