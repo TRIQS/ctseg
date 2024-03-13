@@ -93,6 +93,7 @@ void solver_core::solve(solve_params_t const &solve_params) {
   if (p.measure_sperpt) CTQMC.add_measure(measures::sperp_tau{p, wdata, config, results}, "<s_x s_x>(tau)");
   if (p.measure_perturbation_order_histograms)
     CTQMC.add_measure(measures::perturbation_order_histo{p, wdata, config, results}, "Perturbation orders");
+  if (p.measure_statehist) CTQMC.add_measure(measures::state_hist{p, wdata, config, results}, "State histograms");
 
   // Run and collect results
   CTQMC.warmup_and_accumulate(p.n_warmup_cycles, p.n_cycles, p.length_cycle,

@@ -84,6 +84,11 @@ c.add_member(c_name = "perturbation_order_histo_Jperp",
              read_only= True,
              doc = r"""Perturbation order histogram""")
 
+c.add_member(c_name = "state_hist",
+             c_type = "std::optional<nda::vector<double>>",
+             read_only= True,
+             doc = r"""State histogram""")
+
 c.add_member(c_name = "sign",
              c_type = "double",
              read_only= True,
@@ -180,6 +185,8 @@ c.add_method("""void solve (**solve_params_t)""",
 | measure_nnt                           | bool                                 | false                                   | Whether to measure langle n(tau)n(0)rangle (see [[measure_nnt]])                                                  |
 +---------------------------------------+--------------------------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
 | measure_sperpt                        | bool                                 | false                                   | Whether to measure langle s_x(tau)s_x(0)rangle (see [[measure_sperp_tau]])                                        |
++---------------------------------------+--------------------------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
+| measure_statehist                     | bool                                 | false                                   | Whether to measure state histograms (see [[measure_statehist]])                                                   |
 +---------------------------------------+--------------------------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
 | hartree_shift                         | nda::vector<double>                  | nda::vector<double>{}                   | Hartree shift of the chem pot                                                                                     |
 +---------------------------------------+--------------------------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
@@ -348,6 +355,11 @@ c.add_member(c_name = "measure_sperpt",
              c_type = "bool",
              initializer = """ false """,
              doc = r"""Whether to measure langle s_x(tau)s_x(0)rangle (see [[measure_sperp_tau]])""")
+
+c.add_member(c_name = "measure_statehist",
+             c_type = "bool",
+             initializer = """ false """,
+             doc = r"""Whether to measure state histograms (see [[measure_statehist]])""")
 
 c.add_member(c_name = "hartree_shift",
              c_type = "nda::vector<double>",
