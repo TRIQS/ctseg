@@ -26,3 +26,8 @@ long det_lower_bound_x(auto const &d, auto const &x) {
 long det_lower_bound_y(auto const &d, auto const &y) {
   return lower_bound([&d](long i) { return d.get_y(i).first; }, d.size(), y);
 }
+
+// Integer power
+constexpr unsigned int ipow(unsigned int n, unsigned int m) {
+  return m == 0 ? 1 : m == 1 ? n : n * ipow(n, m - 1);
+}

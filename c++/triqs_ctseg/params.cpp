@@ -54,6 +54,7 @@ void h5_write(h5::group h5group, std::string subgroup_name, solve_params_t const
   h5_write(grp, "measure_nn", c.measure_nn);
   h5_write(grp, "measure_nnt", c.measure_nnt);
   h5_write(grp, "measure_sperpt", c.measure_sperpt);
+  h5_write(grp, "measure_statehist", c.measure_statehist);
   h5_write(grp, "hartree_shift", c.hartree_shift);
   h5_write(grp, "det_init_size", c.det_init_size);
   h5_write(grp, "det_n_operations_before_check", c.det_n_operations_before_check);
@@ -95,6 +96,7 @@ void h5_read(h5::group h5group, std::string subgroup_name, solve_params_t &c) {
   h5_read(grp, "measure_nn", c.measure_nn);
   h5_read(grp, "measure_nnt", c.measure_nnt);
   h5_read(grp, "measure_sperpt", c.measure_sperpt);
+  h5_read(grp, "measure_statehist", c.measure_statehist);
   h5_read(grp, "hartree_shift", c.hartree_shift);
   h5_read(grp, "det_init_size", c.det_init_size);
   h5_read(grp, "det_n_operations_before_check", c.det_n_operations_before_check);

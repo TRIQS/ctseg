@@ -41,6 +41,13 @@ struct segment_t {
   static segment_t full_line() { return {tau_t::beta(), tau_t::zero()}; }
 };
 
+// operator descriptor: time, color, is_cdag[creation/annihilation]
+struct colored_ops_t {
+  tau_t tau;
+  int color;
+  bool is_cdag;
+};
+
 // simple alias
 using vec_seg_iter_t = std::vector<segment_t>::const_iterator;
 
@@ -141,9 +148,15 @@ double K_overlap(std::vector<segment_t> const &seglist, tau_t const &tau_c, tau_
 double K_overlap(std::vector<segment_t> const &seglist, tau_t const &tau, bool is_c, gf<imtime, matrix_valued> const &K,
                  int c1, int c2);
 
+// List of operators containing all colors.
+std::vector<colored_ops_t> colored_ordered_ops(std::vector<std::vector<segment_t>> const &seglists);
+
 // ===================  PRINTING ========================
 
 std::ostream &operator<<(std::ostream &out, std::vector<segment_t> const &sl);
 
 std::ostream &operator<<(std::ostream &out, configuration_t const &config);
 template <> struct fmt::formatter<configuration_t> : ostream_formatter {};
+
+std::ostream &operator<<(std::ostream &out, std::vector<colored_ops_t> const &col);
+template <> struct fmt::formatter<std::vector<colored_ops_t>> : ostream_formatter {};

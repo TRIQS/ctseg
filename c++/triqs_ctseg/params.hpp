@@ -108,6 +108,9 @@ struct solve_params_t {
   /// Whether to measure langle s_x(tau)s_x(0)rangle (see [[measure_sperp_tau]])
   bool measure_sperpt = false;
 
+  /// Whether to measure state histograms (see [[measure_statehist]])
+  bool measure_statehist = false;
+
   /// Chemical potential (high frequency limit of :math:`G_0^{-1}(i\omega) - i \omega`)
   nda::vector<double> hartree_shift = nda::vector<double>{};
 
