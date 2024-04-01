@@ -26,7 +26,7 @@ struct constr_params_t {
 
 struct solve_params_t {
 
-  /// local Hamiltonian
+  /// Local Hamiltonian
   triqs::operators::many_body_operator h_int;
 
   /// Number of QMC cycles
@@ -108,7 +108,7 @@ struct solve_params_t {
   /// Whether to measure langle s_x(tau)s_x(0)rangle (see [[measure_sperp_tau]])
   bool measure_sperpt = false;
 
-  /// Hartree shift of the chem pot
+  /// Chemical potential (high frequency limit of :math:`G_0^{-1}(i\omega) - i \omega`)
   nda::vector<double> hartree_shift = nda::vector<double>{};
 
   /// The maximum size of the determinant matrix before a resize
@@ -140,8 +140,14 @@ inline int count_colors(gf_struct_t const &gf_struct) {
   return n;
 };
 
-/// writes all containers to hdf5 file
+/// Write all containers to hdf5 file
 void h5_write(h5::group h5group, std::string subgroup_name, constr_params_t const &c);
 
-/// reads all containers to hdf5 file
+/// Reads all containers from hdf5 file
 void h5_read(h5::group h5group, std::string subgroup_name, constr_params_t &c);
+
+/// Write all containers to hdf5 file
+void h5_write(h5::group h5group, std::string subgroup_name, solve_params_t const &c);
+
+/// Reads all containers from hdf5 file
+void h5_read(h5::group h5group, std::string subgroup_name, solve_params_t &c);

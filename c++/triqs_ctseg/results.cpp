@@ -7,8 +7,6 @@ void h5_write(h5::group h5group, std::string subgroup_name, results_t const &c) 
   h5_write(grp, "G_tau", c.G_tau);
   h5_write(grp, "sign", c.sign);
   h5_write(grp, "F_tau", c.F_tau);
-  h5_write(grp, "K_tau", c.K_tau);
-  h5_write(grp, "Kprime_tau", c.Kprime_tau);
   h5_write(grp, "nn_tau", c.nn_tau);
   h5_write(grp, "sperp_tau", c.sperp_tau);
   h5_write(grp, "nn_static", c.nn_static);
@@ -26,8 +24,6 @@ void h5_read(h5::group h5group, std::string subgroup_name, results_t &c) {
   h5_read(grp, "G_tau", c.G_tau);
   h5_read(grp, "sign", c.sign);
   h5_read(grp, "F_tau", c.F_tau);
-  h5_read(grp, "K_tau", c.K_tau);
-  h5_read(grp, "Kprime_tau", c.Kprime_tau);
   h5_read(grp, "nn_tau", c.nn_tau);
   h5_read(grp, "sperp_tau", c.sperp_tau);
   h5_read(grp, "nn_static", c.nn_static);

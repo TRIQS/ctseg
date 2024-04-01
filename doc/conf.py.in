@@ -6,6 +6,9 @@ import sys
 sys.path.insert(0, "@CMAKE_CURRENT_SOURCE_DIR@/sphinxext")
 sys.path.insert(0, "@CMAKE_CURRENT_SOURCE_DIR@/sphinxext/numpydoc")
 
+# exclude these folders from scanning by sphinx
+exclude_patterns = ['_templates']
+
 extensions = ['sphinx.ext.autodoc',
               'sphinx.ext.mathjax',
               'sphinx.ext.intersphinx',
@@ -15,7 +18,7 @@ extensions = ['sphinx.ext.autodoc',
               'sphinx.ext.autosummary',
               'sphinx.ext.githubpages',
               'sphinx_autorun',
-              'nbsphinx',
+ #             'nbsphinx',
               'myst_parser',
               'matplotlib.sphinxext.plot_directive',
               'numpydoc']
@@ -39,10 +42,21 @@ pygments_style = 'sphinx'
 
 source_suffix = '.rst'
 
-project = 'CTSEG - TRIQS Hybridization Expansion Segment Solver'
+# Turn on sphinx.ext.autosummary
+autosummary_generate = True
+autosummary_imported_members=False
+
+project = '@PROJECT_NAME@'
 version = '@PROJECT_VERSION@'
 
-copyright = '2013-2018, T. Ayral, H. Hafermann, P.Delange, M. Ferrero, O. Parcollet'
+# this makes the current project version available as var in every rst file
+rst_epilog = """
+.. |PROJECT_VERSION| replace:: {version}
+""".format(
+version = version,
+)
+
+copyright = '2024 The Simons Foundation, authors: N. Kavokine, H. Lu, N. Wentzell, O. Parcollet'
 
 mathjax_path = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=default"
 templates_path = ['@CMAKE_CURRENT_SOURCE_DIR@/_templates']
@@ -66,28 +80,19 @@ html_theme_options = {
     # Toc options
     'collapse_navigation': False,
     'sticky_navigation': True,
-    'navigation_depth': 4,
+    'navigation_depth': 5,
     'includehidden': True,
     'titles_only': False
 }
 
 html_show_sphinx = False
 
-html_context = {'header_title': '@PROJECT_NAME@'}
+html_context = {'header_title': 'TRIQS Segment Picture Solver'}
 
 html_static_path = ['@CMAKE_CURRENT_SOURCE_DIR@/_static']
 html_sidebars = {'index': ['sideb.html', 'searchbox.html']}
 
-htmlhelp_basename = 'TRIQSCTSEGdoc'
-
-sys.path +=[ "@CMAKE_BINARY_DIR@/doc/autorun"]
-##options for autorun module: python execution
-autorun_languages = {}
-autorun_languages['python'] = '@TRIQS_PYTHON_EXECUTABLE@ -'
-autorun_languages['python_input_encoding'] = 'utf8'
-autorun_languages['python_output_encoding'] = 'utf8'
-autorun_languages['python_prefix_chars'] = 0
-autorun_languages['python_show_source'] = True
+htmlhelp_basename = '@PROJECT_NAME@doc'
 
 # Plot options
 plot_include_source = True

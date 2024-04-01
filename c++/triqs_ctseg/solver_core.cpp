@@ -32,30 +32,32 @@ void solver_core::solve(solve_params_t const &solve_params) {
   // http://patorjk.com/software/taag/#p=display&f=Calvin%20S&t=TRIQS%20ctint
   if (c.rank() == 0)
     std::cout << "\n"
-                 "╔╦╗╦═╗╦╔═╗ ╔═╗  ┌─┐┌┬┐┌─┐┌─┐┌─┐\n"
-                 " ║ ╠╦╝║║═╬╗╚═╗  │   │ └─┐├┤ │ ┬    (2024) \n"
-                 " ╩ ╩╚═╩╚═╝╚╚═╝  └─┘ ┴ └─┘└─┘└─┘\n";
+                 "╔╦╗╦═╗╦╔═╗ ╔═╗  ┌─┐┌┬┐┌─┐┌─┐┌─┐   ┬ \n"
+                 " ║ ╠╦╝║║═╬╗╚═╗  │   │ └─┐├┤ │ ┬───│ \n"
+                 " ╩ ╩╚═╩╚═╝╚╚═╝  └─┘ ┴ └─┘└─┘└─┘  └┘ \n";
 
-  // parameters
+  // ................ Parameters .................
+  // Store the solve_params
   last_solve_params = solve_params;
   // Merge constr_params and solve_params
   params_t p(constr_params, solve_params);
 
-  // ................   wdata & config  ...................
+  // ................   Work data & Configuration  ...................
 
+  // Initialize work data
   work_data_t wdata{p, inputs, c};
+  // Initialize configuration 
   configuration_t config{wdata.n_color};
+  // Start from a non-empty configuration when Delta(tau) = 0
   if (not wdata.has_delta) {
     config.seglists[0].push_back(segment_t::full_line());
   }
-  results.K_tau      = wdata.K;
-  results.Kprime_tau = wdata.Kprime;
 
   // ................   QMC  ...................
 
   auto CTQMC = triqs::mc_tools::mc_generic<double>(p.random_name, p.random_seed, p.verbosity);
 
-  // initialize moves
+  // Initialize moves
   if (wdata.has_delta) {
     if (p.move_insert_segment) CTQMC.add_move(moves::insert_segment{wdata, config, CTQMC.get_rng()}, "insert");
     if (p.move_remove_segment) CTQMC.add_move(moves::remove_segment{wdata, config, CTQMC.get_rng()}, "remove");
@@ -84,7 +86,7 @@ void solver_core::solve(solve_params_t const &solve_params) {
     if (p.move_swap_spin_lines) CTQMC.add_move(moves::swap_spin_lines{wdata, config, CTQMC.get_rng()}, "spin swap");
   }
 
-  // initialize measurements
+  // Initialize measurements
   if (p.measure_gt) CTQMC.add_measure(measures::g_f_tau{p, wdata, config, results}, "G(tau)");
   if (p.measure_n) CTQMC.add_measure(measures::density{p, wdata, config, results}, "Density");
   if (p.measure_sign) CTQMC.add_measure(measures::sign{p, wdata, config, results}, "Sign");
@@ -104,7 +106,7 @@ void solver_core::solve(solve_params_t const &solve_params) {
 
 } // solve
 
-// -------------- h5 -----------------------
+// ----------------- Save to h5 file -----------------------
 
 #define STR(x) #x
 #define STRINGIZE(x) STR(x)
@@ -116,18 +118,17 @@ void h5_write(h5::group h5group, std::string subgroup_name, solver_core const &s
   h5_write_attribute(grp, "TRIQS_GIT_HASH", std::string(STRINGIZE(TRIQS_GIT_HASH)));
   h5_write_attribute(grp, "CTSEG_GIT_HASH", std::string(STRINGIZE(CTSEG_GIT_HASH)));
   h5_write(grp, "constr_params", s.constr_params);
-  // FIXME : implement
-  //h5_write(grp, "last_solve_params", s.last_solve_params);
+  h5_write(grp, "last_solve_params", s.last_solve_params);
   h5_write(grp, "inputs", s.inputs);
   h5_write(grp, "results", s.results);
 }
 
-// Function that read all containers to hdf5 file
+// Function that reads all containers in hdf5 file
 solver_core solver_core::h5_read_construct(h5::group h5group, std::string subgroup_name) {
   auto grp           = h5group.open_group(subgroup_name);
   auto constr_params = h5_read<constr_params_t>(grp, "constr_params");
   auto s             = solver_core{constr_params};
-  //h5_read(grp, "last_solve_params", s.last_solve_params);
+  h5_read(grp, "last_solve_params", s.last_solve_params);
   h5_read(grp, "inputs", s.inputs);
   h5_read(grp, "results", s.results);
   return s;

@@ -2,11 +2,11 @@
 
 .. _install:
 
-Install CTSEG
-*************
+Install CTSEG-J
+*******************
 
-Compiling CTSEG from source
-===========================
+Compiling CTSEG-J from source
+===============================
 
 .. note:: To guarantee reproducibility in scientific calculations we strongly recommend the use of a stable `release <https://github.com/TRIQS/triqs/releases>`_ of both TRIQS and its applications.
 
@@ -19,9 +19,9 @@ Prerequisites
 Installation steps
 ------------------
 
-#. Download the source code of the latest stable version by cloning the ``TRIQS/ctseg`` repository from GitHub::
+#. Download the source code of the latest stable version by cloning the ``TRIQS/ctseg_J`` repository from GitHub::
 
-     $ git clone https://github.com/TRIQS/ctseg ctseg.src
+     $ git clone https://github.com/TRIQS/ctseg_J ctseg.src
 
 #. Create and move to a new directory where you will compile the code::
 
@@ -44,7 +44,7 @@ Installation steps
 Version compatibility
 ---------------------
 
-Keep in mind that the version of ``ctseg`` must be compatible with your TRIQS library version,
+Keep in mind that the version of ``CTSEG-J`` must be compatible with your TRIQS library version,
 see :ref:`TRIQS website <triqslibs:versions>`.
 In particular the Major and Minor Version numbers have to be the same.
 To use a particular version, go into the directory with the sources, and look at all available versions::
@@ -60,7 +60,7 @@ and follow steps 2 to 4 above to compile the code.
 Custom CMake options
 --------------------
 
-The compilation of ``ctseg`` can be configured using CMake-options::
+The compilation of ``CTSEG-J`` can be configured using CMake-options::
 
     cmake ../ctseg.src -DOPTION1=value1 -DOPTION2=value2 ...
 
@@ -68,8 +68,6 @@ The compilation of ``ctseg`` can be configured using CMake-options::
 | Options                                                         | Syntax                                        |
 +=================================================================+===============================================+
 | Specify an installation path other than path_to_triqs           | -DCMAKE_INSTALL_PREFIX=path_to_ctseg          |
-+-----------------------------------------------------------------+-----------------------------------------------+
-| Build the functionality depenedent on the NFFT library          | -DUSE_NFFT=ON                                 |
 +-----------------------------------------------------------------+-----------------------------------------------+
 | Build in Debugging Mode                                         | -DCMAKE_BUILD_TYPE=Debug                      |
 +-----------------------------------------------------------------+-----------------------------------------------+

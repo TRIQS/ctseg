@@ -39,16 +39,6 @@ c.add_member(c_name = "G_tau",
              read_only= True,
              doc = r"""""")
 
-c.add_member(c_name = "K_tau",
-             c_type = "gf<imtime>",
-             read_only= True,
-             doc = r"""Dynamical interaction kernel K(tau)""")
-
-c.add_member(c_name = "Kprime_tau",
-             c_type = "gf<imtime>",
-             read_only= True,
-             doc = r"""Dynamical interaction kernel Kprime(tau)""")
-
 c.add_member(c_name = "F_tau",
              c_type = "std::optional<block_gf<imtime>>",
              read_only= True,
@@ -72,7 +62,7 @@ c.add_member(c_name = "nn_static",
 c.add_member(c_name = "densities",
              c_type = "nda::array<double, 1>",
              read_only= True,
-             doc = r"""Density per color. FIXME : optional ??""")
+             doc = r"""Density per color.""")
 
 c.add_member(c_name = "perturbation_order_histo_Delta",
              c_type = "std::optional<triqs::stat::histogram>",

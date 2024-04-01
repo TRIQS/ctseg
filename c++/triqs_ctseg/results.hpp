@@ -11,31 +11,25 @@ struct results_t {
   /// Single-particle Green's function :math:`G(\tau)`.
   block_gf<imtime> G_tau;
 
-  /// Dynamical interaction kernel K(tau)
-  gf<imtime> K_tau;
-
-  /// Dynamical interaction kernel Kprime(tau)
-  gf<imtime> Kprime_tau;
-
   /// Self-energy improved estimator :math:`F(\tau)`.
   std::optional<block_gf<imtime>> F_tau;
 
-  /// <n_a(tau) n_b(0)>
+  /// Density-density time correlation function :math:`\langle n_a(\tau) n_b(0) \rangle`.  
   std::optional<gf<imtime>> nn_tau;
 
-  /// <s_x(tau) s_x(0)>
+  /// Perpendicular spin-spin correlation function :math:`\langle s_x(\tau) s_x(0) \rangle`.
   std::optional<gf<imtime>> sperp_tau;
 
-  /// <n_a n_b>
+  /// Density-density static correlation function :math:`\langle n_a(0) n_b(0) \rangle`. 
   std::optional<nda::matrix<double>> nn_static;
 
   /// Density per color. 
   nda::array<double, 1> densities;
 
-  /// Perturbation order histogram
+  /// Delta perturbation order histogram
   std::optional<triqs::stat::histogram> perturbation_order_histo_Delta;
 
-  /// Perturbation order histogram
+  /// J_perp perturbation order histogram
   std::optional<triqs::stat::histogram> perturbation_order_histo_Jperp;
 
   /// Average sign 
@@ -45,5 +39,5 @@ struct results_t {
 /// writes all containers to hdf5 file
 void h5_write(h5::group h5group, std::string subgroup_name, results_t const &c);
 
-/// reads all containers to hdf5 file
+/// reads all containers from hdf5 file
 void h5_read(h5::group h5group, std::string subgroup_name, results_t &c);
