@@ -54,12 +54,6 @@ work_data_t::work_data_t(params_t const &p, inputs_t const &inputs, mpi::communi
   has_Dt    = max_element(abs(inputs.d0t.data())) > 1.e-13;
   has_jperp = max_element(abs(inputs.jperpt.data())) > 1.e-13;
 
-  // Check: no J_perp or D(tau) implementation for more than 2 colors
-  if (n_color != 2) {
-    ALWAYS_EXPECTS((not has_jperp), "Error : has_jperp is true and we have {} colors instead of 2", n_color);
-    ALWAYS_EXPECTS((not has_Dt), "Error : has_Dt is true and we have {} colors instead of 2", n_color);
-  }
-
   // For numerical integration of the D0 and Jperp
   auto ramp = nda::zeros<double>(p.n_tau_k);
   for (auto n : range(p.n_tau_k)) { ramp(n) = n * beta / (p.n_tau_k - 1); }
