@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Measurements &mdash; triqs_ctseg  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
+
+  
+    <link rel="shortcut icon" href="../_static/triqs_favicon.ico"/>
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+        <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+        <script defer="defer" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=default"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="author" title="About these documents" href="../about.html" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="triqs_ctseg.solver" href="../_ref/triqs_ctseg.solver.html" />
+    <link rel="prev" title="Monte Carlo moves" href="moves.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #7E588A" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            triqs_ctseg
+          </a>
+              <div class="version">
+                3.2.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Install CTSEG-J</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../install.html#compiling-ctseg-j-from-source">Compiling CTSEG-J from source</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../install.html#prerequisites">Prerequisites</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../install.html#installation-steps">Installation steps</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../install.html#version-compatibility">Version compatibility</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../install.html#custom-cmake-options">Custom CMake options</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="../documentation.html">Documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../documentation.html#algorithm-and-implementation">Algorithm and implementation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../algorithm_implementation/ctseg.html">The CTSEG-J algorithm</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../algorithm_implementation/ctseg.html#double-expansion">Double expansion</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../algorithm_implementation/ctseg.html#configuration">Configuration</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../algorithm_implementation/ctseg.html#sign">Sign</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../algorithm_implementation/implementation_notes.html">Implementation notes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../algorithm_implementation/implementation_notes.html#solver-core">Solver core</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../algorithm_implementation/implementation_notes.html#inputs">Inputs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../algorithm_implementation/implementation_notes.html#configuration">Configuration</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../algorithm_implementation/implementation_notes.html#imaginary-time-points">Imaginary time points</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../algorithm_implementation/implementation_notes.html#work-data">Work data</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../algorithm_implementation/implementation_notes.html#determinants">Determinants</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../algorithm_implementation/implementation_notes.html#miscellaneous">Miscellaneous</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2 current"><a class="reference internal" href="../documentation.html#user-guide">User guide</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="step_by_step.html">Step-by-step guide</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="step_by_step.html#step-1-choose-the-construction-parameters">Step 1 - Choose the construction parameters</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="step_by_step.html#green-s-function-structure">Green’s function structure</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="step_by_step.html#step-2-construct-the-solver">Step 2 - Construct the solver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="step_by_step.html#step-3-supply-the-solver-inputs">Step 3 - Supply the solver inputs</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="step_by_step.html#interaction-hamiltonian">Interaction Hamiltonian</a></li>
+<li class="toctree-l5"><a class="reference internal" href="step_by_step.html#hybridization-function">Hybridization function</a></li>
+<li class="toctree-l5"><a class="reference internal" href="step_by_step.html#chemical-potential">Chemical potential</a></li>
+<li class="toctree-l5"><a class="reference internal" href="step_by_step.html#dynamical-density-density-interaction">Dynamical density-density interaction</a></li>
+<li class="toctree-l5"><a class="reference internal" href="step_by_step.html#spin-spin-interaction">Spin-spin interaction</a></li>
+<li class="toctree-l5"><a class="reference internal" href="step_by_step.html#solve-parameters">Solve parameters</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="step_by_step.html#step-4-run-the-solver">Step 4 - Run the solver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="step_by_step.html#step-5-access-the-results">Step 5 - Access the results</a></li>
+<li class="toctree-l4"><a class="reference internal" href="step_by_step.html#step-6-save-the-results">Step 6 - Save the results</a></li>
+<li class="toctree-l4"><a class="reference internal" href="step_by_step.html#running-the-solver-in-parallel">Running the solver in parallel</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="moves.html">Monte Carlo moves</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="moves.html#insert-segment">Insert segment</a></li>
+<li class="toctree-l4"><a class="reference internal" href="moves.html#remove-segment">Remove segment</a></li>
+<li class="toctree-l4"><a class="reference internal" href="moves.html#split-segment">Split segment</a></li>
+<li class="toctree-l4"><a class="reference internal" href="moves.html#regroup-segment">Regroup segment</a></li>
+<li class="toctree-l4"><a class="reference internal" href="moves.html#move-segment">Move segment</a></li>
+<li class="toctree-l4"><a class="reference internal" href="moves.html#insert-spin-segment">Insert spin segment</a></li>
+<li class="toctree-l4"><a class="reference internal" href="moves.html#remove-spin-segment">Remove spin segment</a></li>
+<li class="toctree-l4"><a class="reference internal" href="moves.html#swap-spin-lines">Swap spin lines</a></li>
+<li class="toctree-l4"><a class="reference internal" href="moves.html#split-spin-segment">Split spin segment</a></li>
+<li class="toctree-l4"><a class="reference internal" href="moves.html#regroup-spin-segment">Regroup spin segment</a></li>
+</ul>
+</li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Measurements</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#imaginary-time-green-s-function">Imaginary time Green’s function</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#self-energy-improved-estimator">Self-energy improved estimator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#density">Density</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#static-density-correlation-function">Static density correlation function</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#dynamic-density-correlation-function">Dynamic density correlation function</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#perpendicular-spin-spin-correlation-function">Perpendicular spin-spin correlation function</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#state-histogram">State histogram</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#average-sign">Average sign</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#perturbation-order-histograms">Perturbation order histograms</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../documentation.html#reference-manual">Reference manual</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../_ref/triqs_ctseg.solver.html">triqs_ctseg.solver</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../_ref/triqs_ctseg.solver.Solver.html">triqs_ctseg.solver.Solver</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../_ref/triqs_ctseg.solver.Solver.html#triqs_ctseg.solver.Solver"><code class="docutils literal notranslate"><span class="pre">Solver</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="../_ref/triqs_ctseg.solver.Solver.__init__.html">triqs_ctseg.solver.Solver.__init__</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../_ref/triqs_ctseg.solver.Solver.hdf5_format.html">triqs_ctseg.solver.Solver.hdf5_format</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../_ref/triqs_ctseg.solver.Solver.solve.html">triqs_ctseg.solver.Solver.solve</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../_ref/triqs_ctseg.solver.Solver.D0_tau.html">triqs_ctseg.solver.Solver.D0_tau</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../_ref/triqs_ctseg.solver.Solver.Delta_tau.html">triqs_ctseg.solver.Solver.Delta_tau</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../_ref/triqs_ctseg.solver.Solver.Jperp_tau.html">triqs_ctseg.solver.Solver.Jperp_tau</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../_ref/triqs_ctseg.solver.Solver.results.html">triqs_ctseg.solver.Solver.results</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../issues.html">Reporting issues</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ChangeLog.html">Changelog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../ChangeLog.html#version-3-2-0">Version 3.2.0</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../about.html">About CTSEG-J</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #7E588A" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">triqs_ctseg</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../documentation.html">Documentation</a></li>
+      <li class="breadcrumb-item active">Measurements</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/guide/measurements.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="section" id="measurements">
+<span id="id1"></span><h1>Measurements<a class="headerlink" href="#measurements" title="Permalink to this heading"></a></h1>
+<p>Below is a list of all observables that can be measured by the solver, along with their definitions. Details on the
+implementation of the measurements can be found in the <a class="reference external" href="https://hal.archives-ouvertes.fr/tel-01247625" rel="noopener noreferrer" target="_blank">PhD thesis of T. Ayral</a> (chapter 11). Each measurement can be
+turned on or off via the corresponding parameter of the <code class="docutils literal notranslate"><span class="pre">solve</span></code> method.</p>
+<div class="section" id="imaginary-time-green-s-function">
+<h2>Imaginary time Green’s function<a class="headerlink" href="#imaginary-time-green-s-function" title="Permalink to this heading"></a></h2>
+<p>The imaginary time Green’s function is defined as</p>
+<div class="math notranslate nohighlight">
+\[G_{ij}^{A}(\tau) = - \langle T_{\tau} c_{Ai}(\tau) c^{\dagger}_{Aj}(0) \rangle,\]</div>
+<p>where <span class="math notranslate nohighlight">\(A\)</span> is a block index and <span class="math notranslate nohighlight">\(i, j\)</span> are inner indices within the block. The block structure
+of <span class="math notranslate nohighlight">\(G_{ij}^A(\tau)\)</span> (valid values of the indices) is set by <code class="docutils literal notranslate"><span class="pre">gf_struct</span></code> in the <code class="docutils literal notranslate"><span class="pre">constr_params</span></code>.
+It is measured on a uniform time grid, whose number of points is set by <code class="docutils literal notranslate"><span class="pre">n_tau</span></code> in the <code class="docutils literal notranslate"><span class="pre">constr_params</span></code>.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">The value of <code class="docutils literal notranslate"><span class="pre">n_tau</span></code> supplied in the <code class="docutils literal notranslate"><span class="pre">constr_params</span></code> and the number of points in the <span class="math notranslate nohighlight">\(\tau\)</span> grid of
+the <span class="math notranslate nohighlight">\(\Delta(\tau)\)</span> input must match.</p>
+</div>
+<p>The measurement is turned on by setting <code class="docutils literal notranslate"><span class="pre">measure_gt</span></code> in the <code class="docutils literal notranslate"><span class="pre">solve_params</span></code> to <code class="docutils literal notranslate"><span class="pre">True</span></code>. The result of the
+accumulation is accessible through the <code class="docutils literal notranslate"><span class="pre">results.G_tau</span></code> attribute of the solver object.</p>
+</div>
+<div class="section" id="self-energy-improved-estimator">
+<h2>Self-energy improved estimator<a class="headerlink" href="#self-energy-improved-estimator" title="Permalink to this heading"></a></h2>
+<p>The impurity self-energy can be computed via the Dyson equation</p>
+<div class="math notranslate nohighlight">
+\[\Sigma(i\omega_n) = i \omega_n + \mu - G^{-1}(i \omega_n)\]</div>
+<p>from the Green’s function <span class="math notranslate nohighlight">\(G_{ij}^A(\tau)\)</span>. However, this procedure suffers from numerical
+instability at high Matsubara frequencies. A numerically stable way of computing the self-energy is
+provided by measuring the improved estimator</p>
+<div class="math notranslate nohighlight">
+\[F_{ij}^A (\tau) = \langle T_{\tau} c_{iA}(\tau) c_{jA}^{\dagger}(0) I_i^{A}(\tau).\]</div>
+<p>In the absence of <span class="math notranslate nohighlight">\(\mathcal{J}_{\perp}\)</span> interactions,</p>
+<div class="math notranslate nohighlight">
+\[I_i^A (\tau) = \int_0^{\beta} d\tau' \sum_k \mathcal{U}^A_{ik}(\tau - \tau') n_{Ak}(\tau').\]</div>
+<p>The expression of <span class="math notranslate nohighlight">\(I_i^A(\tau)\)</span> in the presence of <span class="math notranslate nohighlight">\(\mathcal{J}_{\perp}\)</span> interactions can be found
+in the <a class="reference external" href="https://hal.archives-ouvertes.fr/tel-01247625" rel="noopener noreferrer" target="_blank">PhD thesis of T. Ayral</a> (Eq. 11.41).</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">In the presence of <span class="math notranslate nohighlight">\(\mathcal{J}_{\perp}\)</span> interactions, the measurement of <span class="math notranslate nohighlight">\(F(\tau)\)</span> is possible
+only if the spin-spin interactions are rotationally invariant (<span class="math notranslate nohighlight">\(\mathcal{J}_{\perp}(\tau) = \mathcal{J}_z(\tau)\)</span>).</p>
+</div>
+<p>Once the improved estimator is known, the self-energy is obtained according to</p>
+<div class="math notranslate nohighlight">
+\[\Sigma^A(i\omega_n) = [G^A]^{-1}(i\omega_n) F^A(i \omega_n).\]</div>
+<p>The block structure and imaginary time grid for the improved estimator are the same as for the Green’s function.
+The measurement is turned on by setting <code class="docutils literal notranslate"><span class="pre">measure_ft</span></code> in the <code class="docutils literal notranslate"><span class="pre">solve_params</span></code> to <code class="docutils literal notranslate"><span class="pre">True</span></code>. The result of the
+accumulation is accessible through the <code class="docutils literal notranslate"><span class="pre">results.F_tau</span></code> attribute of the solver object.</p>
+</div>
+<div class="section" id="density">
+<h2>Density<a class="headerlink" href="#density" title="Permalink to this heading"></a></h2>
+<p>The average density is</p>
+<div class="math notranslate nohighlight">
+\[\langle n_i \rangle = \frac{1}{\beta} \int_0^{\beta} d \tau \langle n_i(\tau) \rangle.\]</div>
+<p>Here the index <span class="math notranslate nohighlight">\(i = 0, \dots N - 1\)</span> represents the color (irrespective of the block structure). The measurement
+is turned on by setting <code class="docutils literal notranslate"><span class="pre">measure_n</span></code> in the <code class="docutils literal notranslate"><span class="pre">solve_params</span></code> to <code class="docutils literal notranslate"><span class="pre">True</span></code>. The result of the
+accumulation is accessible through the <code class="docutils literal notranslate"><span class="pre">results.densities</span></code> attribute of the solver object, as a numpy
+array of size <span class="math notranslate nohighlight">\(N\)</span>.</p>
+</div>
+<div class="section" id="static-density-correlation-function">
+<h2>Static density correlation function<a class="headerlink" href="#static-density-correlation-function" title="Permalink to this heading"></a></h2>
+<p>The static density correlation function is defined as</p>
+<div class="math notranslate nohighlight">
+\[\langle n_i n_j \rangle = \frac{1}{\beta} \int_0^{\beta} d \tau \langle n_i(\tau) n_j(\tau) \rangle.\]</div>
+<p>Here the indices <span class="math notranslate nohighlight">\(i, j = 0, \dots N - 1\)</span> represents colors (irrespective of the block structure). The measurement
+is turned on by setting <code class="docutils literal notranslate"><span class="pre">measure_nn</span></code> in the <code class="docutils literal notranslate"><span class="pre">solve_params</span></code> to <code class="docutils literal notranslate"><span class="pre">True</span></code>. The result of the
+accumulation is accessible through the <code class="docutils literal notranslate"><span class="pre">results.nn_static</span></code> attribute of the solver object, as a numpy
+array of size <span class="math notranslate nohighlight">\(N \times N\)</span>.</p>
+</div>
+<div class="section" id="dynamic-density-correlation-function">
+<h2>Dynamic density correlation function<a class="headerlink" href="#dynamic-density-correlation-function" title="Permalink to this heading"></a></h2>
+<p>The dynamic density correlation function is defined as</p>
+<div class="math notranslate nohighlight">
+\[\chi_{ij}(\tau) =  \langle T_{\tau} n_i(\tau) n_j(0) \rangle.\]</div>
+<p>Here the indices <span class="math notranslate nohighlight">\(i, j = 0, \dots N - 1\)</span> represents colors (irrespective of the block structure).
+<span class="math notranslate nohighlight">\(\chi_{ij}(\tau)\)</span> is measured on a uniform time grid, whose number of points is set by <code class="docutils literal notranslate"><span class="pre">n_tau_k</span></code> in the <code class="docutils literal notranslate"><span class="pre">constr_params</span></code>.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">The value of <code class="docutils literal notranslate"><span class="pre">n_tau_k</span></code> supplied in the <code class="docutils literal notranslate"><span class="pre">constr_params</span></code> and the number of points in the <span class="math notranslate nohighlight">\(\tau\)</span> grids of
+the <span class="math notranslate nohighlight">\(D(\tau)\)</span> and <span class="math notranslate nohighlight">\(J_{\perp}(\tau)\)</span> inputs must match.</p>
+</div>
+<p>The measurement is turned on by setting <code class="docutils literal notranslate"><span class="pre">measure_nnt</span></code> in the <code class="docutils literal notranslate"><span class="pre">solve_params</span></code> to <code class="docutils literal notranslate"><span class="pre">True</span></code>. The result of the
+accumulation is accessible through the <code class="docutils literal notranslate"><span class="pre">results.nn_tau</span></code> attribute of the solver object, as a matrix-valued
+<code class="docutils literal notranslate"><span class="pre">GfImTime</span></code> with size <span class="math notranslate nohighlight">\(N \times N\)</span>.</p>
+</div>
+<div class="section" id="perpendicular-spin-spin-correlation-function">
+<h2>Perpendicular spin-spin correlation function<a class="headerlink" href="#perpendicular-spin-spin-correlation-function" title="Permalink to this heading"></a></h2>
+<p>The perpendicular spin-spin correlation function is defined as</p>
+<div class="math notranslate nohighlight">
+\[\chi^{\perp}(\tau) =  \langle T_{\tau} s^x(\tau) s^x(0) \rangle.\]</div>
+<p><span class="math notranslate nohighlight">\(\chi^{\perp}(\tau)\)</span> is measured on a uniform time grid, whose number of points is set by <code class="docutils literal notranslate"><span class="pre">n_tau_k</span></code> in the <code class="docutils literal notranslate"><span class="pre">constr_params</span></code>.
+This measurement is useful if rotational invariance is broken (for instance, in the presence of a Zeeman field). Otherwise,
+all components of the spin-spin correlation function can be determined from <span class="math notranslate nohighlight">\(\chi_{ij}(\tau)\)</span>, with better statistics.</p>
+<p>The measurement is turned on by setting <code class="docutils literal notranslate"><span class="pre">measure_sperpt</span></code> in the <code class="docutils literal notranslate"><span class="pre">solve_params</span></code> to <code class="docutils literal notranslate"><span class="pre">True</span></code>. The result of the
+accumulation is accessible through the <code class="docutils literal notranslate"><span class="pre">results.sperp_tau</span></code> attribute of the solver object, as a matrix-valued
+<code class="docutils literal notranslate"><span class="pre">GfImTime</span></code> with size <span class="math notranslate nohighlight">\(1 \times 1\)</span>.</p>
+</div>
+<div class="section" id="state-histogram">
+<h2>State histogram<a class="headerlink" href="#state-histogram" title="Permalink to this heading"></a></h2>
+<p>This measurement determines the occupation probabilities of the non-interacting impurity eigenstates.
+Formally, these are the diagonal elements of the impurity density matrix expressed in the occupation
+number basis. For example, in the case of an impurity with 2 colors, the eigenstates are
+<span class="math notranslate nohighlight">\(|00\rangle, |10\rangle, |01 \rangle, |11\rangle\)</span>.</p>
+<p>The measurement is turned on by setting <code class="docutils literal notranslate"><span class="pre">measure_statehist</span></code> in the <code class="docutils literal notranslate"><span class="pre">solve_params</span></code> to <code class="docutils literal notranslate"><span class="pre">True</span></code>. The result of the
+accumulation is accessible through the <code class="docutils literal notranslate"><span class="pre">results.state_hist</span></code> attribute of the solver object, as a numpy array of size
+<span class="math notranslate nohighlight">\(2^N\)</span>. The index of the state <span class="math notranslate nohighlight">\(|n_0, n_1, \dots n_N \rangle\)</span> in the histogram is given by <span class="math notranslate nohighlight">\(\sum_{i = 0}^{N - 1} n_i 2^i\)</span>.</p>
+</div>
+<div class="section" id="average-sign">
+<h2>Average sign<a class="headerlink" href="#average-sign" title="Permalink to this heading"></a></h2>
+<p>This measurement computes the average sign of the weight of the configuration.
+The measurement is turned on by setting <code class="docutils literal notranslate"><span class="pre">measure_sign</span></code> in the <code class="docutils literal notranslate"><span class="pre">solve_params</span></code> to <code class="docutils literal notranslate"><span class="pre">True</span></code>. The result of the
+accumulation is accessible through the <code class="docutils literal notranslate"><span class="pre">results.sign</span></code> attribute of the solver object as a double precision scalar.</p>
+</div>
+<div class="section" id="perturbation-order-histograms">
+<h2>Perturbation order histograms<a class="headerlink" href="#perturbation-order-histograms" title="Permalink to this heading"></a></h2>
+<p>This measurement determines the histograms of the perturbation orders in <span class="math notranslate nohighlight">\(\Delta(\tau)\)</span> and <span class="math notranslate nohighlight">\(\mathcal{J}_{\perp}(\tau)\)</span>.
+The measurement is turned on by setting <code class="docutils literal notranslate"><span class="pre">measure_statehist</span></code> in the <code class="docutils literal notranslate"><span class="pre">solve_params</span></code> to <code class="docutils literal notranslate"><span class="pre">True</span></code>. The results of the
+accumulation are accessible through the <code class="docutils literal notranslate"><span class="pre">results.perturbation_order_histo_Delta</span></code> and <code class="docutils literal notranslate"><span class="pre">results.perturbation_order_histo_Jperp</span></code>
+attributes of the solver, as TRIQS histogram objects.</p>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="moves.html" class="btn btn-neutral float-left" title="Monte Carlo moves" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../_ref/triqs_ctseg.solver.html" class="btn btn-neutral float-right" title="triqs_ctseg.solver" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024 The Simons Foundation, authors: N. Kavokine, H. Lu, N. Wentzell, O. Parcollet.</p>
+  </div>
+
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Implementation notes &mdash; triqs_ctseg  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
+
+  
+    <link rel="shortcut icon" href="../_static/triqs_favicon.ico"/>
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+        <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+        <script defer="defer" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=default"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="author" title="About these documents" href="../about.html" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Step-by-step guide" href="../guide/step_by_step.html" />
+    <link rel="prev" title="The CTSEG-J algorithm" href="ctseg.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #7E588A" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            triqs_ctseg
+          </a>
+              <div class="version">
+                3.2.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Install CTSEG-J</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../install.html#compiling-ctseg-j-from-source">Compiling CTSEG-J from source</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../install.html#prerequisites">Prerequisites</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../install.html#installation-steps">Installation steps</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../install.html#version-compatibility">Version compatibility</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../install.html#custom-cmake-options">Custom CMake options</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="../documentation.html">Documentation</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../documentation.html#algorithm-and-implementation">Algorithm and implementation</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="ctseg.html">The CTSEG-J algorithm</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ctseg.html#double-expansion">Double expansion</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ctseg.html#configuration">Configuration</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ctseg.html#sign">Sign</a></li>
+</ul>
+</li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Implementation notes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#solver-core">Solver core</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#inputs">Inputs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#configuration">Configuration</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#imaginary-time-points">Imaginary time points</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#work-data">Work data</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#determinants">Determinants</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#miscellaneous">Miscellaneous</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../documentation.html#user-guide">User guide</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../guide/step_by_step.html">Step-by-step guide</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../guide/step_by_step.html#step-1-choose-the-construction-parameters">Step 1 - Choose the construction parameters</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../guide/step_by_step.html#green-s-function-structure">Green’s function structure</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../guide/step_by_step.html#step-2-construct-the-solver">Step 2 - Construct the solver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../guide/step_by_step.html#step-3-supply-the-solver-inputs">Step 3 - Supply the solver inputs</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../guide/step_by_step.html#interaction-hamiltonian">Interaction Hamiltonian</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../guide/step_by_step.html#hybridization-function">Hybridization function</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../guide/step_by_step.html#chemical-potential">Chemical potential</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../guide/step_by_step.html#dynamical-density-density-interaction">Dynamical density-density interaction</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../guide/step_by_step.html#spin-spin-interaction">Spin-spin interaction</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../guide/step_by_step.html#solve-parameters">Solve parameters</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../guide/step_by_step.html#step-4-run-the-solver">Step 4 - Run the solver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../guide/step_by_step.html#step-5-access-the-results">Step 5 - Access the results</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../guide/step_by_step.html#step-6-save-the-results">Step 6 - Save the results</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../guide/step_by_step.html#running-the-solver-in-parallel">Running the solver in parallel</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../guide/moves.html">Monte Carlo moves</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../guide/moves.html#insert-segment">Insert segment</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../guide/moves.html#remove-segment">Remove segment</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../guide/moves.html#split-segment">Split segment</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../guide/moves.html#regroup-segment">Regroup segment</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../guide/moves.html#move-segment">Move segment</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../guide/moves.html#insert-spin-segment">Insert spin segment</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../guide/moves.html#remove-spin-segment">Remove spin segment</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../guide/moves.html#swap-spin-lines">Swap spin lines</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../guide/moves.html#split-spin-segment">Split spin segment</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../guide/moves.html#regroup-spin-segment">Regroup spin segment</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../guide/measurements.html">Measurements</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../guide/measurements.html#imaginary-time-green-s-function">Imaginary time Green’s function</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../guide/measurements.html#self-energy-improved-estimator">Self-energy improved estimator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../guide/measurements.html#density">Density</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../guide/measurements.html#static-density-correlation-function">Static density correlation function</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../guide/measurements.html#dynamic-density-correlation-function">Dynamic density correlation function</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../guide/measurements.html#perpendicular-spin-spin-correlation-function">Perpendicular spin-spin correlation function</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../guide/measurements.html#state-histogram">State histogram</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../guide/measurements.html#average-sign">Average sign</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../guide/measurements.html#perturbation-order-histograms">Perturbation order histograms</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../documentation.html#reference-manual">Reference manual</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../_ref/triqs_ctseg.solver.html">triqs_ctseg.solver</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../_ref/triqs_ctseg.solver.Solver.html">triqs_ctseg.solver.Solver</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../_ref/triqs_ctseg.solver.Solver.html#triqs_ctseg.solver.Solver"><code class="docutils literal notranslate"><span class="pre">Solver</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="../_ref/triqs_ctseg.solver.Solver.__init__.html">triqs_ctseg.solver.Solver.__init__</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../_ref/triqs_ctseg.solver.Solver.hdf5_format.html">triqs_ctseg.solver.Solver.hdf5_format</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../_ref/triqs_ctseg.solver.Solver.solve.html">triqs_ctseg.solver.Solver.solve</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../_ref/triqs_ctseg.solver.Solver.D0_tau.html">triqs_ctseg.solver.Solver.D0_tau</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../_ref/triqs_ctseg.solver.Solver.Delta_tau.html">triqs_ctseg.solver.Solver.Delta_tau</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../_ref/triqs_ctseg.solver.Solver.Jperp_tau.html">triqs_ctseg.solver.Solver.Jperp_tau</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../_ref/triqs_ctseg.solver.Solver.results.html">triqs_ctseg.solver.Solver.results</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../issues.html">Reporting issues</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ChangeLog.html">Changelog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../ChangeLog.html#version-3-2-0">Version 3.2.0</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../about.html">About CTSEG-J</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #7E588A" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">triqs_ctseg</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../documentation.html">Documentation</a></li>
+      <li class="breadcrumb-item active">Implementation notes</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/algorithm_implementation/implementation_notes.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="section" id="implementation-notes">
+<span id="id1"></span><h1>Implementation notes<a class="headerlink" href="#implementation-notes" title="Permalink to this heading"></a></h1>
+<p><em>A guide to reading the code.</em></p>
+<p>CTSEG-J is an application based on the <a class="reference external" href="https://triqs.github.io/app4triqs/unstable/index.html" rel="noopener noreferrer" target="_blank">app4triqs</a> skeleton. The code is written in C++, and a python wrapper
+is generated automatically using <code class="docutils literal notranslate"><span class="pre">cpp2py</span></code>. The user interacts with the solver in python.</p>
+<div class="section" id="solver-core">
+<h2>Solver core<a class="headerlink" href="#solver-core" title="Permalink to this heading"></a></h2>
+<p>The solver is an instance of the <code class="docutils literal notranslate"><span class="pre">solver_core</span></code> class. It is constructed based on parameters (<code class="docutils literal notranslate"><span class="pre">constr_params</span></code>) passed as
+a python dictionary (see <code class="docutils literal notranslate"><span class="pre">params.hpp</span></code>). It contains the set of inputs (<code class="docutils literal notranslate"><span class="pre">inputs.hpp</span></code>),
+the set of results (<code class="docutils literal notranslate"><span class="pre">results.hpp</span></code>) and the <code class="docutils literal notranslate"><span class="pre">solve</span></code> method. The latter runs
+the QMC calculation for a given set of inputs, and given the additional <code class="docutils literal notranslate"><span class="pre">solve_params</span></code> (see <code class="docutils literal notranslate"><span class="pre">params.hpp</span></code>).</p>
+<p>The solve method works with three structures: <code class="docutils literal notranslate"><span class="pre">params_t</span> <span class="pre">p</span></code> (the set of all parameters), <code class="docutils literal notranslate"><span class="pre">configuration_t</span> <span class="pre">config</span></code>
+(the Monte Carlo configuration, see below) and <code class="docutils literal notranslate"><span class="pre">work_data_t</span> <span class="pre">wdata</span></code>, that contains all the data and auxillary
+methods that are used by the Monte Carlo moves and measurements. It further defines an instance of the
+<a class="reference external" href="https://triqs.github.io/triqs/latest/documentation/manual/triqs/mc_tools/contents.html" rel="noopener noreferrer" target="_blank">mc_generic</a> class
+(a component of TRIQS) that takes care of implementing the Metropolis algorithm. The
+<code class="docutils literal notranslate"><span class="pre">mc_generic</span> <span class="pre">CTQMC</span></code> object is supplied with “moves” and “measures”: classes that satisfy a particular concept. Its
+<code class="docutils literal notranslate"><span class="pre">warmup_and_accumulate</span></code> method then takes care of choosing moves at random, accepting or rejecting them according
+to the Metropolis criterion, and sampling the observables every few moves. When the specified number of Monte Carlo
+cycles has been completed, <code class="docutils literal notranslate"><span class="pre">collect_results</span></code> averages the results across nodes and makes them accessible to the user
+through the <code class="docutils literal notranslate"><span class="pre">results</span></code> structure.</p>
+</div>
+<div class="section" id="inputs">
+<h2>Inputs<a class="headerlink" href="#inputs" title="Permalink to this heading"></a></h2>
+<p>The inputs are the numerical data required for defining the impurity problem. They are stored in the <code class="docutils literal notranslate"><span class="pre">inputs</span></code>
+structure, but they can be accessed directly thanks to dedicated methods of the <code class="docutils literal notranslate"><span class="pre">solver_core</span></code> class.</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">Delta_tau</span></code> is the hybridization function. It should be supplied as a TRIQS <code class="docutils literal notranslate"><span class="pre">BlockGf</span></code>.
+The choice of the block structure is usually not unique, but using as many blocks as possible ensures the fastest
+determinant updates.</li>
+<li><code class="docutils literal notranslate"><span class="pre">D0_tau</span></code> is the dynamical part of the density-density interaction. Note that the static part is supplied in
+the <code class="docutils literal notranslate"><span class="pre">solve_params</span></code> as part of the interaction Hamiltonian. It should be supplied as a matrix-valued <code class="docutils literal notranslate"><span class="pre">GfImTime</span></code>
+(no block structure).</li>
+<li><code class="docutils literal notranslate"><span class="pre">Jperp_tau</span></code> is the perpendicular spin-spin interaction. It should be supplied as a <span class="math notranslate nohighlight">\(1 \times 1\)</span> matrix-valued
+<code class="docutils literal notranslate"><span class="pre">GfImTime</span></code>.</li>
+</ul>
+</div>
+<div class="section" id="configuration">
+<h2>Configuration<a class="headerlink" href="#configuration" title="Permalink to this heading"></a></h2>
+<p>The basic units of a configuration (see <code class="docutils literal notranslate"><span class="pre">configuration.hpp</span></code>) are segments and <span class="math notranslate nohighlight">\(J_{\perp}\)</span> lines. A segment
+is a structure containing the time corresponding to a <span class="math notranslate nohighlight">\(c\)</span> operator, the time corresponding to a <span class="math notranslate nohighlight">\(c^{\dagger}\)</span>
+operator, and a boolean for each operator indicating whether it is attached to a <span class="math notranslate nohighlight">\(J_{\perp}\)</span> line.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">By convention, we orient the imaginary time axis from <span class="math notranslate nohighlight">\(\beta\)</span> on the left to 0 on the right.</p>
+</div>
+<p>A segment may be cyclic if <span class="math notranslate nohighlight">\(\tau_c &lt; \tau_{c^{\dagger}}\)</span>. A line that is occcupied at all times
+(a zeroth order term in the hybridization expansion) is represented by a segment with
+<span class="math notranslate nohighlight">\(\tau_{c^{\dagger}} = 0\)</span> and <span class="math notranslate nohighlight">\(\tau_c = \beta\)</span>.</p>
+<p>A <span class="math notranslate nohighlight">\(J_{\perp}\)</span> line is a structure containing the time corresponding to an <span class="math notranslate nohighlight">\(S^+\)</span> operator
+and the time corresponding to an <span class="math notranslate nohighlight">\(S^-\)</span> operator. No orbital indices are stored because the
+<span class="math notranslate nohighlight">\(J_{\perp}\)</span> expansion is only implemented for a single orbital.</p>
+<p>The structure of the configuration is inherited from the structure of the hybridization function. The
+hybridization function is matrix-valued, and its line (or column) indices are termed <em>colors</em>. The configuration
+consists in a list (<code class="docutils literal notranslate"><span class="pre">std::vector</span></code>) of lists of segments (one per color), and a list of <span class="math notranslate nohighlight">\(J_{\perp}\)</span> lines.
+The block structure of the hybridization function is irrelevant for the configuration (it is only used for the determinants, see below).</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">The segment lists are sorted so that the <span class="math notranslate nohighlight">\(c\)</span> operators are in <strong>decreasing</strong> time order. There is
+no imposed ordering for the list of <span class="math notranslate nohighlight">\(J_{\perp}\)</span> lines. When a <span class="math notranslate nohighlight">\(J_{\perp}\)</span> expansion is carried
+out, it is assumed that color 0 is spin up and color 1 is spin down.</p>
+</div>
+</div>
+<div class="section" id="imaginary-time-points">
+<h2>Imaginary time points<a class="headerlink" href="#imaginary-time-points" title="Permalink to this heading"></a></h2>
+<p>Imaginary time points are represented as 64 bit integers, via the custom type <code class="docutils literal notranslate"><span class="pre">tau_t</span></code> (see <code class="docutils literal notranslate"><span class="pre">tau_t.hpp</span></code>). This discretization
+on a very fine grid allows for exact comparisons, which are notoriously dangerous with floating point numbers.
+The Monte Carlo moves explicitly forbid degenerate segments with the <span class="math notranslate nohighlight">\(c\)</span> and <span class="math notranslate nohighlight">\(c^{\dagger}\)</span> operators at
+equal times, as well as coinciding operators for segments of the same color. The <code class="docutils literal notranslate"><span class="pre">tau_t</span></code> type also implements
+<span class="math notranslate nohighlight">\(\beta\)</span>-periodicity for the addition of imaginary times.</p>
+</div>
+<div class="section" id="work-data">
+<h2>Work data<a class="headerlink" href="#work-data" title="Permalink to this heading"></a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">work_data</span></code> structure (see <code class="docutils literal notranslate"><span class="pre">work_data.hpp</span></code>) contains data and methods that are used by the Monte Carlo moves
+and measurements. Most importantly, its construction involves computing the dynamical interaction kernel <span class="math notranslate nohighlight">\(K(\tau)\)</span>,
+and initializing the determinant for every block of the hybridization matrix <span class="math notranslate nohighlight">\([\Delta]\)</span>. <code class="docutils literal notranslate"><span class="pre">work_data.hpp</span></code> also
+contains auxillary functions for the Monte Carlo moves: in particular, <code class="docutils literal notranslate"><span class="pre">trace_sign</span></code>, that computes the sign of the trace
+from the times of the hybridized operators stored in the <code class="docutils literal notranslate"><span class="pre">dets</span></code> object.</p>
+</div>
+<div class="section" id="determinants">
+<h2>Determinants<a class="headerlink" href="#determinants" title="Permalink to this heading"></a></h2>
+<p>The hybridization matrix <span class="math notranslate nohighlight">\([\Delta]\)</span> is stored in <code class="docutils literal notranslate"><span class="pre">work_data</span></code> as a list (<code class="docutils literal notranslate"><span class="pre">std::vector</span></code>) of its blocks.
+Each block is a <code class="docutils literal notranslate"><span class="pre">det_manip</span></code> object. The <code class="docutils literal notranslate"><span class="pre">det_manip</span></code> class is a part of TRIQS, which implements
+a fast computation of the change to <span class="math notranslate nohighlight">\(\mathrm{det}[\Delta]\)</span> upon insertion or removal of a line
+and column in <span class="math notranslate nohighlight">\([\Delta]\)</span>. The <code class="docutils literal notranslate"><span class="pre">det_manip</span></code> object is constructed from the input hybridization function
+via an “adaptor” that specifies how it is to be callled (see <code class="docutils literal notranslate"><span class="pre">dets.hpp</span></code>). The alias <code class="docutils literal notranslate"><span class="pre">det_t</span></code> is used for the
+type of <span class="math notranslate nohighlight">\([\Delta]\)</span>.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Within a given block, the lines and columns of the hybridization matrix <span class="math notranslate nohighlight">\([\Delta]\)</span> are arranged in <strong>increasing</strong>
+order of the corresponding times, regardless of color.</p>
+</div>
+</div>
+<div class="section" id="miscellaneous">
+<h2>Miscellaneous<a class="headerlink" href="#miscellaneous" title="Permalink to this heading"></a></h2>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">util.hpp</span></code> contains utility functions used by the Monte Carlo moves and measurements.</li>
+<li><code class="docutils literal notranslate"><span class="pre">logs.hpp</span></code> contains the preprocessor directives that set the logging level at compile time, and macros that facilitate logging
+(we use the <code class="docutils literal notranslate"><span class="pre">spdlog</span></code> library).</li>
+<li><code class="docutils literal notranslate"><span class="pre">invariants.hpp</span></code> contains functions that check invariants of the algorithm
+at every move if the code is compiled in debug mode. Checks include the time-ordering of the segments and of the lines and
+columns of <span class="math notranslate nohighlight">\([\Delta]\)</span>, the consistency between the times stored in the configuration and in <span class="math notranslate nohighlight">\([\Delta]\)</span>, and the
+consistency between the <span class="math notranslate nohighlight">\(J_{\perp}\)</span> lines and the labels stored in the segments.</li>
+</ul>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="ctseg.html" class="btn btn-neutral float-left" title="The CTSEG-J algorithm" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../guide/step_by_step.html" class="btn btn-neutral float-right" title="Step-by-step guide" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024 The Simons Foundation, authors: N. Kavokine, H. Lu, N. Wentzell, O. Parcollet.</p>
+  </div>
+
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

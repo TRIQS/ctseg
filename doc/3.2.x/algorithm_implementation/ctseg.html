@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The CTSEG-J algorithm &mdash; triqs_ctseg  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
+
+  
+    <link rel="shortcut icon" href="../_static/triqs_favicon.ico"/>
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+        <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+        <script defer="defer" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=default"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="author" title="About these documents" href="../about.html" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Implementation notes" href="implementation_notes.html" />
+    <link rel="prev" title="Documentation" href="../documentation.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #7E588A" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            triqs_ctseg
+          </a>
+              <div class="version">
+                3.2.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Install CTSEG-J</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../install.html#compiling-ctseg-j-from-source">Compiling CTSEG-J from source</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../install.html#prerequisites">Prerequisites</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../install.html#installation-steps">Installation steps</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../install.html#version-compatibility">Version compatibility</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../install.html#custom-cmake-options">Custom CMake options</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="../documentation.html">Documentation</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../documentation.html#algorithm-and-implementation">Algorithm and implementation</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">The CTSEG-J algorithm</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#double-expansion">Double expansion</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#configuration">Configuration</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#sign">Sign</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="implementation_notes.html">Implementation notes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="implementation_notes.html#solver-core">Solver core</a></li>
+<li class="toctree-l4"><a class="reference internal" href="implementation_notes.html#inputs">Inputs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="implementation_notes.html#configuration">Configuration</a></li>
+<li class="toctree-l4"><a class="reference internal" href="implementation_notes.html#imaginary-time-points">Imaginary time points</a></li>
+<li class="toctree-l4"><a class="reference internal" href="implementation_notes.html#work-data">Work data</a></li>
+<li class="toctree-l4"><a class="reference internal" href="implementation_notes.html#determinants">Determinants</a></li>
+<li class="toctree-l4"><a class="reference internal" href="implementation_notes.html#miscellaneous">Miscellaneous</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../documentation.html#user-guide">User guide</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../guide/step_by_step.html">Step-by-step guide</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../guide/step_by_step.html#step-1-choose-the-construction-parameters">Step 1 - Choose the construction parameters</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../guide/step_by_step.html#green-s-function-structure">Green’s function structure</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../guide/step_by_step.html#step-2-construct-the-solver">Step 2 - Construct the solver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../guide/step_by_step.html#step-3-supply-the-solver-inputs">Step 3 - Supply the solver inputs</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../guide/step_by_step.html#interaction-hamiltonian">Interaction Hamiltonian</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../guide/step_by_step.html#hybridization-function">Hybridization function</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../guide/step_by_step.html#chemical-potential">Chemical potential</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../guide/step_by_step.html#dynamical-density-density-interaction">Dynamical density-density interaction</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../guide/step_by_step.html#spin-spin-interaction">Spin-spin interaction</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../guide/step_by_step.html#solve-parameters">Solve parameters</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../guide/step_by_step.html#step-4-run-the-solver">Step 4 - Run the solver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../guide/step_by_step.html#step-5-access-the-results">Step 5 - Access the results</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../guide/step_by_step.html#step-6-save-the-results">Step 6 - Save the results</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../guide/step_by_step.html#running-the-solver-in-parallel">Running the solver in parallel</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../guide/moves.html">Monte Carlo moves</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../guide/moves.html#insert-segment">Insert segment</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../guide/moves.html#remove-segment">Remove segment</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../guide/moves.html#split-segment">Split segment</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../guide/moves.html#regroup-segment">Regroup segment</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../guide/moves.html#move-segment">Move segment</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../guide/moves.html#insert-spin-segment">Insert spin segment</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../guide/moves.html#remove-spin-segment">Remove spin segment</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../guide/moves.html#swap-spin-lines">Swap spin lines</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../guide/moves.html#split-spin-segment">Split spin segment</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../guide/moves.html#regroup-spin-segment">Regroup spin segment</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../guide/measurements.html">Measurements</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../guide/measurements.html#imaginary-time-green-s-function">Imaginary time Green’s function</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../guide/measurements.html#self-energy-improved-estimator">Self-energy improved estimator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../guide/measurements.html#density">Density</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../guide/measurements.html#static-density-correlation-function">Static density correlation function</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../guide/measurements.html#dynamic-density-correlation-function">Dynamic density correlation function</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../guide/measurements.html#perpendicular-spin-spin-correlation-function">Perpendicular spin-spin correlation function</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../guide/measurements.html#state-histogram">State histogram</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../guide/measurements.html#average-sign">Average sign</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../guide/measurements.html#perturbation-order-histograms">Perturbation order histograms</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../documentation.html#reference-manual">Reference manual</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../_ref/triqs_ctseg.solver.html">triqs_ctseg.solver</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../_ref/triqs_ctseg.solver.Solver.html">triqs_ctseg.solver.Solver</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../_ref/triqs_ctseg.solver.Solver.html#triqs_ctseg.solver.Solver"><code class="docutils literal notranslate"><span class="pre">Solver</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="../_ref/triqs_ctseg.solver.Solver.__init__.html">triqs_ctseg.solver.Solver.__init__</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../_ref/triqs_ctseg.solver.Solver.hdf5_format.html">triqs_ctseg.solver.Solver.hdf5_format</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../_ref/triqs_ctseg.solver.Solver.solve.html">triqs_ctseg.solver.Solver.solve</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../_ref/triqs_ctseg.solver.Solver.D0_tau.html">triqs_ctseg.solver.Solver.D0_tau</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../_ref/triqs_ctseg.solver.Solver.Delta_tau.html">triqs_ctseg.solver.Solver.Delta_tau</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../_ref/triqs_ctseg.solver.Solver.Jperp_tau.html">triqs_ctseg.solver.Solver.Jperp_tau</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../_ref/triqs_ctseg.solver.Solver.results.html">triqs_ctseg.solver.Solver.results</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../issues.html">Reporting issues</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ChangeLog.html">Changelog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../ChangeLog.html#version-3-2-0">Version 3.2.0</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../about.html">About CTSEG-J</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #7E588A" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">triqs_ctseg</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../documentation.html">Documentation</a></li>
+      <li class="breadcrumb-item active">The CTSEG-J algorithm</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/algorithm_implementation/ctseg.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="section" id="the-ctseg-j-algorithm">
+<span id="ctseg"></span><h1>The CTSEG-J algorithm<a class="headerlink" href="#the-ctseg-j-algorithm" title="Permalink to this heading"></a></h1>
+<div class="section" id="double-expansion">
+<h2>Double expansion<a class="headerlink" href="#double-expansion" title="Permalink to this heading"></a></h2>
+<p>The double-expansion segment-picture continuous-time quantum Monte Carlo algorithm
+(CTSEG-J) is based on an expansion of the partition function in powers of the
+hybridization function <span class="math notranslate nohighlight">\(\Delta(\tau)\)</span> and perprendicular spin-spin interaction
+<span class="math notranslate nohighlight">\(J_{\perp} (\tau)\)</span>. Details can be found in <a class="footnote-reference" href="#ctqmc1" id="id1">[1]</a> <a class="footnote-reference" href="#ctqmc2" id="id2">[2]</a>. The partition function is <span class="math notranslate nohighlight">\(Z = \int [Dc][D\overline{c}]e^{-\mathcal{S}[c,\overline{c}]}\)</span>,
+with the action <span class="math notranslate nohighlight">\(\mathcal{S}\)</span> given by</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{split}
+\mathcal{S}  &amp;= \iint_0^{\beta} \mathrm{d} \tau \mathrm{d} \tau' \sum_{a,b} \left\{ \overline{c}_{a\sigma} (\tau)
+\left( (\partial_{\tau} + \mu_{a\sigma})\delta_{ab}^{\sigma \sigma'} \delta_{\tau - \tau'} + \Delta_{ab}^{\sigma \sigma'}(\tau - \tau')\right)
+c_{b\sigma'}(\tau') \right\} \\
+&amp;+ \frac{1}{2} \iint_0^{\beta} \mathrm{d} \tau \mathrm{d} \tau' \sum_{a,b} \mathcal{U}_{ab}(\tau - \tau') n_a(\tau) n_b(\tau')
++ \frac{1}{2} \iint_0^{\beta} \mathrm{d} \tau \mathrm{d} \tau' \sum_{a, \xi = x, y, z} s_a^{\xi}(\tau) \mathcal{J}_a^{\xi}(\tau - \tau') s_a^{\xi} (\tau')
+\end{split}\end{split}\]</div>
+<p>Here <span class="math notranslate nohighlight">\(\beta\)</span> is the inverse temperature, <span class="math notranslate nohighlight">\(a\)</span> denote orbital indices, <span class="math notranslate nohighlight">\(\sigma\)</span> spin indices (<span class="math notranslate nohighlight">\(\sigma = \uparrow, \downarrow\)</span>),
+<span class="math notranslate nohighlight">\(n_a \equiv \sum_{\sigma} n_{a\sigma}\)</span>, <span class="math notranslate nohighlight">\(s_a^{\xi} \equiv \frac{1}{2} \sum_{\sigma \sigma'} \overline{c}_{a\sigma}
+\sigma_{\sigma \sigma'}^{\xi} c_{a \sigma'}\)</span> and <span class="math notranslate nohighlight">\(\sigma^{\xi}\)</span> are the Pauli matrices. <span class="math notranslate nohighlight">\(\overline{c}_{a\sigma}(\tau)\)</span>
+and <span class="math notranslate nohighlight">\(c_{a\sigma}(\tau)\)</span> are the <span class="math notranslate nohighlight">\(\beta\)</span>-antiperiodic Grassman fields corresponding to the fermion
+creation and annihilation operators on the impurity, respectively.</p>
+<p>This action can be recast as</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{split}
+\mathcal{S}  &amp;= \iint_0^{\beta} \mathrm{d} \tau \mathrm{d} \tau' \sum_{a,b} \left\{ \overline{c}_{a\sigma} (\tau)
+\left( (\partial_{\tau} + \mu_{a\sigma})\delta_{ab}^{\sigma \sigma'} \delta_{\tau - \tau'} + \Delta_{ab}^{\sigma \sigma'}(\tau - \tau')\right)
+c_{b\sigma'}(\tau') \right\} \\
+&amp;+ \frac{1}{2} \iint_0^{\beta} \mathrm{d} \tau \mathrm{d} \tau' \sum_{u,v} \mathcal{U}_{uv}(\tau - \tau') n_u(\tau) n_v(\tau')
++ \frac{1}{2} \iint_0^{\beta} \mathrm{d} \tau \mathrm{d} \tau' \sum_{a} \mathcal{J}_a^{\perp}(\tau - \tau') s_a^{+}(\tau) s_a^{-} (\tau')
+\end{split}\end{split}\]</div>
+<p>where</p>
+<div class="math notranslate nohighlight">
+\[\mathcal{U}_{uv}(\tau - \tau')  = \mathcal{U}_{ab}(\tau - \tau') + (-1)^{\sigma \sigma'} \frac{1}{4} \mathcal{J}_a^z(\tau) \delta_{ab},\]</div>
+<p><span class="math notranslate nohighlight">\(s^{\pm} = s_x \pm i s_y\)</span> and <span class="math notranslate nohighlight">\(\mathcal{J}^{\perp} \equiv \mathcal{J}^x = \mathcal{J}^y\)</span>. The CTSEG-J solver
+stochastically explores the terms (or configurations) generated by the expansion of <span class="math notranslate nohighlight">\(\mathcal{S}\)</span> in powers of <span class="math notranslate nohighlight">\(\Delta(\tau)\)</span>
+and <span class="math notranslate nohighlight">\(\mathcal{J}^{\perp}(\tau)\)</span> and samples the observables of interest (e.g. the Green’s function) every few
+configurations.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Our CTSEG implementation supports the <span class="math notranslate nohighlight">\(\mathcal{J}^{\perp}(\tau)\)</span> expansion only for a single orbital. For multiple
+orbitals, an expansion only in <span class="math notranslate nohighlight">\(\Delta(\tau)\)</span> is possible. For a single orbital, it is also possible to carry out an
+expansion in <span class="math notranslate nohighlight">\(\mathcal{J}^{\perp}(\tau)\)</span> only (i.e., with <span class="math notranslate nohighlight">\(\Delta(\tau) = 0\)</span>).</p>
+</div>
+</div>
+<div class="section" id="configuration">
+<h2>Configuration<a class="headerlink" href="#configuration" title="Permalink to this heading"></a></h2>
+<p>A term of the double expansion takes the general form</p>
+<div class="math notranslate nohighlight">
+\[w = \mathrm{det} [\Delta] \prod_{i = 1}^{k} \left[ - \frac{\mathcal{J}_{\perp}(q(\alpha_i) - \beta_i) }{2} \right] w_{\rm loc},\]</div>
+<p>where <span class="math notranslate nohighlight">\(w_{\rm loc}\)</span> is the local trace factor:</p>
+<div class="math notranslate nohighlight">
+\[w_{\rm loc} = \langle \psi \vert e^{-S_{\rm loc}} c(v_1)\overline{c}(u_1) \dots c(v_n) \overline{c}(u_n) s^+(\alpha_1)s^-(\beta_1) \dots s^+(\alpha_k) s^-(\beta_k) \vert \psi \rangle.\]</div>
+<p>We have denoted <span class="math notranslate nohighlight">\(\vert \Psi \rangle\)</span> the basis states of the isolated impurity and <span class="math notranslate nohighlight">\(S_{\rm loc}\)</span> the corresponsing action.
+<span class="math notranslate nohighlight">\([\Delta]\)</span> is the matrix with elements <span class="math notranslate nohighlight">\([\Delta]_{ij} = \Delta(u_i - v_j)\)</span> and <span class="math notranslate nohighlight">\(q\)</span> is a permutation
+of <span class="math notranslate nohighlight">\((1, \dots, k)\)</span>. We chose to regoup all the possible permutations of the “hybridized” operators into a determinant
+because it allows for numerically fast updates, while there is no advantage to regrouping the permutations of the spin
+operators into a permanent.</p>
+<p>We will designate by “color” the set of indices carried by an operator in addition to its time (typically, spin and orbital).
+Under the applicability conditions of CTSEG-J (the interaction commutes with the density operator) the configuration can be
+represented as a set of imaginary time segments for each color: within a segment, the color is occupied. Then, the local trace
+factor supports a simple expression in terms of the overlaps of those segments between different colors (up to a sign, discussed below):</p>
+<div class="math notranslate nohighlight">
+\[w_{\rm loc} = w_{\rm st}(\tilde U_{ab}, \tilde \mu_a) \cdot \exp \left[ \sum_{ij} s_i s_j K_{a(i)b(j)} (\tau_i - \tau_j) \right],\]</div>
+<p>where <span class="math notranslate nohighlight">\(s_i = 1\)</span> for creation operators and -1 otherwise. We split the interaction into a
+static and a dynamic part: <span class="math notranslate nohighlight">\(\mathcal{U}_{ab}(\tau) = U_{ab} + D_{ab}(\tau)\)</span>. The dynamical interaction kernel
+<span class="math notranslate nohighlight">\(K_{ab}\)</span> is defined by <span class="math notranslate nohighlight">\(K_{ab}''(\tau) = D_{ab}(\tau)\)</span> and <span class="math notranslate nohighlight">\(K_{ab}(\tau = 0^+) = K_{ab}(\tau = \beta^-) = 0\)</span>.
+The static trace factor is</p>
+<div class="math notranslate nohighlight">
+\[w_{\rm st}(U_{ab}, \mu_a) = \exp \left[ -\sum_{a \neq b} U_{ab} O_{ab} + \sum_a \mu_a \ell_a \right].\]</div>
+<p>Here <span class="math notranslate nohighlight">\(O_{ab}\)</span> is the overlap between the segments of colors a and b, and <span class="math notranslate nohighlight">\(\ell_a\)</span> is the occupied length in color a.
+In the presence of dynamical interactions, the static trace factor is computed with a renormalized interaction and chemical potential:
+<span class="math notranslate nohighlight">\(\tilde U_{ab} = U_{ab} - 2 K'_{ab}(0)\)</span> and <span class="math notranslate nohighlight">\(\tilde \mu_{a} = \mu_a + K'_{aa}(0)\)</span>.</p>
+</div>
+<div class="section" id="sign">
+<h2>Sign<a class="headerlink" href="#sign" title="Permalink to this heading"></a></h2>
+<p>The sign of the Monte Carlo weight depends on the initial ordering of the operators in the expansion. The total sign is the product of
+the sign of the determinant and the sign of the trace, and the ordering of the spin operators does not influence the sign.
+The trace is positive if all the hybridized operators (whatever their nature) are ordered by decreasing (from left to right) time and color.
+In practice, we define the matrix <span class="math notranslate nohighlight">\([\Delta]\)</span> in such a way that the times corresponding to its rows (creation operators)
+and columns (annihilation operators) are both in increasing order, regardless of color: this fixes
+the sign of the determinant. We then compute the sign of the
+permutation that takes the sequence <span class="math notranslate nohighlight">\([c c^{\dagger}  \dots c c^{\dagger} ]\)</span> with the <span class="math notranslate nohighlight">\(c\)</span> and
+<span class="math notranslate nohighlight">\(c^{\dagger}\)</span> increasing-time-ordered to the decreasing-time-and-color-ordered sequence of operators.</p>
+<table class="docutils footnote" frame="void" id="ctqmc1" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>Otsuki, J. Spin-boson coupling in continuous-time quantum Monte Carlo.
+Phys. Rev. B 87, 125102 (2013).</td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="ctqmc2" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id2">[2]</a></td><td>Ayral, T. PhD thesis: Nonlocal Coulomb Interactions and Electronic
+Correlations: Novel Many-Body Approaches. Ecole Polytechnique (2015). <a class="reference external" href="https://hal.archives-ouvertes.fr/tel-01247625" rel="noopener noreferrer" target="_blank">tel-01247625</a></td></tr>
+</tbody>
+</table>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../documentation.html" class="btn btn-neutral float-left" title="Documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="implementation_notes.html" class="btn btn-neutral float-right" title="Implementation notes" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024 The Simons Foundation, authors: N. Kavokine, H. Lu, N. Wentzell, O. Parcollet.</p>
+  </div>
+
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

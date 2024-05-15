@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>triqs_ctseg.solver &mdash; triqs_ctseg  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
+      <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
+
+  
+    <link rel="shortcut icon" href="../../_static/triqs_favicon.ico"/>
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="author" title="About these documents" href="../../about.html" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #7E588A" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            triqs_ctseg
+          </a>
+              <div class="version">
+                3.2.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Install CTSEG-J</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../install.html#compiling-ctseg-j-from-source">Compiling CTSEG-J from source</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../install.html#prerequisites">Prerequisites</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../install.html#installation-steps">Installation steps</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../install.html#version-compatibility">Version compatibility</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../install.html#custom-cmake-options">Custom CMake options</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../documentation.html">Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation.html#algorithm-and-implementation">Algorithm and implementation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../algorithm_implementation/ctseg.html">The CTSEG-J algorithm</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../algorithm_implementation/ctseg.html#double-expansion">Double expansion</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../algorithm_implementation/ctseg.html#configuration">Configuration</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../algorithm_implementation/ctseg.html#sign">Sign</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../algorithm_implementation/implementation_notes.html">Implementation notes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../algorithm_implementation/implementation_notes.html#solver-core">Solver core</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../algorithm_implementation/implementation_notes.html#inputs">Inputs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../algorithm_implementation/implementation_notes.html#configuration">Configuration</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../algorithm_implementation/implementation_notes.html#imaginary-time-points">Imaginary time points</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../algorithm_implementation/implementation_notes.html#work-data">Work data</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../algorithm_implementation/implementation_notes.html#determinants">Determinants</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../algorithm_implementation/implementation_notes.html#miscellaneous">Miscellaneous</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation.html#user-guide">User guide</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../guide/step_by_step.html">Step-by-step guide</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../guide/step_by_step.html#step-1-choose-the-construction-parameters">Step 1 - Choose the construction parameters</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../guide/step_by_step.html#green-s-function-structure">Green’s function structure</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../guide/step_by_step.html#step-2-construct-the-solver">Step 2 - Construct the solver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../guide/step_by_step.html#step-3-supply-the-solver-inputs">Step 3 - Supply the solver inputs</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../guide/step_by_step.html#interaction-hamiltonian">Interaction Hamiltonian</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../guide/step_by_step.html#hybridization-function">Hybridization function</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../guide/step_by_step.html#chemical-potential">Chemical potential</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../guide/step_by_step.html#dynamical-density-density-interaction">Dynamical density-density interaction</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../guide/step_by_step.html#spin-spin-interaction">Spin-spin interaction</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../guide/step_by_step.html#solve-parameters">Solve parameters</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../guide/step_by_step.html#step-4-run-the-solver">Step 4 - Run the solver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../guide/step_by_step.html#step-5-access-the-results">Step 5 - Access the results</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../guide/step_by_step.html#step-6-save-the-results">Step 6 - Save the results</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../guide/step_by_step.html#running-the-solver-in-parallel">Running the solver in parallel</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../guide/moves.html">Monte Carlo moves</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../guide/moves.html#insert-segment">Insert segment</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../guide/moves.html#remove-segment">Remove segment</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../guide/moves.html#split-segment">Split segment</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../guide/moves.html#regroup-segment">Regroup segment</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../guide/moves.html#move-segment">Move segment</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../guide/moves.html#insert-spin-segment">Insert spin segment</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../guide/moves.html#remove-spin-segment">Remove spin segment</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../guide/moves.html#swap-spin-lines">Swap spin lines</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../guide/moves.html#split-spin-segment">Split spin segment</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../guide/moves.html#regroup-spin-segment">Regroup spin segment</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../guide/measurements.html">Measurements</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../guide/measurements.html#imaginary-time-green-s-function">Imaginary time Green’s function</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../guide/measurements.html#self-energy-improved-estimator">Self-energy improved estimator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../guide/measurements.html#density">Density</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../guide/measurements.html#static-density-correlation-function">Static density correlation function</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../guide/measurements.html#dynamic-density-correlation-function">Dynamic density correlation function</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../guide/measurements.html#perpendicular-spin-spin-correlation-function">Perpendicular spin-spin correlation function</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../guide/measurements.html#state-histogram">State histogram</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../guide/measurements.html#average-sign">Average sign</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../guide/measurements.html#perturbation-order-histograms">Perturbation order histograms</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../documentation.html#reference-manual">Reference manual</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../_ref/triqs_ctseg.solver.html">triqs_ctseg.solver</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../_ref/triqs_ctseg.solver.Solver.html">triqs_ctseg.solver.Solver</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../_ref/triqs_ctseg.solver.Solver.html#triqs_ctseg.solver.Solver"><code class="docutils literal notranslate"><span class="pre">Solver</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../_ref/triqs_ctseg.solver.Solver.__init__.html">triqs_ctseg.solver.Solver.__init__</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../_ref/triqs_ctseg.solver.Solver.hdf5_format.html">triqs_ctseg.solver.Solver.hdf5_format</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../_ref/triqs_ctseg.solver.Solver.solve.html">triqs_ctseg.solver.Solver.solve</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../_ref/triqs_ctseg.solver.Solver.D0_tau.html">triqs_ctseg.solver.Solver.D0_tau</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../_ref/triqs_ctseg.solver.Solver.Delta_tau.html">triqs_ctseg.solver.Solver.Delta_tau</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../_ref/triqs_ctseg.solver.Solver.Jperp_tau.html">triqs_ctseg.solver.Solver.Jperp_tau</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../_ref/triqs_ctseg.solver.Solver.results.html">triqs_ctseg.solver.Solver.results</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../issues.html">Reporting issues</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ChangeLog.html">Changelog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../ChangeLog.html#version-3-2-0">Version 3.2.0</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../about.html">About CTSEG-J</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #7E588A" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">triqs_ctseg</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">triqs_ctseg.solver</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for triqs_ctseg.solver</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">.solver_core</span> <span class="kn">import</span> <span class="n">SolverCore</span>
+
+<span class="kn">from</span> <span class="nn">triqs.gf</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">triqs.utility</span> <span class="kn">import</span> <span class="n">mpi</span>
+
+<span class="c1"># === The SolverCore Wrapper</span>
+
+<div class="viewcode-block" id="Solver"><a class="viewcode-back" href="../../_ref/triqs_ctseg.solver.Solver.html#triqs_ctseg.solver.Solver">[docs]</a><span class="k">class</span> <span class="nc">Solver</span><span class="p">(</span><span class="n">SolverCore</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Solver.__init__"><a class="viewcode-back" href="../../_ref/triqs_ctseg.solver.Solver.__init__.html#triqs_ctseg.solver.Solver.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialise the solver.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        Cf. C++ documentation of SolverCore</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;gf_struct&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">fix_gf_struct_type</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;gf_struct&#39;</span><span class="p">])</span>
+
+        <span class="c1"># Initialise the core solver</span>
+        <span class="n">SolverCore</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Solver.solve"><a class="viewcode-back" href="../../_ref/triqs_ctseg.solver.Solver.solve.html#triqs_ctseg.solver.Solver.solve">[docs]</a>    <span class="k">def</span> <span class="nf">solve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Solve the impurity problem.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        Cf. C++ documentation of SolverCore.solve(..)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Solve the impurity problem</span>
+        <span class="n">solve_status</span> <span class="o">=</span> <span class="n">SolverCore</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">solve_status</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024 The Simons Foundation, authors: N. Kavokine, H. Lu, N. Wentzell, O. Parcollet.</p>
+  </div>
+
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

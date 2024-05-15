@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Monte Carlo moves &mdash; triqs_ctseg  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
+
+  
+    <link rel="shortcut icon" href="../_static/triqs_favicon.ico"/>
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+        <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+        <script defer="defer" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=default"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="author" title="About these documents" href="../about.html" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Measurements" href="measurements.html" />
+    <link rel="prev" title="Step-by-step guide" href="step_by_step.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #7E588A" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            triqs_ctseg
+          </a>
+              <div class="version">
+                3.2.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Install CTSEG-J</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../install.html#compiling-ctseg-j-from-source">Compiling CTSEG-J from source</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../install.html#prerequisites">Prerequisites</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../install.html#installation-steps">Installation steps</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../install.html#version-compatibility">Version compatibility</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../install.html#custom-cmake-options">Custom CMake options</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="../documentation.html">Documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../documentation.html#algorithm-and-implementation">Algorithm and implementation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../algorithm_implementation/ctseg.html">The CTSEG-J algorithm</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../algorithm_implementation/ctseg.html#double-expansion">Double expansion</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../algorithm_implementation/ctseg.html#configuration">Configuration</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../algorithm_implementation/ctseg.html#sign">Sign</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../algorithm_implementation/implementation_notes.html">Implementation notes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../algorithm_implementation/implementation_notes.html#solver-core">Solver core</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../algorithm_implementation/implementation_notes.html#inputs">Inputs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../algorithm_implementation/implementation_notes.html#configuration">Configuration</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../algorithm_implementation/implementation_notes.html#imaginary-time-points">Imaginary time points</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../algorithm_implementation/implementation_notes.html#work-data">Work data</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../algorithm_implementation/implementation_notes.html#determinants">Determinants</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../algorithm_implementation/implementation_notes.html#miscellaneous">Miscellaneous</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2 current"><a class="reference internal" href="../documentation.html#user-guide">User guide</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="step_by_step.html">Step-by-step guide</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="step_by_step.html#step-1-choose-the-construction-parameters">Step 1 - Choose the construction parameters</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="step_by_step.html#green-s-function-structure">Green’s function structure</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="step_by_step.html#step-2-construct-the-solver">Step 2 - Construct the solver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="step_by_step.html#step-3-supply-the-solver-inputs">Step 3 - Supply the solver inputs</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="step_by_step.html#interaction-hamiltonian">Interaction Hamiltonian</a></li>
+<li class="toctree-l5"><a class="reference internal" href="step_by_step.html#hybridization-function">Hybridization function</a></li>
+<li class="toctree-l5"><a class="reference internal" href="step_by_step.html#chemical-potential">Chemical potential</a></li>
+<li class="toctree-l5"><a class="reference internal" href="step_by_step.html#dynamical-density-density-interaction">Dynamical density-density interaction</a></li>
+<li class="toctree-l5"><a class="reference internal" href="step_by_step.html#spin-spin-interaction">Spin-spin interaction</a></li>
+<li class="toctree-l5"><a class="reference internal" href="step_by_step.html#solve-parameters">Solve parameters</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="step_by_step.html#step-4-run-the-solver">Step 4 - Run the solver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="step_by_step.html#step-5-access-the-results">Step 5 - Access the results</a></li>
+<li class="toctree-l4"><a class="reference internal" href="step_by_step.html#step-6-save-the-results">Step 6 - Save the results</a></li>
+<li class="toctree-l4"><a class="reference internal" href="step_by_step.html#running-the-solver-in-parallel">Running the solver in parallel</a></li>
+</ul>
+</li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Monte Carlo moves</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#insert-segment">Insert segment</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#remove-segment">Remove segment</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#split-segment">Split segment</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#regroup-segment">Regroup segment</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#move-segment">Move segment</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#insert-spin-segment">Insert spin segment</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#remove-spin-segment">Remove spin segment</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#swap-spin-lines">Swap spin lines</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#split-spin-segment">Split spin segment</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#regroup-spin-segment">Regroup spin segment</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="measurements.html">Measurements</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="measurements.html#imaginary-time-green-s-function">Imaginary time Green’s function</a></li>
+<li class="toctree-l4"><a class="reference internal" href="measurements.html#self-energy-improved-estimator">Self-energy improved estimator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="measurements.html#density">Density</a></li>
+<li class="toctree-l4"><a class="reference internal" href="measurements.html#static-density-correlation-function">Static density correlation function</a></li>
+<li class="toctree-l4"><a class="reference internal" href="measurements.html#dynamic-density-correlation-function">Dynamic density correlation function</a></li>
+<li class="toctree-l4"><a class="reference internal" href="measurements.html#perpendicular-spin-spin-correlation-function">Perpendicular spin-spin correlation function</a></li>
+<li class="toctree-l4"><a class="reference internal" href="measurements.html#state-histogram">State histogram</a></li>
+<li class="toctree-l4"><a class="reference internal" href="measurements.html#average-sign">Average sign</a></li>
+<li class="toctree-l4"><a class="reference internal" href="measurements.html#perturbation-order-histograms">Perturbation order histograms</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../documentation.html#reference-manual">Reference manual</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../_ref/triqs_ctseg.solver.html">triqs_ctseg.solver</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../_ref/triqs_ctseg.solver.Solver.html">triqs_ctseg.solver.Solver</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../_ref/triqs_ctseg.solver.Solver.html#triqs_ctseg.solver.Solver"><code class="docutils literal notranslate"><span class="pre">Solver</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="../_ref/triqs_ctseg.solver.Solver.__init__.html">triqs_ctseg.solver.Solver.__init__</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../_ref/triqs_ctseg.solver.Solver.hdf5_format.html">triqs_ctseg.solver.Solver.hdf5_format</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../_ref/triqs_ctseg.solver.Solver.solve.html">triqs_ctseg.solver.Solver.solve</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../_ref/triqs_ctseg.solver.Solver.D0_tau.html">triqs_ctseg.solver.Solver.D0_tau</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../_ref/triqs_ctseg.solver.Solver.Delta_tau.html">triqs_ctseg.solver.Solver.Delta_tau</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../_ref/triqs_ctseg.solver.Solver.Jperp_tau.html">triqs_ctseg.solver.Solver.Jperp_tau</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../_ref/triqs_ctseg.solver.Solver.results.html">triqs_ctseg.solver.Solver.results</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../issues.html">Reporting issues</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ChangeLog.html">Changelog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../ChangeLog.html#version-3-2-0">Version 3.2.0</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../about.html">About CTSEG-J</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #7E588A" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">triqs_ctseg</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../documentation.html">Documentation</a></li>
+      <li class="breadcrumb-item active">Monte Carlo moves</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/guide/moves.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="section" id="monte-carlo-moves">
+<span id="moves"></span><h1>Monte Carlo moves<a class="headerlink" href="#monte-carlo-moves" title="Permalink to this heading"></a></h1>
+<p>In CTSEG-J, a configuration (state of the Markov chain) is a set of time-ordered list of segments (one for every color), and
+possibly a list of <span class="math notranslate nohighlight">\(J_{\perp}\)</span> lines (see <a class="reference internal" href="../algorithm_implementation/implementation_notes.html"><span class="doc">Implementation Notes</span></a> for more details).
+Below is a list of all possible steps (or “moves”) of the random walk in configuration space.</p>
+<div class="section" id="insert-segment">
+<h2>Insert segment<a class="headerlink" href="#insert-segment" title="Permalink to this heading"></a></h2>
+<a class="reference internal image-reference" href="../_images/insert.png"><img alt="../_images/insert.png" class="align-center" src="../_images/insert.png" style="width: 80%;" /></a>
+<p>Randomly choose a color. Randomly choose a segment within that color. Try to insert a randomly chosen new segment in the interval to
+the right of that segment. If the color is empty, try to insert a random segment. If the color contains a full line, no insertion is possible.</p>
+<p>This move is enabled if there is a non-zero hybridization <span class="math notranslate nohighlight">\(\Delta(\tau)\)</span>.</p>
+</div>
+<div class="section" id="remove-segment">
+<h2>Remove segment<a class="headerlink" href="#remove-segment" title="Permalink to this heading"></a></h2>
+<a class="reference internal image-reference" href="../_images/remove.png"><img alt="../_images/remove.png" class="align-center" src="../_images/remove.png" style="width: 80%;" /></a>
+<p>Randomly choose a color. Try to remove a randomly chosen segment within that color.</p>
+<p>This move is enabled if there is a non-zero hybridization <span class="math notranslate nohighlight">\(\Delta(\tau)\)</span>.</p>
+</div>
+<div class="section" id="split-segment">
+<h2>Split segment<a class="headerlink" href="#split-segment" title="Permalink to this heading"></a></h2>
+<a class="reference internal image-reference" href="../_images/split.png"><img alt="../_images/split.png" class="align-center" src="../_images/split.png" style="width: 80%;" /></a>
+<p>Randomly choose a color and a segment <span class="math notranslate nohighlight">\([\tau, \tau']\)</span> within that color. Choose two random (but ordered) times <span class="math notranslate nohighlight">\([\tau_1, \tau_1']\)</span>
+inside that segment and try replacing <span class="math notranslate nohighlight">\([\tau, \tau']\)</span> with <span class="math notranslate nohighlight">\([\tau, \tau_1]\)</span> and <span class="math notranslate nohighlight">\([\tau_1', \tau']\)</span>.</p>
+<p>This move is enabled if there is a non-zero hybridization <span class="math notranslate nohighlight">\(\Delta(\tau)\)</span>.</p>
+</div>
+<div class="section" id="regroup-segment">
+<h2>Regroup segment<a class="headerlink" href="#regroup-segment" title="Permalink to this heading"></a></h2>
+<a class="reference internal image-reference" href="../_images/regroup.png"><img alt="../_images/regroup.png" class="align-center" src="../_images/regroup.png" style="width: 80%;" /></a>
+<p>Randomly choose a color and a pair of adjacent segments <span class="math notranslate nohighlight">\([\tau, \tau_1]\)</span> and <span class="math notranslate nohighlight">\([\tau_1', \tau']\)</span> within that color.
+Try replacing this pair of segments with the “regrouped” segment <span class="math notranslate nohighlight">\([\tau, \tau']\)</span>.</p>
+<p>This move is enabled if there is a non-zero hybridization <span class="math notranslate nohighlight">\(\Delta(\tau)\)</span>.</p>
+</div>
+<div class="section" id="move-segment">
+<h2>Move segment<a class="headerlink" href="#move-segment" title="Permalink to this heading"></a></h2>
+<a class="reference internal image-reference" href="../_images/move.png"><img alt="../_images/move.png" class="align-center" src="../_images/move.png" style="width: 80%;" /></a>
+<p>Randomly choose a color and either a segment or an antisegment within that color (an antisegment is an interval between two segments). Randomly choose another
+color and try to insert the chosen segment or antisegment within that color.</p>
+<p>This move is enabled if there is a non-zero hybridization <span class="math notranslate nohighlight">\(\Delta(\tau)\)</span>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The antisegment version of the move is implemented as the segment version
+applied to a “flipped” configuration, where all the occupied time intervals become unoccupied, and vice-versa.</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The origin color and the destination color must be within the same block of the hybridization matrix.</p>
+</div>
+</div>
+<div class="section" id="insert-spin-segment">
+<h2>Insert spin segment<a class="headerlink" href="#insert-spin-segment" title="Permalink to this heading"></a></h2>
+<a class="reference internal image-reference" href="../_images/insert_spin.png"><img alt="../_images/insert_spin.png" class="align-center" src="../_images/insert_spin.png" style="width: 80%;" /></a>
+<p>Randomly choose a color <span class="math notranslate nohighlight">\(i\)</span> (spin up or spin down) and a segment <span class="math notranslate nohighlight">\([\tau, \tau']\)</span> within that color. The other color is denoted <span class="math notranslate nohighlight">\(j\)</span>.
+Choose two random (but ordered) times <span class="math notranslate nohighlight">\(\tau_1\)</span> and <span class="math notranslate nohighlight">\(\tau_1'\)</span> within that segment. Try replacing <span class="math notranslate nohighlight">\([\tau, \tau']\)</span> with <span class="math notranslate nohighlight">\([\tau, \tau_1]\)</span>
+and <span class="math notranslate nohighlight">\([\tau_1, \tau']\)</span> in color <span class="math notranslate nohighlight">\(i\)</span>, inserting <span class="math notranslate nohighlight">\([\tau_1, \tau_1']\)</span> in color <span class="math notranslate nohighlight">\(j\)</span>, and inserting a <span class="math notranslate nohighlight">\(J_{\perp}\)</span> line
+between <span class="math notranslate nohighlight">\(\tau_1\)</span> and <span class="math notranslate nohighlight">\(\tau_1'\)</span>.</p>
+<p>This move is enabled if there is a non-zero <span class="math notranslate nohighlight">\(J_{\perp}(\tau)\)</span>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This and the following “spin moves” (that explore the configurations resulting from the <span class="math notranslate nohighlight">\(J_{\perp}\)</span> expansion)
+are only implemented for the case where the configuration has two colors, spin up and spin down.</p>
+</div>
+</div>
+<div class="section" id="remove-spin-segment">
+<h2>Remove spin segment<a class="headerlink" href="#remove-spin-segment" title="Permalink to this heading"></a></h2>
+<a class="reference internal image-reference" href="../_images/remove_spin.png"><img alt="../_images/remove_spin.png" class="align-center" src="../_images/remove_spin.png" style="width: 80%;" /></a>
+<p>Randomly choose a <span class="math notranslate nohighlight">\(J_{\perp}\)</span> line. If its two endpoints are connected by a segment <span class="math notranslate nohighlight">\([\tau_1, \tau_1']\)</span> in color <span class="math notranslate nohighlight">\(i\)</span>, find the segments
+<span class="math notranslate nohighlight">\([\tau, \tau_1]\)</span> and <span class="math notranslate nohighlight">\([\tau_1, \tau']\)</span> that it connects in color <span class="math notranslate nohighlight">\(j\)</span>. Try removing the <span class="math notranslate nohighlight">\(J_{\perp}\)</span> line and segment
+<span class="math notranslate nohighlight">\([\tau_1, \tau_1']\)</span> in color <span class="math notranslate nohighlight">\(i\)</span>, and replacing <span class="math notranslate nohighlight">\([\tau, \tau_1]\)</span> and <span class="math notranslate nohighlight">\([\tau_1, \tau']\)</span> in color <span class="math notranslate nohighlight">\(j\)</span> with a single
+segment <span class="math notranslate nohighlight">\([\tau, \tau']\)</span>.</p>
+<p>This move is enabled if there is a non-zero <span class="math notranslate nohighlight">\(J_{\perp}(\tau)\)</span>.</p>
+</div>
+<div class="section" id="swap-spin-lines">
+<h2>Swap spin lines<a class="headerlink" href="#swap-spin-lines" title="Permalink to this heading"></a></h2>
+<a class="reference internal image-reference" href="../_images/swap_spin.png"><img alt="../_images/swap_spin.png" class="align-center" src="../_images/swap_spin.png" style="width: 80%;" /></a>
+<p>Randomly choose two <span class="math notranslate nohighlight">\(J_{\perp}\)</span> lines <span class="math notranslate nohighlight">\([\tau_+, \tau_-]\)</span> and <span class="math notranslate nohighlight">\([\tau'_+, \tau'_-]\)</span>. Try replacing them with the
+swapped lines <span class="math notranslate nohighlight">\([\tau'_+, \tau_-]\)</span> and <span class="math notranslate nohighlight">\([\tau_+, \tau'_-]\)</span>.</p>
+<p>This move is enabled if there is a non-zero <span class="math notranslate nohighlight">\(J_{\perp}(\tau)\)</span>.</p>
+</div>
+<div class="section" id="split-spin-segment">
+<h2>Split spin segment<a class="headerlink" href="#split-spin-segment" title="Permalink to this heading"></a></h2>
+<a class="reference internal image-reference" href="../_images/split_spin.png"><img alt="../_images/split_spin.png" class="align-center" src="../_images/split_spin.png" style="width: 80%;" /></a>
+<p>Randomly choose a <span class="math notranslate nohighlight">\(J_{\perp}\)</span> line. Try to remove the <span class="math notranslate nohighlight">\(J_{\perp}\)</span> line, and shift the <span class="math notranslate nohighlight">\(c\)</span> operators at
+its end points in each of the colors by independent random amounts.</p>
+<p>This move is enabled if there is a non-zero <span class="math notranslate nohighlight">\(J_{\perp}(\tau)\)</span> and a non-zero <span class="math notranslate nohighlight">\(\Delta(\tau)\)</span>.</p>
+</div>
+<div class="section" id="regroup-spin-segment">
+<h2>Regroup spin segment<a class="headerlink" href="#regroup-spin-segment" title="Permalink to this heading"></a></h2>
+<a class="reference internal image-reference" href="../_images/regroup_spin.png"><img alt="../_images/regroup_spin.png" class="align-center" src="../_images/regroup_spin.png" style="width: 80%;" /></a>
+<p>Randomly choose a <span class="math notranslate nohighlight">\(c\)</span> operator in color 0 (spin up) and determine the window <span class="math notranslate nohighlight">\([\tau_0, \tau_0']\)</span> in which this <span class="math notranslate nohighlight">\(c\)</span> operator can be moved.
+In color 1 (spin down), find the <span class="math notranslate nohighlight">\(c^{\dagger}\)</span> operators in <span class="math notranslate nohighlight">\([\tau_0, \tau_0']\)</span> and choose one of them at random (denote its time <span class="math notranslate nohighlight">\(\tau_1''\)</span>).
+Randomly choose a <span class="math notranslate nohighlight">\(c\)</span> operator in color 1 (spin down) and determine the window <span class="math notranslate nohighlight">\([\tau_1, \tau_1']\)</span> in which this <span class="math notranslate nohighlight">\(c\)</span> operator can be moved.
+In color 0 (spin up), find the <span class="math notranslate nohighlight">\(c^{\dagger}\)</span> operators in <span class="math notranslate nohighlight">\([\tau_1, \tau_1']\)</span> and choose one of them at random (denote its time <span class="math notranslate nohighlight">\(\tau_0''\)</span>).
+Try to shift the <span class="math notranslate nohighlight">\(c\)</span> operator in color 0 to <span class="math notranslate nohighlight">\(\tau_1''\)</span>, the <span class="math notranslate nohighlight">\(c\)</span> operator in color 1 to <span class="math notranslate nohighlight">\(\tau_0''\)</span>, and create a <span class="math notranslate nohighlight">\(J_{\perp}\)</span> line
+between <span class="math notranslate nohighlight">\(\tau_0''\)</span> and <span class="math notranslate nohighlight">\(\tau_1''\)</span>.</p>
+<p>This move is enabled if there is a non-zero <span class="math notranslate nohighlight">\(J_{\perp}(\tau)\)</span> and a non-zero <span class="math notranslate nohighlight">\(\Delta(\tau)\)</span>.</p>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="step_by_step.html" class="btn btn-neutral float-left" title="Step-by-step guide" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="measurements.html" class="btn btn-neutral float-right" title="Measurements" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024 The Simons Foundation, authors: N. Kavokine, H. Lu, N. Wentzell, O. Parcollet.</p>
+  </div>
+
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
