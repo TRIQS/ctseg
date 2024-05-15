@@ -158,6 +158,28 @@ work_data_t::work_data_t(params_t const &p, inputs_t const &inputs, mpi::communi
   }
 } // work_data constructor
 
+long work_data_t::find_block_number(int color) const {
+  long bl            = 0;
+  long colors_so_far = 0;
+  for (auto const &[s, l] : gf_struct) {
+    colors_so_far += l;
+    if (color < colors_so_far) { return bl; }
+    bl++;
+  }
+  ALWAYS_EXPECTS((colors_so_far == n_color), "Error in color-to-block conversion.");
+  return 0;
+}
+
+long work_data_t::find_index_in_block(int color) const {
+  long colors_so_far = 0;
+  for (auto const &[s, l] : gf_struct) {
+    colors_so_far += l;
+    if (color < colors_so_far) { return color - (colors_so_far - l); }
+  }
+  ALWAYS_EXPECTS((colors_so_far == n_color), "Error in color-to-block conversion.");
+  return 0;
+}
+
 // Additional sign of the trace (computed from dets).
 double trace_sign(work_data_t const &wdata) {
   double sign      = 1.0;

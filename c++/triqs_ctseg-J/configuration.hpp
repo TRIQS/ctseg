@@ -1,7 +1,6 @@
 #pragma once
 #include <vector>
 #include "tau_t.hpp"
-#include "logs.hpp"
 #include "dets.hpp"
 #include "work_data.hpp"
 

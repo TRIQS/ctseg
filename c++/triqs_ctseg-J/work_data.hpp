@@ -43,28 +43,10 @@ struct work_data_t {
   int block_to_color(int block, int idx) const { return gf_block_size_partial_sum[block] + idx; }
 
   // Find block of color
-  long find_block_number(int color) const {
-    long bl            = 0;
-    long colors_so_far = 0;
-    for (auto const &[s, l] : gf_struct) {
-      colors_so_far += l;
-      if (color < colors_so_far) { return bl; }
-      bl++;
-    }
-    ALWAYS_EXPECTS((colors_so_far == n_color), "Error in color-to-block conversion.");
-    return 0;
-  }
+  long find_block_number(int color) const;
 
   // Find index of color in block
-  long find_index_in_block(int color) const {
-    long colors_so_far = 0;
-    for (auto const &[s, l] : gf_struct) {
-      colors_so_far += l;
-      if (color < colors_so_far) { return color - (colors_so_far - l); }
-    }
-    ALWAYS_EXPECTS((colors_so_far == n_color), "Error in color-to-block conversion.");
-    return 0;
-  }
+  long find_index_in_block(int color) const;
 };
 
 // Additional sign of the trace (computed from dets).

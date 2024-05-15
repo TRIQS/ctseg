@@ -1,5 +1,4 @@
 #include "configuration.hpp"
-#include "logs.hpp"
 
 // ===================  Functions to manipulate segments ===================
 

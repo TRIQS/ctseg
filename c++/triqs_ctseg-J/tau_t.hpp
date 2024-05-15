@@ -5,7 +5,7 @@
 #include <cmath>
 #include <assert.h>
 
-#include "logs.hpp"
+#include <fmt/ostream.h>
 
 /**
   * Discretized Imaginary Time type tau_t.
@@ -88,6 +88,7 @@ class tau_t {
     return out << double(p) << " [tau_t : n = " << p.n << "]";
   }
 };
+
 template <> struct fmt::formatter<tau_t> : ostream_formatter {};
 
 // ----- arithmetic operations --------
