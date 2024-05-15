@@ -19,7 +19,14 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
+
+    - uses: actions/cache/restore@v4
+      with:
+        path: ${{ env.CCACHE_DIR }}
+        key: ccache-${{ matrix.os }}-${{ matrix.cc }}-${{ github.run_id }}
+        restore-keys:
+          ccache-${{ matrix.os }}-${{ matrix.cc }}-
 
     - name: Install ubuntu dependencies
       if: matrix.os == 'ubuntu-22.04'
@@ -28,6 +35,7 @@ jobs:
         sudo apt-get install lsb-release wget software-properties-common &&
         wget -O /tmp/llvm.sh https://apt.llvm.org/llvm.sh && sudo chmod +x /tmp/llvm.sh && sudo /tmp/llvm.sh 15 &&
         sudo apt-get install
+        ccache
         clang-15
         g++-12
         gfortran
@@ -69,7 +77,8 @@ jobs:
 
     - name: add clang cxxflags
       if: ${{ contains(matrix.cxx, 'clang') }}
-      run:
+      run: |
+        echo "PATH=/usr/local/opt/llvm/bin:$PATH" >> $GITHUB_ENV
         echo "CXXFLAGS=-stdlib=libc++" >> $GITHUB_ENV
 
     - name: Build & Install TRIQS
@@ -96,6 +105,7 @@ jobs:
     - name: Test ctseg-J
       env:
         DYLD_FALLBACK_LIBRARY_PATH: /usr/local/opt/llvm/lib
+        OPENBLAS_NUM_THREADS: "1"
       run: |
         source $HOME/install/share/triqs/triqsvars.sh
         cd build
