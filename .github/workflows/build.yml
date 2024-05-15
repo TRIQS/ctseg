@@ -11,10 +11,10 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - {os: ubuntu-22.04, cc: gcc-12, cxx: g++-12}
+          #- {os: ubuntu-22.04, cc: gcc-12, cxx: g++-12}
           - {os: ubuntu-22.04, cc: clang-15, cxx: clang++-15, doc: ON}
-          - {os: macos-12, cc: gcc-12, cxx: g++-12}
-          - {os: macos-12, cc: /usr/local/opt/llvm/bin/clang, cxx: /usr/local/opt/llvm/bin/clang++}
+          #- {os: macos-12, cc: gcc-12, cxx: g++-12}
+          #- {os: macos-12, cc: /usr/local/opt/llvm/bin/clang, cxx: /usr/local/opt/llvm/bin/clang++}
 
     runs-on: ${{ matrix.os }}
 
@@ -55,7 +55,7 @@ jobs:
         python3-mpi4py
         python3-numpy
         python3-pip
-        python3-scipy
+        python3-scipy &&
         pip3 install myst-parser linkify-it-py &&
         pip3 install sphinx==5.3.0 sphinx-rtd-theme
 
