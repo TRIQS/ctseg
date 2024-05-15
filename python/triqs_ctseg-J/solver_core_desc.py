@@ -1,5 +1,5 @@
 # Generated automatically using the command :
-# c++2py ../../c++/triqs_ctseg/solver_core.hpp -p --members_read_only -a triqs_ctseg -m solver_core -o solver_core --only="results_t solver_core" --moduledoc="The python module for triqs_ctseg" -C triqs -C nda_py --includes=../../c++ --includes=/usr/local/include/ --cxxflags="-std=c++20" --target_file_only
+# c++2py ../../c++/triqs_ctseg-J/solver_core.hpp -p --members_read_only -a triqs_ctseg -m solver_core -o solver_core --only="results_t solver_core" --moduledoc="The python module for triqs_ctseg" -C triqs -C nda_py --includes=../../c++ --includes=/usr/local/include/ --cxxflags="-std=c++20" --target_file_only
 from cpp2py.wrap_generator import *
 
 # The module
@@ -9,7 +9,7 @@ module = module_(full_name = "solver_core", doc = r"The python module for triqs_
 module.add_imports(*['triqs.gf', 'triqs.gf.meshes', 'triqs.operators', 'triqs.stat.histograms', 'h5._h5py'])
 
 # Add here all includes
-module.add_include("triqs_ctseg/solver_core.hpp")
+module.add_include("triqs_ctseg-J/solver_core.hpp")
 
 # Add here anything to add in the C++ code at the start, e.g. namespace using
 module.add_preamble("""
@@ -37,27 +37,27 @@ c = class_(
 c.add_member(c_name = "G_tau",
              c_type = "block_gf<imtime>",
              read_only= True,
-             doc = r"""""")
+             doc = r"""Single-particle Green's function :math:`G(\tau)`.""")
 
 c.add_member(c_name = "F_tau",
              c_type = "std::optional<block_gf<imtime>>",
              read_only= True,
-             doc = r"""Single-particle Green's function :math:`F(\tau)` in imaginary time.""")
+             doc = r"""Self-energy improved estimator :math:`F(\tau)`.""")
 
 c.add_member(c_name = "nn_tau",
              c_type = "std::optional<gf<imtime>>",
              read_only= True,
-             doc = r"""<n_a(tau) n_b(0)>""")
+             doc = r"""Density-density time correlation function :math:`\langle n_a(\tau) n_b(0) \rangle`.""")
 
 c.add_member(c_name = "sperp_tau",
              c_type = "std::optional<gf<imtime>>",
              read_only= True,
-             doc = r"""<s_x(tau) s_x(0)>""")
+             doc = r"""Perpendicular spin-spin correlation function :math:`\langle s_x(\tau) s_x(0) \rangle`.""")
 
 c.add_member(c_name = "nn_static",
              c_type = "std::optional<nda::matrix<double>>",
              read_only= True,
-             doc = r"""<n_a n_b>""")
+             doc = r"""Density-density static correlation function :math:`\langle n_a(0) n_b(0) \rangle`.""")
 
 c.add_member(c_name = "densities",
              c_type = "nda::array<double, 1>",
@@ -67,12 +67,12 @@ c.add_member(c_name = "densities",
 c.add_member(c_name = "perturbation_order_histo_Delta",
              c_type = "std::optional<triqs::stat::histogram>",
              read_only= True,
-             doc = r"""Perturbation order histogram""")
+             doc = r"""Delta perturbation order histogram""")
 
 c.add_member(c_name = "perturbation_order_histo_Jperp",
              c_type = "std::optional<triqs::stat::histogram>",
              read_only= True,
-             doc = r"""Perturbation order histogram""")
+             doc = r"""J_perp perturbation order histogram""")
 
 c.add_member(c_name = "state_hist",
              c_type = "std::optional<nda::vector<double>>",
@@ -94,12 +94,22 @@ c = class_(
         hdf5 = True,
 )
 
+c.add_member(c_name = "constr_params",
+             c_type = "constr_params_t",
+             read_only= True,
+             doc = r"""Solver construction parameters""")
+
+c.add_member(c_name = "last_solve_params",
+             c_type = "std::optional<solve_params_t>",
+             read_only= True,
+             doc = r"""Solver solve parameters (from last call)""")
+
 c.add_member(c_name = "results",
              c_type = "results_t",
              read_only= True,
-             doc = r"""""")
+             doc = r"""The set of results""")
 
-c.add_constructor("""(**constr_params_t)""", doc = r"""
+c.add_constructor("""(**constr_params_t)""", doc = r"""Initialize the solver
 
 
 
@@ -117,14 +127,16 @@ c.add_constructor("""(**constr_params_t)""", doc = r"""
 """)
 
 c.add_method("""void solve (**solve_params_t)""",
-             doc = r"""
+             doc = r"""Solve the impurity problem
 
 
 
 +---------------------------------------+--------------------------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
 | Parameter Name                        | Type                                 | Default                                 | Documentation                                                                                                     |
 +=======================================+======================================+=========================================+===================================================================================================================+
-| h_int                                 | triqs::operators::many_body_operator | --                                      | local Hamiltonian                                                                                                 |
+| h_int                                 | triqs::operators::many_body_operator | --                                      | Local Hamiltonian                                                                                                 |
++---------------------------------------+--------------------------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
+| hartree_shift                         | nda::vector<double>                  | nda::vector<double>{}                   | Chemical potential (high frequency limit of :math:`G_0^{-1}(i\omega) - i \omega`)                                 |
 +---------------------------------------+--------------------------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
 | n_cycles                              | int                                  | --                                      | Number of QMC cycles                                                                                              |
 +---------------------------------------+--------------------------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
@@ -178,8 +190,6 @@ c.add_method("""void solve (**solve_params_t)""",
 +---------------------------------------+--------------------------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
 | measure_statehist                     | bool                                 | false                                   | Whether to measure state histograms (see [[measure_statehist]])                                                   |
 +---------------------------------------+--------------------------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
-| hartree_shift                         | nda::vector<double>                  | nda::vector<double>{}                   | Hartree shift of the chem pot                                                                                     |
-+---------------------------------------+--------------------------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
 | det_init_size                         | int                                  | 100                                     | The maximum size of the determinant matrix before a resize                                                        |
 +---------------------------------------+--------------------------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
 | det_n_operations_before_check         | int                                  | 100                                     | Max number of ops before the test of deviation of the det, M^-1 is performed.                                     |
@@ -190,23 +200,21 @@ c.add_method("""void solve (**solve_params_t)""",
 +---------------------------------------+--------------------------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
 | det_singular_threshold                | double                               | -1                                      | Bound for the determinant matrix being singular, abs(det) > singular_threshold. If <0, it is !isnormal(abs(det))  |
 +---------------------------------------+--------------------------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
+| histogram_max_order                   | int                                  | 1000                                    | Maximum order for the perturbation order histograms                                                               |
++---------------------------------------+--------------------------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
 """)
-
-c.add_method("""std::string hdf5_format ()""",
-             is_static = True,
-             doc = r"""""")
 
 c.add_property(name = "Delta_tau",
                getter = cfunction("block_gf_view<imtime> Delta_tau ()"),
-               doc = r"""Hybridization function $\Delta^\sigma_{ab}(\tau)$""")
+               doc = r"""Hybridization function :math:`\Delta(\tau)`""")
 
 c.add_property(name = "Jperp_tau",
                getter = cfunction("gf_view<imtime> Jperp_tau ()"),
-               doc = r"""Dynamical spin-spin interactions $\mathcal{J}_\perp(\tau)$""")
+               doc = r"""Dynamical spin-spin interaction :math:`\mathcal{J}_\perp(\tau)`""")
 
 c.add_property(name = "D0_tau",
                getter = cfunction("gf_view<imtime> D0_tau ()"),
-               doc = r"""Dynamical density-density interactions $D_0(\tau)$""")
+               doc = r"""Dynamical density-density interaction :math:`D_0(\tau)`""")
 
 module.add_class(c)
 
@@ -219,7 +227,12 @@ c = converter_(
 c.add_member(c_name = "h_int",
              c_type = "triqs::operators::many_body_operator",
              initializer = """  """,
-             doc = r"""local Hamiltonian""")
+             doc = r"""Local Hamiltonian""")
+
+c.add_member(c_name = "hartree_shift",
+             c_type = "nda::vector<double>",
+             initializer = """ nda::vector<double>{} """,
+             doc = r"""Chemical potential (high frequency limit of :math:`G_0^{-1}(i\omega) - i \omega`)""")
 
 c.add_member(c_name = "n_cycles",
              c_type = "int",
@@ -351,11 +364,6 @@ c.add_member(c_name = "measure_statehist",
              initializer = """ false """,
              doc = r"""Whether to measure state histograms (see [[measure_statehist]])""")
 
-c.add_member(c_name = "hartree_shift",
-             c_type = "nda::vector<double>",
-             initializer = """ nda::vector<double>{} """,
-             doc = r"""Hartree shift of the chem pot""")
-
 c.add_member(c_name = "det_init_size",
              c_type = "int",
              initializer = """ 100 """,
@@ -380,6 +388,11 @@ c.add_member(c_name = "det_singular_threshold",
              c_type = "double",
              initializer = """ -1 """,
              doc = r"""Bound for the determinant matrix being singular, abs(det) > singular_threshold. If <0, it is !isnormal(abs(det))""")
+
+c.add_member(c_name = "histogram_max_order",
+             c_type = "int",
+             initializer = """ 1000 """,
+             doc = r"""Maximum order for the perturbation order histograms""")
 
 module.add_converter(c)
 
