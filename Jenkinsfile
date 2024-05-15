@@ -1,4 +1,4 @@
-def projectName = "ctseg-J" /* set to app/repo name */
+def projectName = "ctseg" /* set to app/repo name */
 
 def dockerName = projectName.toLowerCase();
 /* which platform to build documentation on */
