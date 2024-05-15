@@ -1,21 +1,21 @@
 easyblock = 'CMakeMake'
 
 name = 'TRIQS-ctseg'
-version = '3.2.0'
+version = '@PROJECT_VERSION@'
 
-homepage = 'https://triqs.github.io/ctseg_J/'
+homepage = 'https://triqs.github.io/ctseg-J/'
 description = """
  PROVIDE HERE A DESCRIPTION OF YOUR APPLICATION
 """
 
-docurls = ['https://triqs.github.io/ctseg_J/%(version_major_minor)s.x/']
+docurls = ['https://triqs.github.io/ctseg-J/%(version_major_minor)s.x/']
 software_license = 'LicenseGPLv3'
 
 toolchain = {'name': 'foss', 'version': '2021b'}
 toolchainopts = {'pic': True, 'usempi': True}
 
-source_urls = ['https://github.com/TRIQS/ctseg_J/releases/download/%(version)s/']
-sources = ['ctseg_J-%(version)s.tar.gz']
+source_urls = ['https://github.com/TRIQS/ctseg-J/releases/download/%(version)s/']
+sources = ['ctseg-J-%(version)s.tar.gz']
 checksums = ['PUT HERE THE SHA256 OF THE RELEASE TARBALL']
 
 dependencies = [
