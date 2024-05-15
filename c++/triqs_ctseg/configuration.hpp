@@ -34,7 +34,7 @@ struct segment_t {
   bool J_c = false, J_cdag = false; // Whether c (resp cdag) is part of a S operator
 
   /// Length of segment (accounts for cyclicity : length from c to cdag possibly across 0/beta)
-  tau_t length() const { return tau_c - tau_cdag; };
+  [[nodiscard]] tau_t length() const { return tau_c - tau_cdag; };
 
   /// A segment [beta, 0] represent a full line
   static segment_t full_line() { return {tau_t::beta(), tau_t::zero()}; }
@@ -74,7 +74,7 @@ struct configuration_t {
   configuration_t(int n_color) : seglists(n_color) {}
 
   // Accessor number of colors
-  int n_color() const { return seglists.size(); }
+  [[nodiscard]] int n_color() const { return seglists.size(); }
 };
 
 // ===================  Functions to manipulate segments ===================

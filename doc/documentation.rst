@@ -31,5 +31,5 @@ Reference manual
    :template: autosummary_module_template.rst
    :recursive:
 
-   triqs_ctseg-J.solver
+   triqs_ctseg.solver
 

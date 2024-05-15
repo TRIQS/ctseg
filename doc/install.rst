@@ -19,13 +19,13 @@ Prerequisites
 Installation steps
 ------------------
 
-#. Download the source code of the latest stable version by cloning the ``TRIQS/ctseg-J`` repository from GitHub::
+#. Download the source code of the latest stable version by cloning the ``TRIQS/ctseg`` repository from GitHub::
 
-     $ git clone https://github.com/TRIQS/ctseg-J ctseg.src
+     $ git clone https://github.com/TRIQS/ctseg ctseg.src
 
 #. Create and move to a new directory where you will compile the code::
 
-     $ mkdir ctseg-J.build && cd ctseg-J.build
+     $ mkdir ctseg.build && cd ctseg.build
 
 #. Ensure that your shell contains the TRIQS environment variables by sourcing the ``triqsvars.sh`` file from your TRIQS installation::
 
@@ -33,7 +33,7 @@ Installation steps
 
 #. In the build directory call cmake, including any additional custom CMake options, see below::
 
-     $ cmake ../ctseg-J.src
+     $ cmake ../ctseg.src
 
 #. Compile the code, run the tests and install the application::
 
@@ -49,7 +49,7 @@ see :ref:`TRIQS website <triqslibs:versions>`.
 In particular the Major and Minor Version numbers have to be the same.
 To use a particular version, go into the directory with the sources, and look at all available versions::
 
-     $ cd ctseg-J.src && git tag
+     $ cd ctseg.src && git tag
 
 Checkout the version of the code that you want::
 
@@ -62,12 +62,12 @@ Custom CMake options
 
 The compilation of ``CTSEG-J`` can be configured using CMake-options::
 
-    cmake ../ctseg-J.src -DOPTION1=value1 -DOPTION2=value2 ...
+    cmake ../ctseg.src -DOPTION1=value1 -DOPTION2=value2 ...
 
 +-----------------------------------------------------------------+-----------------------------------------------+
 | Options                                                         | Syntax                                        |
 +=================================================================+===============================================+
-| Specify an installation path other than path_to_triqs           | -DCMAKE_INSTALL_PREFIX=path_to_ctseg-J          |
+| Specify an installation path other than path_to_triqs           | -DCMAKE_INSTALL_PREFIX=path_to_ctseg          |
 +-----------------------------------------------------------------+-----------------------------------------------+
 | Build in Debugging Mode                                         | -DCMAKE_BUILD_TYPE=Debug                      |
 +-----------------------------------------------------------------+-----------------------------------------------+

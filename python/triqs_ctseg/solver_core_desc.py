@@ -1,5 +1,5 @@
 # Generated automatically using the command :
-# c++2py ../../c++/triqs_ctseg-J/solver_core.hpp -p --members_read_only -a triqs_ctseg -m solver_core -o solver_core --only="results_t solver_core" --moduledoc="The python module for triqs_ctseg" -C triqs -C nda_py --includes=../../c++ --includes=/usr/local/include/ --cxxflags="-std=c++20" --target_file_only
+# c++2py ../../c++/triqs_ctseg/solver_core.hpp -p --members_read_only -a triqs_ctseg -m solver_core -o solver_core --only="results_t solver_core" --moduledoc="The python module for triqs_ctseg" -C triqs -C nda_py --includes=../../c++ --includes=/usr/local/include/ --cxxflags="-std=c++20" --target_file_only
 from cpp2py.wrap_generator import *
 
 # The module
@@ -9,7 +9,7 @@ module = module_(full_name = "solver_core", doc = r"The python module for triqs_
 module.add_imports(*['triqs.gf', 'triqs.gf.meshes', 'triqs.operators', 'triqs.stat.histograms', 'h5._h5py'])
 
 # Add here all includes
-module.add_include("triqs_ctseg-J/solver_core.hpp")
+module.add_include("triqs_ctseg/solver_core.hpp")
 
 # Add here anything to add in the C++ code at the start, e.g. namespace using
 module.add_preamble("""

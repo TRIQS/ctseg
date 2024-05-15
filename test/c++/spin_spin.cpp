@@ -1,6 +1,6 @@
 #include <cmath>
 #include <triqs/test_tools/gfs.hpp>
-#include <triqs_ctseg-J/solver_core.hpp>
+#include <triqs_ctseg/solver_core.hpp>
 
 using triqs::operators::n;
 

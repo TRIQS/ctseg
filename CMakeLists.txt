@@ -6,7 +6,7 @@ endif()
 
 # ############
 # Define Project
-project(triqs_ctseg-J VERSION 3.3.0 LANGUAGES C CXX)
+project(triqs_ctseg VERSION 3.3.0 LANGUAGES C CXX)
 get_directory_property(IS_SUBPROJECT PARENT_DIRECTORY)
 
 # ############
@@ -148,7 +148,7 @@ if(BUILD_DEBIAN_PACKAGE AND NOT IS_SUBPROJECT)
   set(CPACK_PACKAGE_NAME ${PROJECT_NAME})
   set(CPACK_GENERATOR "DEB")
   set(CPACK_PACKAGE_VERSION ${PROJECT_VERSION})
-  set(CPACK_PACKAGE_CONTACT "https://github.com/TRIQS/ctseg-J")
+  set(CPACK_PACKAGE_CONTACT "https://github.com/TRIQS/ctseg")
   execute_process(COMMAND dpkg --print-architecture OUTPUT_VARIABLE CMAKE_DEBIAN_PACKAGE_ARCHITECTURE OUTPUT_STRIP_TRAILING_WHITESPACE)
   set(CPACK_DEBIAN_PACKAGE_DEPENDS "triqs (>= 3.3)")
   set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)

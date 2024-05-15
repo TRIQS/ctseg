@@ -6,7 +6,7 @@ from triqs.utility import mpi
 from triqs.operators import *
 from h5 import *
 import numpy as np
-from triqs_ctseg-J import SolverCore as Solver
+from triqs_ctseg import SolverCore as Solver
 import h5
 from triqs.utility.h5diff import h5diff
 

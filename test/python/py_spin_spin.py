@@ -6,7 +6,7 @@ from triqs.gf.descriptors import Function
 from triqs.operators import *
 import h5
 from triqs.utility.h5diff import h5diff
-from triqs_ctseg-J import SolverCore as Solver
+from triqs_ctseg import SolverCore as Solver
 
 # Parameters
 beta = 10

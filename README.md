@@ -1,4 +1,4 @@
-[![build](https://github.com/TRIQS/ctseg-J/workflows/build/badge.svg)](https://github.com/TRIQS/ctseg-J/actions?query=workflow%3Abuild)
+[![build](https://github.com/TRIQS/ctseg/workflows/build/badge.svg)](https://github.com/TRIQS/ctseg/actions?query=workflow%3Abuild)
 
 ## TRIQS segment picture solver with spin-spin interactions (CTSEG-J)
 
@@ -6,7 +6,7 @@ Copyright (C) 2024, N. Kavokine, H. Lu, N. Wentzell and O. Parcollet.
 
 ### Documentation
 
-For documentation and installation instructions see [triqs.github.io/ctseg-J](https://triqs.github.io/ctseg-J).
+For documentation and installation instructions see [triqs.github.io/ctseg](https://triqs.github.io/ctseg).
 
 ### License
 

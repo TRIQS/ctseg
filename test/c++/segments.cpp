@@ -2,8 +2,8 @@
 
 #include <cmath>
 #include <triqs/test_tools/arrays.hpp>
-#include <triqs_ctseg-J/tau_t.hpp>
-#include <triqs_ctseg-J/configuration.hpp>
+#include <triqs_ctseg/tau_t.hpp>
+#include <triqs_ctseg/configuration.hpp>
 
 using vs_t = std::vector<segment_t>;
 

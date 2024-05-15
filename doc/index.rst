@@ -28,7 +28,7 @@ The imaginary time action solved by CTSEG-J is of the form
       .. image:: _static/logo_github.png
          :width: 65%
          :align: center
-         :target: https://github.com/triqs/ctseg-J
+         :target: https://github.com/triqs/ctseg
 
 Here :math:`\beta` is the inverse temperature, :math:`a` denote orbital indices, :math:`\sigma` spin indices (:math:`\sigma = \uparrow, \downarrow`),
 :math:`n_a \equiv \sum_{\sigma} n_{a\sigma}`, :math:`s_a^{\xi} \equiv \frac{1}{2} \sum_{\sigma \sigma'} \overline{c}_{a\sigma}
