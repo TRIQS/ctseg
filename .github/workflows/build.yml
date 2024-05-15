@@ -11,10 +11,10 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          #- {os: ubuntu-22.04, cc: gcc-12, cxx: g++-12}
+          - {os: ubuntu-22.04, cc: gcc-12, cxx: g++-12}
           - {os: ubuntu-22.04, cc: clang-15, cxx: clang++-15, doc: ON}
-          #- {os: macos-12, cc: gcc-12, cxx: g++-12}
-          #- {os: macos-12, cc: /usr/local/opt/llvm/bin/clang, cxx: /usr/local/opt/llvm/bin/clang++}
+          - {os: macos-12, cc: gcc-12, cxx: g++-12}
+          - {os: macos-12, cc: /usr/local/opt/llvm/bin/clang, cxx: /usr/local/opt/llvm/bin/clang++}
 
     runs-on: ${{ matrix.os }}
 
@@ -90,7 +90,7 @@ jobs:
         LIBRARY_PATH: /usr/local/opt/llvm/lib
       run: |
         source $HOME/install/share/triqs/triqsvars.sh
-        mkdir build && cd build && cmake ..
+        mkdir build && cd build && cmake .. -DBuild_Documentation=${{ matrix.doc }}
         make -j2 || make -j1 VERBOSE=1
 
     - name: Test ctseg
