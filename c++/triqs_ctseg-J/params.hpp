@@ -131,8 +131,8 @@ struct solve_params_t {
   /// Bound for the determinant matrix being singular, abs(det) > singular_threshold. If <0, it is !isnormal(abs(det))
   double det_singular_threshold = -1;
 
-  /// Maximum order for the perturbation order histograms 
-  int histogram_max_order = 1000; 
+  /// Maximum order for the perturbation order histograms
+  int histogram_max_order = 1000;
 };
 
 /// A struct combining both constr_params_t and solve_params_t

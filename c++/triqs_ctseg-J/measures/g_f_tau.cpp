@@ -40,7 +40,7 @@ namespace measures {
           auto val  = (y.first >= x.first ? s : -s) * Minv;
           auto dtau = double(y.first - x.first);
           g[closest_mesh_pt(dtau)](y.second, x.second) += val;
-          if (measure_ft) f[closest_mesh_pt(dtau)](y.second, x.second) += val * f_fact; 
+          if (measure_ft) f[closest_mesh_pt(dtau)](y.second, x.second) += val * f_fact;
         }
       }
     }

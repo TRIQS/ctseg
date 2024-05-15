@@ -62,7 +62,6 @@ void h5_write(h5::group h5group, std::string subgroup_name, solve_params_t const
   h5_write(grp, "det_precision_error", c.det_precision_error);
   h5_write(grp, "det_singular_threshold", c.det_singular_threshold);
   h5_write(grp, "histogram_max_order", c.histogram_max_order);
-  
 }
 
 //------------------------------------
@@ -105,6 +104,4 @@ void h5_read(h5::group h5group, std::string subgroup_name, solve_params_t &c) {
   h5_read(grp, "det_precision_error", c.det_precision_error);
   h5_read(grp, "det_singular_threshold", c.det_singular_threshold);
   h5_read(grp, "histogram_max_order", c.histogram_max_order);
-
 }
-

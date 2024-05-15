@@ -11,7 +11,7 @@ static constexpr bool ctseg_debug = false;
 #ifdef PRINT_LOGS
 static constexpr bool print_logs = true;
 #else
-static constexpr bool print_logs  = false;
+static constexpr bool print_logs = false;
 #endif
 
 #include <fmt/format.h>

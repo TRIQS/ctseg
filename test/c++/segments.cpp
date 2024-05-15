@@ -19,19 +19,19 @@ segment_t S(auto x, auto y) { return {make_tau(x), make_tau(y)}; }
 
 TEST(segment, overlap) {
   tau_t::set_beta(beta);
-  EXPECT_NEAR(overlap(S(3,2), S(2.5, 1.5)), 0.5, precision);
+  EXPECT_NEAR(overlap(S(3, 2), S(2.5, 1.5)), 0.5, precision);
   // noncyclic, cyclic
-  EXPECT_NEAR(overlap(S(3,2), S(2.5, 10)), 0.5, precision);
+  EXPECT_NEAR(overlap(S(3, 2), S(2.5, 10)), 0.5, precision);
   // cyclic, noncyclic
-  EXPECT_NEAR(overlap(S(2.5, 10), S(3,2)), 0.5, precision);
+  EXPECT_NEAR(overlap(S(2.5, 10), S(3, 2)), 0.5, precision);
 }
 
 // ------------------------------
 
 TEST(segment, flip) {
   tau_t::set_beta(beta);
-  auto v    = vs_t{S(4, 3), S(2, 1)};
-  auto vf    = vs_t{S(3 ,2), S(1, 4)};
+  auto v  = vs_t{S(4, 3), S(2, 1)};
+  auto vf = vs_t{S(3, 2), S(1, 4)};
   //std::cout  << flip(v) << std::endl;
   //std::cout  << vf << std::endl;
   EXPECT_EQ(flip(v), vf);
@@ -59,7 +59,7 @@ TEST(segment, lower_bound) {
 TEST(segment, is_insertable) {
   tau_t::set_beta(beta);
 
-  auto v    = vs_t{S(3, 2.5), S(2, 1)};
+  auto v = vs_t{S(3, 2.5), S(2, 1)};
 
   EXPECT_TRUE(is_insertable_into(S(2.4, 2.3), v));
   EXPECT_FALSE(is_insertable_into(S(2.1, 2.3), v));
@@ -67,8 +67,7 @@ TEST(segment, is_insertable) {
   EXPECT_FALSE(is_insertable_into(S(2.1, 2), v));
 
   EXPECT_TRUE(is_insertable_into(S(0.5, 5), v));
-  
 }
 
-// TEST OVERLAP 
-// 
+// TEST OVERLAP
+//

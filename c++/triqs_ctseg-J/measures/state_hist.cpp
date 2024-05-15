@@ -6,8 +6,8 @@ namespace measures {
   state_hist::state_hist(params_t const &p, work_data_t const &wdata, configuration_t const &config, results_t &results)
      : wdata{wdata}, config{config}, results{results} {
 
-    beta    = p.beta;
-    H       = nda::zeros<double>(ipow(2, config.n_color()));
+    beta = p.beta;
+    H    = nda::zeros<double>(ipow(2, config.n_color()));
   }
 
   // -------------------------------------
@@ -26,19 +26,19 @@ namespace measures {
     *
     * - the length of the histogram is 2^n_colors
     */
-    
+
     Z += s;
 
-    double tau_prev = beta; // time of prevous operator; start with beta
+    double tau_prev         = beta; // time of prevous operator; start with beta
     nda::vector<bool> state = nda::zeros<bool>(config.n_color());
     for (auto const &op : colored_ordered_ops(config.seglists)) {
-        int state_idx = 0;
-        for (auto c : range(config.n_color())) 
-            if (state(c)) state_idx += ipow(2, c); // get the index of the impurity state
-        H(state_idx) += (tau_prev - op.tau);
-        tau_prev = (double)op.tau;
-        ALWAYS_EXPECTS((state(op.color) == op.is_cdag), "Operator error at color {}", op.color);
-        state(op.color) = !op.is_cdag;
+      int state_idx = 0;
+      for (auto c : range(config.n_color()))
+        if (state(c)) state_idx += ipow(2, c); // get the index of the impurity state
+      H(state_idx) += (tau_prev - op.tau);
+      tau_prev = (double)op.tau;
+      ALWAYS_EXPECTS((state(op.color) == op.is_cdag), "Operator error at color {}", op.color);
+      state(op.color) = !op.is_cdag;
     }
 
     // get edge state contribution; tau_prev has time of last operator

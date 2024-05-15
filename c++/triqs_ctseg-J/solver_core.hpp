@@ -25,14 +25,14 @@ class solver_core {
   /// Solver solve parameters (from last call)
   std::optional<solve_params_t> last_solve_params;
 
-  /// The set of results 
+  /// The set of results
   // Will be passed to measures and initialized by them.
   results_t results;
 
   /// Initialize the solver
   CPP2PY_ARG_AS_DICT solver_core(constr_params_t const &p);
 
-  /// Solve the impurity problem 
+  /// Solve the impurity problem
   CPP2PY_ARG_AS_DICT void solve(solve_params_t const &p);
 
   // Green's function views for Python interface

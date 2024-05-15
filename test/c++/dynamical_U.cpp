@@ -57,7 +57,7 @@ TEST(CTSEGJ, Dynamical_U) {
   auto D0w  = gf<imfreq>({beta, Boson, n_iw}, {1, 1});
   auto D0t  = gf<imtime>({beta, Boson, param_constructor.n_tau}, {1, 1});
   D0w(om_) << 2 * l * l * w0 / (om_ * om_ - w0 * w0);
-  D0t()                                 = fourier(D0w);
+  D0t()                                    = fourier(D0w);
   Solver.D0_tau().data()(range::all, 0, 0) = D0t.data()(range::all, 0, 0);
   Solver.D0_tau().data()(range::all, 0, 1) = D0t.data()(range::all, 0, 0);
   Solver.D0_tau().data()(range::all, 1, 0) = D0t.data()(range::all, 0, 0);

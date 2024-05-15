@@ -7,8 +7,8 @@ namespace measures {
                                                      configuration_t const &config, results_t &results)
      : wdata{wdata}, config{config}, results{results} {
 
-    histo_delta = triqs::stat::histogram{0, p.histogram_max_order}; 
-    histo_Jperp = triqs::stat::histogram{0, p.histogram_max_order}; 
+    histo_delta = triqs::stat::histogram{0, p.histogram_max_order};
+    histo_Jperp = triqs::stat::histogram{0, p.histogram_max_order};
   }
 
   // -------------------------------------

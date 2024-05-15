@@ -1,6 +1,6 @@
 #pragma once
 
-inline long modulo(long i, long N) { return (i + N)%N;}
+inline long modulo(long i, long N) { return (i + N) % N; }
 
 // Same as std::lower_bound, but i-th element of vector is returned by f[i]
 // f is called on 0:N strictly
@@ -28,6 +28,4 @@ long det_lower_bound_y(auto const &d, auto const &y) {
 }
 
 // Integer power
-constexpr unsigned int ipow(unsigned int n, unsigned int m) {
-  return m == 0 ? 1 : m == 1 ? n : n * ipow(n, m - 1);
-}
+constexpr unsigned int ipow(unsigned int n, unsigned int m) { return m == 0 ? 1 : m == 1 ? n : n * ipow(n, m - 1); }

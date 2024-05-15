@@ -11,17 +11,17 @@
 // ================= Data structures =================
 
 // The configuration is made of n_color ordered lists of segments
-// and (if needed) a list of J_perp lines. 
+// and (if needed) a list of J_perp lines.
 
 // --------------- Segment -------------------
 //
 // A segment represents a couple (c, cdag), at given tau_t times in [0, beta]
-// Segment is cyclic if tau_c < tau_cdag, non-cyclic otherwise. 
+// Segment is cyclic if tau_c < tau_cdag, non-cyclic otherwise.
 //
 // Some segments are aligned between 2 colors, corresponding to a S^+, S^- operators
 // The S operators will not be linked to Delta, the hybridization, but to Jperp lines.
-// The segment stores two booleans (J_c, J_cdag) that indicate whether its operators are 
-// linked to J_perp lines. 
+// The segment stores two booleans (J_c, J_cdag) that indicate whether its operators are
+// linked to J_perp lines.
 //
 // Special case : full lines.
 // When a line has no operator, we need to take into account 2 states : empty or full.
@@ -45,8 +45,8 @@ using vec_seg_iter_t = std::vector<segment_t>::const_iterator;
 
 // ----------------- J_perp line -------------------
 // Stores the times of a couple (S+, S-)
-// Note: J_perp expansion only implemented for single orbital 
-// (two colors, spin up and spin down). 
+// Note: J_perp expansion only implemented for single orbital
+// (two colors, spin up and spin down).
 struct jperp_line_t {
   tau_t tau_Sminus, tau_Splus; // times of the S-, S+
 };
@@ -60,7 +60,7 @@ struct colored_ops_t {
 };
 
 // --------------- Configuration ----------------------
-// The configuration is a list of of segments for each color, 
+// The configuration is a list of of segments for each color,
 // and a list of J_perp lines.
 struct configuration_t {
   // A list of segments for each color.

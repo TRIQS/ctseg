@@ -131,7 +131,7 @@ work_data_t::work_data_t(params_t const &p, inputs_t const &inputs, mpi::communi
   // Is there a non-zero Delta(tau)?
   for (auto const &bl : range(inputs.delta.size())) {
     if (max_element(abs(inputs.delta[bl].data())) > 1.e-13) has_delta = true;
-    // Report if Delta(tau) has imaginary part. 
+    // Report if Delta(tau) has imaginary part.
     if (!is_gf_real(inputs.delta[bl], 1e-10)) {
       if (c.rank() == 0) {
         spdlog::info("WARNING: The Delta(tau) block number {} is not real in tau space", bl);
@@ -187,10 +187,10 @@ double trace_sign(work_data_t const &wdata) {
   // For every block, we compute the sign of the permutation that takes
   // [(c c_dag) (c c_dag) (c c_dag) ...] with the cdag and c in increasing time order
   // (the reference order of the det) to the  decreasing-time-and-color-ordered list
-  //  of operators (the order that makes the trace positive). 
-  // This is equivalent to computing the sign of the permutation that takes 
+  //  of operators (the order that makes the trace positive).
+  // This is equivalent to computing the sign of the permutation that takes
   // [(c_dag c) (c_dag c) (c_dag c) ...] with the cdag and c in increasing time order
-  // to the increasing time-and-color-ordered list of operators. 
+  // to the increasing time-and-color-ordered list of operators.
   for (auto bl : range(dets.size())) {
     auto s              = long(dets[bl].size());
     auto n_colors_in_bl = wdata.gf_struct[bl].second;
@@ -250,9 +250,9 @@ double trace_sign(work_data_t const &wdata) {
           } // if color == k
           idx_c--;
         } // loop over c
-      }   // loop over colors
-    }     // if block not empty
-  }       // loop over blocks
+      } // loop over colors
+    } // if block not empty
+  } // loop over blocks
   return sign;
 } // sign computation
 

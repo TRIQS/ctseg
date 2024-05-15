@@ -46,12 +46,10 @@ void solver_core::solve(solve_params_t const &solve_params) {
 
   // Initialize work data
   work_data_t wdata{p, inputs, c};
-  // Initialize configuration 
+  // Initialize configuration
   configuration_t config{wdata.n_color};
   // Start from a non-empty configuration when Delta(tau) = 0
-  if (not wdata.has_delta) {
-    config.seglists[0].push_back(segment_t::full_line());
-  }
+  if (not wdata.has_delta) { config.seglists[0].push_back(segment_t::full_line()); }
 
   // ................   QMC  ...................
 

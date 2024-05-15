@@ -14,16 +14,16 @@ struct results_t {
   /// Self-energy improved estimator :math:`F(\tau)`.
   std::optional<block_gf<imtime>> F_tau;
 
-  /// Density-density time correlation function :math:`\langle n_a(\tau) n_b(0) \rangle`.  
+  /// Density-density time correlation function :math:`\langle n_a(\tau) n_b(0) \rangle`.
   std::optional<gf<imtime>> nn_tau;
 
   /// Perpendicular spin-spin correlation function :math:`\langle s_x(\tau) s_x(0) \rangle`.
   std::optional<gf<imtime>> sperp_tau;
 
-  /// Density-density static correlation function :math:`\langle n_a(0) n_b(0) \rangle`. 
+  /// Density-density static correlation function :math:`\langle n_a(0) n_b(0) \rangle`.
   std::optional<nda::matrix<double>> nn_static;
 
-  /// Density per color. 
+  /// Density per color.
   nda::array<double, 1> densities;
 
   /// Delta perturbation order histogram
@@ -35,7 +35,7 @@ struct results_t {
   /// State histogram
   std::optional<nda::vector<double>> state_hist;
 
-  /// Average sign 
+  /// Average sign
   double sign;
 };
 

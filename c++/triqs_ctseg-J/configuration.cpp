@@ -226,7 +226,7 @@ double K_overlap(std::vector<segment_t> const &seglist, tau_t const &tau, bool i
 // List of operators containing all colors.
 // Time are ordered in decreasing order, in agreement with the whole physic literature.
 std::vector<colored_ops_t> colored_ordered_ops(std::vector<std::vector<segment_t>> const &seglists) {
-  int c = 0;  // index of color
+  int c = 0;                           // index of color
   std::vector<colored_ops_t> ops_list; // list of all the operators
   for (auto const &seglist : seglists) {
     for (auto const &s : seglist) {
@@ -275,7 +275,7 @@ std::ostream &operator<<(std::ostream &out, configuration_t const &config) {
 
 std::ostream &operator<<(std::ostream &out, std::vector<colored_ops_t> const &col) {
   for (auto const &[i, co] : itertools::enumerate(col))
-    out << "\n" << "i: " << i << ", tau: " << co.tau << ", color: " << co.color 
-        << ", " << (co.is_cdag ? "cdag" : "c");
+    out << "\n"
+        << "i: " << i << ", tau: " << co.tau << ", color: " << co.color << ", " << (co.is_cdag ? "cdag" : "c");
   return out;
 }

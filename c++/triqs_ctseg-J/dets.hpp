@@ -9,7 +9,7 @@ using namespace triqs::mesh;
 
 /// A lambda to adapt Delta(tau) for the call by det_manip.
 struct delta_block_adaptor {
-  gf<imtime, matrix_real_valued> delta; 
+  gf<imtime, matrix_real_valued> delta;
 
   double operator()(std::pair<tau_t, int> const &x, std::pair<tau_t, int> const &y) const {
     double res = delta(double(x.first - y.first))(x.second, y.second);
