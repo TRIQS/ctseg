@@ -1,5 +1,6 @@
 compile_commands.json
 doc/reference
+doc/cpp2rst_generated
 .*.swo
 .*.swp
 build
