@@ -29,6 +29,9 @@ struct solve_params_t {
   /// Local Hamiltonian
   triqs::operators::many_body_operator h_int;
 
+  /// Chemical potential (high frequency limit of :math:`G_0^{-1}(i\omega) - i \omega`)
+  nda::vector<double> hartree_shift = nda::vector<double>{};
+
   /// Number of QMC cycles
   int n_cycles;
 
@@ -111,8 +114,7 @@ struct solve_params_t {
   /// Whether to measure state histograms (see [[measure_statehist]])
   bool measure_statehist = false;
 
-  /// Chemical potential (high frequency limit of :math:`G_0^{-1}(i\omega) - i \omega`)
-  nda::vector<double> hartree_shift = nda::vector<double>{};
+  // -------- Misc parameters --------------
 
   /// The maximum size of the determinant matrix before a resize
   int det_init_size = 100;
@@ -128,6 +130,9 @@ struct solve_params_t {
 
   /// Bound for the determinant matrix being singular, abs(det) > singular_threshold. If <0, it is !isnormal(abs(det))
   double det_singular_threshold = -1;
+
+  /// Maximum order for the perturbation order histograms 
+  int histogram_max_order = 1000; 
 };
 
 /// A struct combining both constr_params_t and solve_params_t

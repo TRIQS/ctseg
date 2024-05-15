@@ -131,24 +131,25 @@ work_data_t::work_data_t(params_t const &p, inputs_t const &inputs, mpi::communi
   // Is there a non-zero Delta(tau)?
   for (auto const &bl : range(inputs.delta.size())) {
     if (max_element(abs(inputs.delta[bl].data())) > 1.e-13) has_delta = true;
+    // Report if Delta(tau) has imaginary part. 
+    if (!is_gf_real(inputs.delta[bl], 1e-10)) {
+      if (c.rank() == 0) {
+        spdlog::info("WARNING: The Delta(tau) block number {} is not real in tau space", bl);
+        spdlog::info("WARNING: max(Im[Delta(tau)]) = {}", max_element(abs(imag(inputs.delta[bl].data()))));
+        spdlog::info("WARNING: Disregarding the imaginary component in the calculation.");
+      }
+    }
   }
   if (not has_delta) {
     ALWAYS_EXPECTS(has_jperp, "Error : both J_perp(tau) and Delta(tau) are 0: there is nothing to expand.");
     if (c.rank() == 0) { spdlog::info("Delta(tau) is 0, running only spin moves."); }
   }
 
-  // FIXME: real??
+  // Take the real part of Delta(tau)
   delta = map([](gf_const_view<imtime> d) { return real(d); }, inputs.delta);
   for (auto const &bl : range(delta.size())) {
-    if (!is_gf_real(delta[bl], 1e-10)) {
-      if (c.rank() == 0) {
-        spdlog::info("WARNING: The Delta(tau) block number {} is not real in tau space", bl);
-        spdlog::info("WARNING: max(Im[Delta(tau)]) = {}", max_element(abs(imag(delta[bl].data()))));
-        spdlog::info("WARNING: Disregarding the imaginary component in the calculation.");
-      }
-    }
     // Construct the detmanip object for block bl
-    dets.emplace_back(delta_block_adaptor{real(delta[bl])}, p.det_init_size);
+    dets.emplace_back(delta_block_adaptor{delta[bl]}, p.det_init_size);
     // Set parameters
     dets.back().set_singular_threshold(p.det_singular_threshold);
     dets.back().set_n_operations_before_check(p.det_n_operations_before_check);
@@ -161,10 +162,13 @@ work_data_t::work_data_t(params_t const &p, inputs_t const &inputs, mpi::communi
 double trace_sign(work_data_t const &wdata) {
   double sign      = 1.0;
   auto const &dets = wdata.dets;
-  // For every block we compute the sign of the permutation that takes
+  // For every block, we compute the sign of the permutation that takes
+  // [(c c_dag) (c c_dag) (c c_dag) ...] with the cdag and c in increasing time order
+  // (the reference order of the det) to the  decreasing-time-and-color-ordered list
+  //  of operators (the order that makes the trace positive). 
+  // This is equivalent to computing the sign of the permutation that takes 
   // [(c_dag c) (c_dag c) (c_dag c) ...] with the cdag and c in increasing time order
-  // (the reference order of the det) to the completely time-and-color-ordered list
-  //  of operators (the order that makes the trace positive)
+  // to the increasing time-and-color-ordered list of operators. 
   for (auto bl : range(dets.size())) {
     auto s              = long(dets[bl].size());
     auto n_colors_in_bl = wdata.gf_struct[bl].second;

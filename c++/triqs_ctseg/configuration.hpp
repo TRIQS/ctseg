@@ -41,13 +41,6 @@ struct segment_t {
   static segment_t full_line() { return {tau_t::beta(), tau_t::zero()}; }
 };
 
-// operator descriptor: time, color, is_cdag[creation/annihilation]
-struct colored_ops_t {
-  tau_t tau;
-  int color;
-  bool is_cdag;
-};
-
 // simple alias
 using vec_seg_iter_t = std::vector<segment_t>::const_iterator;
 
@@ -57,6 +50,14 @@ using vec_seg_iter_t = std::vector<segment_t>::const_iterator;
 // (two colors, spin up and spin down). 
 struct jperp_line_t {
   tau_t tau_Sminus, tau_Splus; // times of the S-, S+
+};
+
+// ----------------- Operator -------------------
+// (used by measure state_hist)
+struct colored_ops_t {
+  tau_t tau;
+  int color;
+  bool is_cdag;
 };
 
 // --------------- Configuration ----------------------

@@ -4,7 +4,7 @@ Reporting issues
 ****************
 
 Please report all problems and bugs directly at the github issue page
-`<https://github.com/TRIQS/app4triqs/issues>`_.  In order to make it easier for us
+`<https://github.com/TRIQS/ctseg_J/issues>`_.  In order to make it easier for us
 to solve the issue please follow these guidelines:
 
 #. In all cases specify which version of the application you are using. You can
@@ -18,6 +18,6 @@ to solve the issue please follow these guidelines:
    `gist <http://gist.github.com/>`_ file referenced in the issue.
 
 #. If you are experiencing a problem during the execution of the application, provide
-   a script which allows to quickly reproduce the problem.
+   a script which allows us to quickly reproduce the problem.
 
 Thanks!

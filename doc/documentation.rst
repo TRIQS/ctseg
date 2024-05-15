@@ -10,6 +10,7 @@ Algorithm and implementation
    :maxdepth: 1
 
    algorithm_implementation/ctseg
+   algorithm_implementation/implementation_notes
 
 User guide
 ----------
@@ -17,7 +18,9 @@ User guide
 .. toctree::
    :maxdepth: 1
    
-   guide/settingparameters
+   guide/step_by_step
+   guide/moves
+   guide/measurements
    
 
 Reference manual

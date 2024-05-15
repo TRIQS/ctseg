@@ -3,12 +3,12 @@
 
 namespace measures {
 
-  perturbation_order_histo::perturbation_order_histo(params_t const &, work_data_t const &wdata,
+  perturbation_order_histo::perturbation_order_histo(params_t const &p, work_data_t const &wdata,
                                                      configuration_t const &config, results_t &results)
      : wdata{wdata}, config{config}, results{results} {
 
-    histo_delta = triqs::stat::histogram{0, 1000}; // FIXME : put as params ?
-    histo_Jperp = triqs::stat::histogram{0, 1000}; // FIXME : put as params ?
+    histo_delta = triqs::stat::histogram{0, p.histogram_max_order}; 
+    histo_Jperp = triqs::stat::histogram{0, p.histogram_max_order}; 
   }
 
   // -------------------------------------

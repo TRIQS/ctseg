@@ -29,6 +29,7 @@ void h5_write(h5::group h5group, std::string subgroup_name, solve_params_t const
   h5::group grp = subgroup_name.empty() ? h5group : h5group.create_group(subgroup_name);
 
   h5_write(grp, "h_int", c.h_int);
+  h5_write(grp, "hartree_shift", c.hartree_shift);
   h5_write(grp, "n_cycles", c.n_cycles);
   h5_write(grp, "length_cycle", c.length_cycle);
   h5_write(grp, "n_warmup_cycles", c.n_warmup_cycles);
@@ -55,12 +56,12 @@ void h5_write(h5::group h5group, std::string subgroup_name, solve_params_t const
   h5_write(grp, "measure_nnt", c.measure_nnt);
   h5_write(grp, "measure_sperpt", c.measure_sperpt);
   h5_write(grp, "measure_statehist", c.measure_statehist);
-  h5_write(grp, "hartree_shift", c.hartree_shift);
   h5_write(grp, "det_init_size", c.det_init_size);
   h5_write(grp, "det_n_operations_before_check", c.det_n_operations_before_check);
   h5_write(grp, "det_precision_warning", c.det_precision_warning);
   h5_write(grp, "det_precision_error", c.det_precision_error);
   h5_write(grp, "det_singular_threshold", c.det_singular_threshold);
+  h5_write(grp, "histogram_max_order", c.histogram_max_order);
   
 }
 
@@ -71,6 +72,7 @@ void h5_read(h5::group h5group, std::string subgroup_name, solve_params_t &c) {
   h5::group grp = subgroup_name.empty() ? h5group : h5group.open_group(subgroup_name);
 
   h5_read(grp, "h_int", c.h_int);
+  h5_read(grp, "hartree_shift", c.hartree_shift);
   h5_read(grp, "n_cycles", c.n_cycles);
   h5_read(grp, "length_cycle", c.length_cycle);
   h5_read(grp, "n_warmup_cycles", c.n_warmup_cycles);
@@ -97,12 +99,12 @@ void h5_read(h5::group h5group, std::string subgroup_name, solve_params_t &c) {
   h5_read(grp, "measure_nnt", c.measure_nnt);
   h5_read(grp, "measure_sperpt", c.measure_sperpt);
   h5_read(grp, "measure_statehist", c.measure_statehist);
-  h5_read(grp, "hartree_shift", c.hartree_shift);
   h5_read(grp, "det_init_size", c.det_init_size);
   h5_read(grp, "det_n_operations_before_check", c.det_n_operations_before_check);
   h5_read(grp, "det_precision_warning", c.det_precision_warning);
   h5_read(grp, "det_precision_error", c.det_precision_error);
   h5_read(grp, "det_singular_threshold", c.det_singular_threshold);
+  h5_read(grp, "histogram_max_order", c.histogram_max_order);
 
 }
 

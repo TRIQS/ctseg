@@ -18,9 +18,9 @@ struct work_data_t {
   nda::vector<double> mu; // Chemical potential per color
 
   bool has_delta     = false; // There is a non-zero hybridization term
-  bool has_Dt        = false; // There is a non-zero dynamicam nn interaction
+  bool has_Dt        = false; // There is a non-zero dynamical nn interaction
   bool has_jperp     = false; // There is a non-zero Jperp interaction
-  bool rot_inv       = true;  // The spin-spin interaction is rotationally invariant
+  bool rot_inv       = true;  // The spin-spin interaction is rotationally invariant (matters for F(tau) measure)
   bool minus_sign    = false; // Has a move ever produced a negative sign?
   bool offdiag_delta = false; // Does Delta(tau) have blocks of size larger than 1?
 
@@ -28,11 +28,10 @@ struct work_data_t {
   gf<imtime> K, Kprime, Jperp, Kprime_spin;
 
   // Hybridization function
-  using delta_target_t = matrix_real_valued;
-  block_gf<imtime, delta_target_t> delta;
+  block_gf<imtime, matrix_real_valued> delta;
 
   // The determinants
-  // Vector of the det_manip objects, one per block of the input Delta(tau)
+  // Vector of the det_manip objects, one per block of the input Delta(tau). See dets.hpp
   std::vector<det_t> dets;
 
   // Color to (block, idx) conversion tables

@@ -1,8 +1,10 @@
 .. _about:
 
-About app4triqs
-***************
+About CTSEG-J
+*************
 
-An example application using ``cpp2py`` and TRIQS.
+The CTSEG-J solver has been written by N. Kavokine and O. Parcollet, with contriubtions from H. Lu and N. Wentzell. The algorithm has been 
+introduced in [J. Otsuki, Phys. Rev. B 87, 125102 (2013)]. 
 
-Written and maintained by N. Wentzell with contributions from H. U.R. Strand.
+The authors thank T. Ayral and M. Ferrero for sharing their unpublished implementation of CTSEG, which served as an inspiration 
+and a benchmark for the present implementation. 

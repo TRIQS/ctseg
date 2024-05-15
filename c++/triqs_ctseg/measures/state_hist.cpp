@@ -14,7 +14,7 @@ namespace measures {
 
   void state_hist::accumulate(double s) {
 
-    LOG("\n =================== MEASURE <state histogram>  ================ \n");
+    LOG("\n =================== MEASURE STATE HISTOGRAM  ================ \n");
 
     /// Measure the state histogram
     /**

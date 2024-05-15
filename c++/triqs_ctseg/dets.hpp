@@ -7,15 +7,13 @@
 using namespace triqs::gfs;
 using namespace triqs::mesh;
 
-// -----------     dets    ----------------------------------------
-
-/// A lambda to adapt the Delta function for the call of the det.
+/// A lambda to adapt Delta(tau) for the call by det_manip.
 struct delta_block_adaptor {
-  gf<imtime, matrix_real_valued> delta; // make a copy. Needed in the real case anyway.
+  gf<imtime, matrix_real_valued> delta; 
 
   double operator()(std::pair<tau_t, int> const &x, std::pair<tau_t, int> const &y) const {
     double res = delta(double(x.first - y.first))(x.second, y.second);
-    return (x.first >= y.first ? res : -res); // x,y first are time_pt, wrapping is automatic in
+    return (x.first >= y.first ? res : -res); // x,y first are tau_t, wrapping is automatic in
                                               // the - operation, but need to compute the sign
   }
 };

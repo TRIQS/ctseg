@@ -2,7 +2,6 @@
 #include "../configuration.hpp"
 #include "../work_data.hpp"
 #include "../results.hpp"
-//#include "../precompute_fprefactor.hpp"
 
 namespace measures {
 

@@ -1,12 +1,12 @@
-[![build](https://github.com/TRIQS/cthyb/workflows/build/badge.svg)](https://github.com/TRIQS/cthyb/actions?query=workflow%3Abuild)
+[![build](https://github.com/TRIQS/ctseg_J/workflows/build/badge.svg)](https://github.com/TRIQS/ctseg_J/actions?query=workflow%3Abuild)
 
-## TRIQS segment picture impurity solver with spin-spin interactions (CTSEG-J)
+## TRIQS segment picture solver with spin-spin interactions (CTSEG-J)
 
-Copyright (C) 2024, N. Kavokine, H. Lu and O. Parcollet \
+Copyright (C) 2024, N. Kavokine, H. Lu, N. Wentzell and O. Parcollet.
 
 ### Documentation
 
-For documentation and installation instructions see [triqs.github.io/ctseg-j](https://triqs.github.io/ctseg-j).
+For documentation and installation instructions see [triqs.github.io/ctseg-J](https://triqs.github.io/ctseg-J).
 
 ### License
 

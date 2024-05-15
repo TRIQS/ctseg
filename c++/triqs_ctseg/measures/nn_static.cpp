@@ -1,8 +1,6 @@
 #include "./nn_static.hpp"
 #include "../logs.hpp"
 
-// TODO : add non regression test.
-
 namespace measures {
 
   nn_static::nn_static(params_t const &p, work_data_t const &wdata, configuration_t const &config, results_t &results)
@@ -21,10 +19,6 @@ namespace measures {
 
     Z += s;
 
-    // FIXME : this is a simple O(n_color^2) algo
-    // If profiling says it is too slow,
-    // then improve by progressing on the 2 seglists in //
-    // but it is a bit more complex to write
     for (int a = 0; a < n_color; ++a)
       for (int b = 0; b < n_color; ++b) {
         for (auto const &sa : config.seglists[a]) {
