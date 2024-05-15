@@ -6,7 +6,7 @@ endforeach()
 
 # List of all tests
 set(all_tests
-  ./py_spin_spin
+  ./spin_spin
   ./two_orbitals
   ./multiorb
   ./dimer

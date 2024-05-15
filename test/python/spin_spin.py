@@ -73,7 +73,7 @@ p["hartree_shift"] = [mu, mu]
 S.solve(h_int=H, **p)
 
 if mpi.is_master_node():
-    with h5.HDFArchive("py_spin_spin.out.h5", 'w') as A:
+    with h5.HDFArchive("spin_spin.out.h5", 'w') as A:
         A['G_tau'] = S.results.G_tau
         A['F_tau'] = S.results.F_tau
         A['nn_tau'] = S.results.nn_tau
