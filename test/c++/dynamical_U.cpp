@@ -3,7 +3,7 @@
 #include <triqs_ctseg-J/solver_core.hpp>
 
 using triqs::operators::n;
-TEST(CTSEG-J, Dynamical_U) {
+TEST(CTSEGJ, Dynamical_U) {
   // Start the mpi
   mpi::communicator c;
 

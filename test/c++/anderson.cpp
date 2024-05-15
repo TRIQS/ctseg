@@ -5,7 +5,7 @@
 
 using triqs::operators::n;
 
-TEST(CTSEG-J, Anderson) {
+TEST(CTSEGJ, Anderson) {
   // Start the mpi
   mpi::communicator c;
 

@@ -4,7 +4,7 @@
 
 using triqs::operators::n;
 
-TEST(CTSEG-J, Spin_Spin) {
+TEST(CTSEGJ, Spin_Spin) {
   // Start the mpi
   mpi::communicator c;
 

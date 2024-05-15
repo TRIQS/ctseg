@@ -1,6 +1,6 @@
 #include "regroup_spin_segment.hpp"
 #include "../logs.hpp"
-#include "triqs_ctseg/configuration.hpp"
+#include "../configuration.hpp"
 #include <cmath>
 
 namespace moves {

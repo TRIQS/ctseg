@@ -1,7 +1,7 @@
 #pragma once
 
 // Set log levels
-#ifdef CTSEG-J_DEBUG
+#ifdef CTSEG_DEBUG
 #define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_DEBUG
 static constexpr bool ctseg_debug = true;
 #else
