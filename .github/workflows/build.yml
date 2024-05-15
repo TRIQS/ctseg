@@ -2,9 +2,7 @@ name: build
 
 on:
   push:
-    branches: [ unstable ]
-  pull_request:
-    branches: [ unstable ]
+    branches: [ 3.2.x ]
 
 jobs:
   build:
@@ -13,10 +11,10 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - {os: ubuntu-22.04, cc: gcc-12, cxx: g++-12}
-          - {os: ubuntu-22.04, cc: clang-15, cxx: clang++-15}
-          - {os: macos-12, cc: gcc-12, cxx: g++-12}
-          - {os: macos-12, cc: /usr/local/opt/llvm/bin/clang, cxx: /usr/local/opt/llvm/bin/clang++}
+          #- {os: ubuntu-22.04, cc: gcc-12, cxx: g++-12}
+          - {os: ubuntu-22.04, cc: clang-15, cxx: clang++-15, doc: ON}
+          #- {os: macos-12, cc: gcc-12, cxx: g++-12}
+          #- {os: macos-12, cc: /usr/local/opt/llvm/bin/clang, cxx: /usr/local/opt/llvm/bin/clang++}
 
     runs-on: ${{ matrix.os }}
 
@@ -109,4 +107,4 @@ jobs:
       with:
         folder: build/doc/html
         branch: github.io
-        target-folder: docs/3.2.1
+        target-folder: doc/3.2.x
