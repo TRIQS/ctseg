@@ -79,7 +79,7 @@ jobs:
         CC: ${{ matrix.cc }}
         CXX: ${{ matrix.cxx }}
       run: |
-        git clone https://github.com/TRIQS/triqs --branch 3.2.x
+        git clone https://github.com/TRIQS/triqs --branch 3.2.1
         mkdir triqs/build && cd triqs/build
         cmake .. -DBuild_Tests=OFF -DCMAKE_INSTALL_PREFIX=$HOME/install
         make -j1 install VERBOSE=1
@@ -102,3 +102,11 @@ jobs:
         source $HOME/install/share/triqs/triqsvars.sh
         cd build
         ctest -j2 --output-on-failure
+
+    - name: Deploy documentation to website
+      if: matrix.doc == 'ON' 
+      uses: JamesIves/github-pages-deploy-action@v4
+      with:
+        folder: build/doc/html
+        branch: github.io
+        target-folder: docs/3.2.1
