@@ -1,10 +1,10 @@
 #include <cmath>
 #include <triqs/test_tools/gfs.hpp>
-#include <triqs_ctseg/solver_core.hpp>
+#include <triqs_ctseg-J/solver_core.hpp>
 
 using triqs::operators::n;
 
-TEST(CTSEG, J_perp) {
+TEST(CTSEG-J, J_perp) {
   // Start the mpi
   mpi::communicator c;
 

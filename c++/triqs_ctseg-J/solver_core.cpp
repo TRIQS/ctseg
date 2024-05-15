@@ -117,7 +117,7 @@ void h5_write(h5::group h5group, std::string subgroup_name, solver_core const &s
   auto grp = h5group.create_group(subgroup_name);
   h5_write_attribute(grp, "Format", solver_core::hdf5_format());
   h5_write_attribute(grp, "TRIQS_GIT_HASH", std::string(STRINGIZE(TRIQS_GIT_HASH)));
-  h5_write_attribute(grp, "CTSEG_GIT_HASH", std::string(STRINGIZE(CTSEG_GIT_HASH)));
+  h5_write_attribute(grp, "CTSEG-J_GIT_HASH", std::string(STRINGIZE(CTSEG-J_GIT_HASH)));
   h5_write(grp, "constr_params", s.constr_params);
   h5_write(grp, "last_solve_params", s.last_solve_params);
   h5_write(grp, "inputs", s.inputs);

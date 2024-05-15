@@ -28,7 +28,7 @@ The imaginary time action solved by CTSEG-J is of the form
       .. image:: _static/logo_github.png
          :width: 65%
          :align: center
-         :target: https://github.com/triqs/ctseg_J
+         :target: https://github.com/triqs/ctseg-J
 
 Here :math:`\beta` is the inverse temperature, :math:`a` denote orbital indices, :math:`\sigma` spin indices (:math:`\sigma = \uparrow, \downarrow`),
 :math:`n_a \equiv \sum_{\sigma} n_{a\sigma}`, :math:`s_a^{\xi} \equiv \frac{1}{2} \sum_{\sigma \sigma'} \overline{c}_{a\sigma}
@@ -39,7 +39,7 @@ is the hybridization function, that accounts for particle exchange between the i
 :math:`\mathcal{U}_{ab} (\tau)` and  :math:`\mathcal{J}_{a}^{\xi} (\tau)` are the (dynamical)
 density-density and spin-spin interactions, respectively. 
 
-The CTSEG solver carries out a double expansion in the hybridization term and in the perpendicular spin-spin
+The CTSEG-J solver carries out a double expansion in the hybridization term and in the perpendicular spin-spin
 interaction term to obtain the fully interacting impurity Green's function :math:`G(\tau)` and a range of
 other observables. Learn how to use it in the :ref:`documentation`.
 

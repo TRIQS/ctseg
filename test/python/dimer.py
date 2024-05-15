@@ -11,7 +11,7 @@ import h5
 import triqs.utility.mpi as mpi
 from triqs.utility.h5diff import h5diff
 
-from triqs_ctseg import Solver
+from triqs_ctseg-J import Solver
 
 from numpy import matrix, array, block, diag, eye
 from numpy.linalg import inv

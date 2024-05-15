@@ -1,4 +1,4 @@
-[![build](https://github.com/TRIQS/ctseg_J/workflows/build/badge.svg)](https://github.com/TRIQS/ctseg_J/actions?query=workflow%3Abuild)
+[![build](https://github.com/TRIQS/ctseg-J/workflows/build/badge.svg)](https://github.com/TRIQS/ctseg-J/actions?query=workflow%3Abuild)
 
 ## TRIQS segment picture solver with spin-spin interactions (CTSEG-J)
 

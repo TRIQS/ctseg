@@ -83,7 +83,7 @@ jobs:
         make -j1 install VERBOSE=1
         cd ../
 
-    - name: Build ctseg
+    - name: Build ctseg-J
       env:
         CC: ${{ matrix.cc }}
         CXX: ${{ matrix.cxx }}
@@ -93,7 +93,7 @@ jobs:
         mkdir build && cd build && cmake .. -DBuild_Documentation=${{ matrix.doc }}
         make -j2 || make -j1 VERBOSE=1
 
-    - name: Test ctseg
+    - name: Test ctseg-J
       env:
         DYLD_FALLBACK_LIBRARY_PATH: /usr/local/opt/llvm/lib
       run: |
