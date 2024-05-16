@@ -3,12 +3,12 @@
 The Segment Picture Solver
 **************************
 
-The :ref:`TRIQS-based <triqslibs:welcome>` hybridization-expansion **segment picture** solver (CTSEG-J)
+The :ref:`TRIQS-based <triqslibs:welcome>` hybridization-expansion **segment picture** solver (CTSEG)
 can tackle the generic problem of a quantum impurity coupled to an external environement (bath). The "impurity" can
-be any set of orbitals, on one or several atoms. The CTSEG-J solver supports (possibly retarded) density-density 
+be any set of orbitals, on one or several atoms. The CTSEG solver supports (possibly retarded) density-density
 and spin-spin interactions on the impurity. Under these restrictions, it provides better performance than the generic
 `CTHYB <https://triqs.github.io/cthyb/latest/>`_ solver, that supports generic local interaction vertices. 
-The imaginary time action solved by CTSEG-J is of the form 
+The imaginary time action solved by CTSEG is of the form
 
 .. math::
 
@@ -20,7 +20,7 @@ The imaginary time action solved by CTSEG-J is of the form
   + \frac{1}{2} \iint_0^{\beta} \mathrm{d} \tau \mathrm{d} \tau' \sum_{a, \xi = x, y, z} s_a^{\xi}(\tau) \mathcal{J}_a^{\xi}(\tau - \tau') s_a^{\xi} (\tau')
   \end{split}
 
-.. sidebar:: CTSEG-J |PROJECT_VERSION|
+.. sidebar:: CTSEG |PROJECT_VERSION|
 
    This is the homepage of CTSEG |PROJECT_VERSION|.
    For changes see the :ref:`changelog page <changelog>`.
@@ -39,7 +39,7 @@ is the hybridization function, that accounts for particle exchange between the i
 :math:`\mathcal{U}_{ab} (\tau)` and  :math:`\mathcal{J}_{a}^{\xi} (\tau)` are the (dynamical)
 density-density and spin-spin interactions, respectively. 
 
-The CTSEG-J solver carries out a double expansion in the hybridization term and in the perpendicular spin-spin
+The CTSEG solver carries out a double expansion in the hybridization term and in the perpendicular spin-spin
 interaction term to obtain the fully interacting impurity Green's function :math:`G(\tau)` and a range of
 other observables. Learn how to use it in the :ref:`documentation`.
 

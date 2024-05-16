@@ -2,11 +2,11 @@
 
 .. _install:
 
-Install CTSEG-J
-*******************
+Install CTSEG
+*************
 
-Compiling CTSEG-J from source
-===============================
+Compiling CTSEG from source
+===========================
 
 .. note:: To guarantee reproducibility in scientific calculations we strongly recommend the use of a stable `release <https://github.com/TRIQS/triqs/releases>`_ of both TRIQS and its applications.
 
@@ -44,7 +44,7 @@ Installation steps
 Version compatibility
 ---------------------
 
-Keep in mind that the version of ``CTSEG-J`` must be compatible with your TRIQS library version,
+Keep in mind that the version of ``CTSEG`` must be compatible with your TRIQS library version,
 see :ref:`TRIQS website <triqslibs:versions>`.
 In particular the Major and Minor Version numbers have to be the same.
 To use a particular version, go into the directory with the sources, and look at all available versions::
@@ -60,7 +60,7 @@ and follow steps 2 to 4 above to compile the code.
 Custom CMake options
 --------------------
 
-The compilation of ``CTSEG-J`` can be configured using CMake-options::
+The compilation of ``CTSEG`` can be configured using CMake-options::
 
     cmake ../ctseg.src -DOPTION1=value1 -DOPTION2=value2 ...
 
