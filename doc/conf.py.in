@@ -17,7 +17,6 @@ extensions = ['sphinx.ext.autodoc',
               'sphinx.ext.autosummary',
               'sphinx.ext.githubpages',
               'sphinx_autorun',
- #             'nbsphinx',
               'myst_parser',
               'matplotlib.sphinxext.plot_directive']
 
@@ -44,7 +43,7 @@ source_suffix = '.rst'
 autosummary_generate = True
 autosummary_imported_members=False
 
-project = '@PROJECT_NAME@'
+project = 'CTSEG - TRIQS segment picture solver'
 version = '@PROJECT_VERSION@'
 
 # this makes the current project version available as var in every rst file
@@ -85,7 +84,7 @@ html_theme_options = {
 
 html_show_sphinx = False
 
-html_context = {'header_title': 'TRIQS Segment Picture Solver'}
+html_context = {'header_title': 'CTSEG'}
 
 html_static_path = ['@CMAKE_CURRENT_SOURCE_DIR@/_static']
 html_sidebars = {'index': ['sideb.html', 'searchbox.html']}

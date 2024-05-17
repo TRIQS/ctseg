@@ -97,33 +97,37 @@ c = class_(
 c.add_member(c_name = "constr_params",
              c_type = "constr_params_t",
              read_only= True,
-             doc = r"""Solver construction parameters""")
+             doc = r"""Set of parameters used in the construction of the ``solver_core`` class.
 
-c.add_member(c_name = "last_solve_params",
+.. include:: ../../python/triqs_ctseg/parameters_constr_params_t.rst""")
+
+c.add_member(c_name = "solve_params",
              c_type = "std::optional<solve_params_t>",
              read_only= True,
-             doc = r"""Solver solve parameters (from last call)""")
+             doc = r"""Set of parameters used by the last call to ``solve()``.
+
+.. include:: ../../python/triqs_ctseg/parameters_solve_params_t.rst""")
 
 c.add_member(c_name = "results",
              c_type = "results_t",
              read_only= True,
-             doc = r"""The set of results""")
+             doc = r"""The set of results. See :doc:`Measurements <../guide/measurements>`.""")
 
 c.add_constructor("""(**constr_params_t)""", doc = r"""Initialize the solver
 
 
 
-+----------------+-------------+---------+--------------------------------------------------------------+
-| Parameter Name | Type        | Default | Documentation                                                |
-+================+=============+=========+==============================================================+
-| beta           | double      | --      | Inverse temperature                                          |
-+----------------+-------------+---------+--------------------------------------------------------------+
-| gf_struct      | gf_struct_t | --      | Structure of the GF (names, sizes of blocks)                 |
-+----------------+-------------+---------+--------------------------------------------------------------+
-| n_tau          | int         | 10001   | Number of time slices for $Delta(\tau)$/$G(\tau)$/$F(\tau)$  |
-+----------------+-------------+---------+--------------------------------------------------------------+
-| n_tau_k        | int         | 10001   | Number of time slices for $K(\tau)$                          |
-+----------------+-------------+---------+--------------------------------------------------------------+
++----------------+-------------+---------+----------------------------------------------------------------+
+| Parameter Name | Type        | Default | Documentation                                                  |
++================+=============+=========+================================================================+
+| beta           | double      | --      | Inverse temperature                                            |
++----------------+-------------+---------+----------------------------------------------------------------+
+| gf_struct      | gf_struct_t | --      | Structure of the Green's function (names and sizes of blocks)  |
++----------------+-------------+---------+----------------------------------------------------------------+
+| n_tau          | int         | 10001   | Number of time slices for fermionic functions                  |
++----------------+-------------+---------+----------------------------------------------------------------+
+| n_tau_k        | int         | 10001   | Number of time slices for bosonic functions                    |
++----------------+-------------+---------+----------------------------------------------------------------+
 """)
 
 c.add_method("""void solve (**solve_params_t)""",
@@ -172,7 +176,7 @@ c.add_method("""void solve (**solve_params_t)""",
 +---------------------------------------+--------------------------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
 | move_swap_spin_lines                  | bool                                 | true                                    | Whether to perform the move swap spin lines                                                                       |
 +---------------------------------------+--------------------------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
-| measure_perturbation_order_histograms | bool                                 | true                                    | Whether to measure the perturbation order histograms (Order in Delta, and Jperp)                                  |
+| measure_perturbation_order_histograms | bool                                 | true                                    | Whether to measure the perturbation order histograms (order in Delta and Jperp)                                   |
 +---------------------------------------+--------------------------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
 | measure_gt                            | bool                                 | true                                    | Whether to measure G(tau) (see [[measure_g_f_tau]])                                                               |
 +---------------------------------------+--------------------------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
@@ -182,11 +186,11 @@ c.add_method("""void solve (**solve_params_t)""",
 +---------------------------------------+--------------------------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
 | measure_sign                          | bool                                 | true                                    | Whether to measure sign (see [[measure_sign]])                                                                    |
 +---------------------------------------+--------------------------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
-| measure_nn                            | bool                                 | false                                   | Whether to measure <nn> (see [[measure_nn]])                                                                      |
+| measure_nn                            | bool                                 | false                                   | Whether to measure <n(0)n(0)> (see [[measure_nn]])                                                                |
 +---------------------------------------+--------------------------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
-| measure_nnt                           | bool                                 | false                                   | Whether to measure langle n(tau)n(0)rangle (see [[measure_nnt]])                                                  |
+| measure_nnt                           | bool                                 | false                                   | Whether to measure <n(tau)n(0)> (see [[measure_nnt]])                                                             |
 +---------------------------------------+--------------------------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
-| measure_sperpt                        | bool                                 | false                                   | Whether to measure langle s_x(tau)s_x(0)rangle (see [[measure_sperp_tau]])                                        |
+| measure_sperpt                        | bool                                 | false                                   | Whether to measure <s_x(tau)s_x(0)> (see [[measure_sperp_tau]])                                                   |
 +---------------------------------------+--------------------------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
 | measure_statehist                     | bool                                 | false                                   | Whether to measure state histograms (see [[measure_statehist]])                                                   |
 +---------------------------------------+--------------------------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
@@ -322,7 +326,7 @@ c.add_member(c_name = "move_swap_spin_lines",
 c.add_member(c_name = "measure_perturbation_order_histograms",
              c_type = "bool",
              initializer = """ true """,
-             doc = r"""Whether to measure the perturbation order histograms (Order in Delta, and Jperp)""")
+             doc = r"""Whether to measure the perturbation order histograms (order in Delta and Jperp)""")
 
 c.add_member(c_name = "measure_gt",
              c_type = "bool",
@@ -347,17 +351,17 @@ c.add_member(c_name = "measure_sign",
 c.add_member(c_name = "measure_nn",
              c_type = "bool",
              initializer = """ false """,
-             doc = r"""Whether to measure <nn> (see [[measure_nn]])""")
+             doc = r"""Whether to measure <n(0)n(0)> (see [[measure_nn]])""")
 
 c.add_member(c_name = "measure_nnt",
              c_type = "bool",
              initializer = """ false """,
-             doc = r"""Whether to measure langle n(tau)n(0)rangle (see [[measure_nnt]])""")
+             doc = r"""Whether to measure <n(tau)n(0)> (see [[measure_nnt]])""")
 
 c.add_member(c_name = "measure_sperpt",
              c_type = "bool",
              initializer = """ false """,
-             doc = r"""Whether to measure langle s_x(tau)s_x(0)rangle (see [[measure_sperp_tau]])""")
+             doc = r"""Whether to measure <s_x(tau)s_x(0)> (see [[measure_sperp_tau]])""")
 
 c.add_member(c_name = "measure_statehist",
              c_type = "bool",
@@ -409,17 +413,17 @@ c.add_member(c_name = "beta",
 c.add_member(c_name = "gf_struct",
              c_type = "gf_struct_t",
              initializer = """  """,
-             doc = r"""Structure of the GF (names, sizes of blocks)""")
+             doc = r"""Structure of the Green's function (names and sizes of blocks)""")
 
 c.add_member(c_name = "n_tau",
              c_type = "int",
              initializer = """ 10001 """,
-             doc = r"""Number of time slices for $Delta(\tau)$/$G(\tau)$/$F(\tau)$""")
+             doc = r"""Number of time slices for fermionic functions""")
 
 c.add_member(c_name = "n_tau_k",
              c_type = "int",
              initializer = """ 10001 """,
-             doc = r"""Number of time slices for $K(\tau)$""")
+             doc = r"""Number of time slices for bosonic functions""")
 
 module.add_converter(c)
 

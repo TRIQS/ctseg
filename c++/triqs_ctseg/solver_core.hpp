@@ -19,13 +19,19 @@ class solver_core {
   mpi::communicator c;
 
   public:
-  /// Solver construction parameters
+  /**Set of parameters used in the construction of the ``solver_core`` class.
+  *
+  *.. include:: ../../python/triqs_ctseg/parameters_constr_params_t.rst 
+  */
   constr_params_t constr_params;
 
-  /// Solver solve parameters (from last call)
-  std::optional<solve_params_t> last_solve_params;
+  /**Set of parameters used by the last call to ``solve()``.
+  *
+  *.. include:: ../../python/triqs_ctseg/parameters_solve_params_t.rst 
+  */
+  std::optional<solve_params_t> solve_params;
 
-  /// The set of results
+  /// The set of results. See :doc:`Measurements <../guide/measurements>`.
   // Will be passed to measures and initialized by them.
   results_t results;
 
@@ -48,7 +54,7 @@ class solver_core {
   gf_view<imtime> D0_tau() { return inputs.d0t; }
 
   // --------------- h5 -------------------------
-  CPP2PY_IGNORE static std::string hdf5_format() { return "CTSEG-J_SolverCore"; }
+  CPP2PY_IGNORE static std::string hdf5_format() { return "CTSEG_SolverCore"; }
   friend void h5_write(h5::group h5group, std::string subgroup_name, solver_core const &s);
   CPP2PY_IGNORE static solver_core h5_read_construct(h5::group h5group, std::string subgroup_name);
 };

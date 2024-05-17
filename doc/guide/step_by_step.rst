@@ -3,7 +3,7 @@
 Step-by-step guide
 ==================
 
-Below is a step-by-step guide to setting up a CTQMC calcultion with the CTSEG-J solver. 
+Below is a step-by-step guide to setting up a CTQMC calculation with the CTSEG solver. 
 
 Step 1 - Choose the construction parameters
 *******************************************
@@ -12,7 +12,7 @@ We first need to specify the parameters that will define the structure of the so
 They can be conveniently supplied as a Python dictionary::
 
     constr_params = {
-        "gf_struct": gf_struct
+        "gf_struct": gf_struct,
         "beta": 100,
         "n_tau": 1001,
         "n_tau_k": 1001
@@ -31,7 +31,7 @@ Green's function structure
 
 The parameter ``gf_struct`` is a list of pairs of the form ``(block_name, block_size)``. 
 The choice of the blocks is not unique, but choosing the smallest possible blocks 
-ensures the best performance. The impurity problems solved by CTSEG-J are always spin-conserving, 
+ensures the best performance. The impurity problems solved by CTSEG are always spin-conserving, 
 it is therfore always possible to define at least two blocks ``up`` and ``down``. For example, for a 
 single orbital::
 
@@ -53,7 +53,7 @@ Step 2 - Construct the solver
 
 With the parameters set, we are ready to construct the solver object::
 
-    from triqs_ctseg-j import Solver
+    from triqs_ctseg import Solver
     S = Solver(**constr_params)
 
 Step 3 - Supply the solver inputs
@@ -65,7 +65,7 @@ Here, we will give examples for a single-orbital impurity (``gf_struct = [("up",
 Interaction Hamiltonian
 -----------------------
 
-The static part of the electron-electron interaction is supplied as a TRIQS operator. In the CTSEG-J case,
+The static part of the electron-electron interaction is supplied as a TRIQS operator. In the CTSEG case,
 it is always a density-density interaction. Density operators are represented by ``n(block_name, orbital_number)``. 
 For our single orbital problem:: 
 
@@ -95,8 +95,8 @@ The interaction Hamiltonian is passed to the solver as part of the solve paramet
 Hybridization function
 ----------------------
 
-The CTSEG-J solver takes as an input the hybridization function :math:`\Delta(\tau)` that appears in the 
-impurity action (see :doc:`CTSEG-J algorithm <../algorithm_implementation/ctseg>`). It is initialized as::
+The CTSEG solver takes as an input the hybridization function :math:`\Delta(\tau)` that appears in the 
+impurity action (see :doc:`CTSEG algorithm <../algorithm_implementation/ctseg>`). It is initialized as::
 
     from triqs.gf import *
     from triqs.gf.tools import *
@@ -163,8 +163,8 @@ a list with one value per color. For example, for the single-orgital problem::
 
 .. warning::
 
-    In CTSEG-J, the meaning of the ``hartree_shift`` parameter is not the same as in CTHYB. In CTHYB, it represents 
-    a shift of the chemical potential with respect to the one already contained in ``G0_iw``. In CTSEG-J, 
+    In CTSEG, the meaning of the ``hartree_shift`` parameter is not the same as in CTHYB. In CTHYB, it represents 
+    a shift of the chemical potential with respect to the one already contained in ``G0_iw``. In CTSEG, 
     ``hartree_shift`` is the full chemical potential with all shifts applied. 
     
 If the list of chemical potentials is extracted from the CTHYB input ``G0_iw`` as above, then::
@@ -174,7 +174,7 @@ If the list of chemical potentials is extracted from the CTHYB input ``G0_iw`` a
 Dynamical density-density interaction
 -------------------------------------
 
-The dynamical density-density interaction :math:`D(\tau)` (see :doc:`CTSEG-J algorithm <../algorithm_implementation/ctseg>`) is initialized as:: 
+The dynamical density-density interaction :math:`D(\tau)` (see :doc:`CTSEG algorithm <../algorithm_implementation/ctseg>`) is initialized as:: 
 
     D_tau = GfImTime(indices = range(n_colors), beta = beta, statistic = "Boson", n_points = n_tau_k)
 
@@ -195,7 +195,7 @@ The dynamical interaction is supplied to the solver via::
 Spin-spin interaction
 ---------------------
 
-The prependicular spin-spin interaction :math:`J_{\perp}(\tau)` (see :doc:`CTSEG-J algorithm <../algorithm_implementation/ctseg>`) is initialized as:: 
+The prependicular spin-spin interaction :math:`J_{\perp}(\tau)` (see :doc:`CTSEG algorithm <../algorithm_implementation/ctseg>`) is initialized as:: 
 
     Jperp_tau = GfImTime(indices = [0], beta = beta, statistic = "Boson", n_points = n_tau_k)
 
@@ -203,7 +203,7 @@ It is a :math:`1 \times 1` matrix Green's function. It is supplied to the solver
 
     S.Jperp_tau << Jperp_tau
 
-If the impurity action contains a spin-spin interaction term of the form :math:` (1/2) \cdot Q(\tau - \tau') \sum_i s_i(\tau) s_i(\tau')`, 
+If the impurity action contains a spin-spin interaction term of the form :math:`(1/2) \cdot Q(\tau - \tau') \sum_i s_i(\tau) s_i(\tau')`, 
 it can be split into a density-density and a perpendicular spin-spin term. Indeed, making use of symmetry properties, we may replace in the action 
 
 .. math::
@@ -251,7 +251,7 @@ Other parameters include:
 * **Move control**. All the :doc:`Monte Carlo moves <moves>` can be switched on and off. This functionality exists to faciliate testing
   for developers. The solver chooses the relevant moves depending on its inputs, and regular users should not need move control. 
 
-The complete list of parameters is available HERE.
+The complete list of parameters is available :doc:`here <../_ref/triqs_ctseg.solver.Solver.solve>`.
 
 Step 4 - Run the solver 
 ***********************
@@ -263,7 +263,7 @@ The CTQMC run is triggered by::
 .. warning::
     The solver prints to the command line the interaction matrix ``U`` and chemical potential ``mu`` that are used internally. 
     In the presence of dynamical interactions, these are renormalized values, different from the input parameters contained 
-    in ``h_int`` and ``hartree_shift`` (see HERE). 
+    in ``h_int`` and ``hartree_shift`` (see :doc:`CTSEG algorithm <../algorithm_implementation/ctseg>`).
 
 After it is done accumulating, the solver prints the average acceptance rates. Very low acceptance rates for all moves (below 0.1)
 are generally a sign that something went wrong. However, some of the moves (``split_spin_segment``, ``regroup_spin_segment``)
@@ -308,7 +308,7 @@ by saving the solver object::
 Running the solver in parallel
 ******************************
 
-The CTSEG-J solver supports MPI parallelism. If the solver run is set up in a file ``script.py``, a parallel run 
+The CTSEG solver supports MPI parallelism. If the solver run is set up in a file ``script.py``, a parallel run 
 is typically achieved with the command::
 
     mpirun -np <n_cores> python script.py

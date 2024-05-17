@@ -6,19 +6,22 @@ from triqs.utility import mpi
 # === The SolverCore Wrapper
 
 class Solver(SolverCore):
+    """
+    The solver class.
+    """
 
     def __init__(self, **kwargs):
         """
-        Initialise the solver.
+        Initialize the solver.
 
         Parameters
         ----------
-        Cf. C++ documentation of SolverCore
+        .. include:: ../../python/triqs_ctseg/parameters_constr_params_t.rst
         """
 
         kwargs['gf_struct'] = fix_gf_struct_type(kwargs['gf_struct'])
 
-        # Initialise the core solver
+        # Initialize the solver
         SolverCore.__init__(self, **kwargs)
 
     def solve(self, **kwargs):
@@ -27,7 +30,7 @@ class Solver(SolverCore):
 
         Parameters
         ----------
-        Cf. C++ documentation of SolverCore.solve(..)
+        .. include:: ../../python/triqs_ctseg/parameters_solve_params_t.rst
         """
 
         # Solve the impurity problem

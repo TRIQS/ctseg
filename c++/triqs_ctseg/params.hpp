@@ -11,13 +11,13 @@ struct constr_params_t {
   /// Inverse temperature
   double beta;
 
-  /// Structure of the GF (names, sizes of blocks)
+  /// Structure of the Green's function (names and sizes of blocks)
   gf_struct_t gf_struct;
 
-  /// Number of time slices for $Delta(\tau)$/$G(\tau)$/$F(\tau)$
+  /// Number of time slices for fermionic functions
   int n_tau = 10001;
 
-  /// Number of time slices for $K(\tau)$
+  /// Number of time slices for bosonic functions
   int n_tau_k = 10001;
 };
 
@@ -87,7 +87,7 @@ struct solve_params_t {
 
   // -------- Measure control --------------
 
-  /// Whether to measure the perturbation order histograms (Order in Delta, and Jperp)
+  /// Whether to measure the perturbation order histograms (order in Delta and Jperp)
   bool measure_perturbation_order_histograms = true;
 
   /// Whether to measure G(tau) (see [[measure_g_f_tau]])
@@ -102,13 +102,13 @@ struct solve_params_t {
   /// Whether to measure sign (see [[measure_sign]])
   bool measure_sign = true;
 
-  /// Whether to measure <nn> (see [[measure_nn]])
+  /// Whether to measure <n(0)n(0)> (see [[measure_nn]])
   bool measure_nn = false;
 
-  /// Whether to measure langle n(tau)n(0)rangle (see [[measure_nnt]])
+  /// Whether to measure <n(tau)n(0)> (see [[measure_nnt]])
   bool measure_nnt = false;
 
-  /// Whether to measure langle s_x(tau)s_x(0)rangle (see [[measure_sperp_tau]])
+  /// Whether to measure <s_x(tau)s_x(0)> (see [[measure_sperp_tau]])
   bool measure_sperpt = false;
 
   /// Whether to measure state histograms (see [[measure_statehist]])

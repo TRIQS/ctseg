@@ -5,7 +5,7 @@ Implementation notes
 
 *A guide to reading the code.*
 
-CTSEG-J is an application based on the `app4triqs <https://triqs.github.io/app4triqs/unstable/index.html>`_ skeleton. The code is written in C++, and a python wrapper
+CTSEG is an application based on the `app4triqs <https://triqs.github.io/app4triqs/unstable/index.html>`_ skeleton. The code is written in C++, and a python wrapper
 is generated automatically using ``cpp2py``. The user interacts with the solver in python. 
 
 Solver core

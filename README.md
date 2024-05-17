@@ -1,6 +1,6 @@
 [![build](https://github.com/TRIQS/ctseg/workflows/build/badge.svg)](https://github.com/TRIQS/ctseg/actions?query=workflow%3Abuild)
 
-## TRIQS segment picture solver with spin-spin interactions (CTSEG-J)
+## TRIQS segment picture solver (CTSEG)
 
 Copyright (C) 2024, N. Kavokine, H. Lu, N. Wentzell and O. Parcollet.
 

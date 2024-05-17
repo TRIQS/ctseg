@@ -3,7 +3,7 @@
 Monte Carlo moves 
 =================
 
-In CTSEG-J, a configuration (state of the Markov chain) is a set of time-ordered list of segments (one for every color), and 
+In CTSEG, a configuration (state of the Markov chain) is a set of time-ordered list of segments (one for every color), and 
 possibly a list of :math:`J_{\perp}` lines (see :doc:`Implementation Notes <../algorithm_implementation/implementation_notes>` for more details).
 Below is a list of all possible steps (or "moves") of the random walk in configuration space. 
 

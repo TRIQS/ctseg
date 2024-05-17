@@ -27,20 +27,20 @@ solver_core::solver_core(constr_params_t const &p) : constr_params(p) {
 
 // ---------------------------------------------------------------------------
 
-void solver_core::solve(solve_params_t const &solve_params) {
+void solver_core::solve(solve_params_t const &solve_params_input) {
 
-  // http://patorjk.com/software/taag/#p=display&f=Calvin%20S&t=TRIQS%20ctint
+  // http://patorjk.com/software/taag/#p=display&f=Calvin%20S&t=TRIQS%20ctseg
   if (c.rank() == 0)
     std::cout << "\n"
-                 "╔╦╗╦═╗╦╔═╗ ╔═╗  ┌─┐┌┬┐┌─┐┌─┐┌─┐   ┬ \n"
-                 " ║ ╠╦╝║║═╬╗╚═╗  │   │ └─┐├┤ │ ┬───│ \n"
-                 " ╩ ╩╚═╩╚═╝╚╚═╝  └─┘ ┴ └─┘└─┘└─┘  └┘ \n";
+                 "╔╦╗╦═╗╦╔═╗ ╔═╗  ┌─┐┌┬┐┌─┐┌─┐┌─┐\n"
+                 " ║ ╠╦╝║║═╬╗╚═╗  │   │ └─┐├┤ │ ┬\n"
+                 " ╩ ╩╚═╩╚═╝╚╚═╝  └─┘ ┴ └─┘└─┘└─┘\n";
 
   // ................ Parameters .................
-  // Store the solve_params
-  last_solve_params = solve_params;
   // Merge constr_params and solve_params
-  params_t p(constr_params, solve_params);
+  params_t p(constr_params, solve_params_input);
+  // Store the solve_params
+  solve_params = solve_params_input;
 
   // ................   Work data & Configuration  ...................
 
@@ -117,7 +117,7 @@ void h5_write(h5::group h5group, std::string subgroup_name, solver_core const &s
   h5_write_attribute(grp, "TRIQS_GIT_HASH", std::string(STRINGIZE(TRIQS_GIT_HASH)));
   h5_write_attribute(grp, "CTSEGJ_GIT_HASH", std::string(STRINGIZE(CTSEGJ_GIT_HASH)));
   h5_write(grp, "constr_params", s.constr_params);
-  h5_write(grp, "last_solve_params", s.last_solve_params);
+  h5_write(grp, "solve_params", s.solve_params);
   h5_write(grp, "inputs", s.inputs);
   h5_write(grp, "results", s.results);
 }
@@ -127,7 +127,7 @@ solver_core solver_core::h5_read_construct(h5::group h5group, std::string subgro
   auto grp           = h5group.open_group(subgroup_name);
   auto constr_params = h5_read<constr_params_t>(grp, "constr_params");
   auto s             = solver_core{constr_params};
-  h5_read(grp, "last_solve_params", s.last_solve_params);
+  h5_read(grp, "solve_params", s.solve_params);
   h5_read(grp, "inputs", s.inputs);
   h5_read(grp, "results", s.results);
   return s;

@@ -1,4 +1,4 @@
-triqs\_ctseg.solver.Solver
+﻿triqs\_ctseg.solver.Solver
 ==========================
 
 .. currentmodule:: triqs_ctseg.solver
@@ -13,7 +13,6 @@ triqs\_ctseg.solver.Solver
     :toctree:                             
     
       ~Solver.__init__
-      ~Solver.hdf5_format
       ~Solver.solve
 
 
@@ -28,5 +27,7 @@ triqs\_ctseg.solver.Solver
       ~Solver.D0_tau
       ~Solver.Delta_tau
       ~Solver.Jperp_tau
+      ~Solver.constr_params
       ~Solver.results
+      ~Solver.solve_params
 

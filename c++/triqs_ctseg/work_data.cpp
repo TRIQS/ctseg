@@ -54,6 +54,11 @@ work_data_t::work_data_t(params_t const &p, inputs_t const &inputs, mpi::communi
   has_Dt    = max_element(abs(inputs.d0t.data())) > 1.e-13;
   has_jperp = max_element(abs(inputs.jperpt.data())) > 1.e-13;
 
+  // Check: no J_perp implementation for more than 2 colors
+  if (n_color != 2) {
+    ALWAYS_EXPECTS((not has_jperp), "Error : has_jperp is true and we have {} colors instead of 2", n_color);
+  }
+
   // For numerical integration of the D0 and Jperp
   auto ramp = nda::zeros<double>(p.n_tau_k);
   for (auto n : range(p.n_tau_k)) { ramp(n) = n * beta / (p.n_tau_k - 1); }
@@ -73,7 +78,7 @@ work_data_t::work_data_t(params_t const &p, inputs_t const &inputs, mpi::communi
           first_integral(i)  = first_integral(i - 1) + (D_data(i) + D_data(i - 1)) / 2;
           second_integral(i) = second_integral(i - 1) + (first_integral(i) + first_integral(i - 1)) / 2;
         }
-        // Noramlize by bin size
+        // Normalize by bin size
         first_integral *= beta / (p.n_tau_k - 1);
         second_integral *= (beta / (p.n_tau_k - 1)) * (beta / (p.n_tau_k - 1));
         // Enforce K(0) = K(beta) = 0

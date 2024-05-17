@@ -23,13 +23,19 @@ User guide
    guide/measurements
    
 
-Reference manual
-----------------
+Python reference manual
+-----------------------
 
 .. autosummary::
    :toctree: _ref
-   :template: autosummary_module_template.rst
+   :template: autosummary_class_template.rst
    :recursive:
 
-   triqs_ctseg.solver
+   triqs_ctseg.solver.Solver
+
+Links to all relevant solver parameters: 
+
+* :doc:`Construction parameters <_ref/triqs_ctseg.solver.Solver.__init__>`
+
+* :doc:`Solve parameters <_ref/triqs_ctseg.solver.Solver.solve>`
 

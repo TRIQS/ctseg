@@ -111,7 +111,7 @@ jobs:
         make -j1 install VERBOSE=1
         cd ../
 
-    - name: Build ctseg-J
+    - name: Build ctseg
       env:
         CC: ${{ matrix.cc }}
         CXX: ${{ matrix.cxx }}
@@ -121,7 +121,7 @@ jobs:
         mkdir build && cd build && cmake ..
         make -j2 || make -j1 VERBOSE=1
 
-    - name: Test ctseg-J
+    - name: Test ctseg
       env:
         DYLD_FALLBACK_LIBRARY_PATH: /usr/local/opt/llvm/lib
         OPENBLAS_NUM_THREADS: "1"
