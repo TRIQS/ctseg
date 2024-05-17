@@ -84,7 +84,7 @@ Insert spin segment
 
 Randomly choose a color :math:`i` (spin up or spin down) and a segment :math:`[\tau, \tau']` within that color. The other color is denoted :math:`j`.
 Choose two random (but ordered) times :math:`\tau_1` and :math:`\tau_1'` within that segment. Try replacing :math:`[\tau, \tau']` with :math:`[\tau, \tau_1]` 
-and :math:`[\tau_1, \tau']` in color :math:`i`, inserting :math:`[\tau_1, \tau_1']` in color :math:`j`, and inserting a :math:`J_{\perp}` line 
+and :math:`[\tau_1', \tau']` in color :math:`i`, inserting :math:`[\tau_1, \tau_1']` in color :math:`j`, and inserting a :math:`J_{\perp}` line 
 between :math:`\tau_1` and :math:`\tau_1'`. 
 
 This move is enabled if there is a non-zero :math:`J_{\perp}(\tau)`. 
@@ -102,8 +102,8 @@ Remove spin segment
     :width: 80%
 
 Randomly choose a :math:`J_{\perp}` line. If its two endpoints are connected by a segment :math:`[\tau_1, \tau_1']` in color :math:`i`, find the segments 
-:math:`[\tau, \tau_1]` and :math:`[\tau_1, \tau']` that it connects in color :math:`j`. Try removing the :math:`J_{\perp}` line and segment 
-:math:`[\tau_1, \tau_1']` in color :math:`i`, and replacing :math:`[\tau, \tau_1]` and :math:`[\tau_1, \tau']` in color :math:`j` with a single 
+:math:`[\tau, \tau_1]` and :math:`[\tau_1', \tau']` that it connects in color :math:`j`. Try removing the :math:`J_{\perp}` line and segment 
+:math:`[\tau_1, \tau_1']` in color :math:`i`, and replacing :math:`[\tau, \tau_1]` and :math:`[\tau_1', \tau']` in color :math:`j` with a single 
 segment :math:`[\tau, \tau']`. 
 
 This move is enabled if there is a non-zero :math:`J_{\perp}(\tau)`. 

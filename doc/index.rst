@@ -4,7 +4,7 @@ The Segment Picture Solver
 **************************
 
 The :ref:`TRIQS-based <triqslibs:welcome>` hybridization-expansion **segment picture** solver (CTSEG)
-can tackle the generic problem of a quantum impurity coupled to an external environement (bath). The "impurity" can
+can tackle the generic problem of a quantum impurity coupled to an external environment (bath). The "impurity" can
 be any set of orbitals, on one or several atoms. The CTSEG solver supports (possibly retarded) density-density
 and spin-spin interactions on the impurity. Under these restrictions, it provides better performance than the generic
 `CTHYB <https://triqs.github.io/cthyb/latest/>`_ solver, that supports generic local interaction vertices. 
@@ -33,7 +33,7 @@ The imaginary time action solved by CTSEG is of the form
 Here :math:`\beta` is the inverse temperature, :math:`a` denote orbital indices, :math:`\sigma` spin indices (:math:`\sigma = \uparrow, \downarrow`),
 :math:`n_a \equiv \sum_{\sigma} n_{a\sigma}`, :math:`s_a^{\xi} \equiv \frac{1}{2} \sum_{\sigma \sigma'} \overline{c}_{a\sigma}
 \sigma_{\sigma \sigma'}^{\xi} c_{a \sigma'}` and :math:`\sigma^{\xi}` are the Pauli matrices. :math:`\overline{c}_{a\sigma}(\tau)`
-and :math:`c_{a\sigma}(\tau)` are the :math:`\beta`-antiperiodic Grassman fields corresponding to the fermion
+and :math:`c_{a\sigma}(\tau)` are the :math:`\beta`-antiperiodic Grassmann fields corresponding to the fermion
 creation and annihilation operators on the impurity, respectively. :math:`\Delta_{ab}^{\sigma \sigma'}(\tau)` 
 is the hybridization function, that accounts for particle exchange between the impurity and the bath, and 
 :math:`\mathcal{U}_{ab} (\tau)` and  :math:`\mathcal{J}_{a}^{\xi} (\tau)` are the (dynamical)

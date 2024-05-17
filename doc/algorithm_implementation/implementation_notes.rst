@@ -17,7 +17,7 @@ the set of results (``results.hpp``) and the ``solve`` method. The latter runs
 the QMC calculation for a given set of inputs, and given the additional ``solve_params`` (see ``params.hpp``). 
 
 The solve method works with three structures: ``params_t p`` (the set of all parameters), ``configuration_t config``
-(the Monte Carlo configuration, see below) and ``work_data_t wdata``, that contains all the data and auxillary 
+(the Monte Carlo configuration, see below) and ``work_data_t wdata``, that contains all the data and auxiliary 
 methods that are used by the Monte Carlo moves and measurements. It further defines an instance of the 
 `mc_generic <https://triqs.github.io/triqs/latest/documentation/manual/triqs/mc_tools/contents.html>`_ class 
 (a component of TRIQS) that takes care of implementing the Metropolis algorithm. The 
@@ -54,7 +54,7 @@ operator, and a boolean for each operator indicating whether it is attached to a
 
     By convention, we orient the imaginary time axis from :math:`\beta` on the left to 0 on the right. 
 
-A segment may be cyclic if :math:`\tau_c < \tau_{c^{\dagger}}`. A line that is occcupied at all times
+A segment may be cyclic if :math:`\tau_c < \tau_{c^{\dagger}}`. A line that is occupied at all times
 (a zeroth order term in the hybridization expansion) is represented by a segment with 
 :math:`\tau_{c^{\dagger}} = 0` and :math:`\tau_c = \beta`. 
 
@@ -64,7 +64,7 @@ and the time corresponding to an :math:`S^-` operator. No orbital indices are st
 
 The structure of the configuration is inherited from the structure of the hybridization function. The 
 hybridization function is matrix-valued, and its line (or column) indices are termed *colors*. The configuration
-consists in a list (``std::vector``) of lists of segments (one per color), and a list of :math:`J_{\perp}` lines. 
+consists of a list (``std::vector``) of lists of segments (one per color), and a list of :math:`J_{\perp}` lines. 
 The block structure of the hybridization function is irrelevant for the configuration (it is only used for the determinants, see below). 
 
 .. warning::
@@ -88,7 +88,7 @@ Work data
 The ``work_data`` structure (see ``work_data.hpp``) contains data and methods that are used by the Monte Carlo moves 
 and measurements. Most importantly, its construction involves computing the dynamical interaction kernel :math:`K(\tau)`, 
 and initializing the determinant for every block of the hybridization matrix :math:`[\Delta]`. ``work_data.hpp`` also 
-contains auxillary functions for the Monte Carlo moves: in particular, ``trace_sign``, that computes the sign of the trace 
+contains auxiliary functions for the Monte Carlo moves: in particular, ``trace_sign``, that computes the sign of the trace 
 from the times of the hybridized operators stored in the ``dets`` object. 
 
 Determinants
@@ -98,7 +98,7 @@ The hybridization matrix :math:`[\Delta]` is stored in ``work_data`` as a list (
 Each block is a ``det_manip`` object. The ``det_manip`` class is a part of TRIQS, which implements
 a fast computation of the change to :math:`\mathrm{det}[\Delta]` upon insertion or removal of a line 
 and column in :math:`[\Delta]`. The ``det_manip`` object is constructed from the input hybridization function 
-via an "adaptor" that specifies how it is to be callled (see ``dets.hpp``). The alias ``det_t`` is used for the 
+via an "adaptor" that specifies how it is to be called (see ``dets.hpp``). The alias ``det_t`` is used for the 
 type of :math:`[\Delta]`. 
 
 .. warning::

@@ -8,7 +8,7 @@ Double expansion
 
 The segment-picture continuous-time quantum Monte Carlo algorithm
 (CTSEG), in its double expansion version, is based on an expansion of the partition function in powers of the 
-hybridization function :math:`\Delta(\tau)` and perprendicular spin-spin interaction 
+hybridization function :math:`\Delta(\tau)` and perpendicular spin-spin interaction 
 :math:`J_{\perp} (\tau)`. Details can be found in [#ctqmc1]_ [#ctqmc2]_. The partition function is :math:`Z = \int [Dc][D\overline{c}]e^{-\mathcal{S}[c,\overline{c}]}`,
 with the action :math:`\mathcal{S}` given by 
 
@@ -25,7 +25,7 @@ with the action :math:`\mathcal{S}` given by
 Here :math:`\beta` is the inverse temperature, :math:`a` denote orbital indices, :math:`\sigma` spin indices (:math:`\sigma = \uparrow, \downarrow`),
 :math:`n_a \equiv \sum_{\sigma} n_{a\sigma}`, :math:`s_a^{\xi} \equiv \frac{1}{2} \sum_{\sigma \sigma'} \overline{c}_{a\sigma}
 \sigma_{\sigma \sigma'}^{\xi} c_{a \sigma'}` and :math:`\sigma^{\xi}` are the Pauli matrices. :math:`\overline{c}_{a\sigma}(\tau)`
-and :math:`c_{a\sigma}(\tau)` are the :math:`\beta`-antiperiodic Grassman fields corresponding to the fermion
+and :math:`c_{a\sigma}(\tau)` are the :math:`\beta`-antiperiodic Grassmann fields corresponding to the fermion
 creation and annihilation operators on the impurity, respectively.
 
 This action can be recast as 
@@ -72,9 +72,9 @@ where :math:`w_{\rm loc}` is the local trace factor:
 
   w_{\rm loc} = \langle \psi \vert e^{-S_{\rm loc}} c(v_1)\overline{c}(u_1) \dots c(v_n) \overline{c}(u_n) s^+(\alpha_1)s^-(\beta_1) \dots s^+(\alpha_k) s^-(\beta_k) \vert \psi \rangle.
 
-We have denoted :math:`\vert \Psi \rangle` the basis states of the isolated impurity and :math:`S_{\rm loc}` the corresponsing action.
+We have denoted :math:`\vert \Psi \rangle` the basis states of the isolated impurity and :math:`S_{\rm loc}` the corresponding action.
 :math:`[\Delta]` is the matrix with elements :math:`[\Delta]_{ij} = \Delta(u_i - v_j)` and :math:`q` is a permutation 
-of :math:`(1, \dots, k)`. We chose to regoup all the possible permutations of the "hybridized" operators into a determinant
+of :math:`(1, \dots, k)`. We chose to regroup all the possible permutations of the "hybridized" operators into a determinant
 because it allows for numerically fast updates, while there is no advantage to regrouping the permutations of the spin 
 operators into a permanent. 
 
@@ -96,7 +96,7 @@ The static trace factor is
 
   w_{\rm st}(U_{ab}, \mu_a) = \exp \left[ -\sum_{a \neq b} U_{ab} O_{ab} + \sum_a \mu_a \ell_a \right].
 
-Here :math:`O_{ab}` is the overlap between the segments of colors a and b, and :math:`\ell_a` is the occupied length in color a.
+Here :math:`O_{ab}` is the overlap between the segments of colors :math:`a` and :math:`b`, and :math:`\ell_a` is the occupied length in color a.
 In the presence of dynamical interactions, the static trace factor is computed with a renormalized interaction and chemical potential: 
 :math:`\tilde U_{ab} = U_{ab} - 2 K'_{ab}(0)` and :math:`\tilde \mu_{a} = \mu_a + K'_{aa}(0)`. 
 
