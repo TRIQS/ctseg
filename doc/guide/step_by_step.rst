@@ -157,7 +157,7 @@ Chemical potential
 ------------------
 
 The orbital-dependent chemical potential is passed to the solver as the solve parameter ``hartree_shift`` (see below), 
-a list with one value per color. For example, for the single-orgital problem::
+a list with one value per color. For example, for the single-orbital problem::
 
     hartree_shift = [mu, mu]
 
@@ -178,7 +178,7 @@ The dynamical density-density interaction :math:`D(\tau)` (see :doc:`CTSEG algor
 
     D_tau = GfImTime(indices = range(n_colors), beta = beta, statistic = "Boson", n_points = n_tau_k)
 
-It is a matrix Green's function, for which no block strucutre is explicitly enforced. The data in 
+It is a matrix Green's function, for which no block structure is explicitly enforced. The data in 
 ``D_tau`` can be specified manually (``D_tau.data = ...``) or by using an analytical expression. 
 For example:: 
 
@@ -195,7 +195,7 @@ The dynamical interaction is supplied to the solver via::
 Spin-spin interaction
 ---------------------
 
-The prependicular spin-spin interaction :math:`J_{\perp}(\tau)` (see :doc:`CTSEG algorithm <../algorithm_implementation/ctseg>`) is initialized as:: 
+The perpendicular spin-spin interaction :math:`J_{\perp}(\tau)` (see :doc:`CTSEG algorithm <../algorithm_implementation/ctseg>`) is initialized as:: 
 
     Jperp_tau = GfImTime(indices = [0], beta = beta, statistic = "Boson", n_points = n_tau_k)
 
@@ -248,7 +248,7 @@ Other parameters include:
   density correlation functions) can be time-consuming, and they are off by default. For example, to turn the improved estimator 
   measurement on, one should set ``solve_params["measure_ft"] = True``. 
 
-* **Move control**. All the :doc:`Monte Carlo moves <moves>` can be switched on and off. This functionality exists to faciliate testing
+* **Move control**. All the :doc:`Monte Carlo moves <moves>` can be switched on and off. This functionality exists to facilitate testing
   for developers. The solver chooses the relevant moves depending on its inputs, and regular users should not need move control. 
 
 The complete list of parameters is available :doc:`here <../_ref/triqs_ctseg.solver.Solver.solve>`.
@@ -265,7 +265,7 @@ The CTQMC run is triggered by::
     In the presence of dynamical interactions, these are renormalized values, different from the input parameters contained 
     in ``h_int`` and ``hartree_shift`` (see :doc:`CTSEG algorithm <../algorithm_implementation/ctseg>`).
 
-After it is done accumulating, the solver prints the average acceptance rates. Very low acceptance rates for all moves (below 0.1)
+After it is done accumulating, the solver prints the average acceptance rates. Very low acceptance rates for all moves (below 0.01)
 are generally a sign that something went wrong. However, some of the moves (``split_spin_segment``, ``regroup_spin_segment``)
 often have low acceptance rates, even if the calculation runs as it should. 
 
