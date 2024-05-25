@@ -52,7 +52,7 @@ for name, block in S.Delta_tau:
 # Solve parameters
 solve_params = {
     "h_int": h_int,
-    "hartree_shift": [mu] * 2 * n_orb,
+    "chemical_potential": [mu] * 2 * n_orb,
     "length_cycle": 50,
     "n_warmup_cycles": 1000,
     "n_cycles": 10000,

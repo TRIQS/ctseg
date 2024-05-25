@@ -140,7 +140,7 @@ c.add_method("""void solve (**solve_params_t)""",
 +=======================================+======================================+=========================================+===================================================================================================================+
 | h_int                                 | triqs::operators::many_body_operator | --                                      | Local Hamiltonian                                                                                                 |
 +---------------------------------------+--------------------------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
-| hartree_shift                         | nda::vector<double>                  | nda::vector<double>{}                   | Chemical potential (high frequency limit of :math:`G_0^{-1}(i\omega) - i \omega`)                                 |
+| chemical_potential                    | nda::vector<double>                  | nda::vector<double>{}                   | Chemical potential (high frequency limit of :math:`G_0^{-1}(i\omega) - i \omega`)                                 |
 +---------------------------------------+--------------------------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
 | n_cycles                              | int                                  | --                                      | Number of QMC cycles                                                                                              |
 +---------------------------------------+--------------------------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
@@ -233,7 +233,7 @@ c.add_member(c_name = "h_int",
              initializer = """  """,
              doc = r"""Local Hamiltonian""")
 
-c.add_member(c_name = "hartree_shift",
+c.add_member(c_name = "chemical_potential",
              c_type = "nda::vector<double>",
              initializer = """ nda::vector<double>{} """,
              doc = r"""Chemical potential (high frequency limit of :math:`G_0^{-1}(i\omega) - i \omega`)""")

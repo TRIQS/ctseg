@@ -30,7 +30,7 @@ struct solve_params_t {
   triqs::operators::many_body_operator h_int;
 
   /// Chemical potential (high frequency limit of :math:`G_0^{-1}(i\omega) - i \omega`)
-  nda::vector<double> hartree_shift = nda::vector<double>{};
+  nda::vector<double> chemical_potential = nda::vector<double>{};
 
   /// Number of QMC cycles
   int n_cycles;

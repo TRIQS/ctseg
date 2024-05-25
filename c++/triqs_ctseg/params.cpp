@@ -29,7 +29,7 @@ void h5_write(h5::group h5group, std::string subgroup_name, solve_params_t const
   h5::group grp = subgroup_name.empty() ? h5group : h5group.create_group(subgroup_name);
 
   h5_write(grp, "h_int", c.h_int);
-  h5_write(grp, "hartree_shift", c.hartree_shift);
+  h5_write(grp, "chemical_potential", c.chemical_potential);
   h5_write(grp, "n_cycles", c.n_cycles);
   h5_write(grp, "length_cycle", c.length_cycle);
   h5_write(grp, "n_warmup_cycles", c.n_warmup_cycles);
@@ -71,7 +71,7 @@ void h5_read(h5::group h5group, std::string subgroup_name, solve_params_t &c) {
   h5::group grp = subgroup_name.empty() ? h5group : h5group.open_group(subgroup_name);
 
   h5_read(grp, "h_int", c.h_int);
-  h5_read(grp, "hartree_shift", c.hartree_shift);
+  h5_read(grp, "chemical_potential", c.chemical_potential);
   h5_read(grp, "n_cycles", c.n_cycles);
   h5_read(grp, "length_cycle", c.length_cycle);
   h5_read(grp, "n_warmup_cycles", c.n_warmup_cycles);

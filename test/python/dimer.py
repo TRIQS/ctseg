@@ -31,7 +31,7 @@ n_tau = 10001
 gf_struct = [(s, n_orb) for s in block_names] # Green's function structure
 
 ########################################################################
-# --------------- Construct Delta(tau) and hartree_shift ---------------
+# --------------- Construct Delta(tau) and chemical_potential ---------------
 
 # Non-interacting impurity Hamiltonian in matrix representation
 h_0_mat = np.diag(eps - mu)
@@ -54,7 +54,7 @@ G0_iw = BlockGf(mesh=iw_mesh, gf_struct=gf_struct)
 for bl, iw in product(block_names, iw_mesh):
     G0_iw[bl][iw] = linalg.inv(iw.value * np.eye(2*n_orb) - h_tot_mat)[:n_orb, :n_orb]
 
-# Get Delta(iw) and hartree_shift from G0(iw)
+# Get Delta(iw) and chemical_potential from G0(iw)
 def get_h0_Delta(G0_iw):
     h0_lst, Delta_iw = [], G0_iw.copy()
     for bl in G0_iw.indices:
@@ -65,9 +65,9 @@ def get_h0_Delta(G0_iw):
     return h0_lst, Delta_iw
 
 h0_lst, Delta_iw = get_h0_Delta(G0_iw)
-hartree_shift = []
+chemical_potential = []
 for h0 in h0_lst:
-    hartree_shift += [-l for l in linalg.eig(h0)[0].real]
+    chemical_potential += [-l for l in linalg.eig(h0)[0].real]
 
 # Fourier-transform to get Delta(tau)
 tau_mesh = MeshImTime(beta, 'Fermion', n_tau)
@@ -96,7 +96,7 @@ h_int = h_int_density(block_names, n_orb, Umat, Upmat, off_diag=True)
 # --------- Solve parameters ----------
 solve_params = {
     'h_int': h_int,
-    'hartree_shift': hartree_shift,
+    'chemical_potential': chemical_potential,
     'n_warmup_cycles': 5000,
     'n_cycles': 50000,
     'length_cycle': 100,

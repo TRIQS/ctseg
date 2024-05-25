@@ -22,7 +22,7 @@ n_tau = 1001
 # Solve parameters
 solve_params = {
     "h_int": 0*n("up", 0)*n("down", 0),
-    "hartree_shift": [mu] * 2 * n_orb,
+    "chemical_potential": [mu] * 2 * n_orb,
     "length_cycle": 50,
     "n_warmup_cycles": 1000,
     "n_cycles": 10000,

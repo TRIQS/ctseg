@@ -52,7 +52,7 @@ S.D0_tau << 0.25*J**2*D0
 # Solve parameters
 solve_params = {
     "h_int": U*n("up", 0)*n("down", 0),
-    "hartree_shift": [mu, mu],
+    "chemical_potential": [mu, mu],
     "length_cycle": 50,
     "n_warmup_cycles": 1000,
     "n_cycles": 10000,

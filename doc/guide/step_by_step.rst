@@ -156,20 +156,14 @@ If a rotation is required, then the interactions should also be rotated accordin
 Chemical potential
 ------------------
 
-The orbital-dependent chemical potential is passed to the solver as the solve parameter ``hartree_shift`` (see below), 
+The orbital-dependent chemical potential is passed to the solver as the solve parameter ``chemical_potential`` (see below), 
 a list with one value per color. For example, for the single-orbital problem::
 
-    hartree_shift = [mu, mu]
+    chemical_potential = [mu, mu]
 
-.. warning::
+.. note::
 
-    In CTSEG, the meaning of the ``hartree_shift`` parameter is not the same as in CTHYB. In CTHYB, it represents 
-    a shift of the chemical potential with respect to the one already contained in ``G0_iw``. In CTSEG, 
-    ``hartree_shift`` is the full chemical potential with all shifts applied. 
-    
-If the list of chemical potentials is extracted from the CTHYB input ``G0_iw`` as above, then::
-
-        hartree_shift_ctseg = [mu_list[i] + hartree_shift_cthyb[i] for i in range(n_colors)]
+    This is different from the Delta interface in CTHYB, which takes ``h0`` (supplied as TRIQS operator) as an input.  
 
 Dynamical density-density interaction
 -------------------------------------
@@ -178,8 +172,14 @@ The dynamical density-density interaction :math:`D(\tau)` (see :doc:`CTSEG algor
 
     D_tau = GfImTime(indices = range(n_colors), beta = beta, statistic = "Boson", n_points = n_tau_k)
 
-It is a matrix Green's function, for which no block structure is explicitly enforced. The data in 
-``D_tau`` can be specified manually (``D_tau.data = ...``) or by using an analytical expression. 
+It is a matrix Green's function, for which no block structure is explicitly enforced. 
+
+.. note::
+
+    The ordering of the rows and columns in ``D_tau`` is consistent with the ordering of the blocks in ``Delta_tau``.  
+
+
+The data in ``D_tau`` can be specified manually (``D_tau.data = ...``) or by using an analytical expression. 
 For example:: 
 
     from triqs.gf.descriptors import Function
@@ -226,7 +226,7 @@ The following parameters need to be specified for every run. For example::
 
     solve_params = {
         "h_int": h_int, 
-        "hartree_shift": hartree_shift,
+        "chemical_potential": chemical_potential,
         "length_cycle": 50,
         "n_warmup_cycles": 20000, 
         "n_cycles": 200000 
@@ -234,7 +234,7 @@ The following parameters need to be specified for every run. For example::
 
 * ``h_int`` is the local interaction Hamiltonian (see above).
 
-* ``hartree_shift`` is the total orbital-dependent chemical potential (see above). 
+* ``chemical_potential`` is the total orbital-dependent chemical potential (see above). 
 
 * ``length_cycle`` is the length of a Monte Carlo cycle. Observables are sampled every ``length_cycle`` Monte Carlo moves (either accepted or rejected). 
 
@@ -263,7 +263,7 @@ The CTQMC run is triggered by::
 .. warning::
     The solver prints to the command line the interaction matrix ``U`` and chemical potential ``mu`` that are used internally. 
     In the presence of dynamical interactions, these are renormalized values, different from the input parameters contained 
-    in ``h_int`` and ``hartree_shift`` (see :doc:`CTSEG algorithm <../algorithm_implementation/ctseg>`).
+    in ``h_int`` and ``chemical_potential`` (see :doc:`CTSEG algorithm <../algorithm_implementation/ctseg>`).
 
 After it is done accumulating, the solver prints the average acceptance rates. Very low acceptance rates for all moves (below 0.01)
 are generally a sign that something went wrong. However, some of the moves (``split_spin_segment``, ``regroup_spin_segment``)

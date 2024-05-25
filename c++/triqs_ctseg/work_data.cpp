@@ -38,9 +38,9 @@ work_data_t::work_data_t(params_t const &p, inputs_t const &inputs, mpi::communi
 
   // Color-dependent chemical potential
   mu = nda::zeros<double>(n_color);
-  if (p.hartree_shift.size() > 0) {
-    ALWAYS_EXPECTS((p.hartree_shift.size() == n_color), "Hartree shift size is not {}", n_color);
-    mu = p.hartree_shift;
+  if (p.chemical_potential.size() > 0) {
+    ALWAYS_EXPECTS((p.chemical_potential.size() == n_color), "Hartree shift size is not {}", n_color);
+    mu = p.chemical_potential;
   }
 
   // .............. Interactions .................
