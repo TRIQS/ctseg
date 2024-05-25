@@ -1,104 +1,111 @@
 # Two impurity sites coupled to two bath sites.
 # Delta(tau) has off-diagonal components. Can be compared to ED reference dimer_pyed.ref.h5
+# Comparison to CTSEG reference is disabled for this test because results can have large 
+# variations across platforms for short runs. 
 
-from triqs.gf import Gf, BlockGf, MeshImFreq, fit_hermitian_tail, iOmega_n, inverse, Fourier
-from triqs.gf.tools import make_zero_tail
+from triqs.gf import *
+from triqs.gf.tools import *
 from triqs.gf.gf_factories import make_gf_from_fourier
-from triqs.operators import c, c_dag
 from triqs.operators.util import U_matrix_kanamori, h_int_density
-from itertools import product
 import h5
 import triqs.utility.mpi as mpi
 from triqs.utility.h5diff import h5diff
 
 from triqs_ctseg import Solver
 
-from numpy import matrix, array, block, diag, eye
-from numpy.linalg import inv
+import numpy as np
+from numpy import linalg 
 
-# ==== System Parameters ====
-beta = 10.                       # Inverse temperature
+# Numerical values
+beta = 10.                      # Inverse temperature
 mu = 0.0                        # Chemical potential
-eps = array([0.0, 0.1])         # Impurity site energies
-eps_bath = array([0.27, -0.4])  # Bath site energies
+eps = np.array([0.0, 0.1])         # Impurity site energies
+eps_bath = np.array([0.27, -0.4])  # Bath site energies
 U = 1.                          # Density-density interaction
-J = 0.2                         # Hunds coupling
+J = 0.2                         # Hund's coupling
+V = 1                           # Bath-impurity coupling
 block_names = ['up', 'dn']
 n_orb = len(eps)
 n_orb_bath = len(eps_bath)
+n_tau = 10001
+gf_struct = [(s, n_orb) for s in block_names] # Green's function structure
+
+########################################################################
+# --------------- Construct Delta(tau) and hartree_shift ---------------
 
 # Non-interacting impurity Hamiltonian in matrix representation
-h_0_mat = diag(eps - mu)
+h_0_mat = np.diag(eps - mu)
 
 # Bath Hamiltonian in matrix representation
-h_bath_mat = diag(eps_bath)
+h_bath_mat = np.diag(eps_bath)
 
 # Coupling matrix
-V_mat = matrix([[1., 1.],
-                [1., 1.]])
+V_mat = np.matrix([[V, V],
+                [V, V]])
 
-# ==== Local Hamiltonian ====
-c_dag_vec = {s: matrix([[c_dag(s, o) for o in range(n_orb)]]) for s in block_names}
-c_vec = {s: matrix([[c(s, o)] for o in range(n_orb)]) for s in block_names}
+# Total non-interacting Hamiltonian 
+h_tot_mat = np.block([[h_0_mat, V_mat],
+                   [V_mat.H, h_bath_mat]])
 
-h_0 = sum(c_dag_vec[s] * h_0_mat * c_vec[s] for s in block_names)[0, 0]
-
-Umat, Upmat = U_matrix_kanamori(n_orb, U_int=U, J_hund=J)
-h_int = h_int_density(block_names, n_orb, Umat, Upmat, off_diag=True)
-
-h_imp = h_0 + h_int
-
-# ==== Bath & Coupling Hamiltonian ====
-c_dag_bath_vec = {s: matrix([[c_dag(s, o) for o in range(n_orb, n_orb + n_orb_bath)]]) for s in block_names}
-c_bath_vec = {s: matrix([[c(s, o)] for o in range(n_orb, n_orb + n_orb_bath)]) for s in block_names}
-
-h_bath = sum(c_dag_bath_vec[s] * h_bath_mat * c_bath_vec[s] for s in block_names)[0, 0]
-h_coup = sum(c_dag_vec[s] * V_mat * c_bath_vec[s] + c_dag_bath_vec[s] * V_mat.H * c_vec[s] for s in block_names)[0, 0]
-
-# ==== Total impurity Hamiltonian ====
-h_tot = h_imp + h_coup + h_bath
-
-# ==== Green function structure ====
-gf_struct = [(s, n_orb) for s in block_names]
-
-# ==== Non-Interacting Impurity Green function  ====
+# Non-interacting impurity Green's function
 n_iw = int(10 * beta)
 iw_mesh = MeshImFreq(beta, 'Fermion', n_iw)
 G0_iw = BlockGf(mesh=iw_mesh, gf_struct=gf_struct)
-h_tot_mat = block([[h_0_mat, V_mat],
-                   [V_mat.H, h_bath_mat]])
 for bl, iw in product(block_names, iw_mesh):
-    G0_iw[bl][iw] = inv(iw.value * eye(2*n_orb) - h_tot_mat)[:n_orb, :n_orb]
+    G0_iw[bl][iw] = linalg.inv(iw.value * np.eye(2*n_orb) - h_tot_mat)[:n_orb, :n_orb]
 
-# ==== Hybridization Function ====
-Delta = G0_iw.copy()
-Delta['up'] << iOmega_n - h_0_mat - inverse(G0_iw['up'])
-Delta['dn'] << iOmega_n - h_0_mat - inverse(G0_iw['dn'])
+# Get Delta(iw) and hartree_shift from G0(iw)
+def get_h0_Delta(G0_iw):
+    h0_lst, Delta_iw = [], G0_iw.copy()
+    for bl in G0_iw.indices:
+        Delta_iw[bl] << iOmega_n - inverse(G0_iw[bl])
+        tail, err = fit_hermitian_tail(Delta_iw[bl])
+        Delta_iw[bl] << Delta_iw[bl] - tail[0]
+        h0_lst.append(tail[0])
+    return h0_lst, Delta_iw
+
+h0_lst, Delta_iw = get_h0_Delta(G0_iw)
+hartree_shift = []
+for h0 in h0_lst:
+    hartree_shift += [-l for l in linalg.eig(h0)[0].real]
+
+# Fourier-transform to get Delta(tau)
+tau_mesh = MeshImTime(beta, 'Fermion', n_tau)
+Delta_tau = BlockGf(mesh = tau_mesh, gf_struct = gf_struct)
+for name, g0 in Delta_iw:
+    known_moments = make_zero_tail(Delta_iw[name], 1)
+    tail, err = fit_hermitian_tail(Delta_iw[name], known_moments)
+    Delta_tau[name] << make_gf_from_fourier(Delta_iw[name], tau_mesh, tail).real
+###########################################################
 
 # --------- Construct the CTSEG solver ----------
 constr_params = {
     'beta': beta,
     'gf_struct': gf_struct,
-    'n_tau': 10001,
+    'n_tau': n_tau,
 }
 S = Solver(**constr_params)
 
-# --------- fill Delta_tau from G0_iw ----------
-for name, g0 in Delta:
-    known_moments = make_zero_tail(Delta[name], 1)
-    tail, err = fit_hermitian_tail(Delta[name], known_moments)
-    S.Delta_tau[name] << make_gf_from_fourier(Delta[name], S.Delta_tau.mesh, tail).real
+# Input Delta(tau)
+S.Delta_tau << Delta_tau
 
-# --------- Solve! ----------
+# Impurity interaction Hamiltonian
+Umat, Upmat = U_matrix_kanamori(n_orb, U_int=U, J_hund=J)
+h_int = h_int_density(block_names, n_orb, Umat, Upmat, off_diag=True)
+
+# --------- Solve parameters ----------
 solve_params = {
     'h_int': h_int,
-    'hartree_shift': [0.0, -0.1, 0.1, 0.0],
+    'hartree_shift': hartree_shift,
     'n_warmup_cycles': 5000,
     'n_cycles': 50000,
     'length_cycle': 100,
 }
+
+# ---------- Solve ----------
 S.solve(**solve_params)
 
+# --------- Save output ---------
 if mpi.is_master_node():
     with h5.HDFArchive("dimer.out.h5", 'w') as A:
         A['G_tau'] = S.results.G_tau

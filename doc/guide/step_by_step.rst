@@ -128,7 +128,7 @@ The following code extracts from a ``BlockGf`` ``G0_iw`` a ``BlockGf`` ``Delta_i
     def get_h0_Delta(G0_iw):
         h0_lst, Delta_iw = [], G0_iw.copy()
         for bl in G0_iw.indices:
-            Delta_iw[bl] << iOmega_n - inverse(G_iw[bl])
+            Delta_iw[bl] << iOmega_n - inverse(G0_iw[bl])
             tail, err = fit_hermitian_tail(Delta_iw[bl])
             Delta_iw[bl] << Delta_iw[bl] - tail[0]
             h0_lst.append(tail[0])

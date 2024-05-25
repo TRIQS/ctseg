@@ -5,8 +5,8 @@
 using triqs::operators::n;
 
 TEST(CTSEGJ, Spin_Spin) {
-  // Start the mpi
-  mpi::communicator c;
+  
+  mpi::communicator c; // Start the mpi
 
   double beta         = 10.0;
   double U            = 4.0;
@@ -24,6 +24,7 @@ TEST(CTSEGJ, Spin_Spin) {
   constr_params_t param_constructor;
   solve_params_t param_solve;
 
+  // Construction parameters
   param_constructor.beta      = beta;
   param_constructor.gf_struct = {{"up", 1}, {"down", 1}};
   param_constructor.n_tau     = n_tau;
@@ -32,13 +33,13 @@ TEST(CTSEGJ, Spin_Spin) {
   // Create solver instance
   solver_core Solver(param_constructor);
 
+  // Solve parameters
   param_solve.h_int           = U * n("up", 0) * n("down", 0);
   param_solve.hartree_shift   = {mu, mu};
   param_solve.n_cycles        = n_cycles;
   param_solve.n_warmup_cycles = n_warmup_cycles;
   param_solve.length_cycle    = length_cycle;
   param_solve.random_seed     = random_seed;
-  // Measures
   param_solve.measure_ft  = true;
   param_solve.measure_nnt = true;
   param_solve.measure_nn  = true;
@@ -67,7 +68,7 @@ TEST(CTSEGJ, Spin_Spin) {
   Solver.D0_tau().data()(range::all, 1, 1) = D0t.data()(range::all, 0, 0);
   Solver.Jperp_tau()                       = fourier(J0w);
 
-  // Solve!!
+  // Solve
   Solver.solve(param_solve);
 
   // Save the results

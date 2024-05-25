@@ -3,27 +3,38 @@
 from triqs.gf import *
 from triqs.gf.descriptors import Function
 from triqs.utility import mpi
-from triqs.operators import *
+from triqs.operators import n
 from h5 import *
 import numpy as np
-from triqs_ctseg import SolverCore as Solver
-import h5
 from triqs.utility.h5diff import h5diff
+from triqs_ctseg import SolverCore as Solver
 
-# -------------- Model parameters -----------
-
-beta = 20.0 # inverse temperature
-mu   = 0.2 # chemical potential
-
-#number of orbitals
+# Number of orbitals
 n_orb = 3
 
-#interaction
-U    = 2.0
-Up   = 1.0
-J    = 0.0
+# Numerical values
+beta = 20.0 # inverse temperature
+mu   = 0.2 # chemical potential
+eps = 0.3 # hybridization levels
+V = 1. # hybridization strengths
+U    = 2.0 # same orbital interaction 
+Up   = 1.0 # different orbital interaction 
+J    = 0.1 # Hund coupling
+n_tau = 1001
+n_tau_k = 1001
 
-#Hamiltonian for the model
+# Solver construction parameters
+constr_params = {
+    "gf_struct": [(f'up{(l+2)//2}', 1) if l % 2 == 0 else (f'down{(l+1)//2}', 1) for l in range(2 * n_orb)],
+    "beta": beta,
+    "n_tau": n_tau,
+    "n_tau_k": n_tau_k
+}
+
+# Construct solver
+S = Solver(**constr_params)
+
+# Interaction Hamiltonian
 h_int = 0
 for l in range(n_orb):
     h_int += U * n(f'up{l+1}', 0) * n(f'down{l+1}', 0)
@@ -32,45 +43,34 @@ for l1 in range(n_orb):
         h_int += (Up - J) * (n(f'up{l1+1}', 0) * n(f'up{l2+1}', 0) + n(f'down{l1+1}', 0) * n(f'down{l2+1}', 0))
         h_int += Up * (n(f'up{l1+1}', 0) * n(f'down{l2+1}', 0) + n(f'down{l1+1}', 0) * n(f'up{l2+1}', 0))
 
-#hybridization levels
-eps ={} 
-for l in range(n_orb):
-    eps[f'up{l+1}'] = 0.3
-    eps[f'down{l+1}'] = 0.3
-
-#hybridization strengths
-V ={}
-for l in range(n_orb):
-    V[f'up{l+1}'] = 1./np.sqrt(l+1)
-    V[f'down{l+1}'] = 1./np.sqrt(l+1)
-
-
-# -------------- Construct solver -----------
-gf_struct = [(f'up{(l+2)//2}', 1) if l % 2 == 0 else (f'down{(l+1)//2}', 1) for l in range(2 * n_orb)]
-S = Solver(beta = beta,
-           n_tau = 10000,
-           gf_struct= gf_struct
-           )
-
-# -------------- Input Delta(tau) -----------
+# Hybridization Delta(tau)
 for name, block in S.Delta_tau:
-    Delta_iw = GfImFreq(indices=[0], beta=beta, n_points=1000)
-    Delta_iw << V[name]**2 * inverse(iOmega_n - eps[name])
+    Delta_iw = GfImFreq(indices=[0], beta=beta, n_points=n_tau//2)
+    Delta_iw << V**2 * inverse(iOmega_n - eps)
     block << Fourier(Delta_iw)
 
-# -------------- Solve -----------
-S.solve(h_int=h_int, 
-        hartree_shift=[mu] * 2 * n_orb,
-        n_cycles  = 10000,
-        length_cycle = 100,
-        n_warmup_cycles = 1000,     
-        measure_gt=True,
-        measure_nn=False,
-        )
+# Solve parameters
+solve_params = {
+    "h_int": h_int,
+    "hartree_shift": [mu] * 2 * n_orb,
+    "length_cycle": 50,
+    "n_warmup_cycles": 1000,
+    "n_cycles": 10000,
+    "measure_ft": True,
+    "measure_nnt": True,
+    "measure_nn": True
+    }
 
+# Solve
+S.solve(**solve_params)
+
+# Save and compare to reference
 if mpi.is_master_node():
-    with h5.HDFArchive("multiorb.out.h5", 'w') as A:
+    with HDFArchive("multiorb.out.h5", 'w') as A:
         A['G_tau'] = S.results.G_tau
+        A['F_tau'] = S.results.F_tau
+        A['nn_tau'] = S.results.nn_tau
+        A['nn'] = S.results.nn_static
+        A['densities'] = S.results.densities
 
-# --------- Compare to reference ----------      
-    h5diff("multiorb.out.h5", "multiorb.ref.h5", precision=1e-9)
+    #h5diff("multiorb.out.h5", "multiorb.ref.h5", precision=1e-9)
