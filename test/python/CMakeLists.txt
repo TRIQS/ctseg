@@ -9,6 +9,7 @@ set(all_tests
   ./spin_spin
   ./two_orbitals
   ./multiorb
+  ./dynamic_int_multiorb
   ./dimer
 )
 
@@ -18,3 +19,6 @@ foreach(test ${all_tests})
   add_test(NAME Py_${test_name} COMMAND ${TRIQS_PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/${test_dir}/${test_name}.py WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${test_dir})
   set_property(TEST Py_${test_name} APPEND PROPERTY ENVIRONMENT PYTHONPATH=${PROJECT_BINARY_DIR}/python:$ENV{PYTHONPATH} ${SANITIZER_RT_PRELOAD})
 endforeach()
+
+# Copy input data for multi-orbital dynamic interaction test
+FILE(COPY dynamic_int_multiorb_input.h5 DESTINATION ${test_dir})
