@@ -6,7 +6,6 @@ tags:
 authors:
   - name: Nikita Kavokine
     orcid: 0000-0002-8037-7996
-    corresponding: true
     affiliation: "1, 2" 
   - name: Hao Lu
     orcid: 0009-0000-4581-9544
@@ -49,17 +48,19 @@ based on stochastically exploring the terms in the perturbative expansion of the
 around an exactly solvable limit. Hybridization expansion algorithms -- chief of which the 
 continuous-time `CTHYB` -- involve expanding around the limit of an isolated atom [@gull2011]. 
 Three extensive libraries for the numerical treatment of quantum many-body problems are 
-currently available: `ALPS`, `w2dynamics` and `TRIQS`, and each has its own implementation of `CTHYB` 
-[@ALPS2018,@w2dynamics2019,@CTHYB2016]. 
+currently available: `ALPS` [@ALPS2018], `w2dynamics` [@w2dynamics2019] and `TRIQS` [@CTHYB2016], 
+and each has its own implementation of `CTHYB`.
 
 However, a simpler and potentially faster version of the `CTHYB` algorithm, 
 called `CTSEG`, can be used under the restriction of (possibly time-dependent) density-density
 interactions on the impurity. `CTSEG` can be further generalized to allow for time-dependent 
 spin-spin interactions [@otsuki2013]. To our knowledge, no implementation of `CTSEG` has been published so far. 
 Our `CTSEG` solver is about twice as fast as `TRIQS-CTHYB` for a single orbital problem, and has
-better scaling with the number of orbitals (400 times faster in our 5 orbital test case, see Fig. 1). 
+better scaling with the number of orbitals (400 times faster in our 5 orbital test case, see Fig. 1a). 
 `CTSEG` has already allowed us to obtain the first numerically-exact solution of the 
 quantum Heisenberg spin glass [@kavokine2024]. 
+
+![**a**. Running time comparison between the TRIQS implementations of CTSEG and CTHYB. The test system is a multi-orbital impurity at half-filling and inverse temperature $\beta = 20$. The Coulomb repulsion is $U = 2$ for two electrons on the same orbital and $U' = 1$ for two electrons on different orbitals. The hybridization is diagonal and identical for all orbitals: $\Delta(\omega) = 1/(\omega - 0.3)$. **b**. Spin-spin correlation function $\chi(\tau) = \langle \mathbf{S}(\tau) \cdot \mathbf{S}(0) \rangle$ of the $t-J-U$ model studied by Dumitrescu et al., obtained using CTSEG at inverse temperature $\beta = 300$ and different values of doping $p$. At long times $\chi(\tau) \sim 1/\tau^{\theta}$, with $\theta = 1$ at the QCP. Inset: exponent $\theta$ as a function of doping $p$. The QCP is located at $p \approx 0.16$.](figure_JOSS.pdf)
 
 # Example of use
 
