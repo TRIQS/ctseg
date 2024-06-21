@@ -39,7 +39,7 @@ class tau_t {
   /// Not for users. Use the factories
   tau_t(uint64_t n_) : n(n_) {}
   /// For test only, not for users. Use the factories
-  tau_t(double x)  {
+  tau_t(double x) {
     if ((x > _beta || x < 0)) {
       throw std::invalid_argument("Time tau must be in the range [0, beta]");
     } else if (x == _beta)

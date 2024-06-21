@@ -5,7 +5,7 @@
 using triqs::operators::n;
 
 TEST(CTSEGJ, Spin_Spin) {
-  
+
   mpi::communicator c; // Start the mpi
 
   double beta         = 10.0;
@@ -34,15 +34,15 @@ TEST(CTSEGJ, Spin_Spin) {
   solver_core Solver(param_constructor);
 
   // Solve parameters
-  param_solve.h_int           = U * n("up", 0) * n("down", 0);
-  param_solve.chemical_potential   = {mu, mu};
-  param_solve.n_cycles        = n_cycles;
-  param_solve.n_warmup_cycles = n_warmup_cycles;
-  param_solve.length_cycle    = length_cycle;
-  param_solve.random_seed     = random_seed;
-  param_solve.measure_ft  = true;
-  param_solve.measure_nnt = true;
-  param_solve.measure_nn  = true;
+  param_solve.h_int              = U * n("up", 0) * n("down", 0);
+  param_solve.chemical_potential = {mu, mu};
+  param_solve.n_cycles           = n_cycles;
+  param_solve.n_warmup_cycles    = n_warmup_cycles;
+  param_solve.length_cycle       = length_cycle;
+  param_solve.random_seed        = random_seed;
+  param_solve.measure_ft         = true;
+  param_solve.measure_nnt        = true;
+  param_solve.measure_nn         = true;
 
   // Prepare delta
   nda::clef::placeholder<0> om_;
