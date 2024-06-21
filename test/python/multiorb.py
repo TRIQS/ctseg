@@ -7,7 +7,7 @@ from triqs.operators import n
 from h5 import *
 import numpy as np
 from triqs.utility.h5diff import h5diff
-from triqs_ctseg import SolverCore as Solver
+from triqs_ctseg import Solver
 
 # Number of orbitals
 n_orb = 3
