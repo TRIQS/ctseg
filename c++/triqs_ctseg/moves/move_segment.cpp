@@ -71,6 +71,13 @@ namespace moves {
     double ln_trace_ratio =
        (flipped ? -1 : 1) * (wdata.mu(dest_color) - wdata.mu(origin_color)) * double(origin_segment.length());
 
+    for (auto const &[c, slist] : itertools::enumerate(config.seglists)) {
+      if (c != dest_color && c != origin_color) {
+        ln_trace_ratio += -wdata.U(dest_color, c) * overlap(slist, origin_segment) * (flipped ? -1 : 1);
+        ln_trace_ratio -= -wdata.U(origin_color, c) * overlap(slist, origin_segment) * (flipped ? -1 : 1);
+      }
+    }
+
     if (wdata.has_Dt) {
       auto tau_c    = origin_segment.tau_c;
       auto tau_cdag = origin_segment.tau_cdag;
@@ -80,6 +87,7 @@ namespace moves {
         ln_trace_ratio += K_overlap(slist, tau_c, tau_cdag, wdata.K, dest_color, c);
         ln_trace_ratio -= K_overlap(slist, tau_c, tau_cdag, wdata.K, origin_color, c);
       }
+      // Correct double counting
       auto Kl = wdata.K(double(origin_segment.length())); // matrix
       ln_trace_ratio -= real(Kl(origin_color, origin_color));
       ln_trace_ratio -= real(Kl(dest_color, dest_color));

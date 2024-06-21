@@ -68,7 +68,7 @@ a metal at a doping-induced quantum critical point (QCP). Dumitrescu et al.
 obtained solutions at inverse temperatures up to $\beta = 65$, limited by the fermionic sign problem 
 of their interaction expansion solver. The hybridization expansion carried out by `CTSEG` is 
 sign-problem-free for the $t-J-U$ model, allowing us to reach $\beta = 300$ and to obtain a 
-more accurate localization of the QCP at doping $p \approx 0.16$ (Fig. 2).
+more accurate localization of the QCP at doping $p \approx 0.16$ (Fig. 1b).
 
 # Acknowledgements
 
