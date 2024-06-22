@@ -17,8 +17,8 @@ solver_core::solver_core(constr_params_t const &p) : constr_params(p) {
   int n_color = count_colors(p.gf_struct);
 
   inputs.delta  = block_gf<imtime>(triqs::mesh::imtime{beta, Fermion, p.n_tau}, p.gf_struct);
-  inputs.d0t    = gf<imtime>({beta, Boson, p.n_tau_k}, {n_color, n_color});
-  inputs.jperpt = gf<imtime>({beta, Boson, p.n_tau_k}, {1, 1});
+  inputs.d0t    = gf<imtime>({beta, Boson, p.n_tau_bosonic}, {n_color, n_color});
+  inputs.jperpt = gf<imtime>({beta, Boson, p.n_tau_bosonic}, {1, 1});
 
   inputs.delta()  = 0;
   inputs.d0t()    = 0;

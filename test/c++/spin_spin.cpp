@@ -25,10 +25,10 @@ TEST(CTSEGJ, Spin_Spin) {
   solve_params_t param_solve;
 
   // Construction parameters
-  param_constructor.beta      = beta;
-  param_constructor.gf_struct = {{"up", 1}, {"down", 1}};
-  param_constructor.n_tau     = n_tau;
-  param_constructor.n_tau_k   = n_tau;
+  param_constructor.beta          = beta;
+  param_constructor.gf_struct     = {{"up", 1}, {"down", 1}};
+  param_constructor.n_tau         = n_tau;
+  param_constructor.n_tau_bosonic = n_tau;
 
   // Create solver instance
   solver_core Solver(param_constructor);

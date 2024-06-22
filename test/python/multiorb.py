@@ -21,14 +21,14 @@ U    = 2.0 # same orbital interaction
 Up   = 1.0 # different orbital interaction 
 J    = 0.1 # Hund coupling
 n_tau = 1001
-n_tau_k = 1001
+n_tau_bosonic = 1001
 
 # Solver construction parameters
 constr_params = {
     "gf_struct": [(f'up{(l+2)//2}', 1) if l % 2 == 0 else (f'down{(l+1)//2}', 1) for l in range(2 * n_orb)],
     "beta": beta,
     "n_tau": n_tau,
-    "n_tau_k": n_tau_k
+    "n_tau_bosonic": n_tau_bosonic
 }
 
 # Construct solver

@@ -7,11 +7,11 @@ namespace measures {
      : wdata{wdata}, config{config}, results{results} {
 
     beta    = p.beta;
-    ntau    = p.n_tau_k;
+    ntau    = p.n_tau_bosonic;
     dtau    = p.beta / (ntau - 1);
     n_color = config.n_color();
 
-    q_tau   = gf<imtime>({beta, Boson, p.n_tau_k}, {n_color, n_color});
+    q_tau   = gf<imtime>({beta, Boson, p.n_tau_bosonic}, {n_color, n_color});
     q_tau() = 0;
   }
 

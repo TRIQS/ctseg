@@ -14,14 +14,14 @@ U = 4.0
 mu = U/2
 J = 0.5
 n_tau = 2051
-n_tau_k = 2001
+n_tau_bosonic = 2001
 
 # Solver construction parameters
 constr_params = {
     "gf_struct": [('down', 1), ('up', 1)],
     "beta": beta,
     "n_tau": n_tau,
-    "n_tau_k": n_tau_k
+    "n_tau_bosonic": n_tau_bosonic
 }
 
 # Construct solver
@@ -41,7 +41,7 @@ delta << iOmega_n + mu - invg0
 S.Delta_tau << Fourier(delta)
 
 # Spin-spin interaction (D0(tau) and Jperp(tau))
-D0 = GfImTime(indices=[0, 1], beta=beta, statistic='Boson', n_points=n_tau_k)
+D0 = GfImTime(indices=[0, 1], beta=beta, statistic='Boson', n_points=n_tau_bosonic)
 D0[0, 0] = -Q_tau[0, 0]
 D0[1, 1] = -Q_tau[0, 0]
 D0[0, 1] = Q_tau[0, 0]

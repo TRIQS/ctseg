@@ -126,7 +126,7 @@ c.add_constructor("""(**constr_params_t)""", doc = r"""Initialize the solver
 +----------------+-------------+---------+----------------------------------------------------------------+
 | n_tau          | int         | 10001   | Number of time slices for fermionic functions                  |
 +----------------+-------------+---------+----------------------------------------------------------------+
-| n_tau_k        | int         | 10001   | Number of time slices for bosonic functions                    |
+| n_tau_bosonic        | int         | 10001   | Number of time slices for bosonic functions                    |
 +----------------+-------------+---------+----------------------------------------------------------------+
 """)
 
@@ -420,7 +420,7 @@ c.add_member(c_name = "n_tau",
              initializer = """ 10001 """,
              doc = r"""Number of time slices for fermionic functions""")
 
-c.add_member(c_name = "n_tau_k",
+c.add_member(c_name = "n_tau_bosonic",
              c_type = "int",
              initializer = """ 10001 """,
              doc = r"""Number of time slices for bosonic functions""")

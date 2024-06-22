@@ -108,11 +108,11 @@ The dynamic density correlation function is defined as
     \chi_{ij}(\tau) =  \langle T_{\tau} n_i(\tau) n_j(0) \rangle. 
 
 Here the indices :math:`i, j = 0, \dots N - 1` represents colors (irrespective of the block structure).
-:math:`\chi_{ij}(\tau)` is measured on a uniform time grid, whose number of points is set by ``n_tau_k`` in the ``constr_params``. 
+:math:`\chi_{ij}(\tau)` is measured on a uniform time grid, whose number of points is set by ``n_tau_bosonic`` in the ``constr_params``. 
 
 .. warning::
 
-    The value of ``n_tau_k`` supplied in the ``constr_params`` and the number of points in the :math:`\tau` grids of
+    The value of ``n_tau_bosonic`` supplied in the ``constr_params`` and the number of points in the :math:`\tau` grids of
     the :math:`D(\tau)` and :math:`J_{\perp}(\tau)` inputs must match. 
 
 The measurement is turned on by setting ``measure_nn_tau`` in the ``solve_params`` to ``True``. The result of the 
@@ -128,7 +128,7 @@ The perpendicular spin-spin correlation function is defined as
 
     \chi^{\perp}(\tau) =  \langle T_{\tau} s^x(\tau) s^x(0) \rangle. 
 
-:math:`\chi^{\perp}(\tau)` is measured on a uniform time grid, whose number of points is set by ``n_tau_k`` in the ``constr_params``. 
+:math:`\chi^{\perp}(\tau)` is measured on a uniform time grid, whose number of points is set by ``n_tau_bosonic`` in the ``constr_params``. 
 This measurement is useful if rotational invariance is broken (for instance, in the presence of a Zeeman field). Otherwise, 
 all components of the spin-spin correlation function can be determined from :math:`\chi_{ij}(\tau)`, with better statistics. 
 

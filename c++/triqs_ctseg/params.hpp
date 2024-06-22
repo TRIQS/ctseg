@@ -18,7 +18,7 @@ struct constr_params_t {
   int n_tau = 10001;
 
   /// Number of time slices for bosonic functions
-  int n_tau_k = 10001;
+  int n_tau_bosonic = 10001;
 };
 
 //---------------------------------------------

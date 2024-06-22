@@ -15,7 +15,7 @@ They can be conveniently supplied as a Python dictionary::
         "gf_struct": gf_struct,
         "beta": 100,
         "n_tau": 1001,
-        "n_tau_k": 1001
+        "n_tau_bosonic": 1001
     }
 
 * ``gf_struct`` specifies the block structure of the impurity Green's function (see below). 
@@ -24,7 +24,7 @@ They can be conveniently supplied as a Python dictionary::
 
 * ``n_tau`` is the number of points of the imaginary time grid on which the fermionic two-point functions (input hybridization :math:`\Delta(\tau)`, measured Green's function :math:`G(\tau)`, etc.) will be sampled. 
 
-* ``n_tau_k`` is the number of points of the imaginary time grid on which the bosonic two-point functions (input dynamical intercation :math:`D_0(\tau)`, measured density correlation function :math:`\chi(\tau)`, etc.) will be sampled. 
+* ``n_tau_bosonic`` is the number of points of the imaginary time grid on which the bosonic two-point functions (input dynamical intercation :math:`D_0(\tau)`, measured density correlation function :math:`\chi(\tau)`, etc.) will be sampled. 
 
 Green's function structure
 --------------------------
@@ -170,7 +170,7 @@ Dynamical density-density interaction
 
 The dynamical density-density interaction :math:`D(\tau)` (see :doc:`CTSEG algorithm <../algorithm_implementation/ctseg>`) is initialized as:: 
 
-    D_tau = GfImTime(indices = range(n_colors), beta = beta, statistic = "Boson", n_points = n_tau_k)
+    D_tau = GfImTime(indices = range(n_colors), beta = beta, statistic = "Boson", n_points = n_tau_bosonic)
 
 It is a matrix Green's function, for which no block structure is explicitly enforced. 
 
@@ -184,7 +184,7 @@ For example::
 
     from triqs.gf.descriptors import Function
     wp = 1
-    D_iw = GfImFreq(indices = range(n_colors), beta = beta, statistic = "Boson", n_points = n_tau_k//2)
+    D_iw = GfImFreq(indices = range(n_colors), beta = beta, statistic = "Boson", n_points = n_tau_bosonic//2)
     D_iw << Function(lambda w: wp**2 / (w**2 - wp**2))
     D_tau << Fourier(D_iw)
 
@@ -197,7 +197,7 @@ Spin-spin interaction
 
 The perpendicular spin-spin interaction :math:`J_{\perp}(\tau)` (see :doc:`CTSEG algorithm <../algorithm_implementation/ctseg>`) is initialized as:: 
 
-    Jperp_tau = GfImTime(indices = [0], beta = beta, statistic = "Boson", n_points = n_tau_k)
+    Jperp_tau = GfImTime(indices = [0], beta = beta, statistic = "Boson", n_points = n_tau_bosonic)
 
 It is a :math:`1 \times 1` matrix Green's function. It is supplied to the solver via::
 
