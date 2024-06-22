@@ -6,9 +6,9 @@ namespace measures {
   g_f_tau::g_f_tau(params_t const &p, work_data_t const &wdata, configuration_t const &config, results_t &results)
      : wdata{wdata}, config{config}, results{results} {
 
-    beta       = p.beta;
-    measure_ft = p.measure_ft and wdata.rot_inv;
-    gf_struct  = p.gf_struct;
+    beta          = p.beta;
+    measure_F_tau = p.measure_F_tau and wdata.rot_inv;
+    gf_struct     = p.gf_struct;
 
     g_tau   = block_gf<imtime>{triqs::mesh::imtime{beta, Fermion, p.n_tau}, p.gf_struct};
     f_tau   = block_gf<imtime>{triqs::mesh::imtime{beta, Fermion, p.n_tau}, p.gf_struct};
@@ -32,7 +32,7 @@ namespace measures {
       for (long id_y : range(N)) {
         auto y        = det.get_y(id_y);
         double f_fact = 0;
-        if (measure_ft) f_fact = fprefactor(bl_idx, y);
+        if (measure_F_tau) f_fact = fprefactor(bl_idx, y);
         for (long id_x : range(N)) {
           auto x    = det.get_x(id_x);
           auto Minv = det.inverse_matrix(id_y, id_x);
@@ -40,7 +40,7 @@ namespace measures {
           auto val  = (y.first >= x.first ? s : -s) * Minv;
           auto dtau = double(y.first - x.first);
           g[closest_mesh_pt(dtau)](y.second, x.second) += val;
-          if (measure_ft) f[closest_mesh_pt(dtau)](y.second, x.second) += val * f_fact;
+          if (measure_F_tau) f[closest_mesh_pt(dtau)](y.second, x.second) += val * f_fact;
         }
       }
     }
@@ -63,7 +63,7 @@ namespace measures {
     // store the result (not reused later, hence we can move it).
     results.G_tau = std::move(g_tau);
 
-    if (measure_ft) {
+    if (measure_F_tau) {
       f_tau = mpi::all_reduce(f_tau, c);
       f_tau = f_tau / (-beta * Z * f_tau[0].mesh().delta());
 

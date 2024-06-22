@@ -27,10 +27,10 @@ struct results_t {
   nda::array<double, 1> densities;
 
   /// Delta perturbation order histogram
-  std::optional<triqs::stat::histogram> perturbation_order_histo_Delta;
+  std::optional<triqs::stat::histogram> pert_order_histo_Delta;
 
   /// J_perp perturbation order histogram
-  std::optional<triqs::stat::histogram> perturbation_order_histo_Jperp;
+  std::optional<triqs::stat::histogram> pert_order_histo_Jperp;
 
   /// State histogram
   std::optional<nda::vector<double>> state_hist;

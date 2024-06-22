@@ -56,9 +56,9 @@ solve_params = {
     "length_cycle": 50,
     "n_warmup_cycles": 1000,
     "n_cycles": 10000,
-    "measure_ft": True,
-    "measure_nnt": True,
-    "measure_nn": True
+    "measure_F_tau": True,
+    "measure_nn_tau": True,
+    "measure_nn_static": True
     }
 
 # Solve

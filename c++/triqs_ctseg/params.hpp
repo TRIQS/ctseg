@@ -88,31 +88,31 @@ struct solve_params_t {
   // -------- Measure control --------------
 
   /// Whether to measure the perturbation order histograms (order in Delta and Jperp)
-  bool measure_perturbation_order_histograms = true;
+  bool measure_pert_order = true;
 
-  /// Whether to measure G(tau) (see [[measure_g_f_tau]])
-  bool measure_gt = true;
+  /// Whether to measure G(tau) (see measures/g_f_tau)
+  bool measure_G_tau = true;
 
-  /// Whether to measure F(tau) (see [[measure_g_f_tau]])
-  bool measure_ft = false;
+  /// Whether to measure F(tau) (see measures/g_f_tau)
+  bool measure_F_tau = false;
 
-  /// Whether to measure density (see [[measure_density]])
-  bool measure_n = true;
+  /// Whether to measure densities (see measures/densities)
+  bool measure_densities = true;
 
-  /// Whether to measure sign (see [[measure_sign]])
+  /// Whether to measure sign (see measures/sign)
   bool measure_sign = true;
 
-  /// Whether to measure <n(0)n(0)> (see [[measure_nn]])
-  bool measure_nn = false;
+  /// Whether to measure <n(0)n(0)> (see measures/nn_static)
+  bool measure_nn_static = false;
 
-  /// Whether to measure <n(tau)n(0)> (see [[measure_nnt]])
-  bool measure_nnt = false;
+  /// Whether to measure <n(tau)n(0)> (see measures/nn_tau)
+  bool measure_nn_tau = false;
 
-  /// Whether to measure <s_x(tau)s_x(0)> (see [[measure_sperp_tau]])
-  bool measure_sperpt = false;
+  /// Whether to measure <s_x(tau)s_x(0)> (see measures/sperp_tau)
+  bool measure_sperp_tau = false;
 
-  /// Whether to measure state histograms (see [[measure_statehist]])
-  bool measure_statehist = false;
+  /// Whether to measure state histograms (see measures/state_hist)
+  bool measure_state_hist = false;
 
   // -------- Misc parameters --------------
 

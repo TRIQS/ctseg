@@ -39,9 +39,9 @@ TEST(CTSEGJ, Dynamical_U) {
   param_solve.n_warmup_cycles    = n_warmup_cycles;
   param_solve.length_cycle       = length_cycle;
   param_solve.random_seed        = random_seed;
-  param_solve.measure_ft         = true;
-  param_solve.measure_nnt        = true;
-  param_solve.measure_nn         = true;
+  param_solve.measure_F_tau      = true;
+  param_solve.measure_nn_tau     = true;
+  param_solve.measure_nn_static  = true;
 
   // Prepare delta
   nda::clef::placeholder<0> om_;

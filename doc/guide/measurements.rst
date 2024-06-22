@@ -26,7 +26,7 @@ It is measured on a uniform time grid, whose number of points is set by ``n_tau`
     the :math:`\Delta(\tau)` input must match. 
 
 
-The measurement is turned on by setting ``measure_gt`` in the ``solve_params`` to ``True``. The result of the 
+The measurement is turned on by setting ``measure_G_tau`` in the ``solve_params`` to ``True``. The result of the 
 accumulation is accessible through the ``results.G_tau`` attribute of the solver object. 
 
 Self-energy improved estimator
@@ -67,7 +67,7 @@ Once the improved estimator is known, the self-energy is obtained according to
     \Sigma^A(i\omega_n) = [G^A]^{-1}(i\omega_n) F^A(i \omega_n).
 
 The block structure and imaginary time grid for the improved estimator are the same as for the Green's function. 
-The measurement is turned on by setting ``measure_ft`` in the ``solve_params`` to ``True``. The result of the 
+The measurement is turned on by setting ``measure_F_tau`` in the ``solve_params`` to ``True``. The result of the 
 accumulation is accessible through the ``results.F_tau`` attribute of the solver object. 
 
 Density
@@ -115,7 +115,7 @@ Here the indices :math:`i, j = 0, \dots N - 1` represents colors (irrespective o
     The value of ``n_tau_k`` supplied in the ``constr_params`` and the number of points in the :math:`\tau` grids of
     the :math:`D(\tau)` and :math:`J_{\perp}(\tau)` inputs must match. 
 
-The measurement is turned on by setting ``measure_nnt`` in the ``solve_params`` to ``True``. The result of the 
+The measurement is turned on by setting ``measure_nn_tau`` in the ``solve_params`` to ``True``. The result of the 
 accumulation is accessible through the ``results.nn_tau`` attribute of the solver object, as a matrix-valued
 ``GfImTime`` with size :math:`N \times N`. 
 
@@ -132,7 +132,7 @@ The perpendicular spin-spin correlation function is defined as
 This measurement is useful if rotational invariance is broken (for instance, in the presence of a Zeeman field). Otherwise, 
 all components of the spin-spin correlation function can be determined from :math:`\chi_{ij}(\tau)`, with better statistics. 
 
-The measurement is turned on by setting ``measure_sperpt`` in the ``solve_params`` to ``True``. The result of the 
+The measurement is turned on by setting ``measure_sperp_tau`` in the ``solve_params`` to ``True``. The result of the 
 accumulation is accessible through the ``results.sperp_tau`` attribute of the solver object, as a matrix-valued
 ``GfImTime`` with size :math:`1 \times 1`.
 
@@ -144,7 +144,7 @@ Formally, these are the diagonal elements of the impurity density matrix express
 number basis. For example, in the case of an impurity with 2 colors, the eigenstates are 
 :math:`|00\rangle, |10\rangle, |01 \rangle, |11\rangle`. 
 
-The measurement is turned on by setting ``measure_statehist`` in the ``solve_params`` to ``True``. The result of the 
+The measurement is turned on by setting ``measure_state_hist`` in the ``solve_params`` to ``True``. The result of the 
 accumulation is accessible through the ``results.state_hist`` attribute of the solver object, as a numpy array of size
 :math:`2^N`. The index of the state :math:`|n_0, n_1, \dots n_N \rangle` in the histogram is given by :math:`\sum_{i = 0}^{N - 1} n_i 2^i`. 
 
@@ -159,6 +159,6 @@ Perturbation order histograms
 *****************************
 
 This measurement determines the histograms of the perturbation orders in :math:`\Delta(\tau)` and :math:`\mathcal{J}_{\perp}(\tau)`. 
-The measurement is turned on by setting ``measure_statehist`` in the ``solve_params`` to ``True``. The results of the 
-accumulation are accessible through the ``results.perturbation_order_histo_Delta`` and ``results.perturbation_order_histo_Jperp``
+The measurement is turned on by setting ``measure_state_hist`` in the ``solve_params`` to ``True``. The results of the 
+accumulation are accessible through the ``results.pert_order_histo_Delta`` and ``results.pert_order_histo_Jperp``
 attributes of the solver, as TRIQS histogram objects. 

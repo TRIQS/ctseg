@@ -5,16 +5,17 @@
 
 namespace measures {
 
-  struct perturbation_order_histo {
+  struct densities {
 
     work_data_t const &wdata;
     configuration_t const &config;
     results_t &results;
 
-    triqs::stat::histogram histo_delta, histo_Jperp;
+    nda::array<double, 1> n;
 
-    perturbation_order_histo(params_t const &params, work_data_t const &wdata, configuration_t const &config,
-                             results_t &results);
+    double Z = 0;
+
+    densities(params_t const &params, work_data_t const &wdata, configuration_t const &config, results_t &results);
 
     void accumulate(double s);
     void collect_results(mpi::communicator const &c);

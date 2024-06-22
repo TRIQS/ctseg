@@ -11,7 +11,7 @@ namespace measures {
     configuration_t const &config;
     results_t &results;
     double beta;
-    bool measure_ft;
+    bool measure_F_tau;
     gf_struct_t gf_struct;
 
     block_gf<imtime> g_tau;

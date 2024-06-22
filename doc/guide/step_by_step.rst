@@ -246,7 +246,7 @@ Other parameters include:
 
 * **Measure control**. All the :doc:`measurements <measurements>` can be switched on and off. Some of the measurements (self-energy improved estimator,
   density correlation functions) can be time-consuming, and they are off by default. For example, to turn the improved estimator 
-  measurement on, one should set ``solve_params["measure_ft"] = True``. 
+  measurement on, one should set ``solve_params["measure_F_tau"] = True``. 
 
 * **Move control**. All the :doc:`Monte Carlo moves <moves>` can be switched on and off. This functionality exists to facilitate testing
   for developers. The solver chooses the relevant moves depending on its inputs, and regular users should not need move control. 

@@ -1,9 +1,9 @@
-#include "./perturbation_order_histo.hpp"
+#include "./pert_order_histo.hpp"
 #include "../logs.hpp"
 
 namespace measures {
 
-  perturbation_order_histo::perturbation_order_histo(params_t const &p, work_data_t const &wdata,
+  pert_order_histo::pert_order_histo(params_t const &p, work_data_t const &wdata,
                                                      configuration_t const &config, results_t &results)
      : wdata{wdata}, config{config}, results{results} {
 
@@ -13,7 +13,7 @@ namespace measures {
 
   // -------------------------------------
 
-  void perturbation_order_histo::accumulate(double) {
+  void pert_order_histo::accumulate(double) {
 
     // For the config, compute the number of segments
     long n_segments =
@@ -28,13 +28,13 @@ namespace measures {
 
   // -------------------------------------
 
-  void perturbation_order_histo::collect_results(mpi::communicator const &c) {
+  void pert_order_histo::collect_results(mpi::communicator const &c) {
 
     histo_delta = mpi::all_reduce(histo_delta, c);
     histo_Jperp = mpi::all_reduce(histo_Jperp, c);
 
     // Normalize
-    results.perturbation_order_histo_Delta = pdf(histo_delta);
-    results.perturbation_order_histo_Jperp = pdf(histo_Jperp);
+    results.pert_order_histo_Delta = pdf(histo_delta);
+    results.pert_order_histo_Jperp = pdf(histo_Jperp);
   }
 } // namespace measures

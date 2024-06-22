@@ -128,7 +128,7 @@ work_data_t::work_data_t(params_t const &p, inputs_t const &inputs, mpi::communi
   if (c.rank() == 0) {
     spdlog::info("mu = {} \nU = {}", mu, U);
     spdlog::info("Dynamical interactions = {}, J_perp interactions = {}", has_Dt, has_jperp);
-    if (p.measure_ft and !rot_inv)
+    if (p.measure_F_tau and !rot_inv)
       spdlog::info("WARNING: Cannot measure F(tau) because spin-spin interaction is not rotationally invariant.");
   }
 
@@ -255,9 +255,9 @@ double trace_sign(work_data_t const &wdata) {
           } // if color == k
           idx_c--;
         } // loop over c
-      } // loop over colors
-    } // if block not empty
-  } // loop over blocks
+      }   // loop over colors
+    }     // if block not empty
+  }       // loop over blocks
   return sign;
 } // sign computation
 
