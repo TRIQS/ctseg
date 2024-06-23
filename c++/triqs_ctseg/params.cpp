@@ -30,6 +30,8 @@ void h5_write(h5::group h5group, std::string subgroup_name, solve_params_t const
 
   h5_write(grp, "h_int", c.h_int);
   h5_write(grp, "chemical_potential", c.chemical_potential);
+  h5_write(grp, "n_tau_G", c.n_tau_G);
+  h5_write(grp, "n_tau_chi2", c.n_tau_chi2);
   h5_write(grp, "n_cycles", c.n_cycles);
   h5_write(grp, "length_cycle", c.length_cycle);
   h5_write(grp, "n_warmup_cycles", c.n_warmup_cycles);
@@ -72,6 +74,8 @@ void h5_read(h5::group h5group, std::string subgroup_name, solve_params_t &c) {
 
   h5_read(grp, "h_int", c.h_int);
   h5_read(grp, "chemical_potential", c.chemical_potential);
+  h5_read(grp, "n_tau_G", c.n_tau_G);
+  h5_read(grp, "n_tau_chi2", c.n_tau_chi2);
   h5_read(grp, "n_cycles", c.n_cycles);
   h5_read(grp, "length_cycle", c.length_cycle);
   h5_read(grp, "n_warmup_cycles", c.n_warmup_cycles);

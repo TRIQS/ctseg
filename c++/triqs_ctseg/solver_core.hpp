@@ -29,7 +29,7 @@ class solver_core {
   *
   *.. include:: ../../python/triqs_ctseg/parameters_solve_params_t.rst 
   */
-  std::optional<solve_params_t> solve_params;
+  solve_params_t solve_params;
 
   /// The set of results. See :doc:`Measurements <../guide/measurements>`.
   // Will be passed to measures and initialized by them.

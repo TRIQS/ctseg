@@ -33,6 +33,7 @@ long det_lower_bound_y(auto const &d, auto const &y) {
 // Integer power
 constexpr unsigned int ipow(unsigned int n, unsigned int m) { return m == 0 ? 1 : m == 1 ? n : n * ipow(n, m - 1); }
 
+// Block2Gf constructor
 template <typename M> block2_gf<M> make_block2_gf(M const &m, gf_struct_t const &gf_struct) {
 
   std::vector<std::vector<gf<M>>> gf_vecvec;

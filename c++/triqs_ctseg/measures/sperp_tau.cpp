@@ -10,7 +10,7 @@ namespace measures {
 
     n_color = config.n_color();
 
-    ss_tau   = gf<imtime>({beta, Boson, p.n_tau_bosonic}, {1, 1});
+    ss_tau   = gf<imtime>({beta, Boson, p.n_tau_chi2}, {1, 1});
     ss_tau() = 0;
     Z        = 0;
   }

@@ -26,11 +26,17 @@ struct constr_params_t {
 
 struct solve_params_t {
 
-  /// Local Hamiltonian
+  /// Quartic part of the local Hamiltonian
   triqs::operators::many_body_operator h_int;
 
   /// Chemical potential (high frequency limit of :math:`G_0^{-1}(i\omega) - i \omega`)
   nda::vector<double> chemical_potential = nda::vector<double>{};
+
+  /// Number of points on which to measure G(tau)/F(tau) (defaults to n_tau)
+  int n_tau_G = 0; 
+
+  /// Number of points on which to measure 2-point functions (defaults to n_tau_bosonic)
+  int n_tau_chi2 = 0;
 
   /// Number of QMC cycles
   int n_cycles;

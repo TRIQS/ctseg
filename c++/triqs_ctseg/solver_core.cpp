@@ -37,10 +37,13 @@ void solver_core::solve(solve_params_t const &solve_params_input) {
                  " ╩ ╩╚═╩╚═╝╚╚═╝  └─┘ ┴ └─┘└─┘└─┘\n";
 
   // ................ Parameters .................
-  // Merge constr_params and solve_params
-  params_t p(constr_params, solve_params_input);
   // Store the solve_params
   solve_params = solve_params_input;
+  // Set tau mesh parameters for results to default if not supplied 
+  if (solve_params_input.n_tau_G == 0) solve_params.n_tau_G = constr_params.n_tau;
+  if (solve_params_input.n_tau_G == 0) solve_params.n_tau_chi2 = constr_params.n_tau_bosonic;
+  // Merge constr_params and solve_params
+  params_t p(constr_params, solve_params);
 
   // ................   Work data & Configuration  ...................
 
