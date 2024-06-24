@@ -38,14 +38,13 @@ struct work_data_t {
   std::vector<long> block_number;   // block numbers corresponding to colors
   std::vector<long> index_in_block; // index in block of a given color
 
-  // Map (block, idx) of gf to a color
-  std::vector<long> gf_block_size_partial_sum; // data for block_to_color method
-  int block_to_color(int block, int idx) const { return gf_block_size_partial_sum[block] + idx; }
+  // Find color corresponding to (block, idx)
+  int block_to_color(int block, int idx) const;
 
   // Find block of color
   long find_block_number(int color) const;
 
-  // Find index of color in block
+  // Find index of color in its block
   long find_index_in_block(int color) const;
 };
 

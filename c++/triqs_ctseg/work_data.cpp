@@ -22,16 +22,6 @@ work_data_t::work_data_t(params_t const &p, inputs_t const &inputs, mpi::communi
   gf_struct   = p.gf_struct;
   n_color     = count_colors(gf_struct);
 
-  // Compute gf_block_size_partial_sum
-  { // to make acc local
-    long acc = 0;
-    for (auto const &[s, l] : gf_struct) {
-      if (l > 1) offdiag_delta = true;
-      gf_block_size_partial_sum.push_back(acc);
-      acc += l;
-    }
-  }
-
   // Compute color/block conversion tables
   for (auto const &color : range(n_color)) {
     block_number.push_back(find_block_number(color));
@@ -56,6 +46,8 @@ work_data_t::work_data_t(params_t const &p, inputs_t const &inputs, mpi::communi
     spdlog::info("Interaction matrix: U = {}", U);
     spdlog::info("Orbital energies: mu - eps = {}", mu);
   }
+
+  // FIXME: Convert here Block2Gf to matrix Gf. 
 
   // Do we have D(tau) and J_perp(tau)? Yes, unless the data is 0
   has_Dt    = max_element(abs(inputs.d0t.data())) > 1.e-13;
@@ -156,6 +148,11 @@ work_data_t::work_data_t(params_t const &p, inputs_t const &inputs, mpi::communi
     if (c.rank() == 0) { spdlog::info("Delta(tau) is 0, running only spin moves."); }
   }
 
+  // Does gf_struct allow for off-diagonal Delta?
+  for (auto const &[s, l] : gf_struct) {
+    if (l > 1) offdiag_delta = true;
+  }
+
   // Take the real part of Delta(tau)
   delta = map([](gf_const_view<imtime> d) { return real(d); }, inputs.delta);
   for (auto const &bl : range(delta.size())) {
@@ -168,6 +165,16 @@ work_data_t::work_data_t(params_t const &p, inputs_t const &inputs, mpi::communi
     dets.back().set_precision_error(p.det_precision_error);
   }
 } // work_data constructor
+
+int work_data_t::block_to_color(int block, int idx) const {
+  std::vector<long> gf_block_size_partial_sum;
+  long acc = 0;
+  for (auto const &[s, l] : gf_struct) {
+    gf_block_size_partial_sum.push_back(acc);
+    acc += l;
+  }
+  return gf_block_size_partial_sum[block] + idx;
+}
 
 long work_data_t::find_block_number(int color) const {
   long bl            = 0;
