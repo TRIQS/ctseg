@@ -51,7 +51,7 @@ class solver_core {
   gf_view<imtime> Jperp_tau() { return inputs.jperpt; }
 
   /// Dynamical density-density interaction :math:`D_0(\tau)`
-  gf_view<imtime> D0_tau() { return inputs.d0t; }
+  block2_gf_view<imtime> D0_tau() { return inputs.d0t; }
 
   // --------------- h5 -------------------------
   CPP2PY_IGNORE static std::string hdf5_format() { return "CTSEG_SolverCore"; }

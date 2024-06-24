@@ -41,13 +41,11 @@ delta << iOmega_n + mu - invg0
 S.Delta_tau << Fourier(delta)
 
 # Spin-spin interaction (D0(tau) and Jperp(tau))
-D0 = GfImTime(indices=[0, 1], beta=beta, statistic='Boson', n_points=n_tau_bosonic)
-D0[0, 0] = -Q_tau[0, 0]
-D0[1, 1] = -Q_tau[0, 0]
-D0[0, 1] = Q_tau[0, 0]
-D0[1, 0] = Q_tau[0, 0]
 S.Jperp_tau << -J**2*Q_tau
-S.D0_tau << 0.25*J**2*D0
+S.D0_tau["up", "up"] << -0.25*J**2*Q_tau
+S.D0_tau["down", "down"] << -0.25*J**2*Q_tau
+S.D0_tau["up", "down"] << 0.25*J**2*Q_tau
+S.D0_tau["down", "up"] << 0.25*J**2*Q_tau
 
 # Solve parameters
 solve_params = {

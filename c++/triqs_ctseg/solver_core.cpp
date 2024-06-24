@@ -14,10 +14,9 @@ solver_core::solver_core(constr_params_t const &p) : constr_params(p) {
 
   beta = p.beta;
   tau_t::set_beta(beta);
-  int n_color = count_colors(p.gf_struct);
 
-  inputs.delta  = block_gf<imtime>(triqs::mesh::imtime{beta, Fermion, p.n_tau}, p.gf_struct);
-  inputs.d0t    = gf<imtime>({beta, Boson, p.n_tau_bosonic}, {n_color, n_color});
+  inputs.delta  = block_gf<imtime>({beta, Fermion, p.n_tau}, p.gf_struct);
+  inputs.d0t    = make_block2_gf<imtime>({beta, Boson, p.n_tau_bosonic}, p.gf_struct);
   inputs.jperpt = gf<imtime>({beta, Boson, p.n_tau_bosonic}, {1, 1});
 
   inputs.delta()  = 0;
@@ -39,7 +38,7 @@ void solver_core::solve(solve_params_t const &solve_params_input) {
   // ................ Parameters .................
   // Store the solve_params
   solve_params = solve_params_input;
-  // Set tau mesh parameters for results to default if not supplied 
+  // Set tau mesh parameters for results to default if not supplied
   if (solve_params_input.n_tau_G == 0) solve_params.n_tau_G = constr_params.n_tau;
   if (solve_params_input.n_tau_G == 0) solve_params.n_tau_chi2 = constr_params.n_tau_bosonic;
   // Merge constr_params and solve_params

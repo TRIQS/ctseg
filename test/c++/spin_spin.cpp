@@ -62,10 +62,10 @@ TEST(CTSEGJ, Spin_Spin) {
   J0w(om_) << 4 * l * l * w0 / (om_ * om_ - w0 * w0);
   D0w(om_) << l * l * w0 / (om_ * om_ - w0 * w0);
   D0t()                                    = fourier(D0w);
-  Solver.D0_tau().data()(range::all, 0, 0) = D0t.data()(range::all, 0, 0);
-  Solver.D0_tau().data()(range::all, 0, 1) = -D0t.data()(range::all, 0, 0);
-  Solver.D0_tau().data()(range::all, 1, 0) = -D0t.data()(range::all, 0, 0);
-  Solver.D0_tau().data()(range::all, 1, 1) = D0t.data()(range::all, 0, 0);
+  Solver.D0_tau()(0, 0).data()(range::all, 0, 0) = D0t.data()(range::all, 0, 0);
+  Solver.D0_tau()(0, 1).data()(range::all, 0, 0) = -D0t.data()(range::all, 0, 0);
+  Solver.D0_tau()(1, 0).data()(range::all, 0, 0) = -D0t.data()(range::all, 0, 0);
+  Solver.D0_tau()(1, 1).data()(range::all, 0, 0) = D0t.data()(range::all, 0, 0);
   Solver.Jperp_tau()                       = fourier(J0w);
 
   // Solve

@@ -20,7 +20,10 @@ work_data_t::work_data_t(params_t const &p, inputs_t const &inputs, mpi::communi
   // Copy data from inputs
   double beta = p.beta;
   gf_struct   = p.gf_struct;
-  n_color     = count_colors(gf_struct);
+
+  // Count colors
+  n_color = 0; 
+  for (auto const &[bl_name, bl_size] : gf_struct) { n_color += bl_size; }
 
   // Compute color/block conversion tables
   for (auto const &color : range(n_color)) {
@@ -47,10 +50,23 @@ work_data_t::work_data_t(params_t const &p, inputs_t const &inputs, mpi::communi
     spdlog::info("Orbital energies: mu - eps = {}", mu);
   }
 
-  // FIXME: Convert here Block2Gf to matrix Gf. 
+  // Dynamical interactions: convert Block2Gf to matrix Gf of size n_colors
+  D0t = gf<imtime>({beta, Boson, p.n_tau_bosonic}, {n_color, n_color});
+  for (auto const &c1 : range(n_color)) {
+    for (auto const &c2 : range(n_color)) {
+      D0t.data()(range::all, c1, c2) =
+         inputs.d0t(block_number[c1], block_number[c2]).data()(range::all, index_in_block[c1], index_in_block[c2]);
+    }
+  }
+  // Symetrize
+  for (auto const &c1 : range(n_color)) {
+    for (auto const &c2 : range(n_color)) {
+      D0t.data()(range::all, c1, c2) = (D0t.data()(range::all, c1, c2) + D0t.data()(range::all, c2, c1)) / 2;
+    }
+  }
 
   // Do we have D(tau) and J_perp(tau)? Yes, unless the data is 0
-  has_Dt    = max_element(abs(inputs.d0t.data())) > 1.e-13;
+  has_Dt    = max_element(abs(D0t.data())) > 1.e-13;
   has_jperp = max_element(abs(inputs.jperpt.data())) > 1.e-13;
 
   // Check: no J_perp implementation for more than 2 colors
@@ -69,7 +85,7 @@ work_data_t::work_data_t(params_t const &p, inputs_t const &inputs, mpi::communi
     Kprime = K;
     for (auto c1 : range(n_color)) {
       for (auto c2 : range(n_color)) {
-        nda::array<dcomplex, 1> D_data = inputs.d0t.data()(range::all, c1, c2);
+        nda::array<dcomplex, 1> D_data = D0t.data()(range::all, c1, c2);
         auto first_integral            = nda::zeros<dcomplex>(p.n_tau_bosonic);
         auto second_integral           = nda::zeros<dcomplex>(p.n_tau_bosonic);
         // Trapezoidal integration

@@ -221,7 +221,7 @@ c.add_property(name = "Jperp_tau",
                doc = r"""Dynamical spin-spin interaction :math:`\mathcal{J}_\perp(\tau)`""")
 
 c.add_property(name = "D0_tau",
-               getter = cfunction("gf_view<imtime> D0_tau ()"),
+               getter = cfunction("block2_gf_view<imtime> D0_tau ()"),
                doc = r"""Dynamical density-density interaction :math:`D_0(\tau)`""")
 
 module.add_class(c)

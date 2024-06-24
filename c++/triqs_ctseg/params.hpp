@@ -147,13 +147,6 @@ struct params_t : constr_params_t, solve_params_t {
      : constr_params_t{constr_params_}, solve_params_t{solve_params_} {}
 };
 
-/// Get the number of colors from the gf_struct.
-inline int count_colors(gf_struct_t const &gf_struct) {
-  int n = 0;
-  for (auto const &[bl_name, bl_size] : gf_struct) { n += bl_size; }
-  return n;
-};
-
 /// Write all containers to hdf5 file
 void h5_write(h5::group h5group, std::string subgroup_name, constr_params_t const &c);
 

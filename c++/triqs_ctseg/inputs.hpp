@@ -3,13 +3,14 @@
 #include "params.hpp"
 #include <triqs/gfs.hpp>
 
-// Group the inputs of the solvers.
+// Group the inputs of the solver.
 
 struct inputs_t {
 
-  block_gf<imtime> delta;
-  gf<imtime, matrix_valued> jperpt; // perp spin retarded interaction kernel
-  gf<imtime, matrix_valued> d0t;
+  block_gf<imtime> delta; // hybridization function 
+  gf<imtime, matrix_valued> jperpt; // perpendicular spin-spin interaction
+  block2_gf<imtime> d0t; // retarded density-density interaction
+  
 };
 
 // h5_read/write

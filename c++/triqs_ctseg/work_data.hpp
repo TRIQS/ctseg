@@ -25,7 +25,7 @@ struct work_data_t {
   bool offdiag_delta = false; // Does Delta(tau) have blocks of size larger than 1?
 
   // Dynamical and spin-spin interaction kernels
-  gf<imtime> K, Kprime, Jperp, Kprime_spin;
+  gf<imtime> D0t, K, Kprime, Jperp, Kprime_spin;
 
   // Hybridization function
   block_gf<imtime, matrix_real_valued> delta;
