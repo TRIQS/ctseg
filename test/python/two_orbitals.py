@@ -19,10 +19,8 @@ eps = 0.3 # hybridization levels
 V = 0.5 # hybridization strengths
 n_tau = 1001
 
-# Solve parameters
+# Solve parameters common for the two cases
 solve_params = {
-    "h_int": 0*n("up", 0)*n("down", 0),
-    "chemical_potential": [mu] * 2 * n_orb,
     "length_cycle": 50,
     "n_warmup_cycles": 1000,
     "n_cycles": 10000,
@@ -36,6 +34,10 @@ solve_params = {
 
 # Input structure: 4 blocks of size 1 
 gf_struct = [("up1", 1), ("dn1", 1), ("up2", 1), ("dn2", 1)]
+
+# Solve parameters
+solve_params["h_int"] = 0*n("up1", 0)*n("dn1", 0)
+solve_params["h_loc0"] = -mu * (n("up1", 0) + n("dn1", 0) + n("up2", 0) + n("dn2, 0"))
 
 # Construct solver
 S = Solver(beta = beta,
@@ -63,6 +65,10 @@ if mpi.is_master_node():
 
 # Input structure: 2 blocks of size 2 
 gf_struct = [("up1", 2), ("dn1", 2)]
+
+# Solve parameters
+solve_params["h_int"] = 0*n("up1", 0)*n("dn1", 0)
+solve_params["h_loc0"] = -mu * (n("up1", 0) + n("dn1", 0) + n("up1", 1) + n("dn1, 1"))
 
 # Construct solver
 S = Solver(beta = beta,

@@ -35,7 +35,7 @@ TEST(CTSEGJ, J_perp) {
 
   // Solve parameters
   param_solve.h_int              = U * n("up", 0) * n("down", 0);
-  param_solve.chemical_potential = {mu, mu};
+  param_solve.h_loc0             = -mu * (n("up", 0) + n("down", 0));
   param_solve.n_cycles           = n_cycles;
   param_solve.n_warmup_cycles    = n_warmup_cycles;
   param_solve.length_cycle       = length_cycle;

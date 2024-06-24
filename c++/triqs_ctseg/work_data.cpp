@@ -7,6 +7,8 @@
 #include "spdlog/common.h"
 #include "spdlog/spdlog.h"
 
+using namespace triqs::operators::utils;
+
 // Work data constructor
 work_data_t::work_data_t(params_t const &p, inputs_t const &inputs, mpi::communicator c) {
 
@@ -36,19 +38,18 @@ work_data_t::work_data_t(params_t const &p, inputs_t const &inputs, mpi::communi
     index_in_block.push_back(find_index_in_block(color));
   }
 
-  // Color-dependent chemical potential
-  mu = nda::zeros<double>(n_color);
-  if (p.chemical_potential.size() > 0) {
-    ALWAYS_EXPECTS((p.chemical_potential.size() == n_color), "Hartree shift size is not {}", n_color);
-    mu = p.chemical_potential;
-  }
+  // Extract color-dependent chemical potential from operator
+  mu          = nda::zeros<double>(n_color);
+  auto h_loc0 = dict_to_matrix(extract_h_dict(p.h_loc0), p.gf_struct);
+  for (auto const &col : range(n_color)) { mu(col) = -h_loc0(col, col); }
 
   // .............. Interactions .................
   // Extract the U from the operator
-  auto U_full = triqs::operators::utils::dict_to_matrix(triqs::operators::utils::extract_U_dict2(p.h_int), p.gf_struct);
+  auto U_full = dict_to_matrix(extract_U_dict2(p.h_int), p.gf_struct);
   U           = nda::matrix<double>{real(U_full)};
   // We ensure that U(a, a) is 0, which must be true
-  for (int a = 0; a < U.extent(0); ++a) ALWAYS_EXPECTS((abs(U(a, a)) < 1.e-15), "Internal Error. U diag non zero");
+  for (int a = 0; a < U.extent(0); ++a)
+    ALWAYS_EXPECTS((abs(U(a, a)) < 1.e-15), "Error. A diagonal element of the interaction matrix is not 0.");
 
   // Do we have D(tau) and J_perp(tau)? Yes, unless the data is 0
   has_Dt    = max_element(abs(inputs.d0t.data())) > 1.e-13;

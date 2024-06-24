@@ -102,7 +102,7 @@ c.add_member(c_name = "constr_params",
 .. include:: ../../python/triqs_ctseg/parameters_constr_params_t.rst""")
 
 c.add_member(c_name = "solve_params",
-             c_type = "std::optional<solve_params_t>",
+             c_type = "solve_params_t",
              read_only= True,
              doc = r"""Set of parameters used by the last call to ``solve()``.
 
@@ -126,7 +126,7 @@ c.add_constructor("""(**constr_params_t)""", doc = r"""Initialize the solver
 +----------------+-------------+---------+----------------------------------------------------------------+
 | n_tau          | int         | 10001   | Number of time slices for fermionic functions                  |
 +----------------+-------------+---------+----------------------------------------------------------------+
-| n_tau_bosonic        | int         | 10001   | Number of time slices for bosonic functions                    |
+| n_tau_bosonic  | int         | 10001   | Number of time slices for bosonic functions                    |
 +----------------+-------------+---------+----------------------------------------------------------------+
 """)
 
@@ -138,9 +138,13 @@ c.add_method("""void solve (**solve_params_t)""",
 +-------------------------------+--------------------------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
 | Parameter Name                | Type                                 | Default                                 | Documentation                                                                                                     |
 +===============================+======================================+=========================================+===================================================================================================================+
-| h_int                         | triqs::operators::many_body_operator | --                                      | Local Hamiltonian                                                                                                 |
+| h_int                         | triqs::operators::many_body_operator | --                                      | Quartic part of the local Hamiltonian                                                                             |
 +-------------------------------+--------------------------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
-| chemical_potential            | nda::vector<double>                  | nda::vector<double>{}                   | Chemical potential (high frequency limit of :math:`G_0^{-1}(i\omega) - i \omega`)                                 |
+| h_loc0                        | triqs::operators::many_body_operator | --                                      | Quandratic part of the local Hamiltonian (including chemical potential)                                           |
++-------------------------------+--------------------------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
+| n_tau_G                       | int                                  | 0                                       | Number of points on which to measure G(tau)/F(tau) (defaults to n_tau)                                            |
++-------------------------------+--------------------------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
+| n_tau_chi2                    | int                                  | 0                                       | Number of points on which to measure 2-point functions (defaults to n_tau_bosonic)                                |
 +-------------------------------+--------------------------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
 | n_cycles                      | int                                  | --                                      | Number of QMC cycles                                                                                              |
 +-------------------------------+--------------------------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
@@ -231,12 +235,22 @@ c = converter_(
 c.add_member(c_name = "h_int",
              c_type = "triqs::operators::many_body_operator",
              initializer = """  """,
-             doc = r"""Local Hamiltonian""")
+             doc = r"""Quartic part of the local Hamiltonian""")
 
-c.add_member(c_name = "chemical_potential",
-             c_type = "nda::vector<double>",
-             initializer = """ nda::vector<double>{} """,
-             doc = r"""Chemical potential (high frequency limit of :math:`G_0^{-1}(i\omega) - i \omega`)""")
+c.add_member(c_name = "h_loc0",
+             c_type = "triqs::operators::many_body_operator",
+             initializer = """  """,
+             doc = r"""Quandratic part of the local Hamiltonian (including chemical potential)""")
+
+c.add_member(c_name = "n_tau_G",
+             c_type = "int",
+             initializer = """ 0 """,
+             doc = r"""Number of points on which to measure G(tau)/F(tau) (defaults to n_tau)""")
+
+c.add_member(c_name = "n_tau_chi2",
+             c_type = "int",
+             initializer = """ 0 """,
+             doc = r"""Number of points on which to measure 2-point functions (defaults to n_tau_bosonic)""")
 
 c.add_member(c_name = "n_cycles",
              c_type = "int",

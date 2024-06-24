@@ -29,8 +29,8 @@ struct solve_params_t {
   /// Quartic part of the local Hamiltonian
   triqs::operators::many_body_operator h_int;
 
-  /// Chemical potential (high frequency limit of :math:`G_0^{-1}(i\omega) - i \omega`)
-  nda::vector<double> chemical_potential = nda::vector<double>{};
+  /// Quandratic part of the local Hamiltonian (including chemical potential)
+  triqs::operators::many_body_operator h_loc0;
 
   /// Number of points on which to measure G(tau)/F(tau) (defaults to n_tau)
   int n_tau_G = 0; 

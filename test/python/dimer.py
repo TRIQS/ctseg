@@ -10,6 +10,7 @@ from triqs.operators.util import U_matrix_kanamori, h_int_density
 import h5
 import triqs.utility.mpi as mpi
 from triqs.utility.h5diff import h5diff
+from triqs.operators import n
 
 from triqs_ctseg import Solver
 
@@ -31,7 +32,7 @@ n_tau = 10001
 gf_struct = [(s, n_orb) for s in block_names] # Green's function structure
 
 ########################################################################
-# --------------- Construct Delta(tau) and chemical_potential ---------------
+# --------------- Construct Delta(tau) and h_loc0 ---------------
 
 # Non-interacting impurity Hamiltonian in matrix representation
 h_0_mat = np.diag(eps - mu)
@@ -54,20 +55,18 @@ G0_iw = BlockGf(mesh=iw_mesh, gf_struct=gf_struct)
 for bl, iw in product(block_names, iw_mesh):
     G0_iw[bl][iw] = linalg.inv(iw.value * np.eye(2*n_orb) - h_tot_mat)[:n_orb, :n_orb]
 
-# Get Delta(iw) and chemical_potential from G0(iw)
+# Get Delta(iw) and h_loc0 from G0(iw)
 def get_h0_Delta(G0_iw):
     h0_lst, Delta_iw = [], G0_iw.copy()
     for bl in G0_iw.indices:
         Delta_iw[bl] << iOmega_n - inverse(G0_iw[bl])
         tail, err = fit_hermitian_tail(Delta_iw[bl])
         Delta_iw[bl] << Delta_iw[bl] - tail[0]
-        h0_lst.append(tail[0])
+        h0_lst.append(tail[0].real)
     return h0_lst, Delta_iw
 
 h0_lst, Delta_iw = get_h0_Delta(G0_iw)
-chemical_potential = []
-for h0 in h0_lst:
-    chemical_potential += [-l for l in linalg.eig(h0)[0].real]
+h_loc0 = sum(h0_lst[i][0,0] * n(bl, 0) + h0_lst[i][1,1] * n(bl, 1) for i, bl in enumerate(block_names))
 
 # Fourier-transform to get Delta(tau)
 tau_mesh = MeshImTime(beta, 'Fermion', n_tau)
@@ -96,7 +95,7 @@ h_int = h_int_density(block_names, n_orb, Umat, Upmat, off_diag=True)
 # --------- Solve parameters ----------
 solve_params = {
     'h_int': h_int,
-    'chemical_potential': chemical_potential,
+    'h_loc0': h_loc0,
     'n_warmup_cycles': 5000,
     'n_cycles': 50000,
     'length_cycle': 100,

@@ -31,6 +31,8 @@ constr_params = {
     "n_tau_bosonic": n_tau_bosonic
 }
 
+print(constr_params["gf_struct"])
+
 # Construct solver
 S = Solver(**constr_params)
 
@@ -43,6 +45,9 @@ for l1 in range(n_orb):
         h_int += (Up - J) * (n(f'up{l1+1}', 0) * n(f'up{l2+1}', 0) + n(f'down{l1+1}', 0) * n(f'down{l2+1}', 0))
         h_int += Up * (n(f'up{l1+1}', 0) * n(f'down{l2+1}', 0) + n(f'down{l1+1}', 0) * n(f'up{l2+1}', 0))
 
+# Local Hamiltonian
+h_loc0 = -mu * sum(n(f"up{i + 1}", 0) + n(f"down{i + 1}", 0) for i in range(n_orb) )
+
 # Hybridization Delta(tau)
 for name, block in S.Delta_tau:
     Delta_iw = GfImFreq(indices=[0], beta=beta, n_points=n_tau//2)
@@ -52,7 +57,7 @@ for name, block in S.Delta_tau:
 # Solve parameters
 solve_params = {
     "h_int": h_int,
-    "chemical_potential": [mu] * 2 * n_orb,
+    "h_loc0": h_loc0,
     "length_cycle": 50,
     "n_warmup_cycles": 1000,
     "n_cycles": 10000,
@@ -73,4 +78,4 @@ if mpi.is_master_node():
         A['nn'] = S.results.nn_static
         A['densities'] = S.results.densities
 
-    #h5diff("multiorb.out.h5", "multiorb.ref.h5", precision=1e-9)
+    h5diff("multiorb.out.h5", "multiorb.ref.h5", precision=1e-9)
