@@ -51,6 +51,12 @@ work_data_t::work_data_t(params_t const &p, inputs_t const &inputs, mpi::communi
   for (int a = 0; a < U.extent(0); ++a)
     ALWAYS_EXPECTS((abs(U(a, a)) < 1.e-15), "Error. A diagonal element of the interaction matrix is not 0.");
 
+  // Report
+  if (c.rank() == 0) {
+    spdlog::info("Interaction matrix: U = {}", U);
+    spdlog::info("Orbital energies: mu - eps = {}", mu);
+  }
+
   // Do we have D(tau) and J_perp(tau)? Yes, unless the data is 0
   has_Dt    = max_element(abs(inputs.d0t.data())) > 1.e-13;
   has_jperp = max_element(abs(inputs.jperpt.data())) > 1.e-13;
@@ -127,7 +133,6 @@ work_data_t::work_data_t(params_t const &p, inputs_t const &inputs, mpi::communi
 
   // Report
   if (c.rank() == 0) {
-    spdlog::info("mu = {} \nU = {}", mu, U);
     spdlog::info("Dynamical interactions = {}, J_perp interactions = {}", has_Dt, has_jperp);
     if (p.measure_F_tau and !rot_inv)
       spdlog::info("WARNING: Cannot measure F(tau) because spin-spin interaction is not rotationally invariant.");
