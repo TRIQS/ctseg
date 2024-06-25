@@ -34,15 +34,15 @@ TEST(CTSEGJ, Spin_Spin) {
   solver_core Solver(param_constructor);
 
   // Solve parameters
-  param_solve.h_int              = U * n("up", 0) * n("down", 0);
-  param_solve.h_loc0             = -mu * (n("up", 0) + n("down", 0));
-  param_solve.n_cycles           = n_cycles;
-  param_solve.n_warmup_cycles    = n_warmup_cycles;
-  param_solve.length_cycle       = length_cycle;
-  param_solve.random_seed        = random_seed;
-  param_solve.measure_F_tau      = true;
-  param_solve.measure_nn_tau     = true;
-  param_solve.measure_nn_static  = true;
+  param_solve.h_int             = U * n("up", 0) * n("down", 0);
+  param_solve.h_loc0            = -mu * (n("up", 0) + n("down", 0));
+  param_solve.n_cycles          = n_cycles;
+  param_solve.n_warmup_cycles   = n_warmup_cycles;
+  param_solve.length_cycle      = length_cycle;
+  param_solve.random_seed       = random_seed;
+  param_solve.measure_F_tau     = true;
+  param_solve.measure_nn_tau    = true;
+  param_solve.measure_nn_static = true;
 
   // Prepare delta
   nda::clef::placeholder<0> om_;
@@ -61,12 +61,12 @@ TEST(CTSEGJ, Spin_Spin) {
   auto D0t  = gf<imtime>({beta, Boson, param_constructor.n_tau}, {1, 1});
   J0w(om_) << 4 * l * l * w0 / (om_ * om_ - w0 * w0);
   D0w(om_) << l * l * w0 / (om_ * om_ - w0 * w0);
-  D0t()                                    = fourier(D0w);
-  Solver.D0_tau()(0, 0).data()(range::all, 0, 0) = D0t.data()(range::all, 0, 0);
-  Solver.D0_tau()(0, 1).data()(range::all, 0, 0) = -D0t.data()(range::all, 0, 0);
-  Solver.D0_tau()(1, 0).data()(range::all, 0, 0) = -D0t.data()(range::all, 0, 0);
-  Solver.D0_tau()(1, 1).data()(range::all, 0, 0) = D0t.data()(range::all, 0, 0);
-  Solver.Jperp_tau()                       = fourier(J0w);
+  D0t()                 = fourier(D0w);
+  Solver.D0_tau()(0, 0) = D0t;
+  Solver.D0_tau()(0, 1) = -D0t;
+  Solver.D0_tau()(1, 0) = -D0t;
+  Solver.D0_tau()(1, 1) = D0t;
+  Solver.Jperp_tau()    = fourier(J0w);
 
   // Solve
   Solver.solve(param_solve);

@@ -33,15 +33,15 @@ TEST(CTSEGJ, Dynamical_U) {
   solver_core Solver(param_constructor);
 
   // Solve parameters
-  param_solve.h_int              = U * n("up", 0) * n("down", 0);
-  param_solve.h_loc0             = -mu * (n("up", 0) + n("down", 0));
-  param_solve.n_cycles           = n_cycles;
-  param_solve.n_warmup_cycles    = n_warmup_cycles;
-  param_solve.length_cycle       = length_cycle;
-  param_solve.random_seed        = random_seed;
-  param_solve.measure_F_tau      = true;
-  param_solve.measure_nn_tau     = true;
-  param_solve.measure_nn_static  = true;
+  param_solve.h_int             = U * n("up", 0) * n("down", 0);
+  param_solve.h_loc0            = -mu * (n("up", 0) + n("down", 0));
+  param_solve.n_cycles          = n_cycles;
+  param_solve.n_warmup_cycles   = n_warmup_cycles;
+  param_solve.length_cycle      = length_cycle;
+  param_solve.random_seed       = random_seed;
+  param_solve.measure_F_tau     = true;
+  param_solve.measure_nn_tau    = true;
+  param_solve.measure_nn_static = true;
 
   // Prepare delta
   nda::clef::placeholder<0> om_;
@@ -58,7 +58,7 @@ TEST(CTSEGJ, Dynamical_U) {
   auto D0w  = gf<imfreq>({beta, Boson, n_iw}, {1, 1});
   auto D0t  = gf<imtime>({beta, Boson, param_constructor.n_tau}, {1, 1});
   D0w(om_) << 2 * l * l * w0 / (om_ * om_ - w0 * w0);
-  D0t()                                    = fourier(D0w);
+  D0t()                 = fourier(D0w);
   Solver.D0_tau()(0, 0) = D0t;
   Solver.D0_tau()(0, 1) = D0t;
   Solver.D0_tau()(1, 0) = D0t;
