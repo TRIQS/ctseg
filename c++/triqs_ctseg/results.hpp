@@ -15,7 +15,7 @@ struct results_t {
   std::optional<block_gf<imtime>> F_tau;
 
   /// Density-density time correlation function :math:`\langle n_a(\tau) n_b(0) \rangle`.
-  std::optional<gf<imtime>> nn_tau;
+  std::optional<block2_gf<imtime>> nn_tau;
 
   /// Perpendicular spin-spin correlation function :math:`\langle s_x(\tau) s_x(0) \rangle`.
   std::optional<gf<imtime>> sperp_tau;

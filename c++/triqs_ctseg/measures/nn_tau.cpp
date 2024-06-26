@@ -10,9 +10,12 @@ namespace measures {
     ntau    = p.n_tau_chi2;
     dtau    = p.beta / (ntau - 1);
     n_color = config.n_color();
+    block_number = wdata.block_number;
+    index_in_block = wdata.index_in_block;
 
-    q_tau   = gf<imtime>({beta, Boson, p.n_tau_chi2}, {n_color, n_color});
+    q_tau   = gf<imtime>({beta, Boson, ntau}, {n_color, n_color});
     q_tau() = 0;
+    q_tau_block = make_block2_gf<imtime>({beta, Boson, ntau}, p.gf_struct);
   }
 
   // -------------------------------------
@@ -65,7 +68,12 @@ namespace measures {
     q_tau = mpi::all_reduce(q_tau, c);
     q_tau = q_tau / Z; //(beta * Z * q_tau.mesh().delta());
 
-    // store the result (not reused later, hence we can move it).
-    results.nn_tau = std::move(q_tau);
+    // store the result 
+    for (auto const &c1 : range(n_color)) {
+      for (auto const &c2 : range(n_color)) {
+        q_tau_block(block_number[c1], block_number[c2]).data()(range::all, index_in_block[c1], index_in_block[c2]) = q_tau.data()(range::all, c1, c2);
+      }
+    }
+    results.nn_tau = std::move(q_tau_block);
   }
 } // namespace measures

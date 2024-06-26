@@ -2,7 +2,6 @@
 #include "../configuration.hpp"
 #include "../work_data.hpp"
 #include "../results.hpp"
-//#include "../precompute_fprefactor.hpp"
 
 namespace measures {
 
@@ -14,8 +13,10 @@ namespace measures {
     double beta;
     double dtau;
     int ntau;
+    std::vector<long> block_number, index_in_block;
 
     gf<imtime> q_tau;
+    block2_gf<imtime> q_tau_block;
 
     double Z = 0;
     int n_color;

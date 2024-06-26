@@ -81,7 +81,7 @@ TEST(CTSEGJ, Dynamical_U) {
   if (c.rank() == 0) {
     h5::file ref_file("dynamical_U.ref.h5", 'r');
     block_gf<imtime> G_tau, F_tau;
-    gf<imtime> nn_tau;
+    block2_gf<imtime> nn_tau;
     nda::matrix<double> nn_static;
     nda::array<double, 1> densities;
     h5_read(ref_file, "G_tau", G_tau);
@@ -92,7 +92,7 @@ TEST(CTSEGJ, Dynamical_U) {
     EXPECT_ARRAY_NEAR(densities, Solver.results.densities, precision);
     EXPECT_BLOCK_GF_NEAR(G_tau, Solver.results.G_tau, precision);
     EXPECT_BLOCK_GF_NEAR(F_tau, Solver.results.F_tau.value(), precision);
-    EXPECT_GF_NEAR(nn_tau, Solver.results.nn_tau.value(), precision);
+    EXPECT_BLOCK2_GF_NEAR(nn_tau, Solver.results.nn_tau.value(), precision);
     EXPECT_ARRAY_NEAR(nn_static, Solver.results.nn_static.value(), precision);
   }
 }

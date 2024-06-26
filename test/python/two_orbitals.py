@@ -57,7 +57,8 @@ S.solve(**solve_params)
 # Save output
 if mpi.is_master_node(): 
     with HDFArchive("two_orbitals_4b.out.h5", "a") as A: 
-        A['nn_tau'] = S.results.nn_tau
+        A['nn_tau_0'] = S.results.nn_tau["up1", "up1"][0, 0]
+        A['nn_tau_1'] = S.results.nn_tau["dn1", "dn1"][0, 0]
         A['nn'] = S.results.nn_static
         A['densities'] = S.results.densities
 
@@ -90,7 +91,8 @@ S.solve(**solve_params)
 # Save output
 if mpi.is_master_node(): 
     with HDFArchive("two_orbitals_2b.out.h5", "a") as A: 
-        A['nn_tau'] = S.results.nn_tau
+        A['nn_tau_0'] = S.results.nn_tau["up1", "up1"][0, 0]
+        A['nn_tau_1'] = S.results.nn_tau["up1", "up1"][1, 1]
         A['nn'] = S.results.nn_static
         A['densities'] = S.results.densities
 
