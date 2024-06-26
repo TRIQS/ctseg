@@ -52,18 +52,14 @@ work_data_t::work_data_t(params_t const &p, inputs_t const &inputs, mpi::communi
 
   // Dynamical interactions: convert Block2Gf to matrix Gf of size n_colors
   D0t = gf<imtime>({beta, Boson, p.n_tau_bosonic}, {n_color, n_color});
-  for (auto const &c1 : range(n_color)) {
-    for (auto const &c2 : range(n_color)) {
+  for (int c1 : range(n_color)) {
+    for (int c2 : range(n_color)) {
       D0t.data()(range::all, c1, c2) =
          inputs.d0t(block_number[c1], block_number[c2]).data()(range::all, index_in_block[c1], index_in_block[c2]);
     }
   }
   // Symetrize
-  for (auto const &c1 : range(n_color)) {
-    for (auto const &c2 : range(n_color)) {
-      D0t.data()(range::all, c1, c2) = (D0t.data()(range::all, c1, c2) + D0t.data()(range::all, c2, c1)) / 2;
-    }
-  }
+  for (auto t: D0t.mesh()) D0t[t] = 0.5 * make_regular(D0t[t] + transpose(D0t[t]));
 
   // Do we have D(tau) and J_perp(tau)? Yes, unless the data is 0
   has_Dt    = max_element(abs(D0t.data())) > 1.e-13;
