@@ -22,13 +22,21 @@ work_data_t::work_data_t(params_t const &p, inputs_t const &inputs, mpi::communi
   gf_struct   = p.gf_struct;
 
   // Count colors
-  n_color = 0; 
+  n_color = 0;
   for (auto const &[bl_name, bl_size] : gf_struct) { n_color += bl_size; }
 
   // Compute color/block conversion tables
   for (auto const &color : range(n_color)) {
     block_number.push_back(find_block_number(color));
     index_in_block.push_back(find_index_in_block(color));
+  }
+
+  // Print block/index/color correspondence
+  if (c.rank() == 0) {
+    for (auto const &color : range(n_color)) {
+      spdlog::info("Block: {}    Index: {}    Color: {}", gf_struct[block_number[color]].first, index_in_block[color],
+                   color);
+    }
   }
 
   // Extract color-dependent chemical potential from operator
