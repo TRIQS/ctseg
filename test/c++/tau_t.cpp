@@ -4,6 +4,8 @@
 #include <triqs/test_tools/arrays.hpp>
 #include <triqs_ctseg/tau_t.hpp>
 
+using triqs_ctseg::tau_t;
+
 TEST(tau, basic) {
 
   double beta = 40;

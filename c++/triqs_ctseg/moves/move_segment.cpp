@@ -1,7 +1,7 @@
 #include "move_segment.hpp"
 #include "../logs.hpp"
 
-namespace moves {
+namespace triqs_ctseg::moves {
 
   double move_segment::attempt() {
 
@@ -176,4 +176,5 @@ namespace moves {
     wdata.dets[origin_bl].reject_last_try();
     wdata.dets[destination_bl].reject_last_try();
   }
-}; // namespace moves
+
+} // namespace triqs_ctseg::moves

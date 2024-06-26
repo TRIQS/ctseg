@@ -2,7 +2,7 @@
 #include <itertools/itertools.hpp>
 #include "../logs.hpp"
 
-namespace measures {
+namespace triqs_ctseg::measures {
 
   sign::sign(params_t const &, work_data_t const &wdata, configuration_t const &config, results_t &results)
      : wdata{wdata}, config{config}, results{results} {
@@ -24,4 +24,5 @@ namespace measures {
     N            = mpi::all_reduce(N, c);
     results.sign = Z / N;
   }
-} // namespace measures
+
+} // namespace triqs_ctseg::measures

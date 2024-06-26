@@ -1,7 +1,7 @@
 #include "./nn_static.hpp"
 #include "../logs.hpp"
 
-namespace measures {
+namespace triqs_ctseg::measures {
 
   nn_static::nn_static(params_t const &p, work_data_t const &wdata, configuration_t const &config, results_t &results)
      : wdata{wdata}, config{config}, results{results} {
@@ -38,4 +38,5 @@ namespace measures {
     // store the result (not reused later, hence we can move it).
     results.nn_static = std::move(nn);
   }
-} // namespace measures
+
+} // namespace triqs_ctseg::measures

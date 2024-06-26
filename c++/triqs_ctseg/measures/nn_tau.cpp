@@ -1,7 +1,7 @@
 #include "./nn_tau.hpp"
 #include "../logs.hpp"
 
-namespace measures {
+namespace triqs_ctseg::measures {
 
   nn_tau::nn_tau(params_t const &p, work_data_t const &wdata, configuration_t const &config, results_t &results)
      : wdata{wdata}, config{config}, results{results} {
@@ -77,4 +77,5 @@ namespace measures {
     }
     results.nn_tau = std::move(q_tau_block);
   }
-} // namespace measures
+
+} // namespace triqs_ctseg::measures

@@ -2,7 +2,7 @@
 #include "../logs.hpp"
 #include <cmath>
 
-namespace moves {
+namespace triqs_ctseg::moves {
 
   double swap_spin_lines::attempt() {
 
@@ -72,4 +72,5 @@ namespace moves {
 
   //--------------------------------------------------
   void swap_spin_lines::reject() { LOG("\n - - - - - ====> REJECT - - - - - - - - - - -\n"); }
-}; // namespace moves
+
+} // namespace triqs_ctseg::moves

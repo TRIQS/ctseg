@@ -3,7 +3,8 @@
 #include "../configuration.hpp"
 #include "../invariants.hpp"
 
-namespace moves {
+namespace triqs_ctseg::moves {
+
   class remove_spin_segment {
     work_data_t &wdata;
     configuration_t &config;
@@ -24,4 +25,5 @@ namespace moves {
     double accept();
     void reject();
   };
-}; // namespace moves
+
+} // namespace triqs_ctseg::moves

@@ -3,7 +3,7 @@
 #include "../work_data.hpp"
 #include "../results.hpp"
 
-namespace measures {
+namespace triqs_ctseg::measures {
 
   struct g_f_tau {
 
@@ -26,4 +26,4 @@ namespace measures {
     double fprefactor(long const &block, std::pair<tau_t, long> const &y);
   };
 
-} // namespace measures
+} // namespace triqs_ctseg::measures

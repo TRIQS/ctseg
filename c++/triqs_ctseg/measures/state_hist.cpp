@@ -1,7 +1,7 @@
 #include "./state_hist.hpp"
 #include "../logs.hpp"
 
-namespace measures {
+namespace triqs_ctseg::measures {
 
   state_hist::state_hist(params_t const &p, work_data_t const &wdata, configuration_t const &config, results_t &results)
      : wdata{wdata}, config{config}, results{results} {
@@ -56,4 +56,5 @@ namespace measures {
     // store the result (not reused later, hence we can move it).
     results.state_hist = std::move(H);
   }
-} // namespace measures
+
+} // namespace triqs_ctseg::measures

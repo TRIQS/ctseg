@@ -3,7 +3,7 @@
 #include "../results.hpp"
 #include "../work_data.hpp"
 
-namespace measures {
+namespace triqs_ctseg::measures {
 
   struct pert_order_histo {
 
@@ -19,4 +19,5 @@ namespace measures {
     void accumulate(double s);
     void collect_results(mpi::communicator const &c);
   };
-} // namespace measures
+
+} // namespace triqs_ctseg::measures

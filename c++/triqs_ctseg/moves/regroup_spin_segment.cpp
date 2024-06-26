@@ -3,7 +3,7 @@
 #include "../configuration.hpp"
 #include <cmath>
 
-namespace moves {
+namespace triqs_ctseg::moves {
 
   double regroup_spin_segment::attempt() {
 
@@ -198,4 +198,4 @@ namespace moves {
     return {idx_c, idx_cdag, tau_c_new, false};
   }
 
-}; // namespace moves
+} // namespace triqs_ctseg::moves

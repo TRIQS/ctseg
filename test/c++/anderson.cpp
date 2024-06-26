@@ -4,6 +4,7 @@
 #include <triqs_ctseg/solver_core.hpp>
 
 using triqs::operators::n;
+using namespace triqs_ctseg;
 
 TEST(CTSEGJ, Anderson) {
 

@@ -2,7 +2,7 @@
 #include "../logs.hpp"
 #include <cmath>
 
-namespace moves {
+namespace triqs_ctseg::moves {
 
   double remove_spin_segment::attempt() {
 
@@ -156,4 +156,5 @@ namespace moves {
 
   //--------------------------------------------------
   void remove_spin_segment::reject() { LOG("\n - - - - - ====> REJECT - - - - - - - - - - -\n"); }
-}; // namespace moves
+
+} // namespace triqs_ctseg::moves

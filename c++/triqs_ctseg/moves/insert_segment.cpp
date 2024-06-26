@@ -2,7 +2,7 @@
 #include "../logs.hpp"
 #include <cmath>
 
-namespace moves {
+namespace triqs_ctseg::moves {
 
   double insert_segment::attempt() {
 
@@ -133,4 +133,5 @@ namespace moves {
     LOG("\n - - - - - ====> REJECT - - - - - - - - - - -\n");
     wdata.dets[wdata.block_number[color]].reject_last_try();
   }
-}; // namespace moves
+
+} // namespace triqs_ctseg::moves

@@ -3,7 +3,7 @@
 #include "../work_data.hpp"
 #include "../results.hpp"
 
-namespace measures {
+namespace triqs_ctseg::measures {
 
   struct nn_tau {
 
@@ -26,4 +26,5 @@ namespace measures {
     void accumulate(double s);
     void collect_results(mpi::communicator const &c);
   };
-} // namespace measures
+
+} // namespace triqs_ctseg::measures

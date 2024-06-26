@@ -1,7 +1,7 @@
 #include "./pert_order_histo.hpp"
 #include "../logs.hpp"
 
-namespace measures {
+namespace triqs_ctseg::measures {
 
   pert_order_histo::pert_order_histo(params_t const &p, work_data_t const &wdata,
                                                      configuration_t const &config, results_t &results)
@@ -37,4 +37,5 @@ namespace measures {
     results.pert_order_histo_Delta = pdf(histo_delta);
     results.pert_order_histo_Jperp = pdf(histo_Jperp);
   }
-} // namespace measures
+
+} // namespace triqs_ctseg::measures

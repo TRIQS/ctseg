@@ -3,7 +3,7 @@
 #include "../configuration.hpp"
 #include "../invariants.hpp"
 
-namespace moves {
+namespace triqs_ctseg::moves {
 
   class regroup_segment {
     work_data_t &wdata;
@@ -25,4 +25,5 @@ namespace moves {
     double accept();
     void reject();
   };
-}; // namespace moves
+
+} // namespace triqs_ctseg::moves

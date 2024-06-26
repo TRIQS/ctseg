@@ -5,6 +5,7 @@
 #include <triqs_ctseg/tau_t.hpp>
 #include <triqs_ctseg/configuration.hpp>
 
+using namespace triqs_ctseg;
 using vs_t = std::vector<segment_t>;
 
 double beta      = 10;

@@ -2,7 +2,7 @@
 #include "../logs.hpp"
 #include <cmath>
 
-namespace moves {
+namespace triqs_ctseg::moves {
 
   insert_spin_segment::insert_spin_segment(work_data_t &data_, configuration_t &config_,
                                            triqs::mc_tools::random_generator &rng_)
@@ -145,4 +145,5 @@ namespace moves {
 
   //--------------------------------------------------
   void insert_spin_segment::reject() { LOG("\n - - - - - ====> REJECT - - - - - - - - - - -\n"); }
-}; // namespace moves
+
+} // namespace triqs_ctseg::moves

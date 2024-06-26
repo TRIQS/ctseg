@@ -4,7 +4,7 @@
 #include "../results.hpp"
 //#include "../precompute_fprefactor.hpp"
 
-namespace measures {
+namespace triqs_ctseg::measures {
 
   struct sperp_tau {
 
@@ -23,4 +23,5 @@ namespace measures {
     void accumulate(double s);
     void collect_results(mpi::communicator const &c);
   };
-} // namespace measures
+
+} // namespace triqs_ctseg::measures

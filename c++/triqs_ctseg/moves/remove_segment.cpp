@@ -1,7 +1,7 @@
 #include "remove_segment.hpp"
 #include "../logs.hpp"
 
-namespace moves {
+namespace triqs_ctseg::moves {
 
   double remove_segment::attempt() {
 
@@ -112,4 +112,5 @@ namespace moves {
     LOG("\n - - - - - ====> REJECT - - - - - - - - - - -\n");
     wdata.dets[wdata.block_number[color]].reject_last_try();
   }
-} // namespace moves
+
+} // namespace triqs_ctseg::moves

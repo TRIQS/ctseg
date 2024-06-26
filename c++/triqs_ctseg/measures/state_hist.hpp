@@ -4,7 +4,7 @@
 #include "../results.hpp"
 #include "../util.hpp"
 
-namespace measures {
+namespace triqs_ctseg::measures {
 
   struct state_hist {
 
@@ -22,4 +22,5 @@ namespace measures {
     void accumulate(double s);
     void collect_results(mpi::communicator const &c);
   };
-} // namespace measures
+
+} // namespace triqs_ctseg::measures

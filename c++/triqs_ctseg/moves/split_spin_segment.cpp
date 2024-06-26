@@ -3,7 +3,7 @@
 #include <cmath>
 #include <tuple>
 
-namespace moves {
+namespace triqs_ctseg::moves {
 
   double split_spin_segment::attempt() {
 
@@ -194,4 +194,5 @@ namespace moves {
 
     return {idx_c, idx_cdag, tau_c_new};
   }
-}; // namespace moves
+
+} // namespace triqs_ctseg::moves

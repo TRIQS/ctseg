@@ -1,5 +1,5 @@
 # Generated automatically using the command :
-# c++2py ../../c++/triqs_ctseg/solver_core.hpp -p --members_read_only -a triqs_ctseg -m solver_core -o solver_core --only="results_t solver_core" --moduledoc="The python module for triqs_ctseg" -C triqs -C nda_py --includes=../../c++ --includes=/usr/local/include/ --cxxflags="-std=c++20" --target_file_only
+# c++2py ../../c++/triqs_ctseg/solver_core.hpp -p --members_read_only -N triqs_ctseg -a triqs_ctseg -m solver_core -o solver_core --only="results_t solver_core" --moduledoc="The python module for triqs_ctseg" -C triqs -C nda_py --includes=../../c++ --includes=/usr/local/include/ --cxxflags="-std=c++20" --target_file_only
 from cpp2py.wrap_generator import *
 
 # The module
@@ -23,13 +23,14 @@ module.add_preamble("""
 #include <triqs/cpp2py_converters/operators_real_complex.hpp>
 #include <triqs/cpp2py_converters/real_or_complex.hpp>
 
+using namespace triqs_ctseg;
 """)
 
 
 # The class results_t
 c = class_(
         py_type = "ResultsT",  # name of the python class
-        c_type = "results_t",   # name of the C++ class
+        c_type = "triqs_ctseg::results_t",   # name of the C++ class
         doc = r"""""",   # doc of the C++ class
         hdf5 = False,
 )
@@ -45,7 +46,7 @@ c.add_member(c_name = "F_tau",
              doc = r"""Self-energy improved estimator :math:`F(\tau)`.""")
 
 c.add_member(c_name = "nn_tau",
-             c_type = "std::optional<gf<imtime>>",
+             c_type = "std::optional<block2_gf<imtime>>",
              read_only= True,
              doc = r"""Density-density time correlation function :math:`\langle n_a(\tau) n_b(0) \rangle`.""")
 
@@ -89,7 +90,7 @@ module.add_class(c)
 # The class solver_core
 c = class_(
         py_type = "SolverCore",  # name of the python class
-        c_type = "solver_core",   # name of the C++ class
+        c_type = "triqs_ctseg::solver_core",   # name of the C++ class
         doc = r"""Main solver class""",   # doc of the C++ class
         hdf5 = True,
 )
@@ -229,7 +230,7 @@ module.add_class(c)
 
 # Converter for solve_params_t
 c = converter_(
-        c_type = "solve_params_t",
+        c_type = "triqs_ctseg::solve_params_t",
         doc = r"""""",
 )
 c.add_member(c_name = "h_int",
@@ -416,7 +417,7 @@ module.add_converter(c)
 
 # Converter for constr_params_t
 c = converter_(
-        c_type = "constr_params_t",
+        c_type = "triqs_ctseg::constr_params_t",
         doc = r"""""",
 )
 c.add_member(c_name = "beta",
