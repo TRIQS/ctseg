@@ -108,7 +108,7 @@ namespace triqs_ctseg {
     // Initialize measurements
     if (p.measure_G_tau) CTQMC.add_measure(measures::g_f_tau{p, wdata, config, results}, "G(tau)/F(tau)");
     if (p.measure_densities) CTQMC.add_measure(measures::densities{p, wdata, config, results}, "Densities");
-    if (p.measure_sign) CTQMC.add_measure(measures::sign{p, wdata, config, results}, "Sign");
+    if (p.measure_average_sign) CTQMC.add_measure(measures::average_sign{p, wdata, config, results}, "Average Sign");
     if (p.measure_nn_static) CTQMC.add_measure(measures::nn_static{p, wdata, config, results}, "<nn>");
     if (p.measure_nn_tau) CTQMC.add_measure(measures::nn_tau{p, wdata, config, results}, "<n(tau)n(0)>");
     if (p.measure_sperp_tau) CTQMC.add_measure(measures::sperp_tau{p, wdata, config, results}, "<s_x(tau)s_x(0)>");
@@ -133,7 +133,7 @@ namespace triqs_ctseg {
 
     // Report sign and average order
     if (c.rank() == 0) {
-      spdlog::info("Average sign: {}", results.sign);
+      spdlog::info("Average sign: {}", results.average_sign);
       if (results.average_order_Delta)
         spdlog::info("Average perturbation order in Delta: {:.3f}", results.average_order_Delta.value());
       if (results.average_order_Jperp)

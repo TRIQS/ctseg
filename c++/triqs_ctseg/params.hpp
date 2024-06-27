@@ -125,7 +125,7 @@ namespace triqs_ctseg {
     bool measure_densities = true;
 
     /// Whether to measure sign (see measures/sign)
-    bool measure_sign = true;
+    bool measure_average_sign = true;
 
     /// Whether to measure <n(0)n(0)> (see measures/nn_static)
     bool measure_nn_static = false;

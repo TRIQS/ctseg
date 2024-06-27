@@ -72,7 +72,7 @@ namespace triqs_ctseg {
     h5_write(grp, "measure_G_tau", c.measure_G_tau);
     h5_write(grp, "measure_F_tau", c.measure_F_tau);
     h5_write(grp, "measure_densities", c.measure_densities);
-    h5_write(grp, "measure_sign", c.measure_sign);
+    h5_write(grp, "measure_average_sign", c.measure_average_sign);
     h5_write(grp, "measure_nn_static", c.measure_nn_static);
     h5_write(grp, "measure_nn_tau", c.measure_nn_tau);
     h5_write(grp, "measure_sperp_tau", c.measure_sperp_tau);
@@ -116,7 +116,7 @@ namespace triqs_ctseg {
     h5_read(grp, "measure_G_tau", c.measure_G_tau);
     h5_read(grp, "measure_F_tau", c.measure_F_tau);
     h5_read(grp, "measure_densities", c.measure_densities);
-    h5_read(grp, "measure_sign", c.measure_sign);
+    h5_read(grp, "measure_average_sign", c.measure_average_sign);
     h5_read(grp, "measure_nn_static", c.measure_nn_static);
     h5_read(grp, "measure_nn_tau", c.measure_nn_tau);
     h5_read(grp, "measure_sperp_tau", c.measure_sperp_tau);

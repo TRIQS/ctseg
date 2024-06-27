@@ -90,7 +90,7 @@ c.add_member(c_name = "state_hist",
              read_only= True,
              doc = r"""State histogram""")
 
-c.add_member(c_name = "sign",
+c.add_member(c_name = "average_sign",
              c_type = "double",
              read_only= True,
              doc = r"""Average sign""")
@@ -199,7 +199,7 @@ c.add_method("""void solve (**solve_params_t)""",
 +-------------------------------+--------------------------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
 | measure_densities             | bool                                 | true                                    | Whether to measure densities (see measures/densities)                                                             |
 +-------------------------------+--------------------------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
-| measure_sign                  | bool                                 | true                                    | Whether to measure sign (see measures/sign)                                                                       |
+| measure_average_sign          | bool                                 | true                                    | Whether to measure the average sign (see measures/average_sign)                                                   |
 +-------------------------------+--------------------------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
 | measure_nn_static             | bool                                 | false                                   | Whether to measure <n(0)n(0)> (see measures/nn_static)                                                            |
 +-------------------------------+--------------------------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
@@ -368,10 +368,10 @@ c.add_member(c_name = "measure_densities",
              initializer = """ true """,
              doc = r"""Whether to measure densities (see measures/densities)""")
 
-c.add_member(c_name = "measure_sign",
+c.add_member(c_name = "measure_average_sign",
              c_type = "bool",
              initializer = """ true """,
-             doc = r"""Whether to measure sign (see measures/sign)""")
+             doc = r"""Whether to measure the average sign (see measures/average_sign)""")
 
 c.add_member(c_name = "measure_nn_static",
              c_type = "bool",

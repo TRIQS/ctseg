@@ -61,7 +61,7 @@ namespace triqs_ctseg {
     std::optional<nda::vector<double>> state_hist;
 
     /// Average sign
-    double sign;
+    double average_sign;
   };
 
   /// writes all containers to hdf5 file
