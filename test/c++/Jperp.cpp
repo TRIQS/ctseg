@@ -52,15 +52,15 @@ TEST(CTSEGJ, J_perp) {
   solver_core Solver(param_constructor);
 
   // Solve parameters
-  param_solve.h_int              = U * n("up", 0) * n("down", 0);
-  param_solve.h_loc0             = -mu * (n("up", 0) + n("down", 0));
-  param_solve.n_cycles           = n_cycles;
-  param_solve.n_warmup_cycles    = n_warmup_cycles;
-  param_solve.length_cycle       = length_cycle;
-  param_solve.random_seed        = random_seed;
-  param_solve.measure_F_tau      = true;
-  param_solve.measure_nn_tau     = true;
-  param_solve.measure_nn_static  = true;
+  param_solve.h_int             = U * n("up", 0) * n("down", 0);
+  param_solve.h_loc0            = -mu * (n("up", 0) + n("down", 0));
+  param_solve.n_cycles          = n_cycles;
+  param_solve.n_warmup_cycles   = n_warmup_cycles;
+  param_solve.length_cycle      = length_cycle;
+  param_solve.random_seed       = random_seed;
+  param_solve.measure_F_tau     = true;
+  param_solve.measure_nn_tau    = true;
+  param_solve.measure_nn_static = true;
 
   // Prepare Delta
   nda::clef::placeholder<0> om_;
