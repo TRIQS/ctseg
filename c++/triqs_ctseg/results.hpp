@@ -43,7 +43,7 @@ namespace triqs_ctseg {
     std::optional<nda::matrix<double>> nn_static;
 
     /// Density per color.
-    nda::array<double, 1> densities;
+    std::map<std::string, nda::array<double, 1>> densities;
 
     /// Delta perturbation order histogram
     std::optional<std::vector<double>> pert_order_Delta;

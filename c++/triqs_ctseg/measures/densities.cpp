@@ -45,8 +45,14 @@ namespace triqs_ctseg::measures {
     Z = mpi::all_reduce(Z, c);
     n = mpi::all_reduce(n, c);
     n /= (Z * tau_t::beta());
-    results.densities = n;
-    if (c.rank() == 0) SPDLOG_INFO("Densities: {}", n);
+    for (long offset = 0; auto [bl_name, bl_size] : wdata.gf_struct) {
+      results.densities[bl_name] = n[range(offset, offset + bl_size)];
+      offset += bl_size;
+    }
+    if (c.rank() == 0) {
+      SPDLOG_INFO("Densities:");
+      for (auto &[bl, dens] : results.densities) SPDLOG_INFO("  {}: {}", bl, dens);
+    }
   }
 
 } // namespace triqs_ctseg::measures

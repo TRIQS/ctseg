@@ -13,6 +13,7 @@ module.add_include("triqs_ctseg/solver_core.hpp")
 
 # Add here anything to add in the C++ code at the start, e.g. namespace using
 module.add_preamble("""
+#include <cpp2py/converters/map.hpp>
 #include <cpp2py/converters/optional.hpp>
 #include <cpp2py/converters/pair.hpp>
 #include <cpp2py/converters/std_array.hpp>
@@ -61,7 +62,7 @@ c.add_member(c_name = "nn_static",
              doc = r"""Density-density static correlation function :math:`\langle n_a(0) n_b(0) \rangle`.""")
 
 c.add_member(c_name = "densities",
-             c_type = "nda::array<double, 1>",
+             c_type = "std::map<std::string, nda::array<double, 1>>",
              read_only= True,
              doc = r"""Density per color.""")
 

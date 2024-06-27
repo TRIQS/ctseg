@@ -90,13 +90,14 @@ TEST(CTSEGJ, Anderson) {
     block_gf<imtime> G_tau, F_tau;
     block2_gf<imtime> nn_tau;
     nda::matrix<double> nn_static;
-    nda::array<double, 1> densities;
+    std::map<std::string, nda::array<double, 1>> densities;
     h5_read(ref_file, "G_tau", G_tau);
     h5_read(ref_file, "F_tau", F_tau);
     h5_read(ref_file, "nn_tau", nn_tau);
     h5_read(ref_file, "nn_static", nn_static);
     h5_read(ref_file, "densities", densities);
-    EXPECT_ARRAY_NEAR(densities, Solver.results.densities, precision);
+    EXPECT_ARRAY_NEAR(densities["up"], Solver.results.densities["up"], precision);
+    EXPECT_ARRAY_NEAR(densities["down"], Solver.results.densities["down"], precision);
     EXPECT_BLOCK_GF_NEAR(G_tau, Solver.results.G_tau, precision);
     EXPECT_BLOCK_GF_NEAR(F_tau, Solver.results.F_tau.value(), precision);
     EXPECT_BLOCK2_GF_NEAR(nn_tau, Solver.results.nn_tau.value(), precision);

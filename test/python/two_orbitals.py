@@ -37,7 +37,7 @@ gf_struct = [("up1", 1), ("dn1", 1), ("up2", 1), ("dn2", 1)]
 
 # Solve parameters
 solve_params["h_int"] = 0*n("up1", 0)*n("dn1", 0)
-solve_params["h_loc0"] = -mu * (n("up1", 0) + n("dn1", 0) + n("up2", 0) + n("dn2, 0"))
+solve_params["h_loc0"] = -mu * (n("up1", 0) + n("dn1", 0) + n("up2", 0) + n("dn2", 0))
 
 # Construct solver
 S = Solver(beta = beta,
@@ -60,7 +60,7 @@ if mpi.is_master_node():
         A['nn_tau_0'] = S.results.nn_tau["up1", "up1"][0, 0]
         A['nn_tau_1'] = S.results.nn_tau["dn1", "dn1"][0, 0]
         A['nn'] = S.results.nn_static
-        A['densities'] = S.results.densities
+        A['densities'] = np.concatenate([S.results.densities[bl] for bl in ["up1", "dn1", "up2", "dn2"]])
 
 # --------- 2 blocks of size 2 -----------
 
@@ -69,7 +69,7 @@ gf_struct = [("up1", 2), ("dn1", 2)]
 
 # Solve parameters
 solve_params["h_int"] = 0*n("up1", 0)*n("dn1", 0)
-solve_params["h_loc0"] = -mu * (n("up1", 0) + n("dn1", 0) + n("up1", 1) + n("dn1, 1"))
+solve_params["h_loc0"] = -mu * (n("up1", 0) + n("dn1", 0) + n("up1", 1) + n("dn1", 1))
 
 # Construct solver
 S = Solver(beta = beta,
@@ -94,7 +94,7 @@ if mpi.is_master_node():
         A['nn_tau_0'] = S.results.nn_tau["up1", "up1"][0, 0]
         A['nn_tau_1'] = S.results.nn_tau["up1", "up1"][1, 1]
         A['nn'] = S.results.nn_static
-        A['densities'] = S.results.densities
+        A['densities'] = np.concatenate([S.results.densities[bl] for bl in ["up1", "dn1"]])
 
 # --------- Compare outputs -----------
 if mpi.is_master_node():
