@@ -112,7 +112,7 @@ namespace triqs_ctseg::moves {
     fix_ordering_first_last(sl_dn);
 
     // Add spin line
-    config.Jperp_list.push_back(jperp_line_t{tau_up, tau_dn});
+    config.Jperp_list.push_back(Jperp_line_t{tau_up, tau_dn});
 
     // Compute sign
     double final_sign = trace_sign(wdata);

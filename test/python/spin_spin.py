@@ -35,11 +35,11 @@ with h5.HDFArchive("ctint.ref.h5", 'r') as Af:
 
 # Hybridization Delta(tau)
 n_iw = 1025
-delta = GfImFreq(indices=[0], beta=beta, n_points=n_iw)
+Delta = GfImFreq(indices=[0], beta=beta, n_points=n_iw)
 invg0 = GfImFreq(indices=[0], beta=beta, n_points=n_iw)
 invg0 << inverse(g0)
-delta << iOmega_n + mu - invg0
-S.Delta_tau << Fourier(delta)
+Delta << iOmega_n + mu - invg0
+S.Delta_tau << Fourier(Delta)
 
 # Spin-spin interaction (D0(tau) and Jperp(tau))
 S.Jperp_tau << -J**2*Q_tau

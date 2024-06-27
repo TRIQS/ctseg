@@ -82,7 +82,7 @@ namespace triqs_ctseg {
     for (int c1 : range(n_color)) {
       for (int c2 : range(n_color)) {
         D0t.data()(range::all, c1, c2) =
-           inputs.d0t(block_number[c1], block_number[c2]).data()(range::all, index_in_block[c1], index_in_block[c2]);
+           inputs.D0t(block_number[c1], block_number[c2]).data()(range::all, index_in_block[c1], index_in_block[c2]);
       }
     }
     // Symetrize
@@ -90,11 +90,11 @@ namespace triqs_ctseg {
 
     // Do we have D(tau) and J_perp(tau)? Yes, unless the data is 0
     has_Dt    = max_element(abs(D0t.data())) > 1.e-13;
-    has_jperp = max_element(abs(inputs.jperpt.data())) > 1.e-13;
+    has_Jperp = max_element(abs(inputs.Jperpt.data())) > 1.e-13;
 
     // Check: no J_perp implementation for more than 2 colors
     if (n_color != 2) {
-      ALWAYS_EXPECTS((not has_jperp), "Error : has_jperp is true and we have {} colors instead of 2", n_color);
+      ALWAYS_EXPECTS((not has_Jperp), "Error : has_jperp is true and we have {} colors instead of 2", n_color);
     }
 
     // For numerical integration of the D0 and Jperp
@@ -130,8 +130,8 @@ namespace triqs_ctseg {
     }
 
     // J_perp interactions
-    if (has_jperp) {
-      Jperp = inputs.jperpt;
+    if (has_Jperp) {
+      Jperp = inputs.Jperpt;
       if (not has_Dt)
         rot_inv = false;
       else {
@@ -164,39 +164,39 @@ namespace triqs_ctseg {
 
     // Report
     if (c.rank() == 0) {
-      spdlog::info("Dynamical interactions = {}, J_perp interactions = {}", has_Dt, has_jperp);
+      spdlog::info("Dynamical interactions = {}, J_perp interactions = {}", has_Dt, has_Jperp);
       if (p.measure_F_tau and !rot_inv)
         spdlog::info("WARNING: Cannot measure F(tau) because spin-spin interaction is not rotationally invariant.");
     }
 
     // ................  Determinants .....................
     // Is there a non-zero Delta(tau)?
-    for (auto const &bl : range(inputs.delta.size())) {
-      if (max_element(abs(inputs.delta[bl].data())) > 1.e-13) has_delta = true;
+    for (auto const &bl : range(inputs.Delta.size())) {
+      if (max_element(abs(inputs.Delta[bl].data())) > 1.e-13) has_Delta = true;
       // Report if Delta(tau) has imaginary part.
-      if (!is_gf_real(inputs.delta[bl], 1e-10)) {
+      if (!is_gf_real(inputs.Delta[bl], 1e-10)) {
         if (c.rank() == 0) {
           spdlog::info("WARNING: The Delta(tau) block number {} is not real in tau space", bl);
-          spdlog::info("WARNING: max(Im[Delta(tau)]) = {}", max_element(abs(imag(inputs.delta[bl].data()))));
+          spdlog::info("WARNING: max(Im[Delta(tau)]) = {}", max_element(abs(imag(inputs.Delta[bl].data()))));
           spdlog::info("WARNING: Disregarding the imaginary component in the calculation.");
         }
       }
     }
-    if (not has_delta) {
-      ALWAYS_EXPECTS(has_jperp, "Error : both J_perp(tau) and Delta(tau) are 0: there is nothing to expand.");
+    if (not has_Delta) {
+      ALWAYS_EXPECTS(has_Jperp, "Error : both J_perp(tau) and Delta(tau) are 0: there is nothing to expand.");
       if (c.rank() == 0) { spdlog::info("Delta(tau) is 0, running only spin moves."); }
     }
 
     // Does gf_struct allow for off-diagonal Delta?
     for (auto const &[s, l] : gf_struct) {
-      if (l > 1) offdiag_delta = true;
+      if (l > 1) offdiag_Delta = true;
     }
 
     // Take the real part of Delta(tau)
-    delta = map([](gf_const_view<imtime> d) { return real(d); }, inputs.delta);
-    for (auto const &bl : range(delta.size())) {
+    Delta = map([](gf_const_view<imtime> d) { return real(d); }, inputs.Delta);
+    for (auto const &bl : range(Delta.size())) {
       // Construct the detmanip object for block bl
-      dets.emplace_back(delta_block_adaptor{delta[bl]}, p.det_init_size);
+      dets.emplace_back(Delta_block_adaptor{Delta[bl]}, p.det_init_size);
       // Set parameters
       dets.back().set_singular_threshold(p.det_singular_threshold);
       dets.back().set_n_operations_before_check(p.det_n_operations_before_check);

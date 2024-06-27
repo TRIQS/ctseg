@@ -62,14 +62,14 @@ TEST(CTSEGJ, J_perp) {
   param_solve.measure_nn_tau     = true;
   param_solve.measure_nn_static  = true;
 
-  // Prepare delta
+  // Prepare Delta
   nda::clef::placeholder<0> om_;
-  auto delta_w   = gf<imfreq>({beta, Fermion, n_iw}, {1, 1});
-  auto delta_tau = gf<imtime>({beta, Fermion, param_constructor.n_tau}, {1, 1});
-  delta_w(om_) << 1.0 / (om_ - epsilon) + 1.0 / (om_ + epsilon);
-  delta_tau()           = fourier(delta_w);
-  Solver.Delta_tau()[0] = delta_tau;
-  Solver.Delta_tau()[1] = delta_tau;
+  auto Delta_w   = gf<imfreq>({beta, Fermion, n_iw}, {1, 1});
+  auto Delta_tau = gf<imtime>({beta, Fermion, param_constructor.n_tau}, {1, 1});
+  Delta_w(om_) << 1.0 / (om_ - epsilon) + 1.0 / (om_ + epsilon);
+  Delta_tau()           = fourier(Delta_w);
+  Solver.Delta_tau()[0] = Delta_tau;
+  Solver.Delta_tau()[1] = Delta_tau;
 
   // Prepare j_perp interaction
   double l  = 1.0; // electron boson coupling
@@ -83,7 +83,7 @@ TEST(CTSEGJ, J_perp) {
 
   // Save the results
   if (c.rank() == 0) {
-    h5::file out_file("jperp.out.h5", 'w');
+    h5::file out_file("Jperp.out.h5", 'w');
     h5_write(out_file, "G_tau", Solver.results.G_tau);
     h5_write(out_file, "nn_tau", Solver.results.nn_tau.value());
     h5_write(out_file, "nn_static", Solver.results.nn_static.value());
@@ -92,7 +92,7 @@ TEST(CTSEGJ, J_perp) {
 
   // Compare with reference
   if (c.rank() == 0) {
-    h5::file ref_file("jperp.ref.h5", 'r');
+    h5::file ref_file("Jperp.ref.h5", 'r');
     block_gf<imtime> G_tau;
     block2_gf<imtime> nn_tau;
     nda::matrix<double> nn_static;

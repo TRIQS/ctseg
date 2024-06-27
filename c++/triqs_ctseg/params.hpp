@@ -115,16 +115,16 @@ namespace triqs_ctseg {
     /// Whether to measure the perturbation order histograms (order in Delta and Jperp)
     bool measure_pert_order = true;
 
-    /// Whether to measure G(tau) (see measures/g_f_tau)
+    /// Whether to measure G(tau) (see measures/G_F_tau)
     bool measure_G_tau = true;
 
-    /// Whether to measure F(tau) (see measures/g_f_tau)
+    /// Whether to measure F(tau) (see measures/G_F_tau)
     bool measure_F_tau = false;
 
     /// Whether to measure densities (see measures/densities)
     bool measure_densities = true;
 
-    /// Whether to measure sign (see measures/sign)
+    /// Whether to measure the average sign (see measures/average_sign)
     bool measure_average_sign = true;
 
     /// Whether to measure <n(0)n(0)> (see measures/nn_static)
@@ -133,8 +133,8 @@ namespace triqs_ctseg {
     /// Whether to measure <n(tau)n(0)> (see measures/nn_tau)
     bool measure_nn_tau = false;
 
-    /// Whether to measure <s_x(tau)s_x(0)> (see measures/sperp_tau)
-    bool measure_sperp_tau = false;
+    /// Whether to measure <S_x(tau)S_x(0)> (see measures/Sperp_tau)
+    bool measure_Sperp_tau = false;
 
     /// Whether to measure state histograms (see measures/state_hist)
     bool measure_state_hist = false;

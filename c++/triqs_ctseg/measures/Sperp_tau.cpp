@@ -15,12 +15,12 @@
 //
 // Authors: Nikita Kavokine, Nils Wentzell
 
-#include "./sperp_tau.hpp"
+#include "./Sperp_tau.hpp"
 #include "../logs.hpp"
 
 namespace triqs_ctseg::measures {
 
-  sperp_tau::sperp_tau(params_t const &p, work_data_t const &wdata, configuration_t const &config, results_t &results)
+  Sperp_tau::Sperp_tau(params_t const &p, work_data_t const &wdata, configuration_t const &config, results_t &results)
      : wdata{wdata}, config{config}, results{results} {
 
     beta = p.beta;
@@ -34,7 +34,7 @@ namespace triqs_ctseg::measures {
 
   // -------------------------------------
 
-  void sperp_tau::accumulate(double s) {
+  void Sperp_tau::accumulate(double s) {
 
     LOG("\n =================== MEASURE < S_x S_x > (tau) ================ \n");
 
@@ -50,7 +50,7 @@ namespace triqs_ctseg::measures {
 
   // -------------------------------------
 
-  void sperp_tau::collect_results(mpi::communicator const &c) {
+  void Sperp_tau::collect_results(mpi::communicator const &c) {
 
     Z = mpi::all_reduce(Z, c);
 
@@ -62,7 +62,7 @@ namespace triqs_ctseg::measures {
     ss_tau[ss_tau.mesh().size() - 1] *= 2;
 
     // store the result (not reused later, hence we can move it).
-    results.sperp_tau = std::move(ss_tau);
+    results.Sperp_tau = std::move(ss_tau);
   }
 
 } // namespace triqs_ctseg::measures

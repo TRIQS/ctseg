@@ -36,18 +36,18 @@ namespace triqs_ctseg {
     int n_color;            // Number of colors
     nda::vector<double> mu; // Chemical potential per color
 
-    bool has_delta     = false; // There is a non-zero hybridization term
+    bool has_Delta     = false; // There is a non-zero hybridization term
     bool has_Dt        = false; // There is a non-zero dynamical nn interaction
-    bool has_jperp     = false; // There is a non-zero Jperp interaction
+    bool has_Jperp     = false; // There is a non-zero Jperp interaction
     bool rot_inv       = true;  // The spin-spin interaction is rotationally invariant (matters for F(tau) measure)
     bool minus_sign    = false; // Has a move ever produced a negative sign?
-    bool offdiag_delta = false; // Does Delta(tau) have blocks of size larger than 1?
+    bool offdiag_Delta = false; // Does Delta(tau) have blocks of size larger than 1?
 
     // Dynamical and spin-spin interaction kernels
     gf<imtime> D0t, K, Kprime, Jperp, Kprime_spin;
 
     // Hybridization function
-    block_gf<imtime, matrix_real_valued> delta;
+    block_gf<imtime, matrix_real_valued> Delta;
 
     // The determinants
     // Vector of the det_manip objects, one per block of the input Delta(tau). See dets.hpp

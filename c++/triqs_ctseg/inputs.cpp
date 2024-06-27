@@ -23,9 +23,9 @@ namespace triqs_ctseg {
 
     h5::group grp = subgroup_name.empty() ? h5group : h5group.create_group(subgroup_name);
 
-    h5_write(grp, "delta", c.delta);
-    h5_write(grp, "jperpt", c.jperpt);
-    h5_write(grp, "d0t", c.d0t);
+    h5_write(grp, "Delta", c.Delta);
+    h5_write(grp, "Jperpt", c.Jperpt);
+    h5_write(grp, "D0t", c.D0t);
   }
 
   //------------------------------------
@@ -34,9 +34,9 @@ namespace triqs_ctseg {
 
     h5::group grp = subgroup_name.empty() ? h5group : h5group.open_group(subgroup_name);
 
-    h5_read(grp, "delta", c.delta);
-    h5_read(grp, "jperpt", c.jperpt);
-    h5_read(grp, "d0t", c.d0t);
+    h5_read(grp, "Delta", c.Delta);
+    h5_read(grp, "Jperpt", c.Jperpt);
+    h5_read(grp, "D0t", c.D0t);
   }
 
 } // namespace triqs_ctseg

@@ -66,7 +66,7 @@ namespace triqs_ctseg {
   // Stores the times of a couple (S+, S-)
   // Note: J_perp expansion only implemented for single orbital
   // (two colors, spin up and spin down).
-  struct jperp_line_t {
+  struct Jperp_line_t {
     tau_t tau_Sminus, tau_Splus; // times of the S-, S+
   };
 
@@ -87,7 +87,7 @@ namespace triqs_ctseg {
     std::vector<std::vector<segment_t>> seglists;
 
     // List of Jperp lines, NOT ordered.
-    std::vector<jperp_line_t> Jperp_list;
+    std::vector<Jperp_line_t> Jperp_list;
 
     // Construct from the number of colors
     configuration_t(int n_color) : seglists(n_color) {}

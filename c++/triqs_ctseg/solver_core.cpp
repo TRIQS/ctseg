@@ -34,13 +34,13 @@ namespace triqs_ctseg {
     beta = p.beta;
     tau_t::set_beta(beta);
 
-    inputs.delta  = block_gf<imtime>({beta, Fermion, p.n_tau}, p.gf_struct);
-    inputs.d0t    = make_block2_gf<imtime>({beta, Boson, p.n_tau_bosonic}, p.gf_struct);
-    inputs.jperpt = gf<imtime>({beta, Boson, p.n_tau_bosonic}, {1, 1});
+    inputs.Delta  = block_gf<imtime>({beta, Fermion, p.n_tau}, p.gf_struct);
+    inputs.D0t    = make_block2_gf<imtime>({beta, Boson, p.n_tau_bosonic}, p.gf_struct);
+    inputs.Jperpt = gf<imtime>({beta, Boson, p.n_tau_bosonic}, {1, 1});
 
-    inputs.delta()  = 0;
-    inputs.d0t()    = 0;
-    inputs.jperpt() = 0;
+    inputs.Delta()  = 0;
+    inputs.D0t()    = 0;
+    inputs.Jperpt() = 0;
   };
 
   // ---------------------------------------------------------------------------
@@ -70,14 +70,14 @@ namespace triqs_ctseg {
     // Initialize configuration
     configuration_t config{wdata.n_color};
     // Start from a non-empty configuration when Delta(tau) = 0
-    if (not wdata.has_delta) { config.seglists[0].push_back(segment_t::full_line()); }
+    if (not wdata.has_Delta) { config.seglists[0].push_back(segment_t::full_line()); }
 
     // ................   QMC  ...................
 
     auto CTQMC = triqs::mc_tools::mc_generic<double>(p.random_name, p.random_seed, p.verbosity);
 
     // Initialize moves
-    if (wdata.has_delta) {
+    if (wdata.has_Delta) {
       if (p.move_insert_segment) CTQMC.add_move(moves::insert_segment{wdata, config, CTQMC.get_rng()}, "insert");
       if (p.move_remove_segment) CTQMC.add_move(moves::remove_segment{wdata, config, CTQMC.get_rng()}, "remove");
       if (p.move_move_segment) CTQMC.add_move(moves::move_segment{wdata, config, CTQMC.get_rng()}, "move");
@@ -85,7 +85,7 @@ namespace triqs_ctseg {
       if (p.move_regroup_segment) CTQMC.add_move(moves::regroup_segment{wdata, config, CTQMC.get_rng()}, "regroup");
     }
 
-    if (wdata.has_jperp) {
+    if (wdata.has_Jperp) {
       if (p.move_insert_spin_segment)
         CTQMC.add_move(moves::insert_spin_segment{wdata, config, CTQMC.get_rng()}, "spin insert");
 
@@ -93,7 +93,7 @@ namespace triqs_ctseg {
         CTQMC.add_move(moves::remove_spin_segment{wdata, config, CTQMC.get_rng()}, "spin remove");
     }
 
-    if (wdata.has_jperp and wdata.has_delta) {
+    if (wdata.has_Jperp and wdata.has_Delta) {
       if (p.move_split_spin_segment)
         CTQMC.add_move(moves::split_spin_segment{wdata, config, CTQMC.get_rng()}, "spin split");
 
@@ -101,24 +101,24 @@ namespace triqs_ctseg {
         CTQMC.add_move(moves::regroup_spin_segment{wdata, config, CTQMC.get_rng()}, "spin regroup");
     }
 
-    if (wdata.has_jperp) {
+    if (wdata.has_Jperp) {
       if (p.move_swap_spin_lines) CTQMC.add_move(moves::swap_spin_lines{wdata, config, CTQMC.get_rng()}, "spin swap");
     }
 
     // Initialize measurements
-    if (p.measure_G_tau) CTQMC.add_measure(measures::g_f_tau{p, wdata, config, results}, "G(tau)/F(tau)");
+    if (p.measure_G_tau) CTQMC.add_measure(measures::G_F_tau{p, wdata, config, results}, "G(tau)/F(tau)");
     if (p.measure_densities) CTQMC.add_measure(measures::densities{p, wdata, config, results}, "Densities");
     if (p.measure_average_sign) CTQMC.add_measure(measures::average_sign{p, wdata, config, results}, "Average Sign");
     if (p.measure_nn_static) CTQMC.add_measure(measures::nn_static{p, wdata, config, results}, "<nn>");
     if (p.measure_nn_tau) CTQMC.add_measure(measures::nn_tau{p, wdata, config, results}, "<n(tau)n(0)>");
-    if (p.measure_sperp_tau) CTQMC.add_measure(measures::sperp_tau{p, wdata, config, results}, "<s_x(tau)s_x(0)>");
+    if (p.measure_Sperp_tau) CTQMC.add_measure(measures::Sperp_tau{p, wdata, config, results}, "<S_x(tau)S_x(0)>");
     if (p.measure_pert_order) {
-      if (wdata.has_delta) {
+      if (wdata.has_Delta) {
         CTQMC.add_measure(measures::pert_order{[&]() { return config.Delta_order(); }, results.pert_order_Delta,
                                                results.average_order_Delta},
                           "Perturbation order Delta");
       }
-      if (wdata.has_jperp) {
+      if (wdata.has_Jperp) {
         CTQMC.add_measure(measures::pert_order{[&]() { return config.Jperp_order(); }, results.pert_order_Jperp,
                                                results.average_order_Jperp},
                           "Perturbation order Jperp");

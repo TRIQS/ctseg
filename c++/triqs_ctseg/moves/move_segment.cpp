@@ -119,7 +119,7 @@ namespace triqs_ctseg::moves {
     auto seg         = (flipped ? flip(origin_segment) : origin_segment);
     auto &D_dest     = wdata.dets[destination_bl];
     auto &D_orig     = wdata.dets[origin_bl];
-    if (wdata.offdiag_delta) {
+    if (wdata.offdiag_Delta) {
       if (cdag_in_det(seg.tau_cdag, D_dest) or c_in_det(seg.tau_c, D_dest)) {
         LOG("Proposed times already exist in destination block.");
         return 0;

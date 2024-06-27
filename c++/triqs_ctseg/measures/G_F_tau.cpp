@@ -15,28 +15,28 @@
 //
 // Authors: Nikita Kavokine, Olivier Parcollet, Nils Wentzell
 
-#include "./g_f_tau.hpp"
+#include "./G_F_tau.hpp"
 #include "../logs.hpp"
 
 namespace triqs_ctseg::measures {
 
-  g_f_tau::g_f_tau(params_t const &p, work_data_t const &wdata, configuration_t const &config, results_t &results)
+  G_F_tau::G_F_tau(params_t const &p, work_data_t const &wdata, configuration_t const &config, results_t &results)
      : wdata{wdata}, config{config}, results{results} {
 
     beta          = p.beta;
     measure_F_tau = p.measure_F_tau and wdata.rot_inv;
     gf_struct     = p.gf_struct;
 
-    g_tau   = block_gf<imtime>{triqs::mesh::imtime{beta, Fermion, p.n_tau_G}, p.gf_struct};
-    f_tau   = block_gf<imtime>{triqs::mesh::imtime{beta, Fermion, p.n_tau_G}, p.gf_struct};
-    g_tau() = 0;
-    f_tau() = 0;
+    G_tau   = block_gf<imtime>{triqs::mesh::imtime{beta, Fermion, p.n_tau_G}, p.gf_struct};
+    F_tau   = block_gf<imtime>{triqs::mesh::imtime{beta, Fermion, p.n_tau_G}, p.gf_struct};
+    G_tau() = 0;
+    F_tau() = 0;
     Z       = 0;
   }
 
   // -------------------------------------
 
-  void g_f_tau::accumulate(double s) {
+  void G_F_tau::accumulate(double s) {
 
     LOG("\n =================== MEASURE G(tau) ================ \n");
 
@@ -44,8 +44,8 @@ namespace triqs_ctseg::measures {
 
     for (auto [bl_idx, det] : itertools::enumerate(wdata.dets)) {
       long N  = det.size();
-      auto &g = g_tau[bl_idx];
-      auto &f = f_tau[bl_idx];
+      auto &g = G_tau[bl_idx];
+      auto &f = F_tau[bl_idx];
       for (long id_y : range(N)) {
         auto y        = det.get_y(id_y);
         double f_fact = 0;
@@ -65,36 +65,36 @@ namespace triqs_ctseg::measures {
 
   // -------------------------------------
 
-  void g_f_tau::collect_results(mpi::communicator const &c) {
+  void G_F_tau::collect_results(mpi::communicator const &c) {
 
     Z = mpi::all_reduce(Z, c);
 
-    g_tau = mpi::all_reduce(g_tau, c);
-    g_tau = g_tau / (-beta * Z * g_tau[0].mesh().delta());
+    G_tau = mpi::all_reduce(G_tau, c);
+    G_tau = G_tau / (-beta * Z * G_tau[0].mesh().delta());
 
     // Fix the point at zero and beta, for each block
-    for (auto &g : g_tau) {
+    for (auto &g : G_tau) {
       g[0] *= 2;
       g[g.mesh().size() - 1] *= 2;
     }
     // store the result (not reused later, hence we can move it).
-    results.G_tau = std::move(g_tau);
+    results.G_tau = std::move(G_tau);
 
     if (measure_F_tau) {
-      f_tau = mpi::all_reduce(f_tau, c);
-      f_tau = f_tau / (-beta * Z * f_tau[0].mesh().delta());
+      F_tau = mpi::all_reduce(F_tau, c);
+      F_tau = F_tau / (-beta * Z * F_tau[0].mesh().delta());
 
-      for (auto &f : f_tau) {
+      for (auto &f : F_tau) {
         f[0] *= 2;
         f[f.mesh().size() - 1] *= 2;
       }
-      results.F_tau = std::move(f_tau);
+      results.F_tau = std::move(F_tau);
     }
   }
 
   // -------------------------------------
 
-  double g_f_tau::fprefactor(long const &block, std::pair<tau_t, long> const &y) {
+  double G_F_tau::fprefactor(long const &block, std::pair<tau_t, long> const &y) {
     int color    = wdata.block_to_color(block, y.second);
     double I_tau = 0;
     for (auto const &[c, sl] : itertools::enumerate(config.seglists)) {
@@ -104,7 +104,7 @@ namespace triqs_ctseg::measures {
         I_tau -= K_overlap(sl, y.first, false, wdata.Kprime, c, color);
         if (c == color) I_tau -= 2 * real(wdata.Kprime(0)(c, c));
       }
-      if (wdata.has_jperp) {
+      if (wdata.has_Jperp) {
         I_tau -= 4 * real(wdata.Kprime_spin(0)(c, color)) * ntau;
         I_tau -= 2 * K_overlap(sl, y.first, false, wdata.Kprime_spin, c, color);
       }

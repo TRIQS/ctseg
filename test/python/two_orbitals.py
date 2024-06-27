@@ -78,10 +78,10 @@ S = Solver(beta = beta,
            )
 
 # Input Delta(tau)
-delta_iw = GfImFreq(indices=[0, 1], beta=beta, n_points=n_tau//2)
-delta_iw[0, 0] << V**2 * inverse(iOmega_n - eps)
-delta_iw[1, 1] << V**2 * inverse(iOmega_n - eps)
-Delta_iw = BlockGf(block_list = [delta_iw, delta_iw], name_list = ["up1", "dn1"])
+Delta_iw = GfImFreq(indices=[0, 1], beta=beta, n_points=n_tau//2)
+Delta_iw[0, 0] << V**2 * inverse(iOmega_n - eps)
+Delta_iw[1, 1] << V**2 * inverse(iOmega_n - eps)
+Delta_iw = BlockGf(block_list = [Delta_iw, Delta_iw], name_list = ["up1", "dn1"])
 
 S.Delta_tau << Fourier(Delta_iw)
 

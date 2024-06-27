@@ -51,10 +51,10 @@ c.add_member(c_name = "nn_tau",
              read_only= True,
              doc = r"""Density-density time correlation function :math:`\langle n_a(\tau) n_b(0) \rangle`.""")
 
-c.add_member(c_name = "sperp_tau",
+c.add_member(c_name = "Sperp_tau",
              c_type = "std::optional<gf<imtime>>",
              read_only= True,
-             doc = r"""Perpendicular spin-spin correlation function :math:`\langle s_x(\tau) s_x(0) \rangle`.""")
+             doc = r"""Perpendicular spin-spin correlation function :math:`\langle S_x(\tau) S_x(0) \rangle`.""")
 
 c.add_member(c_name = "nn_static",
              c_type = "std::optional<nda::matrix<double>>",
@@ -206,7 +206,7 @@ c.add_method("""void solve (**solve_params_t)""",
 +-------------------------------+--------------------------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
 | measure_nn_tau                | bool                                 | false                                   | Whether to measure <n(tau)n(0)> (see measures/nn_tau)                                                             |
 +-------------------------------+--------------------------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
-| measure_sperp_tau             | bool                                 | false                                   | Whether to measure <s_x(tau)s_x(0)> (see measures/sperp_tau)                                                      |
+| measure_Sperp_tau             | bool                                 | false                                   | Whether to measure <S_x(tau)S_x(0)> (see measures/Sperp_tau)                                                      |
 +-------------------------------+--------------------------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
 | measure_state_hist            | bool                                 | false                                   | Whether to measure state histograms (see measures/state_hist)                                                     |
 +-------------------------------+--------------------------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
@@ -384,10 +384,10 @@ c.add_member(c_name = "measure_nn_tau",
              initializer = """ false """,
              doc = r"""Whether to measure <n(tau)n(0)> (see measures/nn_tau)""")
 
-c.add_member(c_name = "measure_sperp_tau",
+c.add_member(c_name = "measure_Sperp_tau",
              c_type = "bool",
              initializer = """ false """,
-             doc = r"""Whether to measure <s_x(tau)s_x(0)> (see measures/sperp_tau)""")
+             doc = r"""Whether to measure <S_x(tau)S_x(0)> (see measures/Sperp_tau)""")
 
 c.add_member(c_name = "measure_state_hist",
              c_type = "bool",

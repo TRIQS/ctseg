@@ -62,14 +62,14 @@ TEST(CTSEGJ, Dynamical_U) {
   param_solve.measure_nn_tau    = true;
   param_solve.measure_nn_static = true;
 
-  // Prepare delta
+  // Prepare Delta
   nda::clef::placeholder<0> om_;
-  auto delta_w   = gf<imfreq>({beta, Fermion, n_iw}, {1, 1});
-  auto delta_tau = gf<imtime>({beta, Fermion, param_constructor.n_tau}, {1, 1});
-  delta_w(om_) << 1.0 / (om_ - epsilon);
-  delta_tau()           = fourier(delta_w);
-  Solver.Delta_tau()[0] = delta_tau;
-  Solver.Delta_tau()[1] = delta_tau;
+  auto Delta_w   = gf<imfreq>({beta, Fermion, n_iw}, {1, 1});
+  auto Delta_tau = gf<imtime>({beta, Fermion, param_constructor.n_tau}, {1, 1});
+  Delta_w(om_) << 1.0 / (om_ - epsilon);
+  Delta_tau()           = fourier(Delta_w);
+  Solver.Delta_tau()[0] = Delta_tau;
+  Solver.Delta_tau()[1] = Delta_tau;
 
   // Prepare dynamical interaction
   double l  = 1.0; // electron boson coupling

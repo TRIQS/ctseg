@@ -64,13 +64,13 @@ namespace triqs_ctseg {
     // do NOT add const here : python uses a non const object and non const view
 
     /// Hybridization function :math:`\Delta(\tau)`
-    block_gf_view<imtime> Delta_tau() { return inputs.delta; }
+    block_gf_view<imtime> Delta_tau() { return inputs.Delta; }
 
     /// Dynamical spin-spin interaction :math:`\mathcal{J}_\perp(\tau)`
-    gf_view<imtime> Jperp_tau() { return inputs.jperpt; }
+    gf_view<imtime> Jperp_tau() { return inputs.Jperpt; }
 
     /// Dynamical density-density interaction :math:`D_0(\tau)`
-    block2_gf_view<imtime> D0_tau() { return inputs.d0t; }
+    block2_gf_view<imtime> D0_tau() { return inputs.D0t; }
 
     // --------------- h5 -------------------------
     CPP2PY_IGNORE static std::string hdf5_format() { return "CTSEG_SolverCore"; }

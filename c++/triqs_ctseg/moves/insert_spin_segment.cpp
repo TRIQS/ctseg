@@ -149,9 +149,9 @@ namespace triqs_ctseg::moves {
     // Insert Jperp line
     auto &jl = config.Jperp_list;
     if (dest_color == 0)
-      jl.push_back(jperp_line_t{spin_seg.tau_c, spin_seg.tau_cdag});
+      jl.push_back(Jperp_line_t{spin_seg.tau_c, spin_seg.tau_cdag});
     else
-      jl.push_back(jperp_line_t{spin_seg.tau_cdag, spin_seg.tau_c});
+      jl.push_back(Jperp_line_t{spin_seg.tau_cdag, spin_seg.tau_c});
 
     // Check invariant
     if constexpr (print_logs or ctseg_debug) check_invariant(config, wdata);

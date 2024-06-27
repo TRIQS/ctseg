@@ -73,7 +73,7 @@ namespace triqs_ctseg::moves {
     auto &bl     = wdata.block_number[color];
     auto &bl_idx = wdata.index_in_block[color];
     auto &D      = wdata.dets[bl];
-    if (wdata.offdiag_delta) {
+    if (wdata.offdiag_Delta) {
       if (cdag_in_det(tau_left, D) or c_in_det(tau_right, D)) {
         LOG("One of the proposed times already exists in another line of the same block. Rejecting.");
         return 0;
