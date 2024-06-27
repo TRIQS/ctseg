@@ -6,7 +6,7 @@ from cpp2py.wrap_generator import *
 module = module_(full_name = "solver_core", doc = r"The python module for triqs_ctseg", app_name = "triqs_ctseg")
 
 # Imports
-module.add_imports(*['triqs.gf', 'triqs.gf.meshes', 'triqs.operators', 'triqs.stat.histograms', 'h5._h5py'])
+module.add_imports(*['triqs.gf', 'triqs.gf.meshes', 'triqs.operators', 'h5._h5py'])
 
 # Add here all includes
 module.add_include("triqs_ctseg/solver_core.hpp")
@@ -65,15 +65,25 @@ c.add_member(c_name = "densities",
              read_only= True,
              doc = r"""Density per color.""")
 
-c.add_member(c_name = "pert_order_histo_Delta",
-             c_type = "std::optional<triqs::stat::histogram>",
+c.add_member(c_name = "pert_order_Delta",
+             c_type = "std::optional<std::vector<double>>",
              read_only= True,
              doc = r"""Delta perturbation order histogram""")
 
-c.add_member(c_name = "pert_order_histo_Jperp",
-             c_type = "std::optional<triqs::stat::histogram>",
+c.add_member(c_name = "average_order_Delta",
+             c_type = "std::optional<double>",
+             read_only= True,
+             doc = r"""Average Delta perturbation order""")
+
+c.add_member(c_name = "pert_order_Jperp",
+             c_type = "std::optional<std::vector<double>>",
              read_only= True,
              doc = r"""J_perp perturbation order histogram""")
+
+c.add_member(c_name = "average_order_Jperp",
+             c_type = "std::optional<double>",
+             read_only= True,
+             doc = r"""Average J_perp perturbation order""")
 
 c.add_member(c_name = "state_hist",
              c_type = "std::optional<nda::vector<double>>",

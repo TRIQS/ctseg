@@ -112,8 +112,18 @@ namespace triqs_ctseg {
     if (p.measure_nn_static) CTQMC.add_measure(measures::nn_static{p, wdata, config, results}, "<nn>");
     if (p.measure_nn_tau) CTQMC.add_measure(measures::nn_tau{p, wdata, config, results}, "<n(tau)n(0)>");
     if (p.measure_sperp_tau) CTQMC.add_measure(measures::sperp_tau{p, wdata, config, results}, "<s_x(tau)s_x(0)>");
-    if (p.measure_pert_order)
-      CTQMC.add_measure(measures::pert_order_histo{p, wdata, config, results}, "Perturbation orders");
+    if (p.measure_pert_order) {
+      if (wdata.has_delta) {
+        CTQMC.add_measure(measures::pert_order{[&]() { return config.Delta_order(); }, results.pert_order_Delta,
+                                               results.average_order_Delta},
+                          "Perturbation order Delta");
+      }
+      if (wdata.has_jperp) {
+        CTQMC.add_measure(measures::pert_order{[&]() { return config.Jperp_order(); }, results.pert_order_Jperp,
+                                               results.average_order_Jperp},
+                          "Perturbation order Jperp");
+      }
+    }
     if (p.measure_state_hist) CTQMC.add_measure(measures::state_hist{p, wdata, config, results}, "State histograms");
 
     // Run and collect results
@@ -121,8 +131,14 @@ namespace triqs_ctseg {
                                 triqs::utility::clock_callback(p.max_time));
     CTQMC.collect_results(c);
 
-    // Report sign
-    if (c.rank() == 0) { spdlog::info("Average sign: {}", results.sign); }
+    // Report sign and average order
+    if (c.rank() == 0) {
+      spdlog::info("Average sign: {}", results.sign);
+      if (results.average_order_Delta)
+        spdlog::info("Average perturbation order in Delta: {:.3f}", results.average_order_Delta.value());
+      if (results.average_order_Jperp)
+        spdlog::info("Average perturbation order in Jperp: {:.3f}", results.average_order_Jperp.value());
+    }
 
   } // solve
 

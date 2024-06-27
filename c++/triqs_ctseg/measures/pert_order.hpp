@@ -22,19 +22,29 @@
 
 namespace triqs_ctseg::measures {
 
-  struct pert_order_histo {
+  struct pert_order {
 
-    work_data_t const &wdata;
-    configuration_t const &config;
-    results_t &results;
+    pert_order(std::function<int()> get_order, std::optional<std::vector<double>> &hist_opt,
+               std::optional<double> &average_order_opt);
 
-    triqs::stat::histogram histo_delta, histo_Jperp;
-
-    pert_order_histo(params_t const &params, work_data_t const &wdata, configuration_t const &config,
-                             results_t &results);
-
+    /// Accumulate pert order into histogram
     void accumulate(double s);
+
+    /// Reduce and normalize
     void collect_results(mpi::communicator const &c);
+
+    private:
+    // Function to get the pert order
+    std::function<int()> get_order;
+
+    // Histogram
+    std::vector<double> &hist;
+
+    // Average order
+    double &average_order;
+
+    // Accumulation counter
+    long N = 0;
   };
 
 } // namespace triqs_ctseg::measures

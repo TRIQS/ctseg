@@ -23,5 +23,5 @@
 #include "./measures/nn_static.hpp"
 #include "./measures/densities.hpp"
 #include "./measures/sign.hpp"
-#include "./measures/pert_order_histo.hpp"
+#include "./measures/pert_order.hpp"
 #include "./measures/state_hist.hpp"

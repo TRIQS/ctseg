@@ -92,6 +92,17 @@ namespace triqs_ctseg {
     // Construct from the number of colors
     configuration_t(int n_color) : seglists(n_color) {}
 
+    // Number of segments
+    long n_segments() const {
+      return std::accumulate(begin(seglists), end(seglists), 0l, [](long r, auto &v) { return r + v.size(); });
+    }
+
+    // Expansion order in Jperp
+    long Jperp_order() const { return Jperp_list.size(); }
+
+    // Expansion order in Delta
+    long Delta_order() const { return n_segments() - 2 * Jperp_order(); }
+
     // Accessor number of colors
     [[nodiscard]] int n_color() const { return seglists.size(); }
   };

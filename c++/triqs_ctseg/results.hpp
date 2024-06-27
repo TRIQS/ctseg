@@ -46,10 +46,16 @@ namespace triqs_ctseg {
     nda::array<double, 1> densities;
 
     /// Delta perturbation order histogram
-    std::optional<triqs::stat::histogram> pert_order_histo_Delta;
+    std::optional<std::vector<double>> pert_order_Delta;
+
+    /// Average Delta perturbation order
+    std::optional<double> average_order_Delta;
 
     /// J_perp perturbation order histogram
-    std::optional<triqs::stat::histogram> pert_order_histo_Jperp;
+    std::optional<std::vector<double>> pert_order_Jperp;
+
+    /// Average J_perp perturbation order
+    std::optional<double> average_order_Jperp;
 
     /// State histogram
     std::optional<nda::vector<double>> state_hist;
