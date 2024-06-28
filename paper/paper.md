@@ -45,14 +45,15 @@ quantum systems [@TRIQS2015].
 
 The Monte Carlo algorithms for quantum impurity problems are 
 based on stochastically exploring the terms in the perturbative expansion of the solution 
-around an exactly solvable limit. Hybridization expansion algorithms -- chief of which the 
-continuous-time `CTHYB` -- involve expanding around the limit of an isolated atom [@gull2011]. 
+around an exactly solvable limit. Continuous time hybridization expansion algorithms -- chief of which `CTHYB` -- involve expanding around the limit of an isolated atom [@gull2011]. 
 Currently, there exist implementations of `CTHYB` within three different libraries: `ALPS` [@ALPS2018], `w2dynamics` [@w2dynamics2019] and `TRIQS` [@CTHYB2016].
 
 However, a simpler and potentially faster version of the `CTHYB` algorithm, 
 called `CTSEG`, can be used under the restriction of (possibly time-dependent) density-density
 interactions on the impurity. `CTSEG` can be further generalized to allow for time-dependent 
-spin-spin interactions [@otsuki2013]. To our knowledge, no implementation of `CTSEG` has been published so far. 
+spin-spin interactions [@otsuki2013]. To our knowledge, there exists so far one published implementation of `CTSEG` based on ALPS [@ALPS-CTSEG], but it does not allow for spin-spin 
+interactions. 
+
 Our `CTSEG` solver is about twice as fast as `TRIQS-CTHYB` for a single orbital problem, and has
 better scaling with the number of orbitals (40 times faster in our 5 orbital test case, see Fig. 1a). 
 `CTSEG` has already allowed us to obtain the first numerically-exact solution of the 
