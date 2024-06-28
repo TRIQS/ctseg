@@ -58,7 +58,6 @@ TEST(CTSEG, Jperp) {
   param_solve.n_warmup_cycles   = n_warmup_cycles;
   param_solve.length_cycle      = length_cycle;
   param_solve.random_seed       = random_seed;
-  param_solve.measure_F_tau     = true;
   param_solve.measure_nn_tau    = true;
   param_solve.measure_nn_static = true;
 
@@ -85,7 +84,6 @@ TEST(CTSEG, Jperp) {
   if (c.rank() == 0) {
     h5::file out_file("Jperp.out.h5", 'w');
     h5_write(out_file, "G_tau", Solver.results.G_tau);
-    h5_write(out_file, "F_tau", Solver.results.F_tau);
     h5_write(out_file, "nn_tau", Solver.results.nn_tau);
     h5_write(out_file, "densities", Solver.results.densities);
   }
@@ -93,17 +91,15 @@ TEST(CTSEG, Jperp) {
   // Compare with reference
   if (c.rank() == 0) {
     h5::file ref_file("Jperp.ref.h5", 'r');
-    block_gf<imtime> G_tau, F_tau;
+    block_gf<imtime> G_tau;
     block2_gf<imtime> nn_tau;
     std::map<std::string, nda::array<double, 1>> densities;
     h5_read(ref_file, "G_tau", G_tau);
-    h5_read(ref_file, "F_tau", F_tau);
     h5_read(ref_file, "nn_tau", nn_tau);
     h5_read(ref_file, "densities", densities);
     EXPECT_ARRAY_NEAR(densities["up"], Solver.results.densities.value()["up"], precision);
     EXPECT_ARRAY_NEAR(densities["down"], Solver.results.densities.value()["down"], precision);
     EXPECT_BLOCK_GF_NEAR(G_tau, Solver.results.G_tau, precision);
-    EXPECT_BLOCK_GF_NEAR(F_tau, Solver.results.F_tau.value(), precision);
     EXPECT_BLOCK2_GF_NEAR(nn_tau, Solver.results.nn_tau.value(), precision);
   }
 }
