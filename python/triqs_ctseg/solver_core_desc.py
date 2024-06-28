@@ -64,7 +64,7 @@ c.add_member(c_name = "nn_static",
 c.add_member(c_name = "densities",
              c_type = "std::optional<std::map<std::string, nda::array<double, 1>>>",
              read_only= True,
-             doc = r"""Density per color.""")
+             doc = r"""Density per color, organized by blocks.""")
 
 c.add_member(c_name = "pert_order_Delta",
              c_type = "std::optional<std::vector<double>>",
