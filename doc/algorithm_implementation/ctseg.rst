@@ -35,7 +35,7 @@ This action can be recast as
 
   \begin{split}
   \mathcal{S}  &= \iint_0^{\beta} \mathrm{d} \tau \mathrm{d} \tau' \sum_{a,b} \left\{ \overline{c}_{a\sigma} (\tau)
-  \left( (\partial_{\tau} + \epsilon_{a\sigma} - mu)\delta_{ab}^{\sigma \sigma'} \delta_{\tau - \tau'} + \Delta_{ab}^{\sigma \sigma'}(\tau - \tau')\right)
+  \left( (\partial_{\tau} + \epsilon_{a\sigma} - \mu)\delta_{ab}^{\sigma \sigma'} \delta_{\tau - \tau'} + \Delta_{ab}^{\sigma \sigma'}(\tau - \tau')\right)
   c_{b\sigma'}(\tau') \right\} \\
   &+ \frac{1}{2} \iint_0^{\beta} \mathrm{d} \tau \mathrm{d} \tau' \sum_{u,v} \mathcal{U}_{uv}(\tau - \tau') n_u(\tau) n_v(\tau') 
   + \frac{1}{2} \iint_0^{\beta} \mathrm{d} \tau \mathrm{d} \tau' \sum_{a} \mathcal{J}_a^{\perp}(\tau - \tau') s_a^{+}(\tau) s_a^{-} (\tau')
