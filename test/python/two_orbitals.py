@@ -59,7 +59,8 @@ if mpi.is_master_node():
     with HDFArchive("two_orbitals_4b.out.h5", "a") as A: 
         A['nn_tau_0'] = S.results.nn_tau["up1", "up1"][0, 0]
         A['nn_tau_1'] = S.results.nn_tau["dn1", "dn1"][0, 0]
-        A['nn'] = S.results.nn_static
+        A['nn_0'] = S.results.nn_static[("up1", "up1")][0, 0]
+        A['nn_1'] = S.results.nn_static[("dn1", "dn1")][0, 0]
         A['densities'] = np.concatenate([S.results.densities[bl] for bl in ["up1", "dn1", "up2", "dn2"]])
 
 # --------- 2 blocks of size 2 -----------
@@ -93,7 +94,8 @@ if mpi.is_master_node():
     with HDFArchive("two_orbitals_2b.out.h5", "a") as A: 
         A['nn_tau_0'] = S.results.nn_tau["up1", "up1"][0, 0]
         A['nn_tau_1'] = S.results.nn_tau["up1", "up1"][1, 1]
-        A['nn'] = S.results.nn_static
+        A['nn_0'] = S.results.nn_static[("up1", "up1")][0, 0]
+        A['nn_1'] = S.results.nn_static[("up1", "up1")][1, 1]
         A['densities'] = np.concatenate([S.results.densities[bl] for bl in ["up1", "dn1"]])
 
 # --------- Compare outputs -----------

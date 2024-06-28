@@ -52,8 +52,17 @@ namespace triqs_ctseg::measures {
     nn = mpi::all_reduce(nn, c);
     nn = nn / Z / beta;
 
+    std::map<std::pair<std::string, std::string>, nda::matrix<double>> nn_block;
+    for (long x1 = 0; auto &[bl1, bl1_size] : wdata.gf_struct) {
+      for (long x2 = 0; auto &[bl2, bl2_size] : wdata.gf_struct) {
+        nn_block[{bl1, bl2}] = nn(range(x1, x1 + bl1_size), range(x2, x2 + bl2_size));
+        x2 += bl2_size;
+      }
+      x1 += bl1_size;
+    }
+
     // store the result (not reused later, hence we can move it).
-    results.nn_static = std::move(nn);
+    results.nn_static = std::move(nn_block);
   }
 
 } // namespace triqs_ctseg::measures
