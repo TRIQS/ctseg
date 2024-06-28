@@ -16,7 +16,7 @@ with the action :math:`\mathcal{S}` given by
 
   \begin{split}
   \mathcal{S}  &= \iint_0^{\beta} \mathrm{d} \tau \mathrm{d} \tau' \sum_{a,b} \left\{ \overline{c}_{a\sigma} (\tau)
-  \left( (\partial_{\tau} + \mu_{a\sigma})\delta_{ab}^{\sigma \sigma'} \delta_{\tau - \tau'} + \Delta_{ab}^{\sigma \sigma'}(\tau - \tau')\right)
+  \left( (\partial_{\tau} + \epsilon_{a\sigma} - \mu)\delta_{ab}^{\sigma \sigma'} \delta_{\tau - \tau'} + \Delta_{ab}^{\sigma \sigma'}(\tau - \tau')\right)
   c_{b\sigma'}(\tau') \right\} \\
   &+ \frac{1}{2} \iint_0^{\beta} \mathrm{d} \tau \mathrm{d} \tau' \sum_{a,b} \mathcal{U}_{ab}(\tau - \tau') n_a(\tau) n_b(\tau') 
   + \frac{1}{2} \iint_0^{\beta} \mathrm{d} \tau \mathrm{d} \tau' \sum_{a, \xi = x, y, z} s_a^{\xi}(\tau) \mathcal{J}_a^{\xi}(\tau - \tau') s_a^{\xi} (\tau')
@@ -26,7 +26,8 @@ Here :math:`\beta` is the inverse temperature, :math:`a` denote orbital indices,
 :math:`n_a \equiv \sum_{\sigma} n_{a\sigma}`, :math:`s_a^{\xi} \equiv \frac{1}{2} \sum_{\sigma \sigma'} \overline{c}_{a\sigma}
 \sigma_{\sigma \sigma'}^{\xi} c_{a \sigma'}` and :math:`\sigma^{\xi}` are the Pauli matrices. :math:`\overline{c}_{a\sigma}(\tau)`
 and :math:`c_{a\sigma}(\tau)` are the :math:`\beta`-antiperiodic Grassmann fields corresponding to the fermion
-creation and annihilation operators on the impurity, respectively.
+creation and annihilation operators on the impurity, respectively. The :math:`\epsilon_{a\sigma}` are orbital energies and :math:`mu`
+is the chemical potential. 
 
 This action can be recast as 
 
@@ -34,7 +35,7 @@ This action can be recast as
 
   \begin{split}
   \mathcal{S}  &= \iint_0^{\beta} \mathrm{d} \tau \mathrm{d} \tau' \sum_{a,b} \left\{ \overline{c}_{a\sigma} (\tau)
-  \left( (\partial_{\tau} + \mu_{a\sigma})\delta_{ab}^{\sigma \sigma'} \delta_{\tau - \tau'} + \Delta_{ab}^{\sigma \sigma'}(\tau - \tau')\right)
+  \left( (\partial_{\tau} + \epsilon_{a\sigma} - mu)\delta_{ab}^{\sigma \sigma'} \delta_{\tau - \tau'} + \Delta_{ab}^{\sigma \sigma'}(\tau - \tau')\right)
   c_{b\sigma'}(\tau') \right\} \\
   &+ \frac{1}{2} \iint_0^{\beta} \mathrm{d} \tau \mathrm{d} \tau' \sum_{u,v} \mathcal{U}_{uv}(\tau - \tau') n_u(\tau) n_v(\tau') 
   + \frac{1}{2} \iint_0^{\beta} \mathrm{d} \tau \mathrm{d} \tau' \sum_{a} \mathcal{J}_a^{\perp}(\tau - \tau') s_a^{+}(\tau) s_a^{-} (\tau')
@@ -98,7 +99,7 @@ The static trace factor is
 
 Here :math:`O_{ab}` is the overlap between the segments of colors :math:`a` and :math:`b`, and :math:`\ell_a` is the occupied length in color a.
 In the presence of dynamical interactions, the static trace factor is computed with a renormalized interaction and chemical potential: 
-:math:`\tilde U_{ab} = U_{ab} - 2 K'_{ab}(0)` and :math:`\tilde \mu_{a} = \mu_a + K'_{aa}(0)`. 
+:math:`\tilde U_{ab} = U_{ab} - 2 K'_{ab}(0)` and :math:`\tilde \mu_{a} = \mu - \epsilon_a + K'_{aa}(0)`. 
 
 Sign
 *****

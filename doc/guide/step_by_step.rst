@@ -22,9 +22,11 @@ They can be conveniently supplied as a Python dictionary::
 
 * ``beta`` is the inverse temperature. 
 
-* ``n_tau`` is the number of points of the imaginary time grid on which the fermionic two-point functions (input hybridization :math:`\Delta(\tau)`, measured Green's function :math:`G(\tau)`, etc.) will be sampled. 
+* ``n_tau`` is the number of points of the imaginary time grid on which the input hybridization :math:`\Delta(\tau)` is sampled. 
+    It is also the default number of samples for the measured fermionic two-point functions. 
 
-* ``n_tau_bosonic`` is the number of points of the imaginary time grid on which the bosonic two-point functions (input dynamical intercation :math:`D_0(\tau)`, measured density correlation function :math:`\chi(\tau)`, etc.) will be sampled. 
+* ``n_tau_bosonic`` is the number of points of the imaginary time grid on which the bosonic two-point function inputs (:math:`D_0(\tau)` and :math:`\mathcal{J}_{\perp}(\tau)`) are sampled. 
+    It is also the default number of samples for the measured bosonic two-point functions. 
 
 Green's function structure
 --------------------------
@@ -61,12 +63,32 @@ Step 3 - Supply the solver inputs
 
 We now need to provide the solver with the parameters of the action that define the impurity problem. 
 Here, we will give examples for a single-orbital impurity (``gf_struct = [("up", 1), ("down", 1)]``). 
+The CTSEG input structure is similar to the `CTHYB <https://triqs.github.io/cthyb/latest/>`_ Delta interface. 
+The time-independent part of the action (i.e., the local Hamiltonian) is supplied as a TRIQS many-body operator, and the time-dependent parts
+are supplied as the appropriate type of TRIQS Green's functions. 
 
-Interaction Hamiltonian
------------------------
+Local Hamiltonian
+-----------------
 
-The static part of the electron-electron interaction is supplied as a TRIQS operator. In the CTSEG case,
-it is always a density-density interaction. Density operators are represented by ``n(block_name, orbital_number)``. 
+The impurity problem must be supplied to CTSEG in the basis where the quadratic part of the local Hamiltonian is diagonal. 
+
+Quadratic part
+^^^^^^^^^^^^^^
+In its eigenbasis, the quadratic part of the local Hamiltonian ``h_loc0`` is 
+proportional to the density operator. Density operators are represented by ``n(block_name, orbital_number)``. 
+For our single orbital problem::
+
+    from triqs.operators import *
+    h_loc0 = (eps - mu) * (n("up", 0) + n("down", 0))
+
+Here, ``eps`` is the orbital energy and ``mu`` the chemical potential. 
+The interaction Hamiltonian is passed to the solver as part of the solve parameters (see below).
+
+
+
+Quartic part
+^^^^^^^^^^^^
+In the impurity problems handled by CTSEG, the quartic part of the local Hamiltonian is always a density-density interaction. 
 For our single orbital problem:: 
 
     from triqs.operators import *
@@ -116,13 +138,18 @@ The hybridization function is supplied to the solver via::
 
     S.Delta_tau << Delta_tau
 
-This is different from the `CTHYB <https://triqs.github.io/cthyb/latest/>`_ solver, which takes as input the non-interacting impurity 
-Green's function :math:`G_0(i\omega_n)`. It is defined as
+.. warning::
+
+The value of ``n_tau`` supplied in the ``constr_params`` and the number of points in the :math:`\tau` grid of
+the :math:`\Delta(\tau)` input must match. 
+
+This is different from the default interface of the `CTHYB <https://triqs.github.io/cthyb/latest/>`_ solver, 
+which takes as input the non-interacting impurity Green's function :math:`G_0(i\omega_n)`. It is defined as
 
 .. math::
     G_0(i \omega_n) = \frac{1}{i \omega_n - \hat h_0 - \Delta(i \omega_n)}
 
-where :math:`\hat h_0` is the non-interacting impurity Hamiltonian. Note that :math:`\Delta(i\omega_n)` vanishes in the high frequency limit. 
+where :math:`\hat h_0` is the quadratic part of the local Hamiltonian. Note that :math:`\Delta(i\omega_n)` vanishes in the high frequency limit. 
 The following code extracts from a ``BlockGf`` ``G0_iw`` a ``BlockGf`` ``Delta_iw`` and a matrix ``h0`` for each block::
 
     def get_h0_Delta(G0_iw):
@@ -136,14 +163,6 @@ The following code extracts from a ``BlockGf`` ``G0_iw`` a ``BlockGf`` ``Delta_i
 
     h0_lst, Delta_iw = get_h0_Delta(G0_iw)
 
-The eigenvalues of the ``h0`` provide the orbital dependent chemical potential (orbital energies)::
-
-    import numpy as np
-    from numpy import linalg
-    mu_list = []
-    for h0 in h0_lst:
-        mu_list += [-l for l in linalg.eig(h0)[0].real]
-
 If the ``h0`` are already expressed in the local eigenbasis, the obtained hybridization function can be 
 directly used as the solver input. In the general case, they need to be rotated to the eigenbasis::
 
@@ -152,41 +171,42 @@ directly used as the solver input. In the general case, they need to be rotated 
         g0_bl << rot_bl.H * g0_bl * rot_bl
 
 If a rotation is required, then the interactions should also be rotated accordingly. 
+The non-interacting Hamiltonian operator in its eigenbasis is obtained as:: 
 
-Chemical potential
-------------------
+    import numpy as np
+    from numpy import linalg
+    for i, (bl_name, bl_size) in enumerate(gf_struct):
+        for j in range bl_size: 
+            if (i == 0 and j == 0): 
+                hloc_0 = linalg.eig(h0_lst[i])[0][j].real * n(bl_name, j)
+            else:
+                hloc_0 += linalg.eig(h0_lst[i])[0][j].real * n(bl_name, j)
 
-The orbital-dependent chemical potential is passed to the solver as the solve parameter ``chemical_potential`` (see below), 
-a list with one value per color. For example, for the single-orbital problem::
-
-    chemical_potential = [mu, mu]
-
-.. note::
-
-    This is different from the Delta interface in CTHYB, which takes ``h0`` (supplied as TRIQS operator) as an input.  
 
 Dynamical density-density interaction
 -------------------------------------
 
 The dynamical density-density interaction :math:`D(\tau)` (see :doc:`CTSEG algorithm <../algorithm_implementation/ctseg>`) is initialized as:: 
 
-    D_tau = GfImTime(indices = range(n_colors), beta = beta, statistic = "Boson", n_points = n_tau_bosonic)
+    tau_mesh = MeshImTime(beta, 'Boson', n_tau_bosonic)
+    D_tau = Block2Gf(mesh = tau_mesh, gf_struct = gf_struct)
 
-It is a matrix Green's function, for which no block structure is explicitly enforced. 
+It is a two-block-index Green's function, since the dynamical interaction does not necessarily have the same block
+diagonal structure as the hybridization function. 
 
-.. note::
-
-    The ordering of the rows and columns in ``D_tau`` is consistent with the ordering of the blocks in ``Delta_tau``.  
-
-
-The data in ``D_tau`` can be specified manually (``D_tau.data = ...``) or by using an analytical expression. 
+The data in ``D_tau`` can be specified manually (``D_tau["block1", "block2"].data = ...``) or by using an analytical expression. 
 For example:: 
 
     from triqs.gf.descriptors import Function
     wp = 1
-    D_iw = GfImFreq(indices = range(n_colors), beta = beta, statistic = "Boson", n_points = n_tau_bosonic//2)
+    D_iw = GfImFreq(indices = [0], beta = beta, statistic = "Boson", n_points = n_tau_bosonic//2)
+    d_tau = GfImTime(indices = [0], beta = beta, statistic = "Boson", n_points = n_tau_bosonic)
     D_iw << Function(lambda w: wp**2 / (w**2 - wp**2))
-    D_tau << Fourier(D_iw)
+    d_tau << Fourier(D_iw)
+    D_tau["up", "up"] << d_tau
+    D_tau["up", "down"] << d_tau
+    D_tau["down", "up"] << d_tau
+    D_tau["down", "down"] << d_tau
 
 The dynamical interaction is supplied to the solver via::
 
@@ -199,7 +219,8 @@ The perpendicular spin-spin interaction :math:`J_{\perp}(\tau)` (see :doc:`CTSEG
 
     Jperp_tau = GfImTime(indices = [0], beta = beta, statistic = "Boson", n_points = n_tau_bosonic)
 
-It is a :math:`1 \times 1` matrix Green's function. It is supplied to the solver via::
+It is a :math:`1 \times 1` matrix Green's function, since perpendicular spin-spin interactions are 
+only implemented for a single orbital. It is supplied to the solver via::
 
     S.Jperp_tau << Jperp_tau
 
@@ -213,10 +234,15 @@ it can be split into a density-density and a perpendicular spin-spin term. Indee
 The solver is then accordingly set up as:: 
 
     S.Jperp_tau << Q_tau
-    S.D0_tau[0, 0] << D_tau + (1/4) * Q_tau[0, 0]
-    S.D0_tau[0, 1] << D_tau - (1/4) * Q_tau[0, 0]
-    S.D0_tau[1, 0] << D_tau - (1/4) * Q_tau[0, 0]
-    S.D0_tau[1, 1] << D_tau + (1/4) * Q_tau[0, 0]
+    S.D0_tau["up", "up"] << (1/4) * Q_tau
+    S.D0_tau["up", "down"] << - (1/4) * Q_tau
+    S.D0_tau["down", "up"] << - (1/4) * Q_tau
+    S.D0_tau["down", "down"] << (1/4) * Q_tau
+
+.. warning::
+
+The value of ``n_tau_bosonic`` supplied in the ``constr_params`` and the number of points in the :math:`\tau` grids of
+the :math:`D(\tau)` and :math:`J_{\perp}(\tau)` inputs must match. 
 
 Solve parameters
 ----------------
@@ -226,7 +252,7 @@ The following parameters need to be specified for every run. For example::
 
     solve_params = {
         "h_int": h_int, 
-        "chemical_potential": chemical_potential,
+        "h_loc0": h_loc0,
         "length_cycle": 50,
         "n_warmup_cycles": 20000, 
         "n_cycles": 200000 
@@ -234,7 +260,7 @@ The following parameters need to be specified for every run. For example::
 
 * ``h_int`` is the local interaction Hamiltonian (see above).
 
-* ``chemical_potential`` is the total orbital-dependent chemical potential (see above). 
+* ``h_loc0`` is quadratic part of the local Hamiltonian (see above). 
 
 * ``length_cycle`` is the length of a Monte Carlo cycle. Observables are sampled every ``length_cycle`` Monte Carlo moves (either accepted or rejected). 
 
@@ -249,7 +275,10 @@ Other parameters include:
   measurement on, one should set ``solve_params["measure_F_tau"] = True``. 
 
 * **Move control**. All the :doc:`Monte Carlo moves <moves>` can be switched on and off. This functionality exists to facilitate testing
-  for developers. The solver chooses the relevant moves depending on its inputs, and regular users should not need move control. 
+  for developers. The solver chooses the relevant moves depending on its inputs, and regular users should not need move control.
+
+* Optional sample numbers for the measured two-point functions: ``n_tau_G`` (defaults to ``n_tau``) for fermionic functions 
+  and ``n_tau_chi2`` (defaults to ``n_tau_bosonic``) for bosonic functions. 
 
 The complete list of parameters is available :doc:`here <../_ref/triqs_ctseg.solver.Solver.solve>`.
 
@@ -259,11 +288,6 @@ Step 4 - Run the solver
 The CTQMC run is triggered by::
 
     S.solve(**solve_params)
-
-.. warning::
-    The solver prints to the command line the interaction matrix ``U`` and chemical potential ``mu`` that are used internally. 
-    In the presence of dynamical interactions, these are renormalized values, different from the input parameters contained 
-    in ``h_int`` and ``chemical_potential`` (see :doc:`CTSEG algorithm <../algorithm_implementation/ctseg>`).
 
 After it is done accumulating, the solver prints the average acceptance rates. Very low acceptance rates for all moves (below 0.01)
 are generally a sign that something went wrong. However, some of the moves (``split_spin_segment``, ``regroup_spin_segment``)
@@ -286,14 +310,14 @@ For a rotationally-invariant impurity, the spin-spin correlation function :math:
 correlation function::
 
     nn_tau = S.results.nn_tau
-    chi_tau = 0.25 * (nn_tau[0, 0] + nn_tau[1, 1] - nn_tau[0, 1] - nn_tau[1, 0])
+    chi_tau = 0.25 * (nn_tau["up", "up"] + nn_tau["down", "down"] - nn_tau["up", "down"] - nn_tau["down", "up"])
 
 If rotational invariance is broken (for instance, in the presence of a Zeeman field), one needs to measure separately the 
 perpendicular spin-spin correlation function:: 
 
     nn_tau = S.results.nn_tau
     sperp_tau = S.results.sperp_tau
-    chi_tau = (0.25 * (nn_tau[0, 0] + nn_tau[1, 1] - nn_tau[0, 1] - nn_tau[1, 0]) + 2*sperp_tau[0, 0]) / 3
+    chi_tau = (0.25 * (nn_tau["up", "up"] + nn_tau["down", "down"] - nn_tau["up", "down"] - nn_tau["down", "up"]) + 2*sperp_tau) / 3
 
 Step 6 - Save the results
 *************************

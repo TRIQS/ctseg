@@ -18,7 +18,8 @@ The imaginary time Green's function is defined as
 
 where :math:`A` is a block index and :math:`i, j` are inner indices within the block. The block structure 
 of :math:`G_{ij}^A(\tau)` (valid values of the indices) is set by ``gf_struct`` in the ``constr_params``.
-It is measured on a uniform time grid, whose number of points is set by ``n_tau`` in the ``constr_params``. 
+It is measured on a uniform time grid, whose number of points is set by ``n_tau_G`` in the ``solve_params``
+(defaults to ``n_tau`` in ``constr_params``).
 
 .. warning::
 
@@ -77,12 +78,13 @@ The average density is
 
 .. math::
 
-    \langle n_i \rangle = \frac{1}{\beta} \int_0^{\beta} d \tau \langle n_i(\tau) \rangle. 
+    \langle n^A_i \rangle = \frac{1}{\beta} \int_0^{\beta} d \tau \langle n^A_i(\tau) \rangle. 
 
-Here the index :math:`i = 0, \dots N - 1` represents the color (irrespective of the block structure). The measurement
-is turned on by setting ``measure_n`` in the ``solve_params`` to ``True``. The result of the 
-accumulation is accessible through the ``results.densities`` attribute of the solver object, as a numpy 
-array of size :math:`N`. 
+Here :math:`A` represents a block name and :math:`i` an index within the block. The measurement
+is turned on by setting ``measure_densities`` in the ``solve_params`` to ``True``. The result of the 
+accumulation is accessible through the ``results.densities`` attribute of the solver object, as a Python
+dictionary that associates a numpy vector to a block name. For example, the average density in the first 
+color of the spin up block is accessed as ``results.densities["up"][0]``. 
 
 Static density correlation function
 ***********************************
@@ -91,12 +93,13 @@ The static density correlation function is defined as
 
 .. math::
 
-    \langle n_i n_j \rangle = \frac{1}{\beta} \int_0^{\beta} d \tau \langle n_i(\tau) n_j(\tau) \rangle. 
+    \langle n^A_i n^B_j \rangle = \frac{1}{\beta} \int_0^{\beta} d \tau \langle n^A_i(\tau) n^A_j(\tau) \rangle. 
 
-Here the indices :math:`i, j = 0, \dots N - 1` represents colors (irrespective of the block structure). The measurement
-is turned on by setting ``measure_nn`` in the ``solve_params`` to ``True``. The result of the 
-accumulation is accessible through the ``results.nn_static`` attribute of the solver object, as a numpy 
-array of size :math:`N \times N`. 
+Here :math:`A, B` represents block names and :math:`i, j` indices within the block. The measurement
+is turned on by setting ``measure_nn_static`` in the ``solve_params`` to ``True``. The result of the 
+accumulation is accessible through the ``results.nn_static`` attribute of the solver object, as a Python 
+dictionary that associates a matrix to a pair of block names. For example the static density correlation function 
+of the spin up block with itself is acccessed as ``results.nn_static[("up", "up")]``. 
 
 Dynamic density correlation function
 ************************************
@@ -105,19 +108,16 @@ The dynamic density correlation function is defined as
 
 .. math::
 
-    \chi_{ij}(\tau) =  \langle T_{\tau} n_i(\tau) n_j(0) \rangle. 
+    \chi^{AB}_{ij}(\tau) =  \langle T_{\tau} n^A_i(\tau) n^B_j(0) \rangle. 
 
 Here the indices :math:`i, j = 0, \dots N - 1` represents colors (irrespective of the block structure).
-:math:`\chi_{ij}(\tau)` is measured on a uniform time grid, whose number of points is set by ``n_tau_bosonic`` in the ``constr_params``. 
-
-.. warning::
-
-    The value of ``n_tau_bosonic`` supplied in the ``constr_params`` and the number of points in the :math:`\tau` grids of
-    the :math:`D(\tau)` and :math:`J_{\perp}(\tau)` inputs must match. 
+:math:`\chi_{ij}(\tau)` is measured on a uniform time grid, whose number of points is set by ``n_tau_chi2`` in the ``solve_params``
+(which defaults to ``n_tau_bosonic`` from ``constr_params``). 
 
 The measurement is turned on by setting ``measure_nn_tau`` in the ``solve_params`` to ``True``. The result of the 
-accumulation is accessible through the ``results.nn_tau`` attribute of the solver object, as a matrix-valued
-``GfImTime`` with size :math:`N \times N`. 
+accumulation is accessible through the ``results.nn_tau`` attribute of the solver object, as a 
+``Block2Gf``. For example, the correlation function in the first color of the spin up block is accessed as 
+``results.nn_tau["up", "up"][0, 0]``. 
 
 Perpendicular spin-spin correlation function
 ********************************************
@@ -128,9 +128,10 @@ The perpendicular spin-spin correlation function is defined as
 
     \chi^{\perp}(\tau) =  \langle T_{\tau} s^x(\tau) s^x(0) \rangle. 
 
-:math:`\chi^{\perp}(\tau)` is measured on a uniform time grid, whose number of points is set by ``n_tau_bosonic`` in the ``constr_params``. 
-This measurement is useful if rotational invariance is broken (for instance, in the presence of a Zeeman field). Otherwise, 
-all components of the spin-spin correlation function can be determined from :math:`\chi_{ij}(\tau)`, with better statistics. 
+:math:`\chi^{\perp}(\tau)` is measured on a uniform time grid, whose number of points is set by ``n_tau_chi2`` in the ``solve_params``
+(which defaults to ``n_tau_bosonic`` from ``constr_params``).
+This measurement is useful if rotational invariance is broken (for instance, in the presence of a Zeeman field). It is 
+implemented for a single orbital only. Otherwise, all components of the spin-spin correlation function can be determined from :math:`\chi_{ij}(\tau)`, with better statistics. 
 
 The measurement is turned on by setting ``measure_sperp_tau`` in the ``solve_params`` to ``True``. The result of the 
 accumulation is accessible through the ``results.sperp_tau`` attribute of the solver object, as a matrix-valued
@@ -152,13 +153,14 @@ Average sign
 ************
 
 This measurement computes the average sign of the weight of the configuration. 
-The measurement is turned on by setting ``measure_sign`` in the ``solve_params`` to ``True``. The result of the 
-accumulation is accessible through the ``results.sign`` attribute of the solver object as a double precision scalar. 
+It is always on. The result of the accumulation is accessible through the ``results.average_sign`` 
+attribute of the solver object as a double precision scalar. 
 
 Perturbation order histograms
 *****************************
 
 This measurement determines the histograms of the perturbation orders in :math:`\Delta(\tau)` and :math:`\mathcal{J}_{\perp}(\tau)`. 
-The measurement is turned on by setting ``measure_state_hist`` in the ``solve_params`` to ``True``. The results of the 
-accumulation are accessible through the ``results.pert_order_histo_Delta`` and ``results.pert_order_histo_Jperp``
-attributes of the solver, as TRIQS histogram objects. 
+The measurement is turned on by setting ``measure_pert_order`` in the ``solve_params`` to ``True``. The results of the 
+accumulation are accessible through the ``results.pert_order_Delta`` and ``results.pert_order_Jperp``
+attributes of the solver, as TRIQS histogram objects. The average orders can also be directly accessed via 
+``results.average_order_Delta`` and ``results.average_order_Jperp``. 

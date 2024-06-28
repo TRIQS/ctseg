@@ -42,7 +42,7 @@ namespace triqs_ctseg {
     /// Density-density static correlation function :math:`\langle n_a(0) n_b(0) \rangle`.
     std::optional<nda::matrix<double>> nn_static;
 
-    /// Density per color.
+    /// Density per color, organized by blocks.
     std::optional<std::map<std::string, nda::array<double, 1>>> densities;
 
     /// Delta perturbation order histogram

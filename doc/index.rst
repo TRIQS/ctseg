@@ -14,7 +14,7 @@ The imaginary time action solved by CTSEG is of the form
 
   \begin{split}
   \mathcal{S}  &= \iint_0^{\beta} \mathrm{d} \tau \mathrm{d} \tau' \sum_{a,b} \left\{ \overline{c}_{a\sigma} (\tau)
-  \left( (\partial_{\tau} + \epsilon_{a\sigma})\delta_{ab}^{\sigma \sigma'} \delta_{\tau - \tau'} + \Delta_{ab}^{\sigma \sigma'}(\tau - \tau')\right)
+  \left( (\partial_{\tau} + \epsilon_{a\sigma} - \mu)\delta_{ab}^{\sigma \sigma'} \delta_{\tau - \tau'} + \Delta_{ab}^{\sigma \sigma'}(\tau - \tau')\right)
   c_{b\sigma'}(\tau') \right\} \\
   &+ \frac{1}{2} \iint_0^{\beta} \mathrm{d} \tau \mathrm{d} \tau' \sum_{a,b} \mathcal{U}_{ab}(\tau - \tau') n_a(\tau) n_b(\tau') 
   + \frac{1}{2} \iint_0^{\beta} \mathrm{d} \tau \mathrm{d} \tau' \sum_{a, \xi = x, y, z} s_a^{\xi}(\tau) \mathcal{J}_a^{\xi}(\tau - \tau') s_a^{\xi} (\tau')
@@ -37,7 +37,8 @@ and :math:`c_{a\sigma}(\tau)` are the :math:`\beta`-antiperiodic Grassmann field
 creation and annihilation operators on the impurity, respectively. :math:`\Delta_{ab}^{\sigma \sigma'}(\tau)` 
 is the hybridization function, that accounts for particle exchange between the impurity and the bath, and 
 :math:`\mathcal{U}_{ab} (\tau)` and  :math:`\mathcal{J}_{a}^{\xi} (\tau)` are the (dynamical)
-density-density and spin-spin interactions, respectively. 
+density-density and spin-spin interactions, respectively. The :math:`\epsilon_{a\sigma}` are orbital energies and :math:`mu`
+is the chemical potential. 
 
 The CTSEG solver carries out a double expansion in the hybridization term and in the perpendicular spin-spin
 interaction term to obtain the fully interacting impurity Green's function :math:`G(\tau)` and a range of

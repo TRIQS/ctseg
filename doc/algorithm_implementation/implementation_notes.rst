@@ -37,8 +37,8 @@ structure, but they can be accessed directly thanks to dedicated methods of the 
   The choice of the block structure is usually not unique, but using as many blocks as possible ensures the fastest 
   determinant updates. 
 * ``D0_tau`` is the dynamical part of the density-density interaction. Note that the static part is supplied in 
-  the ``solve_params`` as part of the interaction Hamiltonian. It should be supplied as a matrix-valued ``GfImTime``
-  (no block structure).
+  the ``solve_params`` as part of the interaction Hamiltonian. It should be supplied as a TRIQS ``Block2Gf``
+  (since it is no necessarily block-diagonal like ``Delta_tau``).
 * ``Jperp_tau`` is the perpendicular spin-spin interaction. It should be supplied as a :math:`1 \times 1` matrix-valued
   ``GfImTime``.
 
