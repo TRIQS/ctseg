@@ -30,7 +30,7 @@ namespace triqs_ctseg {
   // ================= Data structures =================
 
   // The configuration is made of n_color ordered lists of segments
-  // and (if needed) a list of J_perp lines.
+  // and (if needed) a list of Jperp lines.
 
   // --------------- Segment -------------------
   //
@@ -40,7 +40,7 @@ namespace triqs_ctseg {
   // Some segments are aligned between 2 colors, corresponding to a S^+, S^- operators
   // The S operators will not be linked to Delta, the hybridization, but to Jperp lines.
   // The segment stores two booleans (J_c, J_cdag) that indicate whether its operators are
-  // linked to J_perp lines.
+  // linked to Jperp lines.
   //
   // Special case : full lines.
   // When a line has no operator, we need to take into account 2 states : empty or full.
@@ -62,9 +62,9 @@ namespace triqs_ctseg {
   // simple alias
   using vec_seg_iter_t = std::vector<segment_t>::const_iterator;
 
-  // ----------------- J_perp line -------------------
+  // ----------------- Jperp line -------------------
   // Stores the times of a couple (S+, S-)
-  // Note: J_perp expansion only implemented for single orbital
+  // Note: Jperp expansion only implemented for single orbital
   // (two colors, spin up and spin down).
   struct Jperp_line_t {
     tau_t tau_Sminus, tau_Splus; // times of the S-, S+
@@ -80,7 +80,7 @@ namespace triqs_ctseg {
 
   // --------------- Configuration ----------------------
   // The configuration is a list of of segments for each color,
-  // and a list of J_perp lines.
+  // and a list of Jperp lines.
   struct configuration_t {
     // A list of segments for each color.
     // NB: ordered in DECREASING time order of the tau_c.

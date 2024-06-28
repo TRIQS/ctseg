@@ -51,10 +51,10 @@ namespace triqs_ctseg {
     /// Average Delta perturbation order
     std::optional<double> average_order_Delta;
 
-    /// J_perp perturbation order histogram
+    /// Jperp perturbation order histogram
     std::optional<std::vector<double>> pert_order_Jperp;
 
-    /// Average J_perp perturbation order
+    /// Average Jperp perturbation order
     std::optional<double> average_order_Jperp;
 
     /// State histogram

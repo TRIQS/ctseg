@@ -79,12 +79,12 @@ c.add_member(c_name = "average_order_Delta",
 c.add_member(c_name = "pert_order_Jperp",
              c_type = "std::optional<std::vector<double>>",
              read_only= True,
-             doc = r"""J_perp perturbation order histogram""")
+             doc = r"""Jperp perturbation order histogram""")
 
 c.add_member(c_name = "average_order_Jperp",
              c_type = "std::optional<double>",
              read_only= True,
-             doc = r"""Average J_perp perturbation order""")
+             doc = r"""Average Jperp perturbation order""")
 
 c.add_member(c_name = "state_hist",
              c_type = "std::optional<nda::vector<double>>",

@@ -22,7 +22,7 @@
 using triqs::operators::n;
 using namespace triqs_ctseg;
 
-TEST(CTSEG, J_perp) {
+TEST(CTSEG, Jperp) {
 
   mpi::communicator c; // Start the mpi
 

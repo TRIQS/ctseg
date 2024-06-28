@@ -88,11 +88,11 @@ namespace triqs_ctseg {
     // Symetrize
     for (auto t : D0t.mesh()) D0t[t] = 0.5 * make_regular(D0t[t] + transpose(D0t[t]));
 
-    // Do we have D(tau) and J_perp(tau)? Yes, unless the data is 0
+    // Do we have D(tau) and Jperp(tau)? Yes, unless the data is 0
     has_Dt    = max_element(abs(D0t.data())) > 1.e-13;
     has_Jperp = max_element(abs(inputs.Jperpt.data())) > 1.e-13;
 
-    // Check: no J_perp implementation for more than 2 colors
+    // Check: no Jperp implementation for more than 2 colors
     if (n_color != 2) {
       ALWAYS_EXPECTS((not has_Jperp), "Error : has_jperp is true and we have {} colors instead of 2", n_color);
     }
@@ -129,7 +129,7 @@ namespace triqs_ctseg {
       }
     }
 
-    // J_perp interactions
+    // Jperp interactions
     if (has_Jperp) {
       Jperp = inputs.Jperpt;
       if (not has_Dt)
@@ -164,7 +164,7 @@ namespace triqs_ctseg {
 
     // Report
     if (c.rank() == 0) {
-      spdlog::info("Dynamical interactions = {}, J_perp interactions = {}", has_Dt, has_Jperp);
+      spdlog::info("Dynamical interactions = {}, Jperp interactions = {}", has_Dt, has_Jperp);
       if (p.measure_F_tau and !rot_inv)
         spdlog::info("WARNING: Cannot measure F(tau) because spin-spin interaction is not rotationally invariant.");
     }
@@ -183,7 +183,7 @@ namespace triqs_ctseg {
       }
     }
     if (not has_Delta) {
-      ALWAYS_EXPECTS(has_Jperp, "Error : both J_perp(tau) and Delta(tau) are 0: there is nothing to expand.");
+      ALWAYS_EXPECTS(has_Jperp, "Error : both Jperp(tau) and Delta(tau) are 0: there is nothing to expand.");
       if (c.rank() == 0) { spdlog::info("Delta(tau) is 0, running only spin moves."); }
     }
 
