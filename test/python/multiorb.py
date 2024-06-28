@@ -32,8 +32,6 @@ constr_params = {
     "n_tau_bosonic": n_tau_bosonic
 }
 
-print(constr_params["gf_struct"])
-
 # Construct solver
 S = Solver(**constr_params)
 
@@ -70,18 +68,12 @@ solve_params = {
 # Solve
 S.solve(**solve_params)
 
-# Unwrap Block2Gf nn_tau into matrix Gf
-nn_tau = GfImTime(indices=range(2*n_orb), beta=beta, statistic = "Boson", n_points=n_tau_bosonic)
-for i, (bl_name_i, si) in enumerate(gf_struct): 
-    for j, (bl_name_j, sj) in enumerate(gf_struct): 
-        nn_tau[i, j] = S.results.nn_tau[bl_name_i, bl_name_j][0, 0]
-
 # Save and compare to reference
 if mpi.is_master_node():
     with HDFArchive("multiorb.out.h5", 'w') as A:
         A['G_tau'] = S.results.G_tau
         A['F_tau'] = S.results.F_tau
-        A["nn_tau"] = nn_tau
+        A["nn_tau"] = S.results.nn_tau
         A['nn'] = S.results.nn_static
         A['densities'] = S.results.densities
 

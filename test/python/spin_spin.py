@@ -63,20 +63,12 @@ solve_params = {
 # Solve
 S.solve(**solve_params)
 
-# Unwrap Block2Gf nn_tau into matrix Gf
-n_color = 2
-nn_tau = GfImTime(indices=[0, 1], beta=beta, statistic = "Boson", n_points=n_tau_bosonic)
-nn_tau[0, 0] = S.results.nn_tau["down", "down"][0, 0]
-nn_tau[1, 0] = S.results.nn_tau["up", "down"][0, 0]
-nn_tau[0, 1] = S.results.nn_tau["down", "up"][0, 0]
-nn_tau[1, 1] = S.results.nn_tau["up", "up"][0, 0]
-
 # Save and compare to reference
 if mpi.is_master_node():
     with h5.HDFArchive("spin_spin.out.h5", 'w') as A:
         A['G_tau'] = S.results.G_tau
         A['F_tau'] = S.results.F_tau
-        A['nn_tau'] = nn_tau
+        A['nn_tau'] = S.results.nn_tau
         A['nn'] = S.results.nn_static
         A['densities'] = S.results.densities
 
