@@ -191,6 +191,6 @@ namespace triqs_ctseg {
 
 } // namespace triqs_ctseg
 
-template <> struct ::fmt::formatter<triqs_ctseg::configuration_t> : ostream_formatter {};
+template <> struct fmt::formatter<triqs_ctseg::configuration_t> : ostream_formatter {};
 
-template <> struct ::fmt::formatter<std::vector<triqs_ctseg::colored_ops_t>> : ostream_formatter {};
+template <> struct fmt::formatter<std::vector<triqs_ctseg::colored_ops_t>> : ostream_formatter {};
