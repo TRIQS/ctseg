@@ -22,7 +22,7 @@
 using triqs::operators::n;
 using namespace triqs_ctseg;
 
-TEST(CTSEGJ, Spin_Spin) {
+TEST(CTSEG, Spin_Spin) {
 
   mpi::communicator c; // Start the mpi
 

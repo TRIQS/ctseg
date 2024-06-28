@@ -23,7 +23,7 @@
 using triqs::operators::n;
 using namespace triqs_ctseg;
 
-TEST(CTSEGJ, Anderson) {
+TEST(CTSEG, Anderson) {
 
   mpi::communicator c; // Start the mpi
 
