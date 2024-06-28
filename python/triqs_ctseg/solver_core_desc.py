@@ -62,7 +62,7 @@ c.add_member(c_name = "nn_static",
              doc = r"""Density-density static correlation function :math:`\langle n_a(0) n_b(0) \rangle`.""")
 
 c.add_member(c_name = "densities",
-             c_type = "std::map<std::string, nda::array<double, 1>>",
+             c_type = "std::optional<std::map<std::string, nda::array<double, 1>>>",
              read_only= True,
              doc = r"""Density per color.""")
 
@@ -194,9 +194,9 @@ c.add_method("""void solve (**solve_params_t)""",
 +-------------------------------+--------------------------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
 | measure_pert_order            | bool                                 | true                                    | Whether to measure the perturbation order histograms (order in Delta and Jperp)                                   |
 +-------------------------------+--------------------------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
-| measure_G_tau                 | bool                                 | true                                    | Whether to measure G(tau) (see measures/g_f_tau)                                                                  |
+| measure_G_tau                 | bool                                 | true                                    | Whether to measure G(tau) (see measures/G_F_tau)                                                                  |
 +-------------------------------+--------------------------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
-| measure_F_tau                 | bool                                 | false                                   | Whether to measure F(tau) (see measures/g_f_tau)                                                                  |
+| measure_F_tau                 | bool                                 | false                                   | Whether to measure F(tau) (see measures/G_F_tau)                                                                  |
 +-------------------------------+--------------------------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
 | measure_densities             | bool                                 | true                                    | Whether to measure densities (see measures/densities)                                                             |
 +-------------------------------+--------------------------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
@@ -357,12 +357,12 @@ c.add_member(c_name = "measure_pert_order",
 c.add_member(c_name = "measure_G_tau",
              c_type = "bool",
              initializer = """ true """,
-             doc = r"""Whether to measure G(tau) (see measures/g_f_tau)""")
+             doc = r"""Whether to measure G(tau) (see measures/G_F_tau)""")
 
 c.add_member(c_name = "measure_F_tau",
              c_type = "bool",
              initializer = """ false """,
-             doc = r"""Whether to measure F(tau) (see measures/g_f_tau)""")
+             doc = r"""Whether to measure F(tau) (see measures/G_F_tau)""")
 
 c.add_member(c_name = "measure_densities",
              c_type = "bool",

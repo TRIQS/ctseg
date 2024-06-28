@@ -108,8 +108,8 @@ TEST(CTSEG, Dynamical_U) {
     h5_read(ref_file, "nn_tau", nn_tau);
     h5_read(ref_file, "nn_static", nn_static);
     h5_read(ref_file, "densities", densities);
-    EXPECT_ARRAY_NEAR(densities["up"], Solver.results.densities["up"], precision);
-    EXPECT_ARRAY_NEAR(densities["down"], Solver.results.densities["down"], precision);
+    EXPECT_ARRAY_NEAR(densities["up"], Solver.results.densities.value()["up"], precision);
+    EXPECT_ARRAY_NEAR(densities["down"], Solver.results.densities.value()["down"], precision);
     EXPECT_BLOCK_GF_NEAR(G_tau, Solver.results.G_tau, precision);
     EXPECT_BLOCK_GF_NEAR(F_tau, Solver.results.F_tau.value(), precision);
     EXPECT_BLOCK2_GF_NEAR(nn_tau, Solver.results.nn_tau.value(), precision);
