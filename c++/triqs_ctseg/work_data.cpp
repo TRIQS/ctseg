@@ -52,6 +52,7 @@ namespace triqs_ctseg {
 
     // Print block/index/color correspondence
     if (c.rank() == 0) {
+      spdlog::info("\n");
       for (auto const &color : range(n_color)) {
         spdlog::info("Block: {}    Index: {}    Color: {}", gf_struct[block_number[color]].first, index_in_block[color],
                      color);
@@ -73,8 +74,8 @@ namespace triqs_ctseg {
 
     // Report
     if (c.rank() == 0) {
-      spdlog::info("Interaction matrix: U = {}", U);
-      spdlog::info("Orbital energies: mu - eps = {}", mu);
+      spdlog::info("\n Interaction matrix: U = {} \n", U);
+      spdlog::info("Orbital energies: mu - eps = {} \n", mu);
     }
 
     // Dynamical interactions: convert Block2Gf to matrix Gf of size n_colors
@@ -164,7 +165,7 @@ namespace triqs_ctseg {
 
     // Report
     if (c.rank() == 0) {
-      spdlog::info("Dynamical interactions = {}, Jperp interactions = {}", has_Dt, has_Jperp);
+      spdlog::info("Dynamical interactions = {}, Jperp interactions = {} \n", has_Dt, has_Jperp);
       if (p.measure_F_tau and !rot_inv)
         spdlog::info("WARNING: Cannot measure F(tau) because spin-spin interaction is not rotationally invariant.");
     }

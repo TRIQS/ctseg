@@ -6,6 +6,9 @@ endforeach()
 
 # List of all tests
 set(all_tests
+  ./anderson
+  ./dynamical_U
+  ./Jperp
   ./spin_spin
   ./two_orbitals
   ./multiorb
