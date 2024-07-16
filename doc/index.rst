@@ -37,7 +37,7 @@ and :math:`c_{a\sigma}(\tau)` are the :math:`\beta`-antiperiodic Grassmann field
 creation and annihilation operators on the impurity, respectively. :math:`\Delta_{ab}^{\sigma \sigma'}(\tau)` 
 is the hybridization function, that accounts for particle exchange between the impurity and the bath, and 
 :math:`\mathcal{U}_{ab} (\tau)` and  :math:`\mathcal{J}_{a}^{\xi} (\tau)` are the (dynamical)
-density-density and spin-spin interactions, respectively. The :math:`\epsilon_{a\sigma}` are orbital energies and :math:`mu`
+density-density and spin-spin interactions, respectively. The :math:`\epsilon_{a\sigma}` are orbital energies and :math:`\mu`
 is the chemical potential. 
 
 The CTSEG solver carries out a double expansion in the hybridization term and in the perpendicular spin-spin
