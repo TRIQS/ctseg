@@ -59,7 +59,7 @@ namespace triqs_ctseg::measures {
 
           auto d = q_tau.data()(nda_all, a, b); // a view of the data for fixed a,b
           // add + s to the data. NB : id1 > id2
-          auto fill = [s, d](long u_idx1, long u_idx2) {
+          auto fill = [s, &d](long u_idx1, long u_idx2) {
             ALWAYS_EXPECTS((u_idx1 >= u_idx2), "error", 1);
             for (auto u = u_idx1; u >= u_idx2; --u) d(u) += s;
           };
