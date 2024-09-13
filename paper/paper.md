@@ -10,6 +10,12 @@ authors:
   - name: Hao Lu
     orcid: 0009-0000-4581-9544
     affiliation: 2
+  - name: Thomas Aryral
+    orcid: 0000-0003-0960-4065
+    affiliation: 3
+  - name: Michel Ferrero
+    orcid: 0000-0003-1882-2881
+    affiliation: "4, 5"
   - name: Nils Wentzell
     orcid: 0000-0003-3613-007X
     affiliation: 1
@@ -21,13 +27,19 @@ affiliations:
    index: 1
  - name: Max Planck Institute for Polymer Research, Ackermannweg 10, 55128 Mainz, Germany
    index: 2
+ - name: Eviden Quantum Laboratory, 78340 Les Clayes-sous-Bois, France
+   index: 3
+ - name: CPHT, CNRS, Ecole Polytechnique, Institut Polytechnique de Paris, 91128 Palaiseau, France
+   index: 4
+ - name: Collège de France, 11 place Marcelin Berthelot, 75005 Paris, France
+   index: 5
 date: 25 May 2024
 bibliography: paper.bib
 ---
 
 # Summary
 
-Electron-electron interactions are a key detereminant of the electrical and 
+Electron-electron interactions are a key determinant of the electrical and 
 optical response properties in solid-state materials. Yet, the many-electron 
 problem is outstandingly difficult, and can be tackled analytically only when 
 interactions are weak, or in rare exactly solvable cases. One of the popular 
