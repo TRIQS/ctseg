@@ -85,9 +85,7 @@ more accurate localization of the QCP at doping $p \approx 0.16$ (Fig. 1b).
 
 # Acknowledgements
 
-We thank Alexander Hampel for testing the code and providing valuable feedback. We thank 
-Thomas Ayral and Michel Ferrero for sharing their unpublished implementation of CTSEG, which 
-served as an inspiration and a benchmark for the present implementation. The Flatiron Institute 
-is a division of the Simons Foundation. 
+We thank Alexander Hampel for testing the code and providing valuable feedback.
+The Flatiron Institute is a division of the Simons Foundation. 
 
 # References
