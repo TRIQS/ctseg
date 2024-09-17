@@ -10,7 +10,7 @@ authors:
   - name: Hao Lu
     orcid: 0009-0000-4581-9544
     affiliation: 2
-  - name: Thomas Aryral
+  - name: Thomas Ayral
     orcid: 0000-0003-0960-4065
     affiliation: 3
   - name: Michel Ferrero
