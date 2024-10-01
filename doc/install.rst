@@ -5,6 +5,38 @@
 Install CTSEG
 *************
 
+Packaged Versions of CTSEG
+==========================
+
+.. _ubuntu_debian:
+Ubuntu Debian packages
+----------------------
+
+We provide a Debian package for the Ubuntu LTS Version 24.04 (noble).
+Please first install TRIQS using the :ref:`Ubuntu Install Instructions<triqslibs:ubuntu_debian>`.
+After the TRIQS setup the command::
+
+     sudo apt-get install -y triqs_ctseg
+
+can be used to install the CTSEG package.
+
+.. _anaconda:
+Anaconda
+--------
+
+We provide Linux and OSX packages for the `Anaconda <https://www.anaconda.com/>`_ distribution. The packages are provided through the `conda-forge <https://conda-forge.org/>`_ repositories. After `installing conda <https://docs.conda.io/en/latest/miniconda.html>`_ you can install CTSEG with::
+
+     conda install -c conda-forge triqs_ctseg
+
+See also `github.com/conda-forge/triqs_ctseg-feedstock <https://github.com/conda-forge/triqs_ctseg-feedstock/>`_.
+
+.. _docker:
+Docker
+------
+
+A Docker image including the latest version of CTSEG is available `here <https://hub.docker.com/r/flatironinstitute/triqs>`_. For more information, please see the page on :ref:`TRIQS Docker <triqslibs:triqs_docker>`.
+
+
 Compiling CTSEG from source
 ===========================
 
@@ -13,7 +45,7 @@ Compiling CTSEG from source
 Prerequisites
 -------------
 
-#. The :ref:`TRIQS <triqslibs:welcome>` library.
+#. The :ref:`TRIQS <triqslibs:welcome>` library, see :ref:`TRIQS installation instruction <triqslibs:triqs_install>`.
    In the following, we assume that TRIQS is installed in the directory ``path_to_triqs``.
 
 Installation steps
@@ -53,7 +85,7 @@ To use a particular version, go into the directory with the sources, and look at
 
 Checkout the version of the code that you want::
 
-     $ git checkout 3.2.1
+     $ git checkout 3.3.0
 
 and follow steps 2 to 4 above to compile the code.
 
