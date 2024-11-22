@@ -26,7 +26,7 @@ Here :math:`\beta` is the inverse temperature, :math:`a` denote orbital indices,
 :math:`n_a \equiv \sum_{\sigma} n_{a\sigma}`, :math:`s_a^{\xi} \equiv \frac{1}{2} \sum_{\sigma \sigma'} \overline{c}_{a\sigma}
 \sigma_{\sigma \sigma'}^{\xi} c_{a \sigma'}` and :math:`\sigma^{\xi}` are the Pauli matrices. :math:`\overline{c}_{a\sigma}(\tau)`
 and :math:`c_{a\sigma}(\tau)` are the :math:`\beta`-antiperiodic Grassmann fields corresponding to the fermion
-creation and annihilation operators on the impurity, respectively. The :math:`\epsilon_{a\sigma}` are orbital energies and :math:`mu`
+creation and annihilation operators on the impurity, respectively. The :math:`\epsilon_{a\sigma}` are orbital energies and :math:`\mu`
 is the chemical potential. 
 
 This action can be recast as 
