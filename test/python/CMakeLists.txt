@@ -14,6 +14,7 @@ set(all_tests
   ./multiorb
   ./dynamic_int_multiorb
   ./dimer
+  ./move_double
 )
 
 foreach(test ${all_tests})

@@ -80,6 +80,8 @@ namespace triqs_ctseg {
     if (wdata.has_Delta) {
       if (p.move_insert_segment) CTQMC.add_move(moves::insert_segment{wdata, config, CTQMC.get_rng()}, "insert");
       if (p.move_remove_segment) CTQMC.add_move(moves::remove_segment{wdata, config, CTQMC.get_rng()}, "remove");
+      if (p.move_double_insert_segment) CTQMC.add_move(moves::double_insert_segment{wdata, config, CTQMC.get_rng()}, "double insert");
+      if (p.move_double_remove_segment) CTQMC.add_move(moves::double_remove_segment{wdata, config, CTQMC.get_rng()}, "double remove");
       if (p.move_move_segment) CTQMC.add_move(moves::move_segment{wdata, config, CTQMC.get_rng()}, "move");
       if (p.move_split_segment) CTQMC.add_move(moves::split_segment{wdata, config, CTQMC.get_rng()}, "split");
       if (p.move_regroup_segment) CTQMC.add_move(moves::regroup_segment{wdata, config, CTQMC.get_rng()}, "regroup");

@@ -62,6 +62,8 @@ namespace triqs_ctseg {
     h5_write(grp, "verbosity", c.verbosity);
     h5_write(grp, "move_insert_segment", c.move_insert_segment);
     h5_write(grp, "move_remove_segment", c.move_remove_segment);
+    h5_write(grp, "move_double_insert_segment", c.move_double_insert_segment);
+    h5_write(grp, "move_double_remove_segment", c.move_double_remove_segment);
     h5_write(grp, "move_move_segment", c.move_move_segment);
     h5_write(grp, "move_split_segment", c.move_split_segment);
     h5_write(grp, "move_regroup_segment", c.move_regroup_segment);
@@ -108,6 +110,8 @@ namespace triqs_ctseg {
     h5_read(grp, "verbosity", c.verbosity);
     h5_read(grp, "move_insert_segment", c.move_insert_segment);
     h5_read(grp, "move_remove_segment", c.move_remove_segment);
+    h5_read(grp, "move_double_insert_segment", c.move_double_insert_segment);
+    h5_read(grp, "move_double_remove_segment", c.move_double_remove_segment);
     h5_read(grp, "move_move_segment", c.move_move_segment);
     h5_read(grp, "move_split_segment", c.move_split_segment);
     h5_read(grp, "move_regroup_segment", c.move_regroup_segment);
