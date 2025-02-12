@@ -1,7 +1,5 @@
 # Two impurity sites coupled to two bath sites.
-# Delta(tau) has off-diagonal components. Can be compared to ED reference dimer_pyed.ref.h5 (see "benchmark" folder)
-# Comparison to CTSEG reference is disabled for this test because results can have large 
-# variations across platforms for short runs. 
+# Data in dimer.ref.h5 is obtained by running this script on 800 cores. 
 
 from triqs.gf import *
 from triqs.gf.tools import *
@@ -97,7 +95,7 @@ solve_params = {
     'h_int': h_int,
     'h_loc0': h_loc0,
     'n_warmup_cycles': 5000,
-    'n_cycles': 50000,
+    'n_cycles': 200000000,
     'length_cycle': 100,
 }
 
@@ -108,8 +106,4 @@ S.solve(**solve_params)
 if mpi.is_master_node():
     with h5.HDFArchive("dimer.out.h5", 'w') as A:
         A['G_tau'] = S.results.G_tau
-
-# --------- Compare to reference ----------      
-    #h5diff("dimer.out.h5", "dimer.ref.h5", precision=1e-8)
-    
 

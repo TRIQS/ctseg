@@ -52,7 +52,6 @@ namespace triqs_ctseg::moves {
 
     // ------------  Trace ratio  -------------
     // Same as insert, up to the sign
-    // FIXME : pull it out ?
     double ln_trace_ratio = -wdata.mu(color) * prop_seg.length();
     for (auto c : range(config.n_color())) {
       if (c != color) { ln_trace_ratio -= -wdata.U(color, c) * overlap(config.seglists[c], prop_seg); }
