@@ -115,15 +115,25 @@ namespace triqs_ctseg::moves {
           LOG("One of the proposed times already exists in another line of the same block. Rejecting.");
           return 0;
         }
+        if (prop_seg[0].tau_cdag == prop_seg[1].tau_cdag or prop_seg[0].tau_c == prop_seg[1].tau_c) {
+          LOG("Two inserting segments have same times. Rejecting.");
+          return 0;
+        }
       }
-      det_ratio = D.try_insert2(det_lower_bound_x(D, prop_seg[0].tau_cdag),
-                                det_lower_bound_x(D, prop_seg[1].tau_cdag),
-                                det_lower_bound_y(D, prop_seg[0].tau_c),
-                                det_lower_bound_y(D, prop_seg[1].tau_c),
-                                {prop_seg[0].tau_cdag, bl_idx_0},
-                                {prop_seg[1].tau_cdag, bl_idx_1},
-                                {prop_seg[0].tau_c, bl_idx_0},
-                                {prop_seg[1].tau_c, bl_idx_1});
+      // Sort smaller and larger times for tau_cdag and tau_c
+      auto tau_cdag_lower = prop_seg[0].tau_cdag > prop_seg[1].tau_cdag ? prop_seg[1].tau_cdag : prop_seg[0].tau_cdag;
+      auto tau_cdag_upper = prop_seg[0].tau_cdag < prop_seg[1].tau_cdag ? prop_seg[1].tau_cdag : prop_seg[0].tau_cdag;
+      auto tau_c_lower    = prop_seg[0].tau_c    > prop_seg[1].tau_c    ? prop_seg[1].tau_c    : prop_seg[0].tau_c;
+      auto tau_c_upper    = prop_seg[0].tau_c    < prop_seg[1].tau_c    ? prop_seg[1].tau_c    : prop_seg[0].tau_c;
+      // Determine block indices corresponding to lower and upper tau values
+      auto bl_cdag_lower  = prop_seg[0].tau_cdag > prop_seg[1].tau_cdag ? bl_idx_1             : bl_idx_0;
+      auto bl_cdag_upper  = prop_seg[0].tau_cdag < prop_seg[1].tau_cdag ? bl_idx_1             : bl_idx_0;
+      auto bl_c_lower     = prop_seg[0].tau_c    > prop_seg[1].tau_c    ? bl_idx_1             : bl_idx_0;
+      auto bl_c_upper     = prop_seg[0].tau_c    < prop_seg[1].tau_c    ? bl_idx_1             : bl_idx_0;
+      det_ratio = D.try_insert2(det_lower_bound_x(D, tau_cdag_lower), det_lower_bound_x(D, tau_cdag_upper) + 1, // +1 to avoid duplicates
+                                det_lower_bound_y(D, tau_c_lower)   , det_lower_bound_y(D, tau_c_upper)    + 1, // +1 to avoid duplicates
+                                {tau_cdag_lower, bl_cdag_lower}     , {tau_cdag_upper, bl_cdag_upper}         ,
+                                {tau_c_lower   , bl_c_lower}        , {tau_c_upper   , bl_c_upper}            );
     }
     else { // insert on different blocks
       auto &D_0 = wdata.dets[bl_0];
