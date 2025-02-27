@@ -96,9 +96,7 @@ Randomly choose two different colors. For each color, perform a single removal.
 .. note::
 
     **Double insert** and **Double remove** are off by default. 
-    When the system's parameters are set in such a way that ergodicity of configurations can hardly be satisfied 
-    (e.g., by applying strong attractive interactions), you can turn them on with setting 
-    ``move_double_insert_segment = True`` and ``move_double_remove_segment = True``. (see :doc:`Solve parameters <./step_by_step>`) 
+    They may be switched on for solving impurities with strong attractive interactions to improve ergodicity (see :doc:`Solve parameters <./step_by_step>`). 
 
 Insert spin segment
 *******************

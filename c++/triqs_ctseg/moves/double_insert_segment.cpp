@@ -25,7 +25,7 @@ namespace triqs_ctseg::moves {
 
     LOG("\n =================== ATTEMPT DOUBLE INSERT ================ \n");
 
-    // ------------ Choice of segment --------------
+    // ------------ Choice of segments --------------
     // Select insertion colors
     int color_0 = rng(config.n_color());
     int color_1 = rng(config.n_color() - 1);
@@ -90,12 +90,12 @@ namespace triqs_ctseg::moves {
         ln_trace_ratio += -real(wdata.K(double(prop_seg[i].length()))(color, color)); // Correct double counting
     } // color
 
-    // Counting the overlap between the inserting segments
-    // Make the prop_seg[1] as a seglist to use K_overlap()
-    std::vector<segment_t> seglist_temp = {prop_seg[1]};
+    // Overlap between the inserted segments
     ln_trace_ratio += -wdata.U(color_0, color_1) * overlap(prop_seg[1], prop_seg[0]);
-    if (wdata.has_Dt)
+    if (wdata.has_Dt) {
+      std::vector<segment_t> seglist_temp = {prop_seg[1]};
       ln_trace_ratio += K_overlap(seglist_temp, prop_seg[0].tau_c, prop_seg[0].tau_cdag, wdata.K, color_0, color_1);
+    }
 
     double trace_ratio = std::exp(ln_trace_ratio);
 
@@ -116,24 +116,24 @@ namespace triqs_ctseg::moves {
           return 0;
         }
         if (prop_seg[0].tau_cdag == prop_seg[1].tau_cdag or prop_seg[0].tau_c == prop_seg[1].tau_c) {
-          LOG("Two inserting segments have same times. Rejecting.");
+          LOG("Two identical times in inserted segments. Rejecting.");
           return 0;
         }
       }
-      // Sort smaller and larger times for tau_cdag and tau_c
+      // Find the ordering of the two tau_cdag and the two tau_c to be inserted. They must be inserted in the correct (inceasing) order. 
       auto tau_cdag_lower = prop_seg[0].tau_cdag > prop_seg[1].tau_cdag ? prop_seg[1].tau_cdag : prop_seg[0].tau_cdag;
       auto tau_cdag_upper = prop_seg[0].tau_cdag < prop_seg[1].tau_cdag ? prop_seg[1].tau_cdag : prop_seg[0].tau_cdag;
       auto tau_c_lower    = prop_seg[0].tau_c    > prop_seg[1].tau_c    ? prop_seg[1].tau_c    : prop_seg[0].tau_c;
       auto tau_c_upper    = prop_seg[0].tau_c    < prop_seg[1].tau_c    ? prop_seg[1].tau_c    : prop_seg[0].tau_c;
-      // Determine block indices corresponding to lower and upper tau values
-      auto bl_cdag_lower  = prop_seg[0].tau_cdag > prop_seg[1].tau_cdag ? bl_idx_1             : bl_idx_0;
-      auto bl_cdag_upper  = prop_seg[0].tau_cdag < prop_seg[1].tau_cdag ? bl_idx_1             : bl_idx_0;
-      auto bl_c_lower     = prop_seg[0].tau_c    > prop_seg[1].tau_c    ? bl_idx_1             : bl_idx_0;
-      auto bl_c_upper     = prop_seg[0].tau_c    < prop_seg[1].tau_c    ? bl_idx_1             : bl_idx_0;
+      // Determine orbital indices (inside the block) corresponding to lower and upper tau values
+      auto idx_cdag_lower  = prop_seg[0].tau_cdag > prop_seg[1].tau_cdag ? bl_idx_1             : bl_idx_0;
+      auto idx_cdag_upper  = prop_seg[0].tau_cdag < prop_seg[1].tau_cdag ? bl_idx_1             : bl_idx_0;
+      auto idx_c_lower     = prop_seg[0].tau_c    > prop_seg[1].tau_c    ? bl_idx_1             : bl_idx_0;
+      auto idx_c_upper     = prop_seg[0].tau_c    < prop_seg[1].tau_c    ? bl_idx_1             : bl_idx_0;
       det_ratio = D.try_insert2(det_lower_bound_x(D, tau_cdag_lower), det_lower_bound_x(D, tau_cdag_upper) + 1, // +1 to avoid duplicates
                                 det_lower_bound_y(D, tau_c_lower)   , det_lower_bound_y(D, tau_c_upper)    + 1, // +1 to avoid duplicates
-                                {tau_cdag_lower, bl_cdag_lower}     , {tau_cdag_upper, bl_cdag_upper}         ,
-                                {tau_c_lower   , bl_c_lower}        , {tau_c_upper   , bl_c_upper}            );
+                                {tau_cdag_lower, idx_cdag_lower}     , {tau_cdag_upper, idx_cdag_upper}         ,
+                                {tau_c_lower   , idx_c_lower}        , {tau_c_upper   , idx_c_upper}            );
     }
     else { // insert on different blocks
       auto &D_0 = wdata.dets[bl_0];

@@ -293,6 +293,10 @@ Other parameters include:
 
 The complete list of parameters is available :doc:`here <../_ref/triqs_ctseg.solver.Solver.solve>`.
 
+.. note::
+
+The moves ``double_insert_segment`` and ``double_remove_segment`` are off by default. They may be switched on by the user when solving impurities with strong attractive interactions to improve ergodicity. 
+
 Step 4 - Run the solver 
 ***********************
 

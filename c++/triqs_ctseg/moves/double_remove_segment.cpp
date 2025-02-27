@@ -24,7 +24,7 @@ namespace triqs_ctseg::moves {
 
     LOG("\n =================== ATTEMPT DOUBLE REMOVE ================ \n");
 
-    // ------------ Choice of segment --------------
+    // ------------ Choice of segments --------------
     // Select removal colors
     int color_0 = rng(config.n_color());
     int color_1 = rng(config.n_color() - 1);
@@ -59,7 +59,6 @@ namespace triqs_ctseg::moves {
 
     // ------------  Trace ratio  -------------
     // Same as double insert, up to the sign
-    // FIXME : pull it out ?
     double ln_trace_ratio = 0.0;
     for (auto const &[i, color] : itertools::enumerate(colors)) {
       ln_trace_ratio += -wdata.mu(color) * prop_seg[i].length();
@@ -71,18 +70,16 @@ namespace triqs_ctseg::moves {
       if (wdata.has_Dt) ln_trace_ratio -= real(wdata.K(double(prop_seg[i].length()))(color, color));
     } // color
 
-    // Counting the overlap between the removal segments
-    // Make the prop_seg[1] as a seglist to use K_overlap()
-    // Be careful to the sign here!
-    std::vector<segment_t> seglist_temp = {prop_seg[1]};
+    // Overlap between the removed segments  
     ln_trace_ratio += -wdata.U(color_0, color_1) * overlap(prop_seg[1], prop_seg[0]);
-    if (wdata.has_Dt)
+    if (wdata.has_Dt) {
+      std::vector<segment_t> seglist_temp = {prop_seg[1]}; // trick for using K_overlap on a single segment
       ln_trace_ratio += K_overlap(seglist_temp, prop_seg[0].tau_c, prop_seg[0].tau_cdag, wdata.K, color_0, color_1);
+    }
 
     double trace_ratio = std::exp(ln_trace_ratio);
 
     // ------------  Det ratio  ---------------
-    // same code as in double insert. In Insert, it is a true bound, does not insert at same time
     auto &bl_0       = wdata.block_number[color_0];
     auto &bl_1       = wdata.block_number[color_1];
     is_same_block = bl_0 == bl_1;

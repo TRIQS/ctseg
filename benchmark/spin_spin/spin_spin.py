@@ -1,5 +1,5 @@
 # Single orbital with dynamical spin-spin interactions. 
-# Can be compared with reference obtained with CTINT (ctint.ref.h5)
+# Data in spin_spin.ref.h5 is obtained by running this script on 800 cores. 
 from triqs.gf import *
 import triqs.utility.mpi as mpi
 from triqs.gf.descriptors import Function
@@ -57,15 +57,13 @@ solve_params = {
     "n_cycles": 1000000,
     "measure_F_tau": True,
     "measure_nn_tau": True,
-    "measure_nn_static": True,
-    "move_double_insert_segment": True,
-    "move_double_remove_segment": True,
+    "measure_nn_static": True
     }
 
 # Solve
 S.solve(**solve_params)
 
-# Save and compare to reference
+# Save data
 if mpi.is_master_node():
     with h5.HDFArchive("spin_spin.out.h5", 'w') as A:
         A['G_tau'] = S.results.G_tau
@@ -73,4 +71,3 @@ if mpi.is_master_node():
         A['nn_tau'] = S.results.nn_tau
         A['nn'] = S.results.nn_static
         A['densities'] = S.results.densities
-

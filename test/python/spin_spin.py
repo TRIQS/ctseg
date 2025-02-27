@@ -1,5 +1,5 @@
 # Single orbital with dynamical spin-spin interactions. 
-# Can be compared with reference obtained with CTINT (ctint.ref.h5)
+# Can be compared with reference obtained with CTINT (ctint.ref.h5), see benchmark folder
 from triqs.gf import *
 import triqs.utility.mpi as mpi
 from triqs.gf.descriptors import Function
