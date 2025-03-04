@@ -176,9 +176,9 @@ c.add_method("""void solve (**solve_params_t)""",
 +-------------------------------+--------------------------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
 | move_remove_segment           | bool                                 | true                                    | Whether to perform the move remove segment                                                                        |
 +-------------------------------+--------------------------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
-| move_double_insert_segment    | bool                                 | false                                   | Whether to perform the move double insert segment                                                                 |
+| move_double_insert_segment    | bool                                 | true                                    | Whether to perform the move double insert segment                                                                 |
 +-------------------------------+--------------------------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
-| move_double_remove_segment    | bool                                 | false                                   | Whether to perform the move double remove segment                                                                 |
+| move_double_remove_segment    | bool                                 | true                                    | Whether to perform the move double remove segment                                                                 |
 +-------------------------------+--------------------------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
 | move_move_segment             | bool                                 | true                                    | Whether to perform the move move segment                                                                          |
 +-------------------------------+--------------------------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
@@ -315,12 +315,12 @@ c.add_member(c_name = "move_remove_segment",
 
 c.add_member(c_name = "move_double_insert_segment",
              c_type = "bool",
-             initializer = """ false """,
+             initializer = """ true """,
              doc = r"""Whether to perform the move double insert segment""")
 
 c.add_member(c_name = "move_double_remove_segment",
              c_type = "bool",
-             initializer = """ false """,
+             initializer = """ true """,
              doc = r"""Whether to perform the move double remove segment""")
 
 c.add_member(c_name = "move_move_segment",

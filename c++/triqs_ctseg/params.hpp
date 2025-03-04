@@ -87,10 +87,10 @@ namespace triqs_ctseg {
     bool move_remove_segment = true;
 
     /// Whether to perform the move double insert segment
-    bool move_double_insert_segment = false;
+    bool move_double_insert_segment = true;
 
     /// Whether to perform the move double remove segment
-    bool move_double_remove_segment = false;
+    bool move_double_remove_segment = true;
 
     /// Whether to perform the move move segment
     bool move_move_segment = true;
