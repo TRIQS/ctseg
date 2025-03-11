@@ -164,6 +164,8 @@ The following code extracts from a ``BlockGf`` ``G0_iw`` a ``BlockGf`` ``Delta_i
 If the ``h0`` are already expressed in the local eigenbasis, the obtained hybridization function can be 
 directly used as the solver input. In the general case, they need to be rotated to the eigenbasis::
 
+    import numpy as np
+    from numpy import linalg
     rot_lst = [np.matrix(linalg.eig(h0_bl)[1]) for h0_bl in h0]
     for (bl, g0_bl), rot_bl in zip(Delta_iw, rot_lst):
         g0_bl << rot_bl.H * g0_bl * rot_bl
@@ -171,14 +173,12 @@ directly used as the solver input. In the general case, they need to be rotated 
 If a rotation is required, then the interactions should also be rotated accordingly. 
 The non-interacting Hamiltonian operator in its eigenbasis is obtained as:: 
 
-    import numpy as np
-    from numpy import linalg
     for i, (bl_name, bl_size) in enumerate(gf_struct):
-        for j in range bl_size: 
-            if (i == 0 and j == 0): 
-                hloc_0 = linalg.eig(h0_lst[i])[0][j].real * n(bl_name, j)
+        for j in range(bl_size):
+            if (i == 0 and j == 0):
+                h_loc0 = linalg.eig(h0_lst[i])[0][j].real * n(bl_name, j)
             else:
-                hloc_0 += linalg.eig(h0_lst[i])[0][j].real * n(bl_name, j)
+                h_loc0 += linalg.eig(h0_lst[i])[0][j].real * n(bl_name, j)
 
 
 Dynamical density-density interaction
