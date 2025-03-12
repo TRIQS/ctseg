@@ -1,4 +1,5 @@
 [![build](https://github.com/TRIQS/ctseg/workflows/build/badge.svg)](https://github.com/TRIQS/ctseg/actions?query=workflow%3Abuild)
+[![status](https://joss.theoj.org/papers/78121720b03290b539169e8bcc42a007/status.svg)](https://joss.theoj.org/papers/78121720b03290b539169e8bcc42a007)
 
 ## TRIQS segment picture solver (CTSEG)
 
