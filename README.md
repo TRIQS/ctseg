@@ -3,7 +3,7 @@
 
 ## TRIQS segment picture solver (CTSEG)
 
-Copyright (C) 2024, N. Kavokine, H. Lu, N. Wentzell and O. Parcollet.
+Copyright (C) 2025, N. Kavokine, H. Lu, T. Ayral, M. Ferrero, N. Wentzell and O. Parcollet.
 
 ### Documentation
 
