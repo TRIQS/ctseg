@@ -13,7 +13,7 @@ Find below an itemized list of changes in this release.
 
 ### General
 * Implement double insert / remove segments and enable by default
-* Add a benchmark folder to show the consistency of move_double
+* Add a benchmark folder with comparison to exact solutions 
 * Fix license files
 * Fix issue with assignment to const
 * Add JOSS paper to paper subdirectory
