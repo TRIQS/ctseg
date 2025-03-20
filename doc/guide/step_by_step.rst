@@ -22,11 +22,9 @@ They can be conveniently supplied as a Python dictionary::
 
 * ``beta`` is the inverse temperature. 
 
-* ``n_tau`` is the number of points of the imaginary time grid on which the input hybridization :math:`\Delta(\tau)` is sampled. 
-    It is also the default number of samples for the measured fermionic two-point functions. 
+* ``n_tau`` is the number of points of the imaginary time grid on which the input hybridization :math:`\Delta(\tau)` is sampled. It is also the default number of samples for the measured fermionic two-point functions. 
 
-* ``n_tau_bosonic`` is the number of points of the imaginary time grid on which the bosonic two-point function inputs (:math:`D_0(\tau)` and :math:`\mathcal{J}_{\perp}(\tau)`) are sampled. 
-    It is also the default number of samples for the measured bosonic two-point functions. 
+* ``n_tau_bosonic`` is the number of points of the imaginary time grid on which the bosonic two-point function inputs (:math:`D_0(\tau)` and :math:`\mathcal{J}_{\perp}(\tau)`) are sampled. It is also the default number of samples for the measured bosonic two-point functions. 
 
 Green's function structure
 --------------------------
@@ -166,6 +164,8 @@ The following code extracts from a ``BlockGf`` ``G0_iw`` a ``BlockGf`` ``Delta_i
 If the ``h0`` are already expressed in the local eigenbasis, the obtained hybridization function can be 
 directly used as the solver input. In the general case, they need to be rotated to the eigenbasis::
 
+    import numpy as np
+    from numpy import linalg
     rot_lst = [np.matrix(linalg.eig(h0_bl)[1]) for h0_bl in h0]
     for (bl, g0_bl), rot_bl in zip(Delta_iw, rot_lst):
         g0_bl << rot_bl.H * g0_bl * rot_bl
@@ -173,14 +173,12 @@ directly used as the solver input. In the general case, they need to be rotated 
 If a rotation is required, then the interactions should also be rotated accordingly. 
 The non-interacting Hamiltonian operator in its eigenbasis is obtained as:: 
 
-    import numpy as np
-    from numpy import linalg
     for i, (bl_name, bl_size) in enumerate(gf_struct):
-        for j in range bl_size: 
-            if (i == 0 and j == 0): 
-                hloc_0 = linalg.eig(h0_lst[i])[0][j].real * n(bl_name, j)
+        for j in range(bl_size):
+            if (i == 0 and j == 0):
+                h_loc0 = linalg.eig(h0_lst[i])[0][j].real * n(bl_name, j)
             else:
-                hloc_0 += linalg.eig(h0_lst[i])[0][j].real * n(bl_name, j)
+                h_loc0 += linalg.eig(h0_lst[i])[0][j].real * n(bl_name, j)
 
 
 Dynamical density-density interaction
@@ -243,6 +241,19 @@ The solver is then accordingly set up as::
 
 The value of ``n_tau_bosonic`` supplied in the ``constr_params`` and the number of points in the :math:`\tau` grids of
 the :math:`D(\tau)` and :math:`J_{\perp}(\tau)` inputs must match. 
+
+Conditions for half-filling
+---------------------------
+
+For a particle-hole symmetric, spin-symmetric single-orbital problem, the following values of the chemical potential correspond to half-filling (assuming that the orbital energy ``eps`` is 0):
+
+* In the absence of dynamical density-density interaction: :math:`\mu = U/2`. 
+
+* In the presence of a dynamical density-density interaction :math:`D_{\sigma \sigma'} (\tau)` and possibly a perpendicular spin-spin interaction :math:`J_{\perp}(\tau)`: 
+  
+.. math::
+    
+    \mu = \frac{U + [D_{\uparrow\uparrow} + D_{\uparrow \downarrow}](i\omega_n = 0)}{2}
 
 Solve parameters
 ----------------
