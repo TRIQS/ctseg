@@ -1,3 +1,8 @@
+# Copyright (c) 2025--present, The TRIQS/ctseg Authors and their Assignees
+# This file is part of TRIQS/ctseg and is licensed under the terms of GPLv3 or later.
+# SPDX-License-Identifier: GPL-3.0-or-later
+# See LICENSE.txt in the root of this distribution for details.
+
 # Single orbital with dynamical spin-spin interactions. 
 # Data in spin_spin.ref.h5 is obtained by running this script on 800 cores. 
 from triqs.gf import *
