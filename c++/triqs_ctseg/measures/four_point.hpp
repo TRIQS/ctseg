@@ -23,8 +23,8 @@ namespace triqs_ctseg::measures {
     int n_w_bosonic;
     std::vector<std::string> block_names;
     std::vector<array<dcomplex, 4>> Mw_vector, nMw_vector;
-    vector<dcomplex> y_exp_ini, y_exp_inc, x_exp_ini, x_exp_inc;
-    vector<int> y_inner_index, x_inner_index;
+    nda::vector<dcomplex> y_exp_ini, y_exp_inc, x_exp_ini, x_exp_inc;
+    nda::vector<int> y_inner_index, x_inner_index;
 
     block_gf<prod<imfreq, imfreq, imfreq>, tensor_valued<4>> g3w;
     block_gf<prod<imfreq, imfreq, imfreq>, tensor_valued<4>> f3w;
