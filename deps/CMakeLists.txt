@@ -70,8 +70,8 @@ external_dependency(GTest
 set(SPDLOG_FMT_EXTERNAL ON)
 external_dependency(spdlog
   GIT_REPO https://github.com/gabime/spdlog.git
-  VERSION 1.12
-  GIT_TAG v1.12.0
+  VERSION 1.15
+  GIT_TAG v1.15.1
   BUILD_ALWAYS
 )
 set_target_properties(spdlog PROPERTIES POSITION_INDEPENDENT_CODE ON)
