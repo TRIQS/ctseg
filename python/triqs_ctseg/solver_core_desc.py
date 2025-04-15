@@ -1,7 +1,8 @@
-# Copyright (c) 2022--present, The TRIQS/ctseg Authors and their Assignees
+# Copyright (c) 2022--present, The Simons Foundation
+# Copyright (c) 2022--present, Max Planck Institute for Polymer Research, Mainz, Germany
 # This file is part of TRIQS/ctseg and is licensed under the terms of GPLv3 or later.
 # SPDX-License-Identifier: GPL-3.0-or-later
-# See LICENSE.txt in the root of this distribution for details.
+# See LICENSE in the root of this distribution for details.
 
 # Generated automatically using the command :
 # c++2py ../../c++/triqs_ctseg/solver_core.hpp -p --members_read_only -N triqs_ctseg -a triqs_ctseg -m solver_core -o solver_core --only="results_t solver_core" --moduledoc="The python module for triqs_ctseg" -C triqs -C nda_py --includes=../../c++ --includes=/usr/local/include/ --cxxflags="-std=c++20" --target_file_only
