@@ -1,19 +1,8 @@
-// Copyright (c) 2024 Simons Foundation
-//
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You may obtain a copy of the License at
-//     https://www.gnu.org/licenses/gpl-3.0.txt
-//
-// Authors: Hao Lu
+// Copyright (c) 2024--present, The Simons Foundation
+// Copyright (c) 2024--present, Max Planck Institute for Polymer Research, Mainz, Germany
+// This file is part of TRIQS/ctseg and is licensed under the terms of GPLv3 or later.
+// SPDX-License-Identifier: GPL-3.0-or-later
+// See LICENSE in the root of this distribution for details.
 
 #pragma once
 #include "../configuration.hpp"
@@ -35,8 +24,8 @@ namespace triqs_ctseg::measures {
     int n_w_bosonic;
     std::vector<std::string> block_names;
     std::vector<array<dcomplex, 4>> Mw_vector, nMw_vector;
-    vector<dcomplex> y_exp_ini, y_exp_inc, x_exp_ini, x_exp_inc;
-    vector<int> y_inner_index, x_inner_index;
+    nda::vector<dcomplex> y_exp_ini, y_exp_inc, x_exp_ini, x_exp_inc;
+    nda::vector<int> y_inner_index, x_inner_index;
 
     block_gf<prod<imfreq, imfreq, imfreq>, tensor_valued<4>> g3w;
     block_gf<prod<imfreq, imfreq, imfreq>, tensor_valued<4>> f3w;

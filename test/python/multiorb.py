@@ -1,3 +1,9 @@
+# Copyright (c) 2024--present, The Simons Foundation
+# Copyright (c) 2024--present, Max Planck Institute for Polymer Research, Mainz, Germany
+# This file is part of TRIQS/ctseg and is licensed under the terms of GPLv3 or later.
+# SPDX-License-Identifier: GPL-3.0-or-later
+# See LICENSE in the root of this distribution for details.
+
 # Multi-orbital impurity with diagonal Delta(tau). 
 # Number of orbitals can be changed. 
 from triqs.gf import *

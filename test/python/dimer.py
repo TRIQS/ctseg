@@ -1,3 +1,9 @@
+# Copyright (c) 2024--present, The Simons Foundation
+# Copyright (c) 2024--present, Max Planck Institute for Polymer Research, Mainz, Germany
+# This file is part of TRIQS/ctseg and is licensed under the terms of GPLv3 or later.
+# SPDX-License-Identifier: GPL-3.0-or-later
+# See LICENSE in the root of this distribution for details.
+
 # Two impurity sites coupled to two bath sites.
 # Delta(tau) has off-diagonal components. Can be compared to ED reference dimer_pyed.ref.h5 (see "benchmark" folder)
 # Comparison to CTSEG reference is disabled for this test because results can have large 

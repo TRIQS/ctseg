@@ -53,7 +53,7 @@ rst_epilog = """
 version = version,
 )
 
-copyright = '2024 The Simons Foundation, authors: N. Kavokine, H. Lu, N. Wentzell, O. Parcollet'
+copyright = '2022--present The Simons Foundation, Max-Planck-Institut for Polymer Research Mainz'
 
 mathjax_path = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=default"
 templates_path = ['@CMAKE_CURRENT_SOURCE_DIR@/_templates']
