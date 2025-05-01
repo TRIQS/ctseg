@@ -23,7 +23,7 @@ authors:
     orcid: 0000-0002-0389-2660
     affiliation: 1
 affiliations:
- - name: Center for Computational Quantum Physics, Flatiron Institute, 162 5th Avenue, NY 10010, New York, USA
+ - name: Center for Computational Quantum Physics, Flatiron Institute, 162 5th Avenue, NY 10010, New York, United States of America
    index: 1
  - name: Max Planck Institute for Polymer Research, Ackermannweg 10, 55128 Mainz, Germany
    index: 2
@@ -62,8 +62,8 @@ Currently, there exist implementations of `CTHYB` within three different librari
 
 However, a simpler and potentially faster version of the `CTHYB` algorithm, 
 called `CTSEG`, can be used under the restriction of density-density
-interactions on the impurity [@werner2006a;@werner2006b;@haule2007]. `CTSEG` can be further generalized to allow for time-dependent[@werner2007;@werner2010] and 
-spin-spin interactions [@otsuki2013;@steiner2015]: see `@werner2016` for a review. To our knowledge, there exists so far one published implementation of `CTSEG` based on ALPS [@ALPS-CTSEG], but it does not allow for spin-spin interactions. 
+interactions on the impurity [@werner2006a;@werner2006b;@haule2007]. `CTSEG` can be further generalized to allow for time-dependent [@werner2007;@werner2010] and 
+spin-spin interactions [@otsuki2013;@steiner2015]: see [@werner2016] for a review. To our knowledge, there exists so far one published implementation of `CTSEG` based on ALPS [@ALPS-CTSEG], but it does not allow for spin-spin interactions. 
 
 Our `CTSEG` solver is about twice as fast as `TRIQS-CTHYB` for a single orbital problem, and has
 better scaling with the number of orbitals (40 times faster in our 5 orbital test case, see Fig. 1a). 
@@ -74,8 +74,8 @@ quantum Heisenberg spin glass [@kavokine2024].
 
 # Example of use
 
-As a further illustration of our solver's performance, we apply it to the fully connected $t-J-U$ model
-studied by @dumitrescu2022. At half-filling, the model forms a spin glass phase, which melts into 
+As a further illustration of our solver's performance, we apply it to the fully connected $t-J-U$ model, 
+which has been previously studied [@dumitrescu2022]. At half-filling, the model forms a spin glass phase, which melts into 
 a metal at a doping-induced quantum critical point (QCP). Dumitrescu et al. 
 obtained solutions at inverse temperatures up to $\beta = 65$, limited by the fermionic sign problem 
 of their interaction expansion solver. The hybridization expansion carried out by `CTSEG` is 
