@@ -44,7 +44,7 @@ optical response properties in solid-state materials. Yet, the many-electron
 problem is outstandingly difficult, and can be tackled analytically only when 
 interactions are weak, or in rare exactly solvable cases. One of the popular 
 numerical schemes for addressing strongly interacting systems is dynamical 
-mean-field theory (DMFT) [@georges1996]. In DMFT, the many-body problem formulated on a
+mean-field theory [DMFT\; @georges1996]. In DMFT, the many-body problem formulated on a
 crystal lattice is self-consistently mapped onto a single atom (or impurity)
 immersed in an effective environment (or bath). The remaining computational 
 task is then the solution of the impurity problem, which can be carried out 
@@ -63,7 +63,7 @@ Currently, there exist implementations of `CTHYB` within three different librari
 However, a simpler and potentially faster version of the `CTHYB` algorithm, 
 called `CTSEG`, can be used under the restriction of density-density
 interactions on the impurity [@werner2006a;@werner2006b;@haule2007]. `CTSEG` can be further generalized to allow for time-dependent [@werner2007;@werner2010] and 
-spin-spin interactions [@otsuki2013;@steiner2015]: see [@werner2016] for a review. To our knowledge, there exists so far one published implementation of `CTSEG` based on ALPS [@ALPS-CTSEG], but it does not allow for spin-spin interactions. 
+spin-spin interactions [@otsuki2013;@steiner2015]: see @werner2016 for a review. To our knowledge, there exists so far one published implementation of `CTSEG` based on ALPS [@ALPS-CTSEG], but it does not allow for spin-spin interactions. 
 
 Our `CTSEG` solver is about twice as fast as `TRIQS-CTHYB` for a single orbital problem, and has
 better scaling with the number of orbitals (40 times faster in our 5 orbital test case, see Fig. 1a). 
