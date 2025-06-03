@@ -78,6 +78,7 @@ namespace triqs_ctseg {
     h5_write(grp, "det_precision_error", c.det_precision_error);
     h5_write(grp, "det_singular_threshold", c.det_singular_threshold);
     h5_write(grp, "histogram_max_order", c.histogram_max_order);
+    h5_write(grp, "visualize_config", c.visualize_config);
   }
 
   //------------------------------------
@@ -126,6 +127,7 @@ namespace triqs_ctseg {
     h5_read(grp, "det_precision_error", c.det_precision_error);
     h5_read(grp, "det_singular_threshold", c.det_singular_threshold);
     h5_read(grp, "histogram_max_order", c.histogram_max_order);
+    h5_read(grp, "visualize_config", c.visualize_config);
   }
 
 } // namespace triqs_ctseg

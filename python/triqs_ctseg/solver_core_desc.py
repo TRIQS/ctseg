@@ -250,6 +250,8 @@ c.add_method("""void solve (**solve_params_t)""",
 +-------------------------------+--------------------------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
 | histogram_max_order           | int                                  | 1000                                    | Maximum order for the perturbation order histograms                                                               |
 +-------------------------------+--------------------------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
+| visualize_config              | bool                                 | false                                   | Output characteristic configurations in a separate file                                                           |
++-------------------------------+--------------------------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
 """)
 
 c.add_property(name = "Delta_tau",
@@ -481,6 +483,11 @@ c.add_member(c_name = "histogram_max_order",
              c_type = "int",
              initializer = """ 1000 """,
              doc = r"""Maximum order for the perturbation order histograms""")
+
+c.add_member(c_name = "visualize_config",
+             c_type = "bool",
+             initializer = """ false """,
+             doc = r"""Output characteristic configurations in a separate file""")
 
 module.add_converter(c)
 

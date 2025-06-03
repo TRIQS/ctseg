@@ -165,6 +165,9 @@ namespace triqs_ctseg {
 
     /// Maximum order for the perturbation order histograms
     int histogram_max_order = 1000;
+
+    /// Output characteristic configurations in a separate file
+    bool visualize_config = false;
   };
 
   /// A struct combining both constr_params_t and solve_params_t

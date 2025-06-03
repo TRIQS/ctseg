@@ -117,6 +117,10 @@ namespace triqs_ctseg {
         }
         mu(c1) += real(Kprime.data()(0, c1, c1));
       }
+      if (c.rank() == 0) {
+        spdlog::info("\n Renormalized interaction matrix: U = {} \n", U);
+        spdlog::info("Renormalized orbital energies: mu - eps = {} \n", mu);
+      }
     }
 
     // Jperp interactions

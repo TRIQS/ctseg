@@ -118,6 +118,7 @@ namespace triqs_ctseg {
     if (p.measure_state_hist) CTQMC.add_measure(measures::state_hist{p, wdata, config, results}, "State histograms");
     if (p.measure_g3w || p.measure_f3w) 
       CTQMC.add_measure(measures::four_point{p, wdata, config, results}, "Four-point correlation function");
+    if (p.visualize_config) CTQMC.add_measure(measures::visualize_config{config}, "Visualizing configurations");
 
     // Run and collect results
     CTQMC.warmup_and_accumulate(p.n_warmup_cycles, p.n_cycles, p.length_cycle,

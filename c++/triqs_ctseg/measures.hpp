@@ -15,3 +15,4 @@
 #include "./measures/pert_order.hpp"
 #include "./measures/state_hist.hpp"
 #include "./measures/four_point.hpp"
+#include "./measures/visualize_config.hpp"
