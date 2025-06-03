@@ -119,6 +119,26 @@ accumulation is accessible through the ``results.nn_tau`` attribute of the solve
 ``Block2Gf``. For example, the correlation function in the first color of the spin up block is accessed as 
 ``results.nn_tau["up", "up"][0, 0]``. 
 
+Two-particle (four-point) correlation function
+**********************************************
+
+The two-particle (four-point) correlation function is defined as
+
+.. math::
+
+    G^{AB}_{ij}(i\omega_l, i\nu_m, i\nu'_n) = \langle c_{Ai}(i\nu_m)
+    c^\dagger_{Ai}(i\nu_m+i\omega_l) c_{Bj}(i\nu'_n+i\omega_l)
+    c^\dagger_{Bj}(i\nu'_n) \rangle
+
+where :math:`A, B` are block indices and :math:`i, j` are inner indices within the block. 
+:math:`i\omega_l` are bosonic Matsubara frequencies, 
+whose number of points is set by ``n_w_b_vertex`` in the ``solve_params`` (which defaults to 10); 
+:math:`i\nu_m, i\nu'_n` are fermionic Matsubara frequencies, 
+whose number of points is set by ``n_w_f_vertex`` in the ``solve_params`` (which defaults to 10). 
+
+This measurement is turned on by setting ``measure_g3w`` in the ``solve_params`` to ``True``. 
+The result of the accumulation is accessible through the ``results.g3w`` attribute of the solver object, as a ``Block2Gf``. 
+
 Perpendicular spin-spin correlation function
 ********************************************
 
