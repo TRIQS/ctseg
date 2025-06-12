@@ -55,21 +55,22 @@ namespace triqs_ctseg::measures {
 
     /// Measure the four-point correlation function
     /**
-    *The four-point correlation function is defined as:
-    *
-    *$$\chi^{\sigma\sigma'}_{abcd}(i\omega, i\omega',i\Omega) = G^{2,\sigma,
-    *\sigma'}_{abcd}(i\omega, i\omega',i\Omega) = \langle c_{a\sigma}(i\omega)
-    *c^\dagger_{b\sigma}(i\omega+i\Omega) c_{c\sigma'}(i\omega'+i\Omega)
-    *c^\dagger_{d\sigma'}(i\omega') \rangle$$
-    *
+    * The four-point correlation function is defined as:
+    
+    $$\chi^{\sigma\sigma'}_{abcd}(i\omega, i\omega',i\Omega) = G^{2,\sigma,
+    \sigma'}_{abcd}(i\omega, i\omega',i\Omega) = \langle c_{a\sigma}(i\omega)
+    c^\dagger_{b\sigma}(i\omega+i\Omega) c_{c\sigma'}(i\omega'+i\Omega)
+    c^\dagger_{d\sigma'}(i\omega') \rangle$$
+    
     * Its improved estimator is the Fourier transform of
-    *
-    *$$F^{3,\sigma\sigma'}_{abcd}(\tau,\tau',\tau'') = \int \mathrm{d}\bar{\tau}
-    *\sum_{e\bar{\sigma}} \mathcal{U}^{\sigma\bar{\sigma}}_{ae}(\bar{\tau}-\tau)
-    *\langle c_{a\sigma}(\tau) c^\dagger_{b\sigma}(\tau') c_{c\sigma'}(\tau'')
-    *c^\dagger_{d\sigma'}(0) \rangle$$
-    *
-    * The vertex corresponding to this correlation function is evaluated separately.
+    
+    $$F^{3,\sigma\sigma'}_{abcd}(\tau,\tau',\tau'') = \int \mathrm{d}\bar{\tau}
+    \sum_{e\bar{\sigma}} \mathcal{U}^{\sigma\bar{\sigma}}_{ae}(\bar{\tau}-\tau)
+    \langle c_{a\sigma}(\tau) c^\dagger_{b\sigma}(\tau') c_{c\sigma'}(\tau'')
+    c^\dagger_{d\sigma'}(0) \rangle$$
+    
+    * The number of fermionic (bosonic) frequencies is specified through the
+    parameters ``n_w_f_vertex`` (``n_w_b_vertex``).
     */
 
     Z += s;
@@ -183,7 +184,8 @@ namespace triqs_ctseg::measures {
 
   double four_point::fprefactor(long const &block, std::pair<tau_t, long> const &y) {
 
-    // Copied from G_F_tau.cpp
+    // This function appears in G_F_tau.cpp, four_point.cpp and three_point.cpp
+    // If furtherly used, consider to put it in a separate file
     int color    = wdata.block_to_color(block, y.second);
     double I_tau = 0;
     for (auto const &[c, sl] : itertools::enumerate(config.seglists)) {

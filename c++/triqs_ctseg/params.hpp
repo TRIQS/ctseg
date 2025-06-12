@@ -140,6 +140,12 @@ namespace triqs_ctseg {
     /// Whether to measure state histograms (see measures/state_hist)
     bool measure_state_hist = false;
 
+    /// Whether to measure three-point correlation function (see measures/three_point)
+    bool measure_g2w = false;
+
+    /// Whether to measure three-point correlation function improved estimator (see measures/three_point)
+    bool measure_f2w = false;
+
     /// Whether to measure four-point correlation function (see measures/four_point)
     bool measure_g3w = false;
 

@@ -13,15 +13,19 @@ namespace triqs_ctseg::measures {
 
   struct visualize_config {
 
-    mpi::communicator c;
+    mpi::communicator _c;
 
     configuration_t const &config;
+
+    double Z = 0;
 
     visualize_config(configuration_t const &config): config{config} {};
 
     void accumulate(double s) {
 
-      if (c.rank() == 0) {
+      Z += s;
+
+      if (_c.rank() == 0) {
 
         std::ofstream outFile("configuration.txt", std::ios::app);
 
@@ -33,7 +37,11 @@ namespace triqs_ctseg::measures {
 
     }
 
-    void collect_results(mpi::communicator const &c) {}
+    void collect_results(mpi::communicator const &c) {
+
+      Z = mpi::all_reduce(Z, c);
+
+    }
 
   };
 
