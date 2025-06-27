@@ -45,7 +45,7 @@ provided by measuring the improved estimator
 
 .. math::
 
-    F_{ij}^A (\tau) = \langle T_{\tau} c_{iA}(\tau) c_{jA}^{\dagger}(0) I_i^{A}(\tau). 
+    F_{ij}^A (\tau) = \langle T_{\tau} c_{iA}(\tau) c_{jA}^{\dagger}(0) I_i^{A}(\tau) \rangle.
 
 In the absence of :math:`\mathcal{J}_{\perp}` interactions, 
 
