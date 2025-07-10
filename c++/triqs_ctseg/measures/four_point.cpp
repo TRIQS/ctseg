@@ -213,6 +213,8 @@ namespace triqs_ctseg::measures {
     std::vector<array<dcomplex, 4>> Mw(wdata.gf_struct.size());
     int n_w_aux = n_w_fermionic + n_w_bosonic - 1;
     mesh_imfreq aux_mesh = mesh(beta, n_w_aux, Fermion);
+    auto w0 = aux_mesh[0].value
+    auto dw = aux_mesh[1].value - aux_mesh[0].value
 
     for (auto const &[bl, bl_info] : itertools::enumerate(wdata.gf_struct)) {
       auto const &[bl_name, bl_size] = bl_info;
@@ -227,10 +229,18 @@ namespace triqs_ctseg::measures {
         for (long j : range(N)) {
           auto [tau_j, b] = det.get_y(j);
           auto Mij = det.inverse_matrix(i, j);
+          auto exp_i = std::exp(w0 * tau_i);
+          auto exp_i_dw = std::exp(dw * tau_i);
+          auto exp_j0 = std::exp(w0 * tau_j);
+          auto exp_j_dw = std::exp(dw * tau_j);
+          auto exp_j = exp_j0; 
           for (int n : range(aux_mesh.size())) {
+            exp_j = exp_j0;
             for (int m : range(aux_mesh.size())) {
-              Mw[bl](a, b, n, m) += Mij * std::exp(aux_mesh[n].value * double(tau_i) + aux_mesh[m].value * double(tau_j));
+              Mw[bl](a, b, n, m) += Mij * exp_i * exp_j;
+              exp_j = exp_j * exp_j_dw;
             }
+            exp_i = exp_i * exp_i_dw;
           }
         }
       }
