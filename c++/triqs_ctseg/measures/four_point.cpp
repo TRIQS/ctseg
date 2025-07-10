@@ -206,63 +206,36 @@ namespace triqs_ctseg::measures {
 
   // -------------------------------------
 
-  std::vector<array<dcomplex, 4>> four_point::compute_Mw(bool is_nMw) {
+  std::vector<array<dcomplex, 4>> four_point::compute_Mw() {
 
-    int n_w_aux = 2 * (n_w_fermionic + n_w_bosonic - 1) > 0 ? 2 * (n_w_fermionic + n_w_bosonic - 1) : 0;
-    std::vector<array<dcomplex, 4>> result;
-    result.resize(wdata.gf_struct.size());
+    // Mw(a, b, c ,d) = < c^dagger_a (nu[c]) c_b (nu[d]) >
 
-    for (auto const &[bl, bl_pair] : itertools::enumerate(wdata.gf_struct)) {
-      auto const &[bl_name, bl_size] = bl_pair;
-      result[bl].resize(make_shape(bl_size, bl_size, n_w_aux, n_w_aux));
-      result[bl]() = 0;
+    std::vector<array<dcomplex, 4>> Mw(wdata.gf_struct.size());
+    int n_w_aux = n_w_fermionic + n_w_bosonic - 1;
+    mesh_imfreq aux_mesh = mesh(beta, n_w_aux, Fermion);
+
+    for (auto const &[bl, bl_info] : itertools::enumerate(wdata.gf_struct)) {
+      auto const &[bl_name, bl_size] = bl_info;
+      Mw[bl].resize(make_shape(bl_size, bl_size, n_w_aux, n_w_aux));
+      Mw[bl]() = 0;
     }
 
     for (auto const &[bl, det] : itertools::enumerate(wdata.dets)) {
       long N = det.size();
-      y_exp_ini.resize(N);
-      y_exp_inc.resize(N);
-      x_exp_ini.resize(N);
-      x_exp_inc.resize(N);
-      y_inner_index.resize(N);
-      x_inner_index.resize(N);
-
-      for (long id : range(N)) {
-        auto y = det.get_y(id);
-        auto x = det.get_x(id);
-        y_exp_ini(id) = std::exp(dcomplex(0, w_ini * double(std::get<0>(y))));
-        y_exp_inc(id) = std::exp(dcomplex(0, w_inc * double(std::get<0>(y))));
-        x_exp_ini(id) = std::exp(dcomplex(0, -w_ini * double(std::get<0>(x))));
-        x_exp_inc(id) = std::exp(dcomplex(0, -w_inc * double(std::get<0>(x))));
-        y_inner_index(id) = std::get<1>(y);
-        x_inner_index(id) = std::get<1>(x);
-      }
-
-      for (long id_y : range(N)) {
-        auto y = det.get_y(id_y);
-        int yj = y_inner_index(id_y);
-        double f_fact = is_nMw ? fprefactor(bl, y) : 1.0;
-
-        for (long id_x : range(N)) {
-          int xi = x_inner_index(id_x);
-          dcomplex y_exp = y_exp_ini(id_y);
-          dcomplex x_exp = x_exp_ini(id_x);
-          auto Minv = det.inverse_matrix(id_y, id_x);
-
-          for (int n_1 : range(n_w_aux)) {
-            for (int n_2 : range(n_w_aux)) {
-              auto val = Minv * y_exp * x_exp;
-              result[bl](yj, xi, n_1, n_2) += val * f_fact;
-              x_exp *= x_exp_inc(id_x);
+      for (long i : range(N)) {
+        auto [tau_i, a] = det.get_x(i);
+        for (long j : range(N)) {
+          auto [tau_j, b] = det.get_y(j);
+          auto Mij = det.inverse_matrix(i, j);
+          for (int n : range(aux_mesh.size())) {
+            for (int m : range(aux_mesh.size())) {
+              Mw[bl](a, b, n, m) += Mij * std::exp(aux_mesh[n].value * double(tau_i) + aux_mesh[m].value * double(tau_j));
             }
-            x_exp = x_exp_ini(id_x);
-            y_exp *= y_exp_inc(id_y);
           }
         }
       }
     }
-    return result;
-
+    return Mw;
   }
 
 } // namespace triqs_ctseg::measures
