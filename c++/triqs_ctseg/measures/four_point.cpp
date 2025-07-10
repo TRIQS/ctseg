@@ -236,8 +236,9 @@ namespace triqs_ctseg::measures {
           auto exp_j = exp_j0; 
           for (int n : range(aux_mesh.size())) {
             exp_j = exp_j0;
+            auto expMij = exp_i * Mij; 
             for (int m : range(aux_mesh.size())) {
-              Mw[bl](a, b, n, m) += Mij * exp_i * exp_j;
+              Mw[bl](a, b, n, m) += expMij * exp_j;
               exp_j = exp_j * exp_j_dw;
             }
             exp_i = exp_i * exp_i_dw;
