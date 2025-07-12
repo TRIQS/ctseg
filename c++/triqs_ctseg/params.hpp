@@ -149,9 +149,6 @@ namespace triqs_ctseg {
     /// Whether to measure four-point correlation function (see measures/four_point)
     bool measure_g3w = false;
 
-    /// Whether to measure four-point correlation function improved estimator (see measures/four_point)
-    bool measure_f3w = false;
-
     // -------- Misc parameters --------------
 
     /// The maximum size of the determinant matrix before a resize

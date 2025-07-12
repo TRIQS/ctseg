@@ -58,9 +58,6 @@ namespace triqs_ctseg {
     /// Four-point correlation function
     std::optional<block2_gf<prod<imfreq, imfreq, imfreq>, tensor_valued<4>>> g3w;
 
-    /// Four-point correlation function improved estimator
-    std::optional<block2_gf<prod<imfreq, imfreq, imfreq>, tensor_valued<4>>> f3w;
-
     /// Average sign
     double average_sign;
   };
