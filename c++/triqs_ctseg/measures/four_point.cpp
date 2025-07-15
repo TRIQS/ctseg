@@ -44,10 +44,10 @@ namespace triqs_ctseg::measures {
     /**
     * The four-point correlation function is defined as:
     
-    $$\chi^{\sigma\sigma'}_{abcd}(i\omega, i\omega',i\Omega) = G^{2,\sigma,
-    \sigma'}_{abcd}(i\omega, i\omega',i\Omega) = \langle c_{a\sigma}(i\omega)
-    c^\dagger_{b\sigma}(i\omega+i\Omega) c_{c\sigma'}(i\omega'+i\Omega)
-    c^\dagger_{d\sigma'}(i\omega') \rangle$$
+    $$g_{abcd}^{(4)\,ph}(\omega, \nu, \nu') = \frac{1}{\beta} \int_0^\beta d\tau_2\, d\tau_3\, d\tau_4\, 
+    \exp\left[i\omega(\tau_2 - \tau_3) + i\nu(\tau_2 - \tau_1) + i\nu'(\tau_4 - \tau_3)\right] \left\langle c_a^\dagger(\tau_1) c_b(\tau_2) c_c^\dagger(\tau_3) c_d(\tau_4) \right\rangle
+    = \left\langle c_a^\dagger(-nu) c_b(nu + omega) c_c^\dagger(-nu' - omega) c_d(nu') \right\rangle
+    $$
     
     * The number of fermionic (bosonic) frequencies is specified through the
     parameters ``n_w_f_vertex`` (``n_w_b_vertex``).
@@ -56,21 +56,20 @@ namespace triqs_ctseg::measures {
     Z += s;
 
     auto Mw = compute_Mw();
+    auto const &nb_blocks = wdata.gf_struct.size();
 
-    for (auto const &b1 : range(wdata.gf_struct.size())) {
-      for (auto const &b2 : range(wdata.gf_struct.size())) {
-        for (auto const &a : range(g3w[b1][b2].target_shape()[0])) {
-          for (auto const &b : range(g3w[b1][b2].target_shape()[1])) {
-            for (auto const &c : range(g3w[b1][b2].target_shape()[2])) {
-              for (auto const &d : range(g3w[b1][b2].target_shape()[3])) {
-                for (auto const &n1 : mesh_fermionic) {
-                  for (auto const &n4 : mesh_fermionic) {
-                    for (auto const &m : mesh_bosonic) {
-                      auto n2 = n1 + m;
-                      auto n3 = n4 + m;
-                      g3w[b1][b2][m, n1, n4](a, b, c, d) += s * 
-                      Mw[b1](a, b, n1.n + n_w_fermionic + n_w_bosonic - 1, n2.n + n_w_fermionic + n_w_bosonic - 1) * 
-                      Mw[b2](c, d, n3.n + n_w_fermionic + n_w_bosonic - 1, n4.n + n_w_fermionic + n_w_bosonic - 1);
+    for (auto const &b1 : range(nb_blocks)) {
+      for (auto const &b2 : range(nb_blocks)) {
+        auto const &block_shape = g3w[b1][b2].target_shape()
+        for (auto const &a : range(block_shape[0])) {
+          for (auto const &b : range(block_shape[1])) {
+            for (auto const &c : range(block_shape[2])) {
+              for (auto const &d : range(block_shape[3])) {
+                for (auto const &nu1 : mesh_fermionic) {
+                  for (auto const &nu2 : mesh_fermionic) {
+                    for (auto const &w : mesh_bosonic) {
+                      g3w[b1][b2][w, nu1, nu2](a, b, c, d) += s * 
+                      Mw[b1][-nu1, nu1 + w](a, b) * Mw[b2][-nu2 - omega, nu2](c, d);
                     } // m
                   } // n4
                 } // n1
@@ -102,21 +101,17 @@ namespace triqs_ctseg::measures {
 
   // -------------------------------------
 
-  std::vector<array<dcomplex, 4>> four_point::compute_Mw() {
+  block_gf<prod<imfreq, imfreq>> four_point::compute_Mw() {
 
-    // Mw(a, b, c ,d) = < c^dagger_a (nu[c]) c_b (nu[d]) >
-
-    std::vector<array<dcomplex, 4>> Mw(wdata.gf_struct.size());
+    // Mw[bl][nu1, nu2](a, b) = < c^dagger_{bl,a} (nu1) c_{bl,b} (nu2) >
+    
     int n_w_aux = n_w_fermionic + n_w_bosonic - 1;
     auto aux_mesh = triqs::mesh::imfreq(beta, Fermion, n_w_aux);
+    auto Mw = make_block_gf({aux_mesh, aux_mesh}, wdata.gf_struct);
+    Mw() = 0;
+
     auto w0 = aux_mesh[0].value();
     auto dw = aux_mesh[1].value() - aux_mesh[0].value();
-
-    for (auto const &[bl, bl_info] : itertools::enumerate(wdata.gf_struct)) {
-      auto const &[bl_name, bl_size] = bl_info;
-      Mw[bl].resize(make_shape(bl_size, bl_size, n_w_aux, n_w_aux));
-      Mw[bl]() = 0;
-    }
 
     for (auto const &[bl, det] : itertools::enumerate(wdata.dets)) {
       long N = det.size();
@@ -130,11 +125,11 @@ namespace triqs_ctseg::measures {
           auto exp_j0 = std::exp(w0 * double(tau_j));
           auto exp_j_dw = std::exp(dw * double(tau_j));
           auto exp_j = exp_j0; 
-          for (int n : range(aux_mesh.size())) {
+          for (auto const &nu1 : aux_mesh) {
             exp_j = exp_j0;
             auto expMij = exp_i * Mij; 
-            for (int m : range(aux_mesh.size())) {
-              Mw[bl](a, b, n, m) += expMij * exp_j;
+            for (auto const &nu2 : aux_mesh) {
+              Mw[bl][nu1, nu2](a, b) += expMij * exp_j;
               exp_j = exp_j * exp_j_dw;
             }
             exp_i = exp_i * exp_i_dw;

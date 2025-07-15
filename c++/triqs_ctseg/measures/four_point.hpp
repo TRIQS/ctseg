@@ -31,7 +31,7 @@ namespace triqs_ctseg::measures {
     void accumulate(double s);
     void collect_results(mpi::communicator const &c);
     
-    std::vector<array<dcomplex, 4>> compute_Mw();
+    block_gf<prod<imfreq, imfreq>> compute_Mw();
 
   };
 
