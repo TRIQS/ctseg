@@ -50,10 +50,7 @@ namespace triqs_ctseg {
     std::optional<nda::vector<double>> state_hist;
 
     /// Three-point correlation function
-    std::optional<block2_gf<prod<imfreq, imfreq>, tensor_valued<3>>> g2w;
-
-    /// Three-point correlation function improved estimator
-    std::optional<block2_gf<prod<imfreq, imfreq>, tensor_valued<3>>> f2w;
+    std::optional<block2_gf<prod<imfreq, imfreq>, tensor_valued<4>>> g2w;
 
     /// Four-point correlation function
     std::optional<block2_gf<prod<imfreq, imfreq, imfreq>, tensor_valued<4>>> g3w;

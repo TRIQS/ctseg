@@ -98,14 +98,9 @@ c.add_member(c_name = "state_hist",
              doc = r"""State histogram""")
 
 c.add_member(c_name = "g2w",
-             c_type = "std::optional<block2_gf<prod<imfreq, imfreq>, tensor_valued<3>>>",
+             c_type = "std::optional<block2_gf<prod<imfreq, imfreq>, tensor_valued<4>>>",
              read_only= True,
              doc = r"""Three-point correlation function""")
-
-c.add_member(c_name = "f2w",
-             c_type = "std::optional<block2_gf<prod<imfreq, imfreq>, tensor_valued<3>>>",
-             read_only= True,
-             doc = r"""Three-point correlation function improved estimator""")
 
 c.add_member(c_name = "g3w",
              c_type = "std::optional<block2_gf<prod<imfreq, imfreq, imfreq>, tensor_valued<4>>>",
@@ -239,9 +234,7 @@ c.add_method("""void solve (**solve_params_t)""",
 +-------------------------------+--------------------------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
 | measure_state_hist            | bool                                 | false                                   | Whether to measure state histograms (see measures/state_hist)                                                     |
 +-------------------------------+--------------------------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
-| measure_g2w                   | bool                                 | false                                   | Whether to measure three-point correlation function (see measures/three_point)                                    |
-+-------------------------------+--------------------------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
-| measure_f2w                   | bool                                 | false                                   | Whether to measure three-point correlation function improved estimator (see measures/three_point)                 |
+| measure_g2w                   | bool                                 | false                                   | Whether to measure three-point correlation function (see measures/four_point)                                     |
 +-------------------------------+--------------------------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
 | measure_g3w                   | bool                                 | false                                   | Whether to measure four-point correlation function (see measures/four_point)                                      |
 +-------------------------------+--------------------------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
@@ -454,12 +447,7 @@ c.add_member(c_name = "measure_state_hist",
 c.add_member(c_name = "measure_g2w",
              c_type = "bool",
              initializer = """ false """,
-             doc = r"""Whether to measure three-point correlation function (see measures/three_point)""")
-
-c.add_member(c_name = "measure_f2w",
-             c_type = "bool",
-             initializer = """ false """,
-             doc = r"""Whether to measure three-point correlation function improved estimator (see measures/three_point)""")
+             doc = r"""Whether to measure three-point correlation function (see measures/four_point)""")
 
 c.add_member(c_name = "measure_g3w",
              c_type = "bool",

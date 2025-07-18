@@ -17,9 +17,13 @@ namespace triqs_ctseg::measures {
     configuration_t const &config;
     results_t &results;
     double beta;
+    bool measure_g2w, measure_g3w;
     int n_w_bosonic, n_w_fermionic;
     triqs::mesh::imfreq mesh_bosonic, mesh_fermionic;
     std::vector<std::string> block_names;
+
+    std::vector<std::vector<gf<prod<imfreq, imfreq>, tensor_valued<4>>>> g2w;
+    block2_gf<prod<imfreq, imfreq>, tensor_valued<4>> g2w_block;
 
     std::vector<std::vector<gf<prod<imfreq, imfreq, imfreq>, tensor_valued<4>>>> g3w;
     block2_gf<prod<imfreq, imfreq, imfreq>, tensor_valued<4>> g3w_block;
@@ -32,6 +36,7 @@ namespace triqs_ctseg::measures {
     void collect_results(mpi::communicator const &c);
     
     block_gf<prod<imfreq, imfreq>> compute_Mw();
+    std::vector<gf<imfreq, scalar_valued>> compute_nw();
 
   };
 
