@@ -16,9 +16,10 @@ extensions = ['sphinx.ext.autodoc',
               'sphinx.ext.viewcode',
               'sphinx.ext.autosummary',
               'sphinx.ext.githubpages',
-              'sphinx_autorun',
+              'nbsphinx',
               'myst_parser',
-              'matplotlib.sphinxext.plot_directive']
+              'matplotlib.sphinxext.plot_directive',
+              'numpydoc']
 
 myst_enable_extensions = [
     "amsmath",
