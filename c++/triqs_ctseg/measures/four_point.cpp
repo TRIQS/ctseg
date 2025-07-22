@@ -81,7 +81,7 @@ namespace triqs_ctseg::measures {
               for (auto const &b : range(block_shape[1])) {
                 for (auto const &w : mesh_bosonic) {
                   for (auto const &nu1 : mesh_fermionic) {
-                    g2w[b1][b2][w, nu1](a, b, c, c) -= s * Mw[b1][-nu1 - w, nu1.value()](a, b) * nw[col][w];
+                    g2w[b1][b2][w, nu1](a, b, c, c) -= s * Mw[b1][-nu1, nu1 + w](a, b) * nw[col][-w];
                   } // nu1
                 } // w
               } // b

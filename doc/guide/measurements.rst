@@ -122,15 +122,19 @@ accumulation is accessible through the ``results.nn_tau`` attribute of the solve
 Two-particle (four-point) correlation function
 **********************************************
 
-The two-particle (four-point) correlation function is defined as
+The two-particle (four-point) correlation function in the particle-hole channel is defined as
 
 .. math::
 
-    G^{AB}_{ij}(i\omega_l, i\nu_m, i\nu'_n) = \langle c_{Ai}(i\nu_m)
-    c^\dagger_{Ai}(i\nu_m+i\omega_l) c_{Bj}(i\nu'_n+i\omega_l)
-    c^\dagger_{Bj}(i\nu'_n) \rangle
+    \begin{split}
+    g^{(4)AB}_{hijk}(i\omega_l, i\nu_m, i\nu'_n) &= \frac{1}{\beta}\iiiint d\tau_1 d\tau_2 d\tau_3 d\tau_4
+    e^{i\omega_l(\tau_2-\tau_3)} e^{i\nu_m(\tau_2-\tau_1)} e^{i\nu'_n(\tau_4-\tau_3)} 
+    \langle c^\dagger_h(\tau_1) c_i(\tau_2) c^\dagger_j(\tau_3) c_k(\tau_4) \rangle \\
+    &= \langle c_{Ah}(-i\nu_m) c^\dagger_{Ai}(i\nu_m+i\omega_l) 
+    c_{Bj}(-i\nu'_n-i\omega_l) c^\dagger_{Bk}(i\nu'_n) \rangle
+    \end{split}
 
-where :math:`A, B` are block indices and :math:`i, j` are inner indices within the block. 
+where :math:`A, B` are block indices and :math:`h, i, j, k` are inner indices within the block. 
 :math:`i\omega_l` are bosonic Matsubara frequencies, 
 whose number of points is set by ``n_w_b_vertex`` in the ``solve_params`` (which defaults to 10); 
 :math:`i\nu_m, i\nu'_n` are fermionic Matsubara frequencies, 
@@ -138,6 +142,33 @@ whose number of points is set by ``n_w_f_vertex`` in the ``solve_params`` (which
 
 This measurement is turned on by setting ``measure_g3w`` in the ``solve_params`` to ``True``. 
 The result of the accumulation is accessible through the ``results.g3w`` attribute of the solver object, as a ``Block2Gf``. 
+For example, the correlation function in the first color of the spin up block is accessed as 
+``results.g3w["up", "up"][0, 0, 0, 0]``. 
+
+Three-point correlation function
+********************************
+
+The three-point correlation function in the particle-hole channel is the four-point with :math:`\tau_3 = \tau_4`:
+
+.. math::
+
+    \begin{split}
+    g^{(3)AB}_{hijk}(i\omega_l, i\nu_m) &= \iiint d\tau_1 d\tau_2 d\tau_3
+    e^{i\omega_l(\tau_2-\tau_3)} e^{i\nu_m(\tau_2-\tau_1)} 
+    \langle c^\dagger_h(\tau_1) c_i(\tau_2) c^\dagger_j(\tau_3) c_k(\tau_3) \rangle \\
+    &= \langle c_{Ah}(-i\nu_m) c^\dagger_{Ai}(i\nu_m+i\omega_l) n^B_{jk}(-i\omega_l) \rangle
+    \end{split}
+
+where :math:`A, B` are block indices and :math:`h, i, j, k` are inner indices within the block. 
+:math:`i\omega_l` are bosonic Matsubara frequencies, 
+whose number of points is set by ``n_w_b_vertex`` in the ``solve_params`` (which defaults to 10); 
+:math:`i\nu_m` are fermionic Matsubara frequencies, 
+whose number of points is set by ``n_w_f_vertex`` in the ``solve_params`` (which defaults to 10). 
+
+This measurement is turned on by setting ``measure_g2w`` in the ``solve_params`` to ``True``. 
+The result of the accumulation is accessible through the ``results.g2w`` attribute of the solver object, as a ``Block2Gf``. 
+For example, the correlation function in the first color of the spin up block is accessed as 
+``results.g2w["up", "up"][0, 0, 0, 0]``. 
 
 Perpendicular spin-spin correlation function
 ********************************************
