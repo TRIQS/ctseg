@@ -129,9 +129,9 @@ The two-particle (four-point) correlation function in the particle-hole channel 
     \begin{split}
     g^{(4)AB}_{hijk}(i\omega_l, i\nu_m, i\nu'_n) &= \frac{1}{\beta}\iiiint d\tau_1 d\tau_2 d\tau_3 d\tau_4
     e^{i\omega_l(\tau_2-\tau_3)} e^{i\nu_m(\tau_2-\tau_1)} e^{i\nu'_n(\tau_4-\tau_3)} 
-    \langle c^\dagger_h(\tau_1) c_i(\tau_2) c^\dagger_j(\tau_3) c_k(\tau_4) \rangle \\
-    &= \langle c_{Ah}(-i\nu_m) c^\dagger_{Ai}(i\nu_m+i\omega_l) 
-    c_{Bj}(-i\nu'_n-i\omega_l) c^\dagger_{Bk}(i\nu'_n) \rangle
+    \langle c^\dagger_{Ah}(\tau_1) c_{Ai}(\tau_2) c^\dagger_{Bj}(\tau_3) c_{Bk}(\tau_4) \rangle \\
+    &= \langle c^\dagger_{Ah}(-i\nu_m) c_{Ai}(i\nu_m+i\omega_l) 
+    c^\dagger_{Bj}(-i\nu'_n-i\omega_l) c_{Bk}(i\nu'_n) \rangle
     \end{split}
 
 where :math:`A, B` are block indices and :math:`h, i, j, k` are inner indices within the block. 
@@ -155,8 +155,8 @@ The three-point correlation function in the particle-hole channel is the four-po
     \begin{split}
     g^{(3)AB}_{hijk}(i\omega_l, i\nu_m) &= \iiint d\tau_1 d\tau_2 d\tau_3
     e^{i\omega_l(\tau_2-\tau_3)} e^{i\nu_m(\tau_2-\tau_1)} 
-    \langle c^\dagger_h(\tau_1) c_i(\tau_2) c^\dagger_j(\tau_3) c_k(\tau_3) \rangle \\
-    &= \langle c_{Ah}(-i\nu_m) c^\dagger_{Ai}(i\nu_m+i\omega_l) n^B_{jk}(-i\omega_l) \rangle
+    \langle c^\dagger_{Ah}(\tau_1) c_{Ai}(\tau_2) c^\dagger_{Bj}(\tau_3) c_{Bk}(\tau_3) \rangle \\
+    &= - \langle c^\dagger_{Ah}(-i\nu_m) c_{Ai}(i\nu_m+i\omega_l) n^B_{jk}(-i\omega_l) \rangle
     \end{split}
 
 where :math:`A, B` are block indices and :math:`h, i, j, k` are inner indices within the block. 
