@@ -209,10 +209,7 @@ namespace triqs_ctseg::measures {
         double tau_cdag = double(s.tau_cdag);
 
         // Zero frequency: Add up the all the segment length
-        if (!is_cyclic(s))
-          nw[c][0] += tau_c - tau_cdag;
-        else
-          nw[c][0] += beta - tau_cdag + tau_c;
+        nw[c][0] += double(s.length());
 
         // Compute remaining frequencies
         for (auto const &w : mesh_bosonic) {
