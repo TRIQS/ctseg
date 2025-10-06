@@ -13,5 +13,4 @@ CMakeFiles
 .gitignore
 test/local_test
 *.pyc
-
-
+.claude
