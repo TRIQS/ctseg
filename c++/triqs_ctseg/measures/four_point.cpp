@@ -202,6 +202,7 @@ namespace triqs_ctseg::measures {
     for (auto const &c : range(wdata.n_color)) {
       nw[c] = gf<imfreq, scalar_valued>(mesh_bosonic);
       nw[c]() = 0;
+      nw[c][0] = -beta;
 
       for (auto const &s: config.seglists[c]) {
 
