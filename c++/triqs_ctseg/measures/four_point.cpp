@@ -50,15 +50,26 @@ namespace triqs_ctseg::measures {
 
   void four_point::accumulate(double s) {
 
-    LOG("\n ============ MEASURE FOUR-POINT CORRELATION FUNCTION  ============ \n");
+    LOG("\n ============ MEASURE FOUR-POINT CORRELATION FUNCTIONS  ============ \n");
 
     /// Measure the four-point correlation function
     /**
-    * The four-point correlation function is defined as:
+    * The four-point correlation functions are:
     
-    $$g_{abcd}^{(4)\,ph}(\omega, \nu, \nu') = \frac{1}{\beta} \int_0^\beta d\tau_2\, d\tau_3\, d\tau_4\, 
-    \exp\left[i\omega(\tau_2 - \tau_3) + i\nu(\tau_2 - \tau_1) + i\nu'(\tau_4 - \tau_3)\right] \left\langle c_a^\dagger(\tau_1) c_b(\tau_2) c_c^\dagger(\tau_3) c_d(\tau_4) \right\rangle
-    = \left\langle c_a^\dagger(-nu) c_b(nu + omega) c_c^\dagger(-nu' - omega) c_d(nu') \right\rangle
+    $$g_{abcd}^{(4)\,ph}(\omega, \nu, \nu') = \frac{1}{\beta} \int_0^\beta d\tau_1\, d\tau_2\, d\tau_3\, d\tau_4\, 
+    \exp\left[i\omega(\tau_2 - \tau_3) + i\nu(\tau_2 - \tau_1) + i\nu'(\tau_4 - \tau_3)\right] \left\langle \mathcal{T} c_a^\dagger(\tau_1) c_b(\tau_2) c_c^\dagger(\tau_3) c_d(\tau_4) \right\rangle
+    = \left\langle c_a^\dagger(nu) c_b(nu + omega) c_c^\dagger(nu' + omega) c_d(nu') \right\rangle
+    $$
+
+    $$g_{abcd}^{(3)\,ph}(\omega, \nu) = \int_0^\beta d\tau_1\, d\tau_2\, d\tau_3\, 
+    \exp\left[i\omega(\tau_2 - \tau_3) + i\nu(\tau_2 - \tau_1) \right] \left\langle \mathcal{T} c_a^\dagger(\tau_1) c_b(\tau_2) c_c^\dagger(\tau_3) c_d(\tau_3) \right\rangle
+    = \left\langle c_a^\dagger(nu) c_b(nu + omega) (c_c^\dagger c_d)_{\omega} \right\rangle
+    $$
+
+    We use the convention $\langle \mathcal{T} c^\dagger(\tau) c(\tau) \rangle = G(\tau = 0^+)$, so that the disconnected component is 
+
+    $$
+    g_{abcd}^{(3)\,disc}(\omega, \nu) = \beta G_{ba}(\nu) G_{dc}(\tau = 0^+) \delta_{\omega, 0} - \beta G_{da}{\nu} G{bc}(\nu + \omega)
     $$
     
     * The number of fermionic (bosonic) frequencies is specified through the
@@ -150,7 +161,8 @@ namespace triqs_ctseg::measures {
 
   block_gf<prod<imfreq, imfreq>> four_point::compute_Mw() {
 
-    // Mw[bl][nu1, nu2](a, b) = < c^dagger_{bl,a} (nu1) c_{bl,b} (nu2) >
+    // Mw[bl][nu1, nu2](a, b) = \int d \tau_a \, d \tau_b e^{i(\nu_1 \tau_a + \nu_2 \tau_b)} M[bl](\tau_a, \tau_b)
+    // The time tau_a (tau_b) corresponds to a c_dag (c) operator. 
     
     int n_w_aux = n_w_fermionic + n_w_bosonic - 1;
     auto aux_mesh = triqs::mesh::imfreq(beta, Fermion, n_w_aux);
@@ -166,7 +178,7 @@ namespace triqs_ctseg::measures {
         auto [tau_i, a] = det.get_x(i);
         for (long j : range(N)) {
           auto [tau_j, b] = det.get_y(j);
-          auto Mij = det.inverse_matrix(j, i);
+          auto Mij = det.inverse_matrix(j, i); // The row index is i and the column index is j. 
           auto exp_i = std::exp(w0 * double(tau_i));
           auto exp_i_dw = std::exp(dw * double(tau_i));
           auto exp_j0 = std::exp(w0 * double(tau_j));
@@ -202,14 +214,14 @@ namespace triqs_ctseg::measures {
     for (auto const &c : range(wdata.n_color)) {
       nw[c] = gf<imfreq, scalar_valued>(mesh_bosonic);
       nw[c]() = 0;
-      nw[c][0] = -beta;
+      nw[c][0] = -beta; // Take care of the convention: nw[omega = 0] = density - 1.
 
       for (auto const &s: config.seglists[c]) {
 
         double tau_c = double(s.tau_c);
         double tau_cdag = double(s.tau_cdag);
 
-        // Zero frequency: Add up the all the segment length
+        // Zero frequency: Add up the all the segment lengths
         nw[c][0] += double(s.length());
 
         // Compute remaining frequencies

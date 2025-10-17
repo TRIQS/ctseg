@@ -119,25 +119,23 @@ accumulation is accessible through the ``results.nn_tau`` attribute of the solve
 ``Block2Gf``. For example, the correlation function in the first color of the spin up block is accessed as 
 ``results.nn_tau["up", "up"][0, 0]``. 
 
-Two-particle (four-point) correlation function
-**********************************************
+Two-particle, three-frequency Green's function in the particle-hole channel 
+***************************************************************************
 
-The two-particle (four-point) correlation function in the particle-hole channel is defined as
+The two-particle Green's function in the particle-hole channel is defined as
 
 .. math::
 
     \begin{split}
-    g^{(4)AB}_{hijk}(i\omega_l, i\nu_m, i\nu'_n) &= \frac{1}{\beta}\iiiint d\tau_1 d\tau_2 d\tau_3 d\tau_4
-    e^{i\omega_l(\tau_2-\tau_3)} e^{i\nu_m(\tau_2-\tau_1)} e^{i\nu'_n(\tau_4-\tau_3)} 
-    \langle c^\dagger_{Ah}(\tau_1) c_{Ai}(\tau_2) c^\dagger_{Bj}(\tau_3) c_{Bk}(\tau_4) \rangle \\
-    &= \langle c^\dagger_{Ah}(-i\nu_m) c_{Ai}(i\nu_m+i\omega_l) 
-    c^\dagger_{Bj}(-i\nu'_n-i\omega_l) c_{Bk}(i\nu'_n) \rangle
+    g^{(3)AB}_{abcd}(i\omega, i\nu, i\nu') &= \frac{1}{\beta}\iiiint d\tau_1 d\tau_2 d\tau_3 d\tau_4
+    e^{i\omega(\tau_2-\tau_3)} e^{i\nu(\tau_2-\tau_1)} e^{i\nu'(\tau_4-\tau_3)} 
+    \langle T_{\tau} c^\dagger_{Aa}(\tau_1) c_{Ab}(\tau_2) c^\dagger_{Bc}(\tau_3) c_{Bd}(\tau_4) \rangle \\
     \end{split}
 
-where :math:`A, B` are block indices and :math:`h, i, j, k` are inner indices within the block. 
-:math:`i\omega_l` are bosonic Matsubara frequencies, 
+where :math:`A, B` are block indices and :math:`a, b, c, d` are inner indices within the block. 
+:math:`i\omega` are bosonic Matsubara frequencies, 
 whose number of points is set by ``n_w_b_vertex`` in the ``solve_params`` (which defaults to 10); 
-:math:`i\nu_m, i\nu'_n` are fermionic Matsubara frequencies, 
+:math:`i\nu, i\nu'` are fermionic Matsubara frequencies, 
 whose number of points is set by ``n_w_f_vertex`` in the ``solve_params`` (which defaults to 10). 
 
 This measurement is turned on by setting ``measure_g3w`` in the ``solve_params`` to ``True``. 
@@ -145,21 +143,20 @@ The result of the accumulation is accessible through the ``results.g3w`` attribu
 For example, the correlation function in the first color of the spin up block is accessed as 
 ``results.g3w["up", "up"][0, 0, 0, 0]``. 
 
-Three-point correlation function
-********************************
+Two-particle, two-frequency Green's function in the particle-hole channel 
+*************************************************************************
 
-The three-point correlation function in the particle-hole channel is the four-point with :math:`\tau_3 = \tau_4`:
+It is the two-particle, three-frequency Green's function with :math:`\tau_3 = \tau_4`:
 
 .. math::
 
     \begin{split}
-    g^{(3)AB}_{hijk}(i\omega_l, i\nu_m) &= \iiint d\tau_1 d\tau_2 d\tau_3
-    e^{i\omega_l(\tau_2-\tau_3)} e^{i\nu_m(\tau_2-\tau_1)} 
-    \langle c^\dagger_{Ah}(\tau_1) c_{Ai}(\tau_2) c^\dagger_{Bj}(\tau_3) c_{Bk}(\tau_3) \rangle \\
-    &= - \langle c^\dagger_{Ah}(-i\nu_m) c_{Ai}(i\nu_m+i\omega_l) n^B_{jk}(-i\omega_l) \rangle
+    g^{(2)AB}_{abcd}(i\omega, i\nu) &= \iiint d\tau_1 d\tau_2 d\tau_3
+    e^{i\omega(\tau_2-\tau_3)} e^{i\nu(\tau_2-\tau_1)} 
+    \langle T_{\tau} c^\dagger_{Aa}(\tau_1) c_{Ab}(\tau_2) c^\dagger_{Bc}(\tau_3) c_{Bd}(\tau_3) \rangle \\
     \end{split}
 
-where :math:`A, B` are block indices and :math:`h, i, j, k` are inner indices within the block. 
+where :math:`A, B` are block indices and :math:`a, b, c ,d` are inner indices within the block. 
 :math:`i\omega_l` are bosonic Matsubara frequencies, 
 whose number of points is set by ``n_w_b_vertex`` in the ``solve_params`` (which defaults to 10); 
 :math:`i\nu_m` are fermionic Matsubara frequencies, 
@@ -169,6 +166,16 @@ This measurement is turned on by setting ``measure_g2w`` in the ``solve_params``
 The result of the accumulation is accessible through the ``results.g2w`` attribute of the solver object, as a ``Block2Gf``. 
 For example, the correlation function in the first color of the spin up block is accessed as 
 ``results.g2w["up", "up"][0, 0, 0, 0]``. 
+
+.. warning::
+
+    There is an ambiguity in the above definition for the disconnected component of :math:`g^{(2)}`. We 
+    adopt the convention :math:`g^{(2),~\rm disc}_{abcd}(\omega, \nu) = \beta G_{ba}(\nu) G_{dc}(\tau = 0^+) \delta_{\omega, 0} - \beta G_{da}{\nu} G{bc}(\nu + \omega)`.
+
+.. warning::
+
+    The measurement can only be implemented for :math:`d = c`. The components where :math:`d \neq c` can be obtained as 
+    :math:`g^{(2)}_{abcd}(\omega, \nu) = \sum_{\nu'} e^{i \nu' 0^-} g^{(3)}_{abcd}(\omega, \nu, \nu')`.
 
 Perpendicular spin-spin correlation function
 ********************************************
