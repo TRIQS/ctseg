@@ -119,10 +119,10 @@ accumulation is accessible through the ``results.nn_tau`` attribute of the solve
 ``Block2Gf``. For example, the correlation function in the first color of the spin up block is accessed as 
 ``results.nn_tau["up", "up"][0, 0]``. 
 
-Two-particle, three-frequency Green's function in the particle-hole channel 
-***************************************************************************
+Two-particle, three-frequency Green's function 
+**********************************************
 
-The two-particle Green's function in the particle-hole channel is defined as
+The two-particle, three-frequency Green's function in the particle-hole channel is defined as
 
 .. math::
 
@@ -143,10 +143,10 @@ The result of the accumulation is accessible through the ``results.g3w`` attribu
 For example, the correlation function in the first color of the spin up block is accessed as 
 ``results.g3w["up", "up"][0, 0, 0, 0]``. 
 
-Two-particle, two-frequency Green's function in the particle-hole channel 
-*************************************************************************
+Two-particle, two-frequency Green's function 
+********************************************
 
-It is the two-particle, three-frequency Green's function with :math:`\tau_3 = \tau_4`:
+It is the two-particle, three-frequency Green's function in the particle-hole channel with :math:`\tau_3 = \tau_4`:
 
 .. math::
 
@@ -157,9 +157,9 @@ It is the two-particle, three-frequency Green's function with :math:`\tau_3 = \t
     \end{split}
 
 where :math:`A, B` are block indices and :math:`a, b, c ,d` are inner indices within the block. 
-:math:`i\omega_l` are bosonic Matsubara frequencies, 
+:math:`i\omega` are bosonic Matsubara frequencies, 
 whose number of points is set by ``n_w_b_vertex`` in the ``solve_params`` (which defaults to 10); 
-:math:`i\nu_m` are fermionic Matsubara frequencies, 
+:math:`i\nu` are fermionic Matsubara frequencies, 
 whose number of points is set by ``n_w_f_vertex`` in the ``solve_params`` (which defaults to 10). 
 
 This measurement is turned on by setting ``measure_g2w`` in the ``solve_params`` to ``True``. 
@@ -170,7 +170,7 @@ For example, the correlation function in the first color of the spin up block is
 .. warning::
 
     There is an ambiguity in the above definition for the disconnected component of :math:`g^{(2)}`. We 
-    adopt the convention :math:`g^{(2),~\rm disc}_{abcd}(\omega, \nu) = \beta G_{ba}(\nu) G_{dc}(\tau = 0^+) \delta_{\omega, 0} - \beta G_{da}{\nu} G{bc}(\nu + \omega)`.
+    adopt the convention :math:`g^{(2),~\rm disc}_{abcd}(\omega, \nu) = \beta G_{ba}(\nu) G_{dc}(\tau = 0^+) \delta_{\omega, 0} - \beta G_{da}(\nu) G_{bc}(\nu + \omega)`.
 
 .. warning::
 
