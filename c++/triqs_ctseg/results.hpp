@@ -25,6 +25,9 @@ namespace triqs_ctseg {
     /// Density-density time correlation function :math:`\langle n_a(\tau) n_b(0) \rangle`.
     std::optional<block2_gf<imtime>> nn_tau;
 
+    /// Density-density frequency correlation function :math:`\langle n_a(i\nu) n_b(-i\nu) \rangle`.
+    std::optional<block2_gf<dlr_imfreq>> nn_nu;
+
     /// Perpendicular spin-spin correlation function :math:`\langle S_x(\tau) S_x(0) \rangle`.
     std::optional<gf<imtime>> Sperp_tau;
 

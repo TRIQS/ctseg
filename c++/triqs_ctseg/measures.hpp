@@ -8,6 +8,7 @@
 
 #include "./measures/G_F_tau.hpp"
 #include "./measures/nn_tau.hpp"
+#include "./measures/nn_nu.hpp"
 #include "./measures/Sperp_tau.hpp"
 #include "./measures/nn_static.hpp"
 #include "./measures/densities.hpp"

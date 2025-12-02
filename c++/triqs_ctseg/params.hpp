@@ -46,6 +46,12 @@ namespace triqs_ctseg {
     /// Number of points on which to measure 2-point functions (defaults to n_tau_bosonic)
     int n_tau_chi2 = 0;
 
+    /// dlr frequency cutoff  FIXME : default value or not ?
+    double dlr_omega_max = 100;
+
+    /// dlr precision: FIXME : default value or not ?
+    double dlr_epsilon = 1e-8;
+
     /// Number of bosonic M-frequency points on which to measure vertex functions
     int n_w_b_vertex = 10;
 
@@ -133,6 +139,9 @@ namespace triqs_ctseg {
 
     /// Whether to measure <n(tau)n(0)> (see measures/nn_tau)
     bool measure_nn_tau = false;
+
+    /// Whether to measure <n(nu)n(0)> (see measures/nn_nu)
+    bool measure_nn_nu = false;
 
     /// Whether to measure <S_x(tau)S_x(0)> (see measures/Sperp_tau)
     bool measure_Sperp_tau = false;
