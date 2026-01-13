@@ -188,6 +188,7 @@ namespace triqs_ctseg {
 
     // Take the real part of Delta(tau)
     Delta = map([](gf_const_view<imtime> d) { return real(d); }, inputs.Delta);
+    dets.reserve(Delta.size());
     for (auto const &bl : range(Delta.size())) {
       // Construct the detmanip object for block bl
       dets.emplace_back(Delta_block_adaptor{Delta[bl]}, p.det_init_size);
