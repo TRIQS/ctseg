@@ -21,7 +21,14 @@ User guide
    guide/step_by_step
    guide/moves
    guide/measurements
-   
+
+Tutorials
+---------
+
+.. toctree::
+   :maxdepth: 1
+
+   tutorials/One-boson retarded interaction.ipynb
 
 Python reference manual
 -----------------------
