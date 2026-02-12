@@ -12,6 +12,7 @@
 #include "logs.hpp"
 #include "spdlog/common.h"
 #include "spdlog/spdlog.h"
+#include <fmt/ostream.h>
 
 using namespace triqs::operators::utils;
 
@@ -63,8 +64,8 @@ namespace triqs_ctseg {
 
     // Report
     if (c.rank() == 0) {
-      spdlog::info("\n Interaction matrix: U = {} \n", U);
-      spdlog::info("Orbital energies: mu - eps = {} \n", mu);
+      spdlog::info("\n Interaction matrix: U = {} \n", fmt::streamed(U));
+      spdlog::info("Orbital energies: mu - eps = {} \n", fmt::streamed(mu));
     }
 
     // Dynamical interactions: convert Block2Gf to matrix Gf of size n_colors
@@ -118,8 +119,8 @@ namespace triqs_ctseg {
         mu(c1) += real(Kprime.data()(0, c1, c1));
       }
       if (c.rank() == 0) {
-        spdlog::info("\n Renormalized interaction matrix: U = {} \n", U);
-        spdlog::info("Renormalized orbital energies: mu - eps = {} \n", mu);
+        spdlog::info("\n Renormalized interaction matrix: U = {} \n", fmt::streamed(U));
+        spdlog::info("Renormalized orbital energies: mu - eps = {} \n", fmt::streamed(mu));
       }
     }
 

@@ -6,6 +6,7 @@
 
 #include "densities.hpp"
 #include <itertools/itertools.hpp>
+#include <fmt/ostream.h>
 #include "../logs.hpp"
 
 namespace triqs_ctseg::measures {
@@ -42,7 +43,7 @@ namespace triqs_ctseg::measures {
     }
     if (c.rank() == 0) {
       SPDLOG_INFO("Densities:");
-      for (auto &[bl, dens] : densities) SPDLOG_INFO("  {}: {}", bl, dens);
+      for (auto &[bl, dens] : densities) SPDLOG_INFO("  {}: {}", bl, fmt::streamed(dens));
     }
 
     results.densities = std::move(densities);
