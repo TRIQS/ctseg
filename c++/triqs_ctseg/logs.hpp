@@ -24,9 +24,6 @@ static constexpr bool print_logs = false;
 #include <fmt/ostream.h>
 #include <spdlog/spdlog.h>
 
-#include <nda/nda.hpp>
-template <nda::MemoryArray A> struct fmt::formatter<A> : ostream_formatter {};
-
 // Log messages for dubugging
 #define LOG(...) SPDLOG_DEBUG(__VA_ARGS__)
 
