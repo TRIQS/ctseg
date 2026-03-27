@@ -6,11 +6,14 @@
 
 #pragma once
 #include <vector>
-#include "tau_t.hpp"
+#include <triqs/utility/tau_t.hpp>
+#include <fmt/ostream.h>
 #include "dets.hpp"
 #include "work_data.hpp"
 
 namespace triqs_ctseg {
+
+  using triqs::utility::tau_t;
 
   // The MC configuration and associated functions.
   // NB : all the time ordering are in DECREASING order,
@@ -179,6 +182,8 @@ namespace triqs_ctseg {
   std::ostream &operator<<(std::ostream &out, std::vector<colored_ops_t> const &col);
 
 } // namespace triqs_ctseg
+
+template <> struct fmt::formatter<triqs::utility::tau_t> : ostream_formatter {};
 
 template <> struct fmt::formatter<triqs_ctseg::configuration_t> : ostream_formatter {};
 

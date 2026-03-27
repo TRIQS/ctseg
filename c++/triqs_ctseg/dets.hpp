@@ -8,12 +8,14 @@
 #include <triqs/gfs.hpp>
 #include <triqs/det_manip.hpp>
 
-#include "./tau_t.hpp"
+#include <triqs/utility/tau_t.hpp>
 
 using namespace triqs::gfs;
 using namespace triqs::mesh;
 
 namespace triqs_ctseg {
+
+  using triqs::utility::tau_t;
 
   /// A lambda to adapt Delta(tau) for the call by det_manip.
   struct Delta_block_adaptor {

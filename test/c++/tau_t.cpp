@@ -8,9 +8,9 @@
 
 #include <cmath>
 #include <triqs/test_tools/arrays.hpp>
-#include <triqs_ctseg/tau_t.hpp>
+#include <triqs/utility/tau_t.hpp>
 
-using triqs_ctseg::tau_t;
+using triqs::utility::tau_t;
 
 TEST(tau, basic) {
 
