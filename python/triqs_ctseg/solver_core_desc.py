@@ -77,6 +77,16 @@ c.add_member(c_name = "densities",
              read_only= True,
              doc = r"""Density per color, organized by blocks.""")
 
+c.add_member(c_name = "auto_corr_time",
+             c_type = "double",
+             read_only= True,
+             doc = r"""Auto-correlation time estimated from log-binning analysis.""")
+
+c.add_member(c_name = "densities_errors",
+             c_type = "std::optional<std::map<std::string, nda::array<double, 1>>>",
+             read_only= True,
+             doc = r"""Error bars for densities, organized by blocks.""")
+
 c.add_member(c_name = "pert_order_Delta",
              c_type = "std::optional<std::vector<double>>",
              read_only= True,

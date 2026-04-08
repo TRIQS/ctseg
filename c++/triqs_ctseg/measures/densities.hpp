@@ -8,6 +8,8 @@
 #include "../configuration.hpp"
 #include "../results.hpp"
 #include "../work_data.hpp"
+#include <triqs/stat/log_binning.hpp>
+#include <triqs/stat/lin_binning.hpp>
 
 namespace triqs_ctseg::measures {
 
@@ -17,9 +19,17 @@ namespace triqs_ctseg::measures {
     configuration_t const &config;
     results_t &results;
 
-    nda::array<double, 1> n;
+    bool measure_densities_;
 
+    nda::array<double, 1> n;
     double Z = 0;
+    long N_  = 0;
+
+    // Log-binning for auto-correlation: [0] = perturbation order, [1..n_color] = sign * density
+    std::vector<triqs::stat::log_binning<dcomplex>> log_accs_;
+
+    // Linear binning for density errors (one per block)
+    std::vector<triqs::stat::lin_binning<nda::array<dcomplex, 1>>> dens_bins_;
 
     densities(params_t const &params, work_data_t const &wdata, configuration_t const &config, results_t &results);
 

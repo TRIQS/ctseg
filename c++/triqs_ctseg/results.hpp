@@ -58,6 +58,12 @@ namespace triqs_ctseg {
     /// Four-point correlation function
     std::optional<block2_gf<prod<imfreq, imfreq, imfreq>, tensor_valued<4>>> g3w;
 
+    /// Auto-correlation time
+    double auto_corr_time = 0.0;
+
+    /// Error bars for densities, organized by blocks.
+    std::optional<std::map<std::string, nda::array<double, 1>>> densities_errors;
+
     /// Average sign
     double average_sign;
   };

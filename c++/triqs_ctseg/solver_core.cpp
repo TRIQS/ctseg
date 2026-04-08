@@ -98,7 +98,7 @@ namespace triqs_ctseg {
 
     // Initialize measurements
     if (p.measure_G_tau) CTQMC.add_measure(measures::G_F_tau{p, wdata, config, results}, "G(tau)/F(tau)");
-    if (p.measure_densities) CTQMC.add_measure(measures::densities{p, wdata, config, results}, "Densities");
+    CTQMC.add_measure(measures::densities{p, wdata, config, results}, "Densities");
     if (p.measure_average_sign) CTQMC.add_measure(measures::average_sign{p, wdata, config, results}, "Average Sign");
     if (p.measure_nn_static) CTQMC.add_measure(measures::nn_static{p, wdata, config, results}, "<nn>");
     if (p.measure_nn_tau) CTQMC.add_measure(measures::nn_tau{p, wdata, config, results}, "<n(tau)n(0)>");
