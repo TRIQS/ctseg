@@ -3,7 +3,7 @@ add_library(${PROJECT_NAME}_c ${sources})
 add_library(${PROJECT_NAME}::${PROJECT_NAME}_c ALIAS ${PROJECT_NAME}_c)
 
 # Link against triqs and enable warnings
-target_link_libraries(${PROJECT_NAME}_c PUBLIC triqs PRIVATE $<BUILD_INTERFACE:${PROJECT_NAME}_warnings>)
+target_link_libraries(${PROJECT_NAME}_c PUBLIC triqs PRIVATE $<BUILD_INTERFACE:${PROJECT_NAME}_warnings> $<BUILD_INTERFACE:${PROJECT_NAME}_performance_flags>)
 
 # link against spdlog
 target_link_libraries(${PROJECT_NAME}_c PUBLIC spdlog)
