@@ -21,6 +21,8 @@ namespace triqs_ctseg {
     h5_write(grp, "nn_static", c.nn_static);
     h5_write(grp, "densities", c.densities);
     h5_write(grp, "auto_corr_time", c.auto_corr_time);
+    h5_write(grp, "warmup_cycles_done", c.warmup_cycles_done);
+    h5_write(grp, "length_cycle_used", c.length_cycle_used);
     h5_write(grp, "densities_errors", c.densities_errors);
     h5_write(grp, "pert_order_Delta", c.pert_order_Delta);
     h5_write(grp, "average_order_Delta", c.average_order_Delta);
@@ -46,6 +48,8 @@ namespace triqs_ctseg {
     h5_read(grp, "nn_static", c.nn_static);
     h5_read(grp, "densities", c.densities);
     h5::try_read(grp, "auto_corr_time", c.auto_corr_time);
+    h5::try_read(grp, "warmup_cycles_done", c.warmup_cycles_done);
+    h5::try_read(grp, "length_cycle_used", c.length_cycle_used);
     h5::try_read(grp, "densities_errors", c.densities_errors);
     h5_read(grp, "pert_order_Delta", c.pert_order_Delta);
     h5_read(grp, "average_order_Delta", c.average_order_Delta);

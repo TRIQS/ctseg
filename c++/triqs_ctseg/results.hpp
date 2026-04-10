@@ -61,6 +61,12 @@ namespace triqs_ctseg {
     /// Auto-correlation time
     double auto_corr_time = 0.0;
 
+    /// Number of warmup cycles actually performed
+    int64_t warmup_cycles_done = 0;
+
+    /// The length_cycle value used during accumulation (after auto-determination)
+    int length_cycle_used = 0;
+
     /// Error bars for densities, organized by blocks.
     std::optional<std::map<std::string, nda::array<double, 1>>> densities_errors;
 

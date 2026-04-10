@@ -82,6 +82,16 @@ c.add_member(c_name = "auto_corr_time",
              read_only= True,
              doc = r"""Auto-correlation time estimated from log-binning analysis.""")
 
+c.add_member(c_name = "warmup_cycles_done",
+             c_type = "int64_t",
+             read_only= True,
+             doc = r"""Number of warmup cycles actually performed.""")
+
+c.add_member(c_name = "length_cycle_used",
+             c_type = "int",
+             read_only= True,
+             doc = r"""The length_cycle value used during accumulation (after auto-determination).""")
+
 c.add_member(c_name = "densities_errors",
              c_type = "std::optional<std::map<std::string, nda::array<double, 1>>>",
              read_only= True,
@@ -199,9 +209,15 @@ c.add_method("""void solve (**solve_params_t)""",
 +-------------------------------+--------------------------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
 | n_cycles                      | int                                  | --                                      | Number of QMC cycles                                                                                              |
 +-------------------------------+--------------------------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
-| length_cycle                  | int                                  | 50                                      | Length of a single QMC cycle                                                                                      |
+| length_cycle                  | int                                  | -1                                      | Length of a single QMC cycle (-1: auto)                                                                           |
 +-------------------------------+--------------------------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
-| n_warmup_cycles               | int                                  | 5000                                    | Number of cycles for thermalization                                                                               |
+| max_length_cycle              | int                                  | 5000                                    | Maximum allowed length_cycle when auto-determined                                                                 |
++-------------------------------+--------------------------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
+| target_auto_corr_time         | double                               | 2.0                                     | Target autocorrelation time per cycle (for auto calibration)                                                      |
++-------------------------------+--------------------------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
+| n_warmup_cycles               | int                                  | -1                                      | Number of cycles for thermalization (-1: auto)                                                                    |
++-------------------------------+--------------------------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
+| max_warmup_cycles             | int                                  | 100000                                  | Maximum warmup cycles for automatic warmup                                                                        |
 +-------------------------------+--------------------------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
 | random_seed                   | int                                  | 34788+928374*mpi::communicator().rank() | Seed for random number generator                                                                                  |
 +-------------------------------+--------------------------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
@@ -342,13 +358,28 @@ c.add_member(c_name = "n_cycles",
 
 c.add_member(c_name = "length_cycle",
              c_type = "int",
-             initializer = """ 50 """,
-             doc = r"""Length of a single QMC cycle""")
+             initializer = """ -1 """,
+             doc = r"""Length of a single QMC cycle (-1: automatically determined from autocorrelation time)""")
+
+c.add_member(c_name = "max_length_cycle",
+             c_type = "int",
+             initializer = """ 5000 """,
+             doc = r"""Maximum allowed length_cycle when auto-determined (safety cap)""")
+
+c.add_member(c_name = "target_auto_corr_time",
+             c_type = "double",
+             initializer = """ 2.0 """,
+             doc = r"""Target autocorrelation time in units of length_cycle (used when length_cycle=-1)""")
 
 c.add_member(c_name = "n_warmup_cycles",
              c_type = "int",
-             initializer = """ 5000 """,
-             doc = r"""Number of cycles for thermalization""")
+             initializer = """ -1 """,
+             doc = r"""Number of cycles for thermalization (-1: automatic convergence detection)""")
+
+c.add_member(c_name = "max_warmup_cycles",
+             c_type = "int",
+             initializer = """ 100000 """,
+             doc = r"""Maximum number of warmup cycles when using automatic warmup (safety cap)""")
 
 c.add_member(c_name = "random_seed",
              c_type = "int",

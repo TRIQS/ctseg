@@ -6,6 +6,8 @@
 
 #include <triqs/mc_tools/mc_generic.hpp>
 #include <triqs/utility/callbacks.hpp>
+#include <triqs/stat/log_binning.hpp>
+#include <chrono>
 
 #include "solver_core.hpp"
 #include "work_data.hpp"
@@ -96,6 +98,178 @@ namespace triqs_ctseg {
       if (p.move_swap_spin_lines) CTQMC.add_move(moves::swap_spin_lines{wdata, config, CTQMC.get_rng()}, "spin swap");
     }
 
+    // ========== Phase 1: Warmup ==========
+
+    int warmup_cycle_length = (p.length_cycle >= 0) ? p.length_cycle : 100;
+    bool auto_warmup        = (p.n_warmup_cycles < 0);
+
+    if (auto_warmup) {
+      if (c.rank() == 0) spdlog::info("Warming up (auto) ...");
+      CTQMC.set_verbosity(0);
+
+      // Automatic warmup: run until perturbation order stabilizes
+      double mean_k      = 0.0;
+      double prev_mean_k = 0.0;
+      double sign_sum    = 0.0;
+      int64_t n_acc      = 0;
+      int n_stable       = 0;
+      bool converged     = false;
+      double next_print  = 2.0;
+
+      constexpr int check_interval    = 100;
+      constexpr int min_warmup        = 100;
+      constexpr double rtol           = 0.03;
+      constexpr int n_stable_required = 3;
+
+      auto clock_cb = triqs::utility::clock_callback(p.max_time);
+      auto t0       = std::chrono::steady_clock::now();
+
+      auto after_duty = [&]() {
+        long pert_order = config.Delta_order();
+        if (wdata.has_Jperp) pert_order += config.Jperp_order();
+        double k = static_cast<double>(pert_order);
+        ++n_acc;
+        mean_k += (k - mean_k) / n_acc; // online mean
+        sign_sum += CTQMC.get_sign();
+      };
+
+      auto stop_cb = [&]() -> bool {
+        if (clock_cb()) return true;
+        if (n_acc < min_warmup || n_acc % check_interval != 0) return false;
+
+        // Periodic status print
+        double elapsed = std::chrono::duration<double>(std::chrono::steady_clock::now() - t0).count();
+        if (elapsed > next_print) {
+          next_print = 1.25 * elapsed + 2.0;
+          if (c.rank() == 0)
+            spdlog::info("  mean k = {}, sign = {} ({} cycles)", mean_k, sign_sum / static_cast<double>(n_acc), n_acc);
+        }
+
+        // Compute relative change of running mean
+        double rel_change = std::abs(mean_k - prev_mean_k) / std::max(std::abs(mean_k), 1.0);
+        prev_mean_k       = mean_k;
+
+        if (rel_change < rtol)
+          ++n_stable;
+        else
+          n_stable = 0;
+
+        bool local_converged = (n_stable >= n_stable_required);
+        int global_converged = mpi::all_reduce(static_cast<int>(local_converged), c, MPI_MIN);
+        converged            = (global_converged == 1);
+        return converged;
+      };
+
+      typename decltype(CTQMC)::run_param_t rp;
+      rp.ncycles         = p.max_warmup_cycles;
+      rp.cycle_length    = warmup_cycle_length;
+      rp.stop_callback   = stop_cb;
+      rp.after_cycle_duty = after_duty;
+      rp.comm            = c;
+      rp.enable_measures = false;
+      CTQMC.run(rp);
+
+      if (!converged) {
+        if (c.rank() == 0) spdlog::warn("Warmup did not converge after {} cycles", p.max_warmup_cycles);
+      } else {
+        if (c.rank() == 0) spdlog::info("  mean k = {} -> converged", mean_k);
+      }
+
+      CTQMC.set_verbosity(p.verbosity);
+    } else {
+      if (c.rank() == 0) spdlog::info("Warming up ...");
+      CTQMC.run(p.n_warmup_cycles, warmup_cycle_length, triqs::utility::clock_callback(p.max_time), /* enable_measures */ false, c);
+    }
+    results.warmup_cycles_done = CTQMC.get_current_cycle_number();
+
+    // ========== Phase 2: length_cycle calibration ==========
+
+    int effective_length_cycle = p.length_cycle;
+    bool auto_length_cycle     = (p.length_cycle < 0);
+    if (auto_length_cycle) {
+      if (c.rank() == 0) spdlog::info("Calibrating length_cycle ...");
+      CTQMC.set_verbosity(0);
+
+      // Register densities measure for calibration (gives auto_corr_time including density correlations)
+      CTQMC.add_measure(measures::densities{p, wdata, config, results}, "calibration densities");
+
+      // Log-binning on perturbation order for convergence detection
+      triqs::stat::log_binning<dcomplex> k_acc(dcomplex{0.0}, -1);
+      int64_t calib_count = 0;
+      double prev_tau     = -1.0;
+      int n_stable        = 0;
+      double next_print   = 2.0;
+
+      constexpr int check_interval    = 500;
+      constexpr int min_calib         = 1000;
+      constexpr int max_calib_cycles   = 100000;
+      constexpr double tau_rtol       = 0.1;
+      constexpr int n_stable_required = 3;
+
+      auto clock_cb = triqs::utility::clock_callback(p.max_time);
+      auto t0       = std::chrono::steady_clock::now();
+
+      auto after_duty = [&]() {
+        long pert_order = config.Delta_order();
+        if (wdata.has_Jperp) pert_order += config.Jperp_order();
+        k_acc << dcomplex(double(pert_order));
+        ++calib_count;
+      };
+
+      auto stop_cb = [&]() -> bool {
+        if (clock_cb()) return true;
+        if (calib_count < min_calib || calib_count % check_interval != 0) return false;
+
+        auto [mean, errs, taus, effs] = k_acc.mean_errors_and_taus(c);
+        double tau = taus.empty() ? 0.0 : std::real(taus.back());
+
+        // Periodic status print
+        double elapsed = std::chrono::duration<double>(std::chrono::steady_clock::now() - t0).count();
+        if (elapsed > next_print) {
+          next_print = 1.25 * elapsed + 2.0;
+          if (c.rank() == 0) spdlog::info("  tau_ac = {} ({} cycles)", tau, calib_count);
+        }
+
+        if (prev_tau >= 0) {
+          double rel_change = std::abs(tau - prev_tau) / std::max(tau, 1.0);
+          if (rel_change < tau_rtol)
+            ++n_stable;
+          else
+            n_stable = 0;
+        }
+        prev_tau = tau;
+        return (n_stable >= n_stable_required);
+      };
+
+      typename decltype(CTQMC)::run_param_t rp;
+      rp.ncycles          = max_calib_cycles;
+      rp.cycle_length     = 1;
+      rp.stop_callback    = stop_cb;
+      rp.after_cycle_duty = after_duty;
+      rp.comm             = c;
+      rp.enable_measures  = true;
+      CTQMC.run(rp);
+
+      // Collect results to compute auto_corr_time from the densities measure
+      CTQMC.collect_results(c);
+      double tau_raw = results.auto_corr_time;
+
+      // Set length_cycle so that effective autocorrelation ~ target_auto_corr_time
+      effective_length_cycle = std::max(1, static_cast<int>(std::ceil(tau_raw / p.target_auto_corr_time)));
+      effective_length_cycle = std::min(effective_length_cycle, p.max_length_cycle);
+
+      if (c.rank() == 0) spdlog::info("  tau_ac = {} -> length_cycle = {}", tau_raw, effective_length_cycle);
+
+      // Clean up calibration phase
+      CTQMC.clear_measures();
+      results = results_t{};
+      results.warmup_cycles_done = CTQMC.get_current_cycle_number();
+      CTQMC.set_verbosity(p.verbosity);
+    }
+    results.length_cycle_used = effective_length_cycle;
+
+    // ========== Phase 3: Accumulation ==========
+
     // Initialize measurements
     if (p.measure_G_tau) CTQMC.add_measure(measures::G_F_tau{p, wdata, config, results}, "G(tau)/F(tau)");
     CTQMC.add_measure(measures::densities{p, wdata, config, results}, "Densities");
@@ -117,22 +291,24 @@ namespace triqs_ctseg {
       }
     }
     if (p.measure_state_hist) CTQMC.add_measure(measures::state_hist{p, wdata, config, results}, "State histograms");
-    if (p.measure_g2w || p.measure_g3w) 
+    if (p.measure_g2w || p.measure_g3w)
       CTQMC.add_measure(measures::four_point{p, wdata, config, results}, "Four-point correlation function");
     if (p.visualize_config) CTQMC.add_measure(measures::visualize_config{config}, "Visualizing configurations");
 
-    // Run and collect results
-    CTQMC.warmup_and_accumulate(p.n_warmup_cycles, p.n_cycles, p.length_cycle,
-                                triqs::utility::clock_callback(p.max_time));
+    // Run accumulation and collect results
+    CTQMC.run(p.n_cycles, effective_length_cycle, triqs::utility::clock_callback(p.max_time), /* enable_measures */ true, c);
     CTQMC.collect_results(c);
 
-    // Report sign and average order
+    // Report summary
     if (c.rank() == 0) {
       spdlog::info("Average sign: {}", results.average_sign);
       if (results.average_order_Delta)
         spdlog::info("Average perturbation order in Delta: {:.3f}", results.average_order_Delta.value());
       if (results.average_order_Jperp)
         spdlog::info("Average perturbation order in Jperp: {:.3f}", results.average_order_Jperp.value());
+      spdlog::info("Auto-correlation time: {}", results.auto_corr_time);
+      spdlog::info("Warmup cycles: {}{}", results.warmup_cycles_done, auto_warmup ? " (auto)" : "");
+      spdlog::info("Length cycle: {}{}", results.length_cycle_used, auto_length_cycle ? " (auto)" : "");
     }
 
   } // solve

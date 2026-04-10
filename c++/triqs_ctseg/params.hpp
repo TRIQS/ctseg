@@ -61,11 +61,20 @@ namespace triqs_ctseg {
     /// Number of QMC cycles
     int n_cycles;
 
-    /// Length of a single QMC cycle
-    int length_cycle = 50;
+    /// Length of a single QMC cycle (-1: automatically determined from autocorrelation time)
+    int length_cycle = -1;
 
-    /// Number of cycles for thermalization
-    int n_warmup_cycles = 5000;
+    /// Maximum allowed length_cycle when auto-determined (safety cap)
+    int max_length_cycle = 5000;
+
+    /// Target autocorrelation time in units of length_cycle (used when length_cycle=-1)
+    double target_auto_corr_time = 2.0;
+
+    /// Number of cycles for thermalization (-1: automatic convergence detection)
+    int n_warmup_cycles = -1;
+
+    /// Maximum number of warmup cycles when using automatic warmup (safety cap)
+    int max_warmup_cycles = 100000;
 
     /// Seed for random number generator
     int random_seed = 34788 + 928374 * mpi::communicator().rank();

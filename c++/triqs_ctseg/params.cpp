@@ -46,7 +46,10 @@ namespace triqs_ctseg {
     h5_write(grp, "n_w_f_vertex", c.n_w_f_vertex);
     h5_write(grp, "n_cycles", c.n_cycles);
     h5_write(grp, "length_cycle", c.length_cycle);
+    h5_write(grp, "max_length_cycle", c.max_length_cycle);
+    h5_write(grp, "target_auto_corr_time", c.target_auto_corr_time);
     h5_write(grp, "n_warmup_cycles", c.n_warmup_cycles);
+    h5_write(grp, "max_warmup_cycles", c.max_warmup_cycles);
     h5_write(grp, "random_seed", c.random_seed);
     h5_write(grp, "random_name", c.random_name);
     h5_write(grp, "max_time", c.max_time);
@@ -98,7 +101,10 @@ namespace triqs_ctseg {
     h5_read(grp, "dlr_epsilon", c.dlr_epsilon);
     h5_read(grp, "n_cycles", c.n_cycles);
     h5_read(grp, "length_cycle", c.length_cycle);
+    h5::try_read(grp, "max_length_cycle", c.max_length_cycle);
+    h5::try_read(grp, "target_auto_corr_time", c.target_auto_corr_time);
     h5_read(grp, "n_warmup_cycles", c.n_warmup_cycles);
+    h5::try_read(grp, "max_warmup_cycles", c.max_warmup_cycles);
     h5_read(grp, "random_seed", c.random_seed);
     h5_read(grp, "random_name", c.random_name);
     h5_read(grp, "max_time", c.max_time);
