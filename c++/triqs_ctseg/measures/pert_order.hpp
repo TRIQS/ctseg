@@ -23,6 +23,9 @@ namespace triqs_ctseg::measures {
     /// Reduce and normalize
     void collect_results(mpi::communicator const &c);
 
+    /// Report current running average
+    std::string report() const;
+
     private:
     // Function to get the pert order
     std::function<int()> get_order;
@@ -36,6 +39,9 @@ namespace triqs_ctseg::measures {
 
     // Linear binning for error estimation
     triqs::stat::lin_binning<dcomplex> order_bins_;
+
+    // Running sum for report
+    double order_sum_ = 0.0;
 
     // Accumulation counter
     long N = 0;

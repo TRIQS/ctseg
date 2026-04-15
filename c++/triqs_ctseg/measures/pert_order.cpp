@@ -5,6 +5,7 @@
 // See LICENSE in the root of this distribution for details.
 
 #include "./pert_order.hpp"
+#include <sstream>
 #include "../logs.hpp"
 
 namespace triqs_ctseg::measures {
@@ -23,6 +24,7 @@ namespace triqs_ctseg::measures {
     auto order = get_order();
     while (order >= hist.size()) hist.resize(2 * hist.size());
     hist[order] += 1;
+    order_sum_ += order;
     order_bins_ << dcomplex(double(order));
     ++N;
   }
@@ -47,6 +49,14 @@ namespace triqs_ctseg::measures {
 
     auto [m, err, tau]  = order_bins_.mean_error_and_tau(c);
     average_order_error = std::abs(err);
+  }
+
+  // -------------------------------------
+
+  std::string pert_order::report() const {
+    std::ostringstream os;
+    os << "Average perturbation order: " << (N > 0 ? order_sum_ / N : 0.0);
+    return os.str();
   }
 
 } // namespace triqs_ctseg::measures

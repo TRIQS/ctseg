@@ -180,8 +180,23 @@ namespace triqs_ctseg {
       CTQMC.set_verbosity(p.verbosity);
     } else {
       if (c.rank() == 0) spdlog::info("Warming up ...");
+      // Register warmup measurements for progress display
+      CTQMC.add_measure(measures::average_sign{p, wdata, config, results}, "Average Sign", /* enable_timer */ true,
+                         /* enable_report */ true);
+      if (wdata.has_Delta) {
+        CTQMC.add_measure(measures::pert_order{[&]() { return config.Delta_order(); }, results.pert_order_Delta,
+                                               results.average_order_Delta, results.average_order_Delta_error},
+                          "Perturbation order Delta", /* enable_timer */ true, /* enable_report */ true);
+      }
+      if (wdata.has_Jperp) {
+        CTQMC.add_measure(measures::pert_order{[&]() { return config.Jperp_order(); }, results.pert_order_Jperp,
+                                               results.average_order_Jperp, results.average_order_Jperp_error},
+                          "Perturbation order Jperp", /* enable_timer */ true, /* enable_report */ true);
+      }
       CTQMC.run(p.n_warmup_cycles, warmup_cycle_length, triqs::utility::clock_callback(p.max_time),
-                /* enable_measures */ false, c);
+                /* enable_measures */ true, c);
+      CTQMC.clear_measures();
+      results = results_t{};
     }
     results.warmup_cycles_done = CTQMC.get_current_cycle_number();
 
@@ -276,7 +291,9 @@ namespace triqs_ctseg {
     // Initialize measurements
     if (p.measure_G_tau) CTQMC.add_measure(measures::G_F_tau{p, wdata, config, results}, "G(tau)/F(tau)");
     CTQMC.add_measure(measures::densities{p, wdata, config, results}, "Densities");
-    if (p.measure_average_sign) CTQMC.add_measure(measures::average_sign{p, wdata, config, results}, "Average Sign");
+    if (p.measure_average_sign)
+      CTQMC.add_measure(measures::average_sign{p, wdata, config, results}, "Average Sign", /* enable_timer */ true,
+                         /* enable_report */ true);
     if (p.measure_nn_static) CTQMC.add_measure(measures::nn_static{p, wdata, config, results}, "<nn>");
     if (p.measure_nn_tau) CTQMC.add_measure(measures::nn_tau{p, wdata, config, results}, "<n(tau)n(0)>");
     if (p.measure_nn_nu_dlr) CTQMC.add_measure(measures::nn_nu_dlr{p, wdata, config, results}, "<n(nu)n(-nu)>");
@@ -285,12 +302,12 @@ namespace triqs_ctseg {
       if (wdata.has_Delta) {
         CTQMC.add_measure(measures::pert_order{[&]() { return config.Delta_order(); }, results.pert_order_Delta,
                                                results.average_order_Delta, results.average_order_Delta_error},
-                          "Perturbation order Delta");
+                          "Perturbation order Delta", /* enable_timer */ true, /* enable_report */ true);
       }
       if (wdata.has_Jperp) {
         CTQMC.add_measure(measures::pert_order{[&]() { return config.Jperp_order(); }, results.pert_order_Jperp,
                                                results.average_order_Jperp, results.average_order_Jperp_error},
-                          "Perturbation order Jperp");
+                          "Perturbation order Jperp", /* enable_timer */ true, /* enable_report */ true);
       }
     }
     if (p.measure_state_hist) CTQMC.add_measure(measures::state_hist{p, wdata, config, results}, "State histograms");

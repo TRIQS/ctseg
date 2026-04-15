@@ -6,6 +6,7 @@
 
 #include "average_sign.hpp"
 #include <itertools/itertools.hpp>
+#include <sstream>
 #include "../logs.hpp"
 
 namespace triqs_ctseg::measures {
@@ -34,6 +35,14 @@ namespace triqs_ctseg::measures {
 
     auto [m, err, tau]         = sign_bins_->mean_error_and_tau(c);
     results.average_sign_error = std::abs(err);
+  }
+
+  // -------------------------------------
+
+  std::string average_sign::report() const {
+    std::ostringstream os;
+    os << "Average sign: " << Z / N;
+    return os.str();
   }
 
 } // namespace triqs_ctseg::measures

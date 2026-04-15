@@ -27,6 +27,7 @@ namespace triqs_ctseg::measures {
 
     void accumulate(double s);
     void collect_results(mpi::communicator const &c);
+    std::string report() const;
   };
 
 } // namespace triqs_ctseg::measures
