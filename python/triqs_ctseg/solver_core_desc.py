@@ -157,6 +157,16 @@ c.add_member(c_name = "g3w",
              read_only= True,
              doc = r"""Four-point correlation function""")
 
+c.add_member(c_name = "chi3",
+             c_type = "std::optional<block2_gf<dlr2d_imfreq, tensor_valued<4>>>",
+             read_only= True,
+             doc = r"""Three-point function chi3(nu1, nu2) on DLR2D fermionic mesh""")
+
+c.add_member(c_name = "chi4",
+             c_type = "std::optional<block2_gf<prod<imfreq, imfreq, imfreq>, tensor_valued<4>>>",
+             read_only= True,
+             doc = r"""Four-point function chi4(Omega, nu, nu') on mixed bosonic-fermionic mesh""")
+
 c.add_member(c_name = "average_sign",
              c_type = "double",
              read_only= True,
@@ -545,6 +555,51 @@ c.add_member(c_name = "measure_g3w",
              c_type = "bool",
              initializer = """ false """,
              doc = r"""Whether to measure four-point correlation function (see measures/four_point)""")
+
+c.add_member(c_name = "measure_chi3",
+             c_type = "bool",
+             initializer = """ false """,
+             doc = r"""Whether to measure chi3(nu1, nu2) on DLR2D mesh using NFFT (see measures/chi3)""")
+
+c.add_member(c_name = "measure_chi4",
+             c_type = "bool",
+             initializer = """ false """,
+             doc = r"""Whether to measure chi4(Omega, nu, nu') using NFFT (see measures/chi4)""")
+
+c.add_member(c_name = "dlr_wmax",
+             c_type = "double",
+             initializer = """ 10.0 """,
+             doc = r"""DLR energy cutoff for chi3 DLR2D mesh""")
+
+c.add_member(c_name = "dlr_eps",
+             c_type = "double",
+             initializer = """ 1e-10 """,
+             doc = r"""DLR precision for chi3 DLR2D mesh""")
+
+c.add_member(c_name = "dlr2d_compress_grid",
+             c_type = "bool",
+             initializer = """ true """,
+             doc = r"""Whether to compress the DLR2D grid""")
+
+c.add_member(c_name = "n_w_chi4_f",
+             c_type = "int",
+             initializer = """ 10 """,
+             doc = r"""Number of fermionic Matsubara frequencies for chi4""")
+
+c.add_member(c_name = "n_w_chi4_b",
+             c_type = "int",
+             initializer = """ 10 """,
+             doc = r"""Number of bosonic Matsubara frequencies for chi4""")
+
+c.add_member(c_name = "nfft_buf_size",
+             c_type = "int",
+             initializer = """ 100000 """,
+             doc = r"""NFFT buffer size for chi3/chi4 measurements""")
+
+c.add_member(c_name = "nfft_tol",
+             c_type = "double",
+             initializer = """ 1e-8 """,
+             doc = r"""NFFT tolerance for chi3/chi4 measurements""")
 
 c.add_member(c_name = "det_init_size",
              c_type = "int",

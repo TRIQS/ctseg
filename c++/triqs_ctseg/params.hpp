@@ -164,6 +164,33 @@ namespace triqs_ctseg {
     /// Whether to measure four-point correlation function (see measures/four_point)
     bool measure_g3w = false;
 
+    /// Whether to measure chi3(nu1, nu2) on DLR2D mesh using NFFT (see measures/chi3)
+    bool measure_chi3 = false;
+
+    /// Whether to measure chi4(Omega, nu, nu') using NFFT (see measures/chi4)
+    bool measure_chi4 = false;
+
+    /// DLR energy cutoff for chi3 DLR2D mesh
+    double dlr_wmax = 10.0;
+
+    /// DLR precision for chi3 DLR2D mesh
+    double dlr_eps = 1e-10;
+
+    /// Whether to compress the DLR2D grid
+    bool dlr2d_compress_grid = true;
+
+    /// Number of fermionic Matsubara frequencies for chi4
+    int n_w_chi4_f = 10;
+
+    /// Number of bosonic Matsubara frequencies for chi4
+    int n_w_chi4_b = 10;
+
+    /// NFFT buffer size for chi3/chi4 measurements
+    int nfft_buf_size = 100000;
+
+    /// NFFT tolerance for chi3/chi4 measurements
+    double nfft_tol = 1e-8;
+
     // -------- Misc parameters --------------
 
     /// The maximum size of the determinant matrix before a resize

@@ -20,6 +20,7 @@ set(all_tests
   ./solve_generic_dynamical_U
   ./solve_generic_dlr_dynamical_U
   ./solve_density
+  ./chi3_validation
 )
 
 foreach(test ${all_tests})

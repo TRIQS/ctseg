@@ -36,6 +36,8 @@ namespace triqs_ctseg {
     h5_write(grp, "state_hist", c.state_hist);
     h5_write(grp, "g2w", c.g2w);
     h5_write(grp, "g3w", c.g3w);
+    h5_write(grp, "chi3", c.chi3);
+    h5_write(grp, "chi4", c.chi4);
   }
 
   //------------------------------------
@@ -68,6 +70,8 @@ namespace triqs_ctseg {
     h5_read(grp, "state_hist", c.state_hist);
     h5_read(grp, "g2w", c.g2w);
     h5_read(grp, "g3w", c.g3w);
+    h5_read(grp, "chi3", c.chi3);
+    h5_read(grp, "chi4", c.chi4);
   }
 
 } // namespace triqs_ctseg

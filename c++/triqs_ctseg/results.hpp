@@ -64,6 +64,12 @@ namespace triqs_ctseg {
     /// Four-point correlation function
     std::optional<block2_gf<prod<imfreq, imfreq, imfreq>, tensor_valued<4>>> g3w;
 
+    /// Three-point function chi3(nu1, nu2) on DLR2D fermionic mesh
+    std::optional<block2_gf<dlr2d_imfreq, tensor_valued<4>>> chi3;
+
+    /// Four-point function chi4(Omega, nu, nu') on mixed bosonic-fermionic mesh
+    std::optional<block2_gf<prod<imfreq, imfreq, imfreq>, tensor_valued<4>>> chi4;
+
     /// Auto-correlation time
     double auto_corr_time = 0.0;
 

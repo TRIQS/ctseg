@@ -50,7 +50,7 @@ namespace triqs_ctseg {
     solve_params = solve_params_input;
     // Set tau mesh parameters for results to default if not supplied
     if (solve_params_input.n_tau_G == 0) solve_params.n_tau_G = constr_params.n_tau;
-    if (solve_params_input.n_tau_G == 0) solve_params.n_tau_chi2 = constr_params.n_tau_bosonic;
+    if (solve_params_input.n_tau_chi2 == 0) solve_params.n_tau_chi2 = constr_params.n_tau_bosonic;
     // Merge constr_params and solve_params
     params_t p(constr_params, solve_params);
 
@@ -313,6 +313,13 @@ namespace triqs_ctseg {
     if (p.measure_state_hist) CTQMC.add_measure(measures::state_hist{p, wdata, config, results}, "State histograms");
     if (p.measure_g2w || p.measure_g3w)
       CTQMC.add_measure(measures::four_point{p, wdata, config, results}, "Four-point correlation function");
+#ifdef TRIQS_WITH_NFFT
+    if (p.measure_chi3) CTQMC.add_measure(measures::chi3{p, wdata, config, results}, "chi3");
+    if (p.measure_chi4) CTQMC.add_measure(measures::chi4{p, wdata, config, results}, "chi4");
+#else
+    if (p.measure_chi3 || p.measure_chi4)
+      TRIQS_RUNTIME_ERROR << "chi3/chi4 measurements require TRIQS to be built with -DTRIQS_WITH_NFFT=ON";
+#endif
     if (p.visualize_config) CTQMC.add_measure(measures::visualize_config{config}, "Visualizing configurations");
 
     // Run accumulation and collect results
