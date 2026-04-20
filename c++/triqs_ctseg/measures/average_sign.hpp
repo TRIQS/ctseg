@@ -8,6 +8,7 @@
 #include "../configuration.hpp"
 #include "../results.hpp"
 #include "../work_data.hpp"
+#include <triqs/stat/lin_binning.hpp>
 
 namespace triqs_ctseg::measures {
 
@@ -19,6 +20,8 @@ namespace triqs_ctseg::measures {
 
     double N = 0;
     double Z = 0;
+
+    std::optional<triqs::stat::lin_binning<dcomplex>> sign_bins_;
 
     average_sign(params_t const &params, work_data_t const &wdata, configuration_t const &config, results_t &results);
 

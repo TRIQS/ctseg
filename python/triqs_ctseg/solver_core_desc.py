@@ -97,6 +97,21 @@ c.add_member(c_name = "densities_errors",
              read_only= True,
              doc = r"""Error bars for densities, organized by blocks.""")
 
+c.add_member(c_name = "nn_static_errors",
+             c_type = "std::optional<std::map<std::pair<std::string, std::string>, nda::matrix<double>>>",
+             read_only= True,
+             doc = r"""Error bars for density-density static correlation function.""")
+
+c.add_member(c_name = "state_hist_errors",
+             c_type = "std::optional<nda::vector<double>>",
+             read_only= True,
+             doc = r"""Error bars for state histogram.""")
+
+c.add_member(c_name = "average_sign_error",
+             c_type = "std::optional<double>",
+             read_only= True,
+             doc = r"""Error bar for average sign.""")
+
 c.add_member(c_name = "pert_order_Delta",
              c_type = "std::optional<std::vector<double>>",
              read_only= True,
@@ -107,6 +122,11 @@ c.add_member(c_name = "average_order_Delta",
              read_only= True,
              doc = r"""Average Delta perturbation order""")
 
+c.add_member(c_name = "average_order_Delta_error",
+             c_type = "std::optional<double>",
+             read_only= True,
+             doc = r"""Error bar for average Delta perturbation order""")
+
 c.add_member(c_name = "pert_order_Jperp",
              c_type = "std::optional<std::vector<double>>",
              read_only= True,
@@ -116,6 +136,11 @@ c.add_member(c_name = "average_order_Jperp",
              c_type = "std::optional<double>",
              read_only= True,
              doc = r"""Average Jperp perturbation order""")
+
+c.add_member(c_name = "average_order_Jperp_error",
+             c_type = "std::optional<double>",
+             read_only= True,
+             doc = r"""Error bar for average Jperp perturbation order""")
 
 c.add_member(c_name = "state_hist",
              c_type = "std::optional<nda::vector<double>>",

@@ -8,13 +8,14 @@
 #include "../configuration.hpp"
 #include "../results.hpp"
 #include "../work_data.hpp"
+#include <triqs/stat/lin_binning.hpp>
 
 namespace triqs_ctseg::measures {
 
   struct pert_order {
 
     pert_order(std::function<int()> get_order, std::optional<std::vector<double>> &hist_opt,
-               std::optional<double> &average_order_opt);
+               std::optional<double> &average_order_opt, std::optional<double> &average_order_error_opt);
 
     /// Accumulate pert order into histogram
     void accumulate(double s);
@@ -31,6 +32,10 @@ namespace triqs_ctseg::measures {
 
     // Average order
     double &average_order;
+    std::optional<double> &average_order_error;
+
+    // Linear binning for error estimation
+    triqs::stat::lin_binning<dcomplex> order_bins_;
 
     // Accumulation counter
     long N = 0;

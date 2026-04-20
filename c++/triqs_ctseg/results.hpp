@@ -43,11 +43,17 @@ namespace triqs_ctseg {
     /// Average Delta perturbation order
     std::optional<double> average_order_Delta;
 
+    /// Error bar for average Delta perturbation order
+    std::optional<double> average_order_Delta_error;
+
     /// Jperp perturbation order histogram
     std::optional<std::vector<double>> pert_order_Jperp;
 
     /// Average Jperp perturbation order
     std::optional<double> average_order_Jperp;
+
+    /// Error bar for average Jperp perturbation order
+    std::optional<double> average_order_Jperp_error;
 
     /// State histogram
     std::optional<nda::vector<double>> state_hist;
@@ -70,8 +76,17 @@ namespace triqs_ctseg {
     /// Error bars for densities, organized by blocks.
     std::optional<std::map<std::string, nda::array<double, 1>>> densities_errors;
 
+    /// Error bars for density-density static correlations, organized by block pairs.
+    std::optional<std::map<std::pair<std::string, std::string>, nda::matrix<double>>> nn_static_errors;
+
+    /// Error bars for state histogram.
+    std::optional<nda::vector<double>> state_hist_errors;
+
     /// Average sign
     double average_sign;
+
+    /// Error bar for average sign.
+    std::optional<double> average_sign_error;
   };
 
   /// writes all containers to hdf5 file

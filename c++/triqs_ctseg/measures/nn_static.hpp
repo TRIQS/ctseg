@@ -8,6 +8,7 @@
 #include "../configuration.hpp"
 #include "../work_data.hpp"
 #include "../results.hpp"
+#include <triqs/stat/lin_binning.hpp>
 
 namespace triqs_ctseg::measures {
 
@@ -21,7 +22,11 @@ namespace triqs_ctseg::measures {
     nda::matrix<double> nn;
 
     double Z = 0;
+    long N_  = 0;
     int n_color;
+
+    // One lin_binning accumulator per block pair
+    std::vector<triqs::stat::lin_binning<nda::array<dcomplex, 2>>> nn_bins_;
 
     nn_static(params_t const &params, work_data_t const &wdata, configuration_t const &config, results_t &results);
 

@@ -71,8 +71,10 @@ namespace triqs_ctseg {
     if (wdata.has_Delta) {
       if (p.move_insert_segment) CTQMC.add_move(moves::insert_segment{wdata, config, CTQMC.get_rng()}, "insert");
       if (p.move_remove_segment) CTQMC.add_move(moves::remove_segment{wdata, config, CTQMC.get_rng()}, "remove");
-      if (p.move_double_insert_segment) CTQMC.add_move(moves::double_insert_segment{wdata, config, CTQMC.get_rng()}, "double insert");
-      if (p.move_double_remove_segment) CTQMC.add_move(moves::double_remove_segment{wdata, config, CTQMC.get_rng()}, "double remove");
+      if (p.move_double_insert_segment)
+        CTQMC.add_move(moves::double_insert_segment{wdata, config, CTQMC.get_rng()}, "double insert");
+      if (p.move_double_remove_segment)
+        CTQMC.add_move(moves::double_remove_segment{wdata, config, CTQMC.get_rng()}, "double remove");
       if (p.move_move_segment) CTQMC.add_move(moves::move_segment{wdata, config, CTQMC.get_rng()}, "move");
       if (p.move_split_segment) CTQMC.add_move(moves::split_segment{wdata, config, CTQMC.get_rng()}, "split");
       if (p.move_regroup_segment) CTQMC.add_move(moves::regroup_segment{wdata, config, CTQMC.get_rng()}, "regroup");
@@ -161,12 +163,12 @@ namespace triqs_ctseg {
       };
 
       typename decltype(CTQMC)::run_param_t rp;
-      rp.ncycles         = p.max_warmup_cycles;
-      rp.cycle_length    = warmup_cycle_length;
-      rp.stop_callback   = stop_cb;
+      rp.ncycles          = p.max_warmup_cycles;
+      rp.cycle_length     = warmup_cycle_length;
+      rp.stop_callback    = stop_cb;
       rp.after_cycle_duty = after_duty;
-      rp.comm            = c;
-      rp.enable_measures = false;
+      rp.comm             = c;
+      rp.enable_measures  = false;
       CTQMC.run(rp);
 
       if (!converged) {
@@ -178,7 +180,8 @@ namespace triqs_ctseg {
       CTQMC.set_verbosity(p.verbosity);
     } else {
       if (c.rank() == 0) spdlog::info("Warming up ...");
-      CTQMC.run(p.n_warmup_cycles, warmup_cycle_length, triqs::utility::clock_callback(p.max_time), /* enable_measures */ false, c);
+      CTQMC.run(p.n_warmup_cycles, warmup_cycle_length, triqs::utility::clock_callback(p.max_time),
+                /* enable_measures */ false, c);
     }
     results.warmup_cycles_done = CTQMC.get_current_cycle_number();
 
@@ -202,7 +205,7 @@ namespace triqs_ctseg {
 
       constexpr int check_interval    = 500;
       constexpr int min_calib         = 1000;
-      constexpr int max_calib_cycles   = 100000;
+      constexpr int max_calib_cycles  = 100000;
       constexpr double tau_rtol       = 0.1;
       constexpr int n_stable_required = 3;
 
@@ -221,7 +224,7 @@ namespace triqs_ctseg {
         if (calib_count < min_calib || calib_count % check_interval != 0) return false;
 
         auto [mean, errs, taus, effs] = k_acc.mean_errors_and_taus(c);
-        double tau = taus.empty() ? 0.0 : std::real(taus.back());
+        double tau                    = taus.empty() ? 0.0 : std::real(taus.back());
 
         // Periodic status print
         double elapsed = std::chrono::duration<double>(std::chrono::steady_clock::now() - t0).count();
@@ -262,7 +265,7 @@ namespace triqs_ctseg {
 
       // Clean up calibration phase
       CTQMC.clear_measures();
-      results = results_t{};
+      results                    = results_t{};
       results.warmup_cycles_done = CTQMC.get_current_cycle_number();
       CTQMC.set_verbosity(p.verbosity);
     }
@@ -281,12 +284,12 @@ namespace triqs_ctseg {
     if (p.measure_pert_order) {
       if (wdata.has_Delta) {
         CTQMC.add_measure(measures::pert_order{[&]() { return config.Delta_order(); }, results.pert_order_Delta,
-                                               results.average_order_Delta},
+                                               results.average_order_Delta, results.average_order_Delta_error},
                           "Perturbation order Delta");
       }
       if (wdata.has_Jperp) {
         CTQMC.add_measure(measures::pert_order{[&]() { return config.Jperp_order(); }, results.pert_order_Jperp,
-                                               results.average_order_Jperp},
+                                               results.average_order_Jperp, results.average_order_Jperp_error},
                           "Perturbation order Jperp");
       }
     }
@@ -296,7 +299,8 @@ namespace triqs_ctseg {
     if (p.visualize_config) CTQMC.add_measure(measures::visualize_config{config}, "Visualizing configurations");
 
     // Run accumulation and collect results
-    CTQMC.run(p.n_cycles, effective_length_cycle, triqs::utility::clock_callback(p.max_time), /* enable_measures */ true, c);
+    CTQMC.run(p.n_cycles, effective_length_cycle, triqs::utility::clock_callback(p.max_time),
+              /* enable_measures */ true, c);
     CTQMC.collect_results(c);
 
     // Report summary

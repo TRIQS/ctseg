@@ -14,6 +14,7 @@ namespace triqs_ctseg::measures {
 
     beta = p.beta;
     H    = nda::zeros<double>(ipow(2, config.n_color()));
+    hist_bins_.emplace(nda::array<dcomplex, 1>(nda::zeros<dcomplex>(ipow(2, config.n_color()))), 128, 1);
   }
 
   // -------------------------------------
@@ -34,6 +35,9 @@ namespace triqs_ctseg::measures {
     */
 
     Z += s;
+    ++N_;
+
+    nda::array<dcomplex, 1> H_step = nda::zeros<dcomplex>(H.size());
 
     double tau_prev         = beta; // time of prevous operator; start with beta
     nda::vector<bool> state = nda::zeros<bool>(config.n_color());
@@ -41,7 +45,9 @@ namespace triqs_ctseg::measures {
       int state_idx = 0;
       for (auto c : range(config.n_color()))
         if (state(c)) state_idx += ipow(2, c); // get the index of the impurity state
-      H(state_idx) += (tau_prev - op.tau);
+      double dt = tau_prev - op.tau;
+      H(state_idx) += dt;
+      H_step(state_idx) += dt;
       tau_prev = (double)op.tau;
       ALWAYS_EXPECTS((state(op.color) == op.is_cdag), "Operator error at color {}", op.color);
       state(op.color) = !op.is_cdag;
@@ -50,6 +56,10 @@ namespace triqs_ctseg::measures {
     // get edge state contribution; tau_prev has time of last operator
     ALWAYS_EXPECTS((state == nda::zeros<bool>(config.n_color())), "Operator error");
     H(0) += tau_prev;
+    H_step(0) += tau_prev;
+
+    H_step *= dcomplex(s) / beta;
+    *hist_bins_ << H_step;
   }
   // -------------------------------------
 
@@ -61,6 +71,12 @@ namespace triqs_ctseg::measures {
 
     // store the result (not reused later, hence we can move it).
     results.state_hist = std::move(H);
+
+    // Compute error bars from linear binning
+    N_                        = mpi::all_reduce(N_, c);
+    auto norm                 = std::abs(dcomplex(Z) / dcomplex(N_));
+    auto [m, err, tau]        = hist_bins_->mean_error_and_tau(c);
+    results.state_hist_errors = nda::vector<double>(nda::abs(err) / norm);
   }
 
 } // namespace triqs_ctseg::measures

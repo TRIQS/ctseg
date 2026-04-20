@@ -10,8 +10,12 @@
 namespace triqs_ctseg::measures {
 
   pert_order::pert_order(std::function<int()> get_order, std::optional<std::vector<double>> &hist_opt,
-                         std::optional<double> &average_order_opt)
-     : get_order{get_order}, hist{hist_opt.emplace(4, 0.0)}, average_order{average_order_opt.emplace(0.0)} {}
+                         std::optional<double> &average_order_opt, std::optional<double> &average_order_error_opt)
+     : get_order{get_order},
+       hist{hist_opt.emplace(4, 0.0)},
+       average_order{average_order_opt.emplace(0.0)},
+       average_order_error{average_order_error_opt},
+       order_bins_(dcomplex{0.0}, 128, 1) {}
 
   // -------------------------------------
 
@@ -19,6 +23,7 @@ namespace triqs_ctseg::measures {
     auto order = get_order();
     while (order >= hist.size()) hist.resize(2 * hist.size());
     hist[order] += 1;
+    order_bins_ << dcomplex(double(order));
     ++N;
   }
 
@@ -39,6 +44,9 @@ namespace triqs_ctseg::measures {
       hist[order] /= N;
       average_order += hist[order] * order;
     }
+
+    auto [m, err, tau]  = order_bins_.mean_error_and_tau(c);
+    average_order_error = std::abs(err);
   }
 
 } // namespace triqs_ctseg::measures

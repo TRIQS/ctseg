@@ -13,8 +13,7 @@ namespace triqs_ctseg::measures {
   average_sign::average_sign(params_t const &, work_data_t const &wdata, configuration_t const &config,
                              results_t &results)
      : wdata{wdata}, config{config}, results{results} {
-    Z = 0.0;
-    N = 0.0;
+    sign_bins_.emplace(dcomplex{0.0}, 128, 1);
   }
 
   // -------------------------------------
@@ -22,6 +21,7 @@ namespace triqs_ctseg::measures {
   void average_sign::accumulate(double s) {
     Z += s;
     N += 1.0;
+    *sign_bins_ << dcomplex(s);
   }
 
   // -------------------------------------
@@ -31,6 +31,9 @@ namespace triqs_ctseg::measures {
     N = mpi::all_reduce(N, c);
 
     results.average_sign = Z / N;
+
+    auto [m, err, tau]         = sign_bins_->mean_error_and_tau(c);
+    results.average_sign_error = std::abs(err);
   }
 
 } // namespace triqs_ctseg::measures
