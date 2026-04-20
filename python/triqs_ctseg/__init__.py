@@ -9,8 +9,9 @@ The CTSEG python module.
 """
 from .solver import Solver
 from .solver_core import SolverCore
+from .solve_generic import solve_generic, solve_density
 
-__all__ = ['Solver', 'SolverCore']
+__all__ = ['Solver', 'SolverCore', 'solve_generic', 'solve_density']
 
 
 class Cpp2pyInfo:

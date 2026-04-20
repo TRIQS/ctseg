@@ -14,6 +14,12 @@ set(all_tests
   ./multiorb
   ./dynamic_int_multiorb
   ./dimer
+  ./postprocessing_helpers
+  ./solve_generic_imfreq
+  ./solve_generic_dlr
+  ./solve_generic_dynamical_U
+  ./solve_generic_dlr_dynamical_U
+  ./solve_density
 )
 
 foreach(test ${all_tests})
