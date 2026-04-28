@@ -51,13 +51,13 @@ _POST_PROC_DEFAULTS = {
 
 def _prepare_solver(
     Delta_iw,
+    gf_struct,
     h_loc0_bl,
     h_int,
     solve_density_only=False,
     **solver_interface_params,
 ):
     """Prepare the CT-SEG solver instance and split parameters into solver/post-processing."""
-    gf_struct = [(bl, gf.target_shape[0]) for (bl, gf) in Delta_iw]
     mesh = Delta_iw.mesh
     beta = mesh.beta
 
@@ -134,7 +134,7 @@ def _run_solver(Delta_iw, h_loc0, h_int, D0_iw, solve_density_only, **params):
     h_loc0_op, h_loc0_bl = _canonicalize_h_loc0(h_loc0, gf_struct)
 
     S, n_tau, solver_params, post_proc_params = _prepare_solver(
-        Delta_iw, h_loc0_bl, h_int,
+        Delta_iw, gf_struct, h_loc0_bl, h_int,
         solve_density_only=solve_density_only, **params,
     )
     _prepare_delta_tau(S, Delta_iw, D0_iw, n_tau)
