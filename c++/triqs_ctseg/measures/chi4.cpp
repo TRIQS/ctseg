@@ -48,7 +48,6 @@ namespace triqs_ctseg::measures {
         chi4_acc[bl1_idx][bl2_idx] = gf<prod<imfreq, imfreq, imfreq>, tensor_valued<4>>(
            {mesh_bosonic, mesh_fermionic, mesh_fermionic},
            make_shape(bl1_size, bl1_size, bl2_size, bl2_size));
-        chi4_acc[bl1_idx][bl2_idx]() = 0;
       }
     }
   }

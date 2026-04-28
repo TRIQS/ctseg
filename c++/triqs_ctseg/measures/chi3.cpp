@@ -49,11 +49,7 @@ namespace triqs_ctseg::measures {
     nw_mesh = triqs::mesh::imfreq{p.beta, Boson, chi3_mesh.max_n() + 1};
 
     // Initialize nw per color
-    nw.resize(wdata.n_color);
-    for (auto &n : nw) {
-      n = gf<imfreq, scalar_valued>(nw_mesh);
-      n() = 0;
-    }
+    nw.resize(wdata.n_color, gf<imfreq, scalar_valued>{nw_mesh});
 
     // Initialize chi3 accumulator
     chi3_acc.resize(wdata.gf_struct.size());
@@ -65,7 +61,6 @@ namespace triqs_ctseg::measures {
         auto &[bl2_name, bl2_size] = bl2;
         chi3_acc[bl1_idx][bl2_idx] = gf<dlr2d_imfreq, tensor_valued<4>>(
            chi3_mesh, make_shape(bl1_size, bl1_size, bl2_size, bl2_size));
-        chi3_acc[bl1_idx][bl2_idx]() = 0;
       }
     }
   }
@@ -123,7 +118,7 @@ namespace triqs_ctseg::measures {
     }
 
     // Assembly: chi3[nu1, nu2](a,b,c,c) -= s * M[-nu1, nu2](a,b) * nw[col][nu1 - nu2]
-    auto const &nb_blocks = wdata.gf_struct.size();
+    auto nb_blocks = wdata.gf_struct.size();
     for (auto b1 : range(nb_blocks)) {
       for (auto b2 : range(nb_blocks)) {
         auto const &block_shape = chi3_acc[b1][b2].target_shape();
