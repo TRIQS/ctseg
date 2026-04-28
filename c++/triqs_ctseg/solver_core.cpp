@@ -100,6 +100,20 @@ namespace triqs_ctseg {
       if (p.move_swap_spin_lines) CTQMC.add_move(moves::swap_spin_lines{wdata, config, CTQMC.get_rng()}, "spin swap");
     }
 
+    // Helper to register pert_order measures (used in warmup progress display and accumulation)
+    auto add_pert_order_measures = [&] {
+      if (wdata.has_Delta) {
+        CTQMC.add_measure(measures::pert_order{[&]() { return config.Delta_order(); }, results.pert_order_Delta,
+                                               results.average_order_Delta, results.average_order_Delta_error},
+                          "Perturbation order Delta", /* enable_timer */ true, /* enable_report */ true);
+      }
+      if (wdata.has_Jperp) {
+        CTQMC.add_measure(measures::pert_order{[&]() { return config.Jperp_order(); }, results.pert_order_Jperp,
+                                               results.average_order_Jperp, results.average_order_Jperp_error},
+                          "Perturbation order Jperp", /* enable_timer */ true, /* enable_report */ true);
+      }
+    };
+
     // ========== Phase 1: Warmup ==========
 
     int warmup_cycle_length = (p.length_cycle >= 0) ? p.length_cycle : 100;
@@ -183,16 +197,7 @@ namespace triqs_ctseg {
       // Register warmup measurements for progress display
       CTQMC.add_measure(measures::average_sign{p, wdata, config, results}, "Average Sign", /* enable_timer */ true,
                          /* enable_report */ true);
-      if (wdata.has_Delta) {
-        CTQMC.add_measure(measures::pert_order{[&]() { return config.Delta_order(); }, results.pert_order_Delta,
-                                               results.average_order_Delta, results.average_order_Delta_error},
-                          "Perturbation order Delta", /* enable_timer */ true, /* enable_report */ true);
-      }
-      if (wdata.has_Jperp) {
-        CTQMC.add_measure(measures::pert_order{[&]() { return config.Jperp_order(); }, results.pert_order_Jperp,
-                                               results.average_order_Jperp, results.average_order_Jperp_error},
-                          "Perturbation order Jperp", /* enable_timer */ true, /* enable_report */ true);
-      }
+      add_pert_order_measures();
       CTQMC.run(p.n_warmup_cycles, warmup_cycle_length, triqs::utility::clock_callback(p.max_time),
                 /* enable_measures */ true, c);
       CTQMC.clear_measures();
@@ -298,18 +303,7 @@ namespace triqs_ctseg {
     if (p.measure_nn_tau) CTQMC.add_measure(measures::nn_tau{p, wdata, config, results}, "<n(tau)n(0)>");
     if (p.measure_nn_nu_dlr) CTQMC.add_measure(measures::nn_nu_dlr{p, wdata, config, results}, "<n(nu)n(-nu)>");
     if (p.measure_Sperp_tau) CTQMC.add_measure(measures::Sperp_tau{p, wdata, config, results}, "<S_x(tau)S_x(0)>");
-    if (p.measure_pert_order) {
-      if (wdata.has_Delta) {
-        CTQMC.add_measure(measures::pert_order{[&]() { return config.Delta_order(); }, results.pert_order_Delta,
-                                               results.average_order_Delta, results.average_order_Delta_error},
-                          "Perturbation order Delta", /* enable_timer */ true, /* enable_report */ true);
-      }
-      if (wdata.has_Jperp) {
-        CTQMC.add_measure(measures::pert_order{[&]() { return config.Jperp_order(); }, results.pert_order_Jperp,
-                                               results.average_order_Jperp, results.average_order_Jperp_error},
-                          "Perturbation order Jperp", /* enable_timer */ true, /* enable_report */ true);
-      }
-    }
+    if (p.measure_pert_order) add_pert_order_measures();
     if (p.measure_state_hist) CTQMC.add_measure(measures::state_hist{p, wdata, config, results}, "State histograms");
     if (p.measure_g2w || p.measure_g3w)
       CTQMC.add_measure(measures::four_point{p, wdata, config, results}, "Four-point correlation function");
