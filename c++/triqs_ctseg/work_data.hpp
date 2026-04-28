@@ -45,6 +45,7 @@ namespace triqs_ctseg {
     // Color to (block, idx) conversion tables
     std::vector<long> block_number;   // block numbers corresponding to colors
     std::vector<long> index_in_block; // index in block of a given color
+    std::vector<long> block_offset;   // first color in each block (partial sum of block sizes)
 
     // Find color corresponding to (block, idx)
     int block_to_color(int block, int idx) const;

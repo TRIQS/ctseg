@@ -30,9 +30,12 @@ namespace triqs_ctseg {
     double beta = p.beta;
     gf_struct   = p.gf_struct;
 
-    // Count colors
+    // Count colors and build block_offset (partial sum of block sizes)
     n_color = 0;
-    for (auto const &[bl_name, bl_size] : gf_struct) { n_color += bl_size; }
+    for (auto const &[bl_name, bl_size] : gf_struct) {
+      block_offset.push_back(n_color);
+      n_color += bl_size;
+    }
 
     // Compute color/block conversion tables
     for (auto const &color : range(n_color)) {
@@ -201,15 +204,7 @@ namespace triqs_ctseg {
     }
   } // work_data constructor
 
-  int work_data_t::block_to_color(int block, int idx) const {
-    std::vector<long> gf_block_size_partial_sum;
-    long acc = 0;
-    for (auto const &[s, l] : gf_struct) {
-      gf_block_size_partial_sum.push_back(acc);
-      acc += l;
-    }
-    return gf_block_size_partial_sum[block] + idx;
-  }
+  int work_data_t::block_to_color(int block, int idx) const { return block_offset[block] + idx; }
 
   long work_data_t::find_block_number(int color) const {
     long bl            = 0;
