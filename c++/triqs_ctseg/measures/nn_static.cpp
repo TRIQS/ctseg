@@ -18,7 +18,7 @@ namespace triqs_ctseg::measures {
 
     for (auto const &[bl1, bl1_size] : wdata.gf_struct)
       for (auto const &[bl2, bl2_size] : wdata.gf_struct)
-        nn_bins_.emplace_back(nda::array<dcomplex, 2>(nda::zeros<dcomplex>(bl1_size, bl2_size)), 128, 1);
+        nn_bins_.emplace_back(nda::zeros<dcomplex>(bl1_size, bl2_size), 128, 1);
   }
 
   // -------------------------------------

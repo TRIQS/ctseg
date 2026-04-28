@@ -14,7 +14,7 @@ namespace triqs_ctseg::measures {
 
     beta = p.beta;
     H    = nda::zeros<double>(ipow(2, config.n_color()));
-    hist_bins_.emplace(nda::array<dcomplex, 1>(nda::zeros<dcomplex>(ipow(2, config.n_color()))), 128, 1);
+    hist_bins_.emplace(nda::zeros<dcomplex>(ipow(2, config.n_color())), 128, 1);
   }
 
   // -------------------------------------
