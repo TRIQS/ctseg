@@ -43,21 +43,19 @@ namespace triqs_ctseg::measures {
     }
 
     // Measure density per color from segment lengths
-    int idx = 1;
     long offset = 0;
     for (long bl = 0; auto const &[bl_name, bl_size] : wdata.gf_struct) {
       nda::array<dcomplex, 1> step;
       if (measure_densities_) step.resize(bl_size);
 
       for (long a = 0; a < bl_size; ++a) {
-        long c = offset + a;
+        long c   = offset + a;
         double sum = 0;
-        for (auto &seg : config.seglists[c]) sum += double(seg.length());
+        for (auto const &seg : config.seglists[c]) sum += double(seg.length());
         n[c] += s * sum;
 
         auto val = dcomplex(s * sum / tau_t::beta());
-        log_accs_[idx++] << val;
-
+        log_accs_[1 + c] << val;
         if (measure_densities_) step(a) = val;
       }
 
