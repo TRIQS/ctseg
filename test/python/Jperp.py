@@ -5,9 +5,9 @@
 # See LICENSE in the root of this distribution for details.
 
 # Single orbital with Jperp interaction and no hybridization 
-from triqs.gf import *
+from triqs.gfs import *
 import triqs.utility.mpi as mpi
-from triqs.gf.descriptors import Function
+from triqs.gfs.descriptors import Function
 from triqs.operators import n
 import h5
 from triqs.utility.h5diff import h5diff

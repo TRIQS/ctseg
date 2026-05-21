@@ -14,7 +14,7 @@ Exercises:
     Sigma_iw / G_iw)
 """
 
-from triqs.gf import MeshDLRImFreq, Gf, BlockGf, iOmega_n, inverse
+from triqs.gfs import MeshDLRImFreq, Gf, BlockGf, iOmega_n, inverse
 from triqs.operators import n
 import triqs.utility.mpi as mpi
 import h5

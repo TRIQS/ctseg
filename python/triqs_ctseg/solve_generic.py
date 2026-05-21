@@ -10,11 +10,11 @@ Provides a functional API to the triqs_ctseg solver with:
 import numpy as np
 import triqs.utility.mpi as mpi
 
-from triqs.gf import (
+from triqs.gfs import (
     MeshDLRImFreq, MeshImFreq, make_gf_from_fourier,
     make_gf_imtime, fit_hermitian_tail
 )
-from triqs.gf.tools import make_zero_tail
+from triqs.gfs.tools import make_zero_tail
 from triqs.operators import Operator
 from triqs.operators.util.extractors import block_matrix_from_op, op_from_block_matrix
 from triqs.solver_utils import SolverResults

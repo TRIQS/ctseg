@@ -9,9 +9,9 @@
 # Comparison to CTSEG reference is disabled for this test because results can have large 
 # variations across platforms for short runs. 
 
-from triqs.gf import *
-from triqs.gf.tools import *
-from triqs.gf.gf_factories import make_gf_from_fourier
+from triqs.gfs import *
+from triqs.gfs.tools import *
+from triqs.gfs.gf_factories import make_gf_from_fourier
 from triqs.operators.util import U_matrix_kanamori, h_int_density
 import h5
 import triqs.utility.mpi as mpi

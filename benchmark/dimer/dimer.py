@@ -7,9 +7,9 @@
 # Two impurity sites coupled to two bath sites.
 # Data in dimer.ref.h5 is obtained by running this script on 800 cores. 
 
-from triqs.gf import *
-from triqs.gf.tools import *
-from triqs.gf.gf_factories import make_gf_from_fourier
+from triqs.gfs import *
+from triqs.gfs.tools import *
+from triqs.gfs.gf_factories import make_gf_from_fourier
 from triqs.operators.util import U_matrix_kanamori, h_int_density
 import h5
 import triqs.utility.mpi as mpi

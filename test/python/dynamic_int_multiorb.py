@@ -7,7 +7,7 @@
 import numpy as np
 from h5 import HDFArchive
 
-from triqs.gf import make_gf_imtime
+from triqs.gfs import make_gf_imtime
 from triqs.operators import util
 from triqs.operators import n
 from triqs.utility import mpi

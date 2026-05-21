@@ -6,7 +6,7 @@
 
 from .solver_core import SolverCore
 
-from triqs.gf import *
+from triqs.gfs import *
 from triqs.utility import mpi
 
 # === The SolverCore Wrapper

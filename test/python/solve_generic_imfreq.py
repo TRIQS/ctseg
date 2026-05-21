@@ -15,7 +15,7 @@ physically comparable.  Exercises:
 """
 
 import numpy as np
-from triqs.gf import MeshImFreq, Gf, BlockGf, inverse, iOmega_n
+from triqs.gfs import MeshImFreq, Gf, BlockGf, inverse, iOmega_n
 from triqs.operators import n
 import triqs.utility.mpi as mpi
 import h5

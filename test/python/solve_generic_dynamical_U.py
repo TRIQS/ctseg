@@ -16,10 +16,10 @@ not measured; this test asserts that Pi/W/Chi are absent from the
 returned SolverResults.
 """
 
-from triqs.gf import (
+from triqs.gfs import (
     MeshImFreq, Gf, BlockGf, Block2Gf, inverse, iOmega_n,
 )
-from triqs.gf.descriptors import Function
+from triqs.gfs.descriptors import Function
 from triqs.operators import n
 import triqs.utility.mpi as mpi
 import h5

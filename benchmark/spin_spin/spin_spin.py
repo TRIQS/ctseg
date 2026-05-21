@@ -6,9 +6,9 @@
 
 # Single orbital with dynamical spin-spin interactions. 
 # Data in spin_spin.ref.h5 is obtained by running this script on 800 cores. 
-from triqs.gf import *
+from triqs.gfs import *
 import triqs.utility.mpi as mpi
-from triqs.gf.descriptors import Function
+from triqs.gfs.descriptors import Function
 from triqs.operators import n
 import h5
 from triqs.utility.h5diff import h5diff

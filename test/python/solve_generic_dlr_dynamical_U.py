@@ -12,10 +12,10 @@ _prepare_delta_tau, which funnels the bosonic Weiss field through
 make_gf_imtime instead of Fourier + tail fit.
 """
 
-from triqs.gf import (
+from triqs.gfs import (
     MeshDLRImFreq, Gf, BlockGf, Block2Gf, inverse, iOmega_n,
 )
-from triqs.gf.descriptors import Function
+from triqs.gfs.descriptors import Function
 from triqs.operators import n
 import triqs.utility.mpi as mpi
 import h5

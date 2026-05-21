@@ -9,11 +9,11 @@ import triqs.utility.mpi as mpi
 import numpy as np
 from itertools import product
 
-from triqs.gf import (
+from triqs.gfs import (
     MeshImFreq, Gf, BlockGf,
     make_gf_dlr, make_gf_imfreq, make_hermitian
 )
-from triqs.gf.tools import make_zero_tail
+from triqs.gfs.tools import make_zero_tail
 from triqs.operators.util.extractors import extract_U_dict2, dict_to_matrix
 
 from triqs.solver_utils import tail_fit
@@ -195,8 +195,8 @@ def postprocess_sigma(
     5. Tail fitting on Sigma(iw)
     6. Extract dynamic part (Sigma - Sigma_HF)
     """
-    from triqs.gf import iOmega_n
-    from triqs.gf.tools import inverse
+    from triqs.gfs import iOmega_n
+    from triqs.gfs.tools import inverse
 
     degenerate_blk = post_proc_params['degenerate_blk']
 

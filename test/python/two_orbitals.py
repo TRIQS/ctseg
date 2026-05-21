@@ -8,8 +8,8 @@
 # We consider a hybridization function specified as either 
 # 4 blocks of size 1 or 2 blocks of size 2. Results should be identical (move_move is disabled). 
 
-from triqs.gf import *
-from triqs.gf.descriptors import Function
+from triqs.gfs import *
+from triqs.gfs.descriptors import Function
 from triqs.utility import mpi
 from triqs.operators import n
 from h5 import *

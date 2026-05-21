@@ -6,8 +6,8 @@
 
 # Multi-orbital impurity with diagonal Delta(tau). 
 # Number of orbitals can be changed. 
-from triqs.gf import *
-from triqs.gf.descriptors import Function
+from triqs.gfs import *
+from triqs.gfs.descriptors import Function
 from triqs.utility import mpi
 from triqs.operators import n
 from h5 import *

@@ -12,7 +12,7 @@ from cpp2py.wrap_generator import *
 module = module_(full_name = "solver_core", doc = r"The python module for triqs_ctseg", app_name = "triqs_ctseg")
 
 # Imports
-module.add_imports(*['triqs.gf', 'triqs.gf.meshes', 'triqs.operators', 'h5._h5py'])
+module.add_imports(*['triqs.gf', 'triqs.mesh.meshes', 'triqs.operators', 'h5._h5py'])
 
 # Add here all includes
 module.add_include("triqs_ctseg/solver_core.hpp")
