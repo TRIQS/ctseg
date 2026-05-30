@@ -140,8 +140,8 @@ namespace triqs_ctseg {
     /// Whether to measure <n(tau)n(0)> (see measures/nn_tau)
     bool measure_nn_tau = false;
 
-    /// Whether to measure <n(nu)n(0)> (see measures/nn_nu)
-    bool measure_nn_nu = false;
+    /// Whether to measure <n(nu)n(0)> (see measures/nn_nu_dlr)
+    bool measure_nn_nu_dlr = false;
 
     /// Whether to measure <S_x(tau)S_x(0)> (see measures/Sperp_tau)
     bool measure_Sperp_tau = false;

@@ -11,7 +11,7 @@ Mirrors the physics of dynamical_U.py.  Exercises:
     extract_screen_matrix_from_D0_tau (triggered by analytic_hf=True
     AND a non-None solver.D0_tau)
 
-postprocess_pi does NOT run for ctseg because solver.results.nn_nu is
+postprocess_pi does NOT run for ctseg because solver.results.nn_nu_dlr is
 not measured; this test asserts that Pi/W/Chi are absent from the
 returned SolverResults.
 """
@@ -73,7 +73,7 @@ results = solve_generic(
 )
 
 if mpi.is_master_node():
-    # postprocess_pi should NOT have fired (nn_nu not measured in ctseg)
+    # postprocess_pi should NOT have fired (nn_nu_dlr not measured in ctseg)
     assert 'Pi_iw' not in results.keys()
     assert 'W_iw' not in results.keys()
     assert 'Chi_iw' not in results.keys()

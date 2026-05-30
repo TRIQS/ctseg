@@ -334,7 +334,7 @@ def postprocess_pi(
     n_orb = n_color // 2
 
     D0_tau = _assemble_color_gf(solver.D0_tau, block_name, index_in_block)
-    nn_iw_dlr = _assemble_color_gf(solver.results.nn_nu, block_name, index_in_block)
+    nn_iw_dlr = _assemble_color_gf(solver.results.nn_nu_dlr, block_name, index_in_block)
     iw_mesh_dlr = nn_iw_dlr.mesh
 
     # 1. Subtract the constant part of the charge susceptibility
@@ -478,7 +478,7 @@ def postprocess(
 ):
     pp_results = postprocess_sigma(solver, symmetrize_func, **post_proc_params)
 
-    has_chi = solver.D0_tau is not None and getattr(solver.results, 'nn_nu', None) is not None
+    has_chi = solver.D0_tau is not None and getattr(solver.results, 'nn_nu_dlr', None) is not None
     if has_chi:
         deg_blk = post_proc_params['degenerate_blk']
         deg_blk_2e = (

@@ -102,7 +102,7 @@ namespace triqs_ctseg {
     if (p.measure_average_sign) CTQMC.add_measure(measures::average_sign{p, wdata, config, results}, "Average Sign");
     if (p.measure_nn_static) CTQMC.add_measure(measures::nn_static{p, wdata, config, results}, "<nn>");
     if (p.measure_nn_tau) CTQMC.add_measure(measures::nn_tau{p, wdata, config, results}, "<n(tau)n(0)>");
-    if (p.measure_nn_nu) CTQMC.add_measure(measures::nn_nu{p, wdata, config, results}, "<n(nu)n(-nu)>");
+    if (p.measure_nn_nu_dlr) CTQMC.add_measure(measures::nn_nu_dlr{p, wdata, config, results}, "<n(nu)n(-nu)>");
     if (p.measure_Sperp_tau) CTQMC.add_measure(measures::Sperp_tau{p, wdata, config, results}, "<S_x(tau)S_x(0)>");
     if (p.measure_pert_order) {
       if (wdata.has_Delta) {

@@ -57,7 +57,7 @@ c.add_member(c_name = "nn_tau",
              read_only= True,
              doc = r"""Density-density time correlation function :math:`\langle n_a(\tau) n_b(0) \rangle`.""")
 
-c.add_member(c_name = "nn_nu",
+c.add_member(c_name = "nn_nu_dlr",
              c_type = "std::optional<block2_gf<imfreq>>",
              read_only= True,
              doc = r"""Density-density frequency correlation function :math:`\langle n_a(i\nu) n_b(-i\nu) \rangle`.""")
@@ -239,7 +239,7 @@ c.add_method("""void solve (**solve_params_t)""",
 +-------------------------------+--------------------------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
 | measure_nn_tau                | bool                                 | false                                   | Whether to measure <n(tau)n(0)> (see measures/nn_tau)                                                             |
 +-------------------------------+--------------------------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
-| measure_nn_nu                 | bool                                 | false                                   | Whether to measure <n(nu)n(-nu)> (see measures/nn_tau)                                                            |
+| measure_nn_nu_dlr             | bool                                 | false                                   | Whether to measure <n(nu)n(-nu)> (see measures/nn_nu_dlr)                                                         |
 +-------------------------------+--------------------------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
 | measure_Sperp_tau             | bool                                 | false                                   | Whether to measure <S_x(tau)S_x(0)> (see measures/Sperp_tau)                                                      |
 +-------------------------------+--------------------------------------+-----------------------------------------+-------------------------------------------------------------------------------------------------------------------+
@@ -455,10 +455,10 @@ c.add_member(c_name = "measure_nn_tau",
              initializer = """ false """,
              doc = r"""Whether to measure <n(tau)n(0)> (see measures/nn_tau)""")
 
-c.add_member(c_name = "measure_nn_nu",
+c.add_member(c_name = "measure_nn_nu_dlr",
              c_type = "bool",
              initializer = """ false """,
-             doc = r"""Whether to measure <n(nu)n(-nu)> (see measures/nn_tau)""")
+             doc = r"""Whether to measure <n(nu)n(-nu)> (see measures/nn_nu_dlr)""")
 
 c.add_member(c_name = "measure_Sperp_tau",
              c_type = "bool",

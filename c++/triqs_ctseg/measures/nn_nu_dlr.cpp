@@ -3,13 +3,13 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // See LICENSE in the root of this distribution for details.
 
-#include "./nn_nu.hpp"
+#include "./nn_nu_dlr.hpp"
 #include "../logs.hpp"
 #include <triqs/mesh.hpp>
 
 namespace triqs_ctseg::measures {
 
-  nn_nu::nn_nu(params_t const &p, work_data_t const &wdata, configuration_t const &config, results_t &results)
+  nn_nu_dlr::nn_nu_dlr(params_t const &p, work_data_t const &wdata, configuration_t const &config, results_t &results)
      : wdata{wdata}, config{config}, results{results} {
 
     beta           = p.beta;
@@ -28,7 +28,7 @@ namespace triqs_ctseg::measures {
 
   // -------------------------------------
 
-  void nn_nu::accumulate(double s) {
+  void nn_nu_dlr::accumulate(double s) {
 
     LOG("\n =================== MEASURE n_n(i nu)  ================ \n");
 
@@ -69,7 +69,7 @@ namespace triqs_ctseg::measures {
 
   // -------------------------------------
 
-  void nn_nu::collect_results(mpi::communicator const &c) {
+  void nn_nu_dlr::collect_results(mpi::communicator const &c) {
 
     Z = mpi::all_reduce(Z, c);
 
@@ -83,7 +83,7 @@ namespace triqs_ctseg::measures {
            q_nu.data()(range::all, c1, c2);
       }
     }
-    results.nn_nu = std::move(q_nu_block);
+    results.nn_nu_dlr = std::move(q_nu_block);
   }
 
 } // namespace triqs_ctseg::measures

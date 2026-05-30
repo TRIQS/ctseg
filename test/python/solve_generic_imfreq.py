@@ -56,7 +56,7 @@ results = solve_generic(
 )
 
 if mpi.is_master_node():
-    # postprocess_pi does not run (solver.results.nn_nu is not measured by
+    # postprocess_pi does not run (solver.results.nn_nu_dlr is not measured by
     # ctseg), so Pi_iw/W_iw/Chi_iw should not appear in results
     assert 'Pi_iw' not in results.keys()
     assert results.G_iw is not None
