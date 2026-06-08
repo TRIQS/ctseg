@@ -12,170 +12,169 @@ using namespace triqs::gfs;
 
 namespace triqs_ctseg {
 
-  // Parameters for the solver construction
-
+  /// Parameters used for constructing the solver class.
   struct constr_params_t {
 
-    /// Inverse temperature
+    /// Inverse temperature \f$ \beta \f$.
     double beta;
 
-    /// Structure of the Green's function (names and sizes of blocks)
+    /// Structure of the Green's function (names and sizes of blocks).
     gf_struct_t gf_struct;
 
-    /// Number of time slices for fermionic functions
+    /// Number of time slices for fermionic functions.
     int n_tau = 10001;
 
-    /// Number of time slices for bosonic functions
+    /// Number of time slices for bosonic functions.
     int n_tau_bosonic = 10001;
   };
 
   //---------------------------------------------
-  // Parameters for the solve method
 
+  /// Parameters passed to the ``solve()`` method of the solver class.
   struct solve_params_t {
 
-    /// Quartic part of the local Hamiltonian
+    /// Quartic part of the local Hamiltonian.
     triqs::operators::many_body_operator h_int;
 
-    /// Quandratic part of the local Hamiltonian (including chemical potential)
+    /// Quandratic part of the local Hamiltonian (including chemical potential).
     triqs::operators::many_body_operator h_loc0;
 
-    /// Number of points on which to measure G(tau)/F(tau) (defaults to n_tau)
+    /// Number of points on which to measure \f$ G(\tau) \f$ / \f$ F(\tau) \f$ (defaults to ``n_tau``).
     int n_tau_G = 0;
 
-    /// Number of points on which to measure 2-point functions (defaults to n_tau_bosonic)
+    /// Number of points on which to measure 2-point functions (defaults to ``n_tau_bosonic``.)
     int n_tau_chi2 = 0;
 
-    /// dlr frequency cutoff  FIXME : default value or not ?
+    /// DLR frequency cutoff.
     double dlr_omega_max = 100;
 
-    /// dlr precision: FIXME : default value or not ?
+    /// DLR precision.
     double dlr_epsilon = 1e-8;
 
-    /// Number of bosonic M-frequency points on which to measure vertex functions
+    /// Number of bosonic M-frequency points on which to measure vertex functions.
     int n_w_b_vertex = 10;
 
-    /// Number of fermionic M-frequency points on which to measure vertex functions
+    /// Number of fermionic M-frequency points on which to measure vertex functions.
     int n_w_f_vertex = 10;
 
-    /// Number of QMC cycles
+    /// Number of QMC cycles.
     int n_cycles;
 
-    /// Length of a single QMC cycle
+    /// Length of a single QMC cycle.
     int length_cycle = 50;
 
-    /// Number of cycles for thermalization
+    /// Number of cycles for thermalization.
     int n_warmup_cycles = 5000;
 
-    /// Seed for random number generator
+    /// Seed for random number generator.
     int random_seed = 34788 + 928374 * mpi::communicator().rank();
 
-    /// Name of random number generator
+    /// Name of random number generator.
     std::string random_name = "";
 
-    /// Maximum runtime in seconds, use -1 to set infinite
+    /// Maximum runtime in seconds, use -1 to set infinite.
     int max_time = -1;
 
-    /// Verbosity level
+    /// Verbosity level.
     int verbosity = mpi::communicator().rank() == 0 ? 3 : 0;
 
     // -------- Move control --------------
 
-    /// Whether to perform the move insert segment
+    /// Whether to perform the move insert segment.
     bool move_insert_segment = true;
 
-    /// Whether to perform the move remove segment
+    /// Whether to perform the move remove segment.
     bool move_remove_segment = true;
 
-    /// Whether to perform the move double insert segment
+    /// Whether to perform the move double insert segment.
     bool move_double_insert_segment = true;
 
-    /// Whether to perform the move double remove segment
+    /// Whether to perform the move double remove segment.
     bool move_double_remove_segment = true;
 
-    /// Whether to perform the move move segment
+    /// Whether to perform the move move segment.
     bool move_move_segment = true;
 
-    /// Whether to perform the move split segment
+    /// Whether to perform the move split segment.
     bool move_split_segment = true;
 
-    /// Whether to perform the move group into spin segment
+    /// Whether to perform the move group into spin segment.
     bool move_regroup_segment = true;
 
-    /// Whether to perform the move insert spin segment
+    /// Whether to perform the move insert spin segment.
     bool move_insert_spin_segment = true;
 
-    /// Whether to perform the move remove spin segment
+    /// Whether to perform the move remove spin segment.
     bool move_remove_spin_segment = true;
 
-    /// Whether to perform the move insert spin segment
+    /// Whether to perform the move insert spin segment.
     bool move_split_spin_segment = true;
 
-    /// Whether to perform the move remove spin segment
+    /// Whether to perform the move remove spin segment.
     bool move_regroup_spin_segment = true;
 
-    /// Whether to perform the move swap spin lines
+    /// Whether to perform the move swap spin lines.
     bool move_swap_spin_lines = true;
 
     // -------- Measure control --------------
 
-    /// Whether to measure the perturbation order histograms (order in Delta and Jperp)
+    /// Whether to measure the perturbation order histograms (order in Delta and Jperp).
     bool measure_pert_order = true;
 
-    /// Whether to measure G(tau) (see measures/G_F_tau)
+    /// Whether to measure \f$ G(\tau) \f$.
     bool measure_G_tau = true;
 
-    /// Whether to measure F(tau) (see measures/G_F_tau)
+    /// Whether to measure \f$ F(\tau) \f$.
     bool measure_F_tau = false;
 
-    /// Whether to measure densities (see measures/densities)
+    /// Whether to measure densities.
     bool measure_densities = true;
 
-    /// Whether to measure the average sign (see measures/average_sign)
+    /// Whether to measure the average sign.
     bool measure_average_sign = true;
 
-    /// Whether to measure <n(0)n(0)> (see measures/nn_static)
+    /// Whether to measure \f$ \langle n(0) n(0) \rangle \f$.
     bool measure_nn_static = false;
 
-    /// Whether to measure <n(tau)n(0)> (see measures/nn_tau)
+    /// Whether to measure \f$ \langle n(\tau) n(0) \rangle \f$.
     bool measure_nn_tau = false;
 
-    /// Whether to measure <n(nu)n(0)> (see measures/nn_nu_dlr)
+    /// Whether to measure \f$ \langle n(\nu)n(0) \rangle \f$.
     bool measure_nn_nu_dlr = false;
 
-    /// Whether to measure <S_x(tau)S_x(0)> (see measures/Sperp_tau)
+    /// Whether to measure \f$ \langle S_x(\tau) S_x(0) \rangle \f$.
     bool measure_Sperp_tau = false;
 
-    /// Whether to measure state histograms (see measures/state_hist)
+    /// Whether to measure state histograms.
     bool measure_state_hist = false;
 
-    /// Whether to measure three-point correlation function (see measures/four_point)
+    /// Whether to measure three-point correlation function.
     bool measure_g2w = false;
 
-    /// Whether to measure four-point correlation function (see measures/four_point)
+    /// Whether to measure four-point correlation function.
     bool measure_g3w = false;
 
     // -------- Misc parameters --------------
 
-    /// The maximum size of the determinant matrix before a resize
+    /// The maximum size of the determinant matrix before a resize.
     int det_init_size = 100;
 
-    /// Max number of ops before the test of deviation of the det, M^-1 is performed.
+    /// Max number of ops before testing the accuracy of \f$ \det(M) \f$ and \f$ M^{-1} \f$.
     int det_n_operations_before_check = 100;
 
-    /// Threshold for determinant precision warnings
+    /// Threshold for determinant precision warnings.
     double det_precision_warning = 1.e-8;
 
-    /// Threshold for determinant precision error
+    /// Threshold for determinant precision error.
     double det_precision_error = 1.e-5;
 
-    /// Bound for the determinant matrix being singular, abs(det) > singular_threshold. If <0, it is !isnormal(abs(det))
+    /// Bound for the determinant matrix being singular (if \f$ < 0 \f$, checks for subnormal numbers).
     double det_singular_threshold = -1;
 
-    /// Maximum order for the perturbation order histograms
+    /// Maximum order for the perturbation order histograms.
     int histogram_max_order = 1000;
 
-    /// Output characteristic configurations in a separate file
+    /// Output characteristic configurations in a separate file.
     bool visualize_config = false;
   };
 

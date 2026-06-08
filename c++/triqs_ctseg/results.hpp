@@ -13,52 +13,52 @@ using namespace triqs::gfs;
 
 namespace triqs_ctseg {
 
-  // Gather all the results of the CTQMC
+  /// Container for all results accumulated by the CTQMC simulation.
   struct results_t {
 
-    /// Single-particle Green's function :math:`G(\tau)`.
+    /// Single-particle Green's function \f$ G(\tau) \f$.
     block_gf<imtime> G_tau;
 
-    /// Self-energy improved estimator :math:`F(\tau)`.
+    /// Self-energy improved estimator \f$ F(\tau) \f$.
     std::optional<block_gf<imtime>> F_tau;
 
-    /// Density-density time correlation function :math:`\langle n_a(\tau) n_b(0) \rangle`.
+    /// Density-density time correlation function \f$ \langle n_a(\tau) n_b(0) \rangle \f$.
     std::optional<block2_gf<imtime>> nn_tau;
 
-    /// Density-density frequency correlation function :math:`\langle n_a(i\nu) n_b(-i\nu) \rangle`.
+    /// Density-density frequency correlation function \f$ \langle n_a(i\nu) n_b(-i\nu) \rangle \f$.
     std::optional<block2_gf<dlr_imfreq>> nn_nu_dlr;
 
-    /// Perpendicular spin-spin correlation function :math:`\langle S_x(\tau) S_x(0) \rangle`.
+    /// Perpendicular spin-spin correlation function \f$ \langle S_x(\tau) S_x(0) \rangle \f$.
     std::optional<gf<imtime>> Sperp_tau;
 
-    /// Density-density static correlation function :math:`\langle n_a(0) n_b(0) \rangle`.
+    /// Density-density static correlation function \f$ \langle n_a(0) n_b(0) \rangle \f$.
     std::optional<std::map<std::pair<std::string, std::string>, nda::matrix<double>>> nn_static;
 
     /// Density per color, organized by blocks.
     std::optional<std::map<std::string, nda::array<double, 1>>> densities;
 
-    /// Delta perturbation order histogram
+    /// Delta perturbation order histogram.
     std::optional<std::vector<double>> pert_order_Delta;
 
-    /// Average Delta perturbation order
+    /// Average Delta perturbation order.
     std::optional<double> average_order_Delta;
 
-    /// Jperp perturbation order histogram
+    /// Jperp perturbation order histogram.
     std::optional<std::vector<double>> pert_order_Jperp;
 
-    /// Average Jperp perturbation order
+    /// Average Jperp perturbation order.
     std::optional<double> average_order_Jperp;
 
-    /// State histogram
+    /// State histogram.
     std::optional<nda::vector<double>> state_hist;
 
-    /// Three-point correlation function
+    /// Three-point correlation function.
     std::optional<block2_gf<prod<imfreq, imfreq>, tensor_valued<4>>> g2w;
 
-    /// Four-point correlation function
+    /// Four-point correlation function.
     std::optional<block2_gf<prod<imfreq, imfreq, imfreq>, tensor_valued<4>>> g3w;
 
-    /// Average sign
+    /// Average sign.
     double average_sign;
   };
 

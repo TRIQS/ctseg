@@ -14,7 +14,7 @@
 
 namespace triqs_ctseg {
 
-  /// Main solver class
+  /// Continuous-time hybridization-expansion quantum Monte Carlo solver.
   class solver_core {
 
     // Inverse temperature
@@ -27,38 +27,35 @@ namespace triqs_ctseg {
     mpi::communicator c;
 
     public:
-    /**Set of parameters used in the construction of the ``solver_core`` class.
-  *
-  *.. include:: ../../python/triqs_ctseg/parameters_constr_params_t.rst 
-  */
+    /// Parameters used for constructing the solver.
     constr_params_t constr_params;
 
-    /**Set of parameters used by the last call to ``solve()``.
-  *
-  *.. include:: ../../python/triqs_ctseg/parameters_solve_params_t.rst 
-  */
+    /// Parameters passed to the ``solve()`` method.
     solve_params_t solve_params;
 
-    /// The set of results. See :doc:`Measurements <../guide/measurements>`.
-    // Will be passed to measures and initialized by them.
+    /// Container for all results accumulated by the CTQMC simulation.
     results_t results;
 
-    /// Initialize the solver
-    CPP2PY_ARG_AS_DICT solver_core(constr_params_t const &p);
+    /**
+     * @brief Initialize the solver.
+     * @param p Parameters used for constructing the solver class.
+     */
 
-    /// Solve the impurity problem
-    CPP2PY_ARG_AS_DICT void solve(solve_params_t const &p);
+    /**
+     * @brief Solve the impurity problem.
+     * @param p Parameters controlling the MC simulation and measurements.
+     */
 
     // Green's function views for Python interface
     // do NOT add const here : python uses a non const object and non const view
 
-    /// Hybridization function :math:`\Delta(\tau)`
+    /// Hybridization function \f$ \Delta(\tau) \f$.
     block_gf_view<imtime> Delta_tau() { return inputs.Delta; }
 
-    /// Dynamical spin-spin interaction :math:`\mathcal{J}_\perp(\tau)`
+    /// Dynamical spin-spin interaction \f$ \mathcal{J}_\perp(\tau) \f$.
     gf_view<imtime> Jperp_tau() { return inputs.Jperpt; }
 
-    /// Dynamical density-density interaction :math:`D_0(\tau)`
+    /// Dynamical density-density interaction \f$ D_0(\tau) \f$.
     block2_gf_view<imtime> D0_tau() { return inputs.D0t; }
 
     // --------------- h5 -------------------------
