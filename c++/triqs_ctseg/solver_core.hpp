@@ -11,6 +11,7 @@
 #include "work_data.hpp"
 #include "inputs.hpp"
 #include "results.hpp"
+#include <triqs/utility/macros.hpp>
 
 namespace triqs_ctseg {
 
@@ -40,28 +41,30 @@ namespace triqs_ctseg {
      * @brief Initialize the solver.
      * @param p Parameters used for constructing the solver class.
      */
+    solver_core(constr_params_t const &p);
 
     /**
      * @brief Solve the impurity problem.
      * @param p Parameters controlling the MC simulation and measurements.
      */
+    void solve(solve_params_t const &p);
 
     // Green's function views for Python interface
     // do NOT add const here : python uses a non const object and non const view
 
     /// Hybridization function \f$ \Delta(\tau) \f$.
-    block_gf_view<imtime> Delta_tau() { return inputs.Delta; }
+    C2PY_PROPERTY_GET(Delta_tau) block_gf_view<imtime> Delta_tau() { return inputs.Delta; }
 
     /// Dynamical spin-spin interaction \f$ \mathcal{J}_\perp(\tau) \f$.
-    gf_view<imtime> Jperp_tau() { return inputs.Jperpt; }
+    C2PY_PROPERTY_GET(Jperp_tau) gf_view<imtime> Jperp_tau() { return inputs.Jperpt; }
 
     /// Dynamical density-density interaction \f$ D_0(\tau) \f$.
-    block2_gf_view<imtime> D0_tau() { return inputs.D0t; }
+    C2PY_PROPERTY_GET(D0_tau) block2_gf_view<imtime> D0_tau() { return inputs.D0t; }
 
     // --------------- h5 -------------------------
-    CPP2PY_IGNORE static std::string hdf5_format() { return "CTSEG_SolverCore"; }
+    static std::string hdf5_format() { return "CTSEG_SolverCore"; }
     friend void h5_write(h5::group h5group, std::string subgroup_name, solver_core const &s);
-    CPP2PY_IGNORE static solver_core h5_read_construct(h5::group h5group, std::string subgroup_name);
+    C2PY_IGNORE static solver_core h5_read_construct(h5::group h5group, std::string subgroup_name);
   };
 
 } // namespace triqs_ctseg

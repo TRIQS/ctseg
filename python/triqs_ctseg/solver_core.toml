@@ -1,0 +1,4 @@
+package_name = "triqs_ctseg"
+documentation = "Core module containing wrapped C++ code."
+namespaces = "triqs_ctseg"
+match_names = "triqs_ctseg::(constr_params_t|results_t|solve_params_t|solver_core)"
