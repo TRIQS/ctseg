@@ -16,10 +16,8 @@ add_custom_command(
 
 option(Sphinx_Only "When building the documentation, skip the Python Modules" OFF)
 if(NOT Sphinx_Only)
-  get_property(CPP2PY_MODULES_LIST GLOBAL PROPERTY CPP2PY_MODULES_LIST)
-  if(CPP2PY_MODULES_LIST)
-    add_dependencies(${PROJECT_NAME}_docs_sphinx ${CPP2PY_MODULES_LIST})
-  endif()
+  # Autodoc usage requires the python modules to be built first
+  add_dependencies(${PROJECT_NAME}_docs_sphinx solver_core)
 endif()
 
 # ---------------------------------

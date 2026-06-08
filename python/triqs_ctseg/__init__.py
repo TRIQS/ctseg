@@ -4,16 +4,10 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # See LICENSE in the root of this distribution for details.
 
-r"""
-The CTSEG python module. 
-"""
+"""TRIQS/ctseg — segment-picture CT-HYB impurity solver."""
+
 from .solver import Solver
-from .solver_core import SolverCore
+from .solver_core import SolverCore, ConstrParamsT, SolveParamsT, ResultsT
 from .solve_generic import solve_generic, solve_density
 
-__all__ = ['Solver', 'SolverCore', 'solve_generic', 'solve_density']
-
-
-class Cpp2pyInfo:
-    table_imports = {}
-    table_converters = {}
+__all__ = ['Solver', 'SolverCore', 'solve_generic', 'solve_density', 'ConstrParamsT', 'SolveParamsT', 'ResultsT']

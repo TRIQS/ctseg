@@ -35,14 +35,15 @@ Python reference manual
 
 .. autosummary::
    :toctree: _ref
-   :template: autosummary_class_template.rst
+   :template: autosummary_module_template.rst
    :recursive:
 
-   triqs_ctseg.solver.Solver
+   triqs_ctseg.solver
+   triqs_ctseg.solver_core
 
 Links to all relevant solver parameters: 
 
-* :doc:`Construction parameters <_ref/triqs_ctseg.solver.Solver.__init__>`
+* :doc:`Construction parameters <_ref/triqs_ctseg.solver_core.ConstrParamsT>`
 
-* :doc:`Solve parameters <_ref/triqs_ctseg.solver.Solver.solve>`
+* :doc:`Solve parameters <_ref/triqs_ctseg.solver_core.SolveParamsT>`
 
