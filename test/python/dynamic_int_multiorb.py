@@ -14,7 +14,7 @@ from triqs.utility import mpi
 from triqs.utility.h5diff import h5diff
 
 
-from triqs_ctseg import SolverCore as Solver
+from triqs_ctseg import Solver
 
 # load input data from h5
 # the input data is generated from the github.com/TRIQS/solid_dmft/tree/3.3.x/test/python/svo_gw_emb_dyn test
