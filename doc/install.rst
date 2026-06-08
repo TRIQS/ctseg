@@ -9,6 +9,7 @@ Packaged Versions of CTSEG
 ==========================
 
 .. _ubuntu_debian:
+
 Ubuntu Debian packages
 ----------------------
 
@@ -21,16 +22,18 @@ After the TRIQS setup the command::
 can be used to install the CTSEG package.
 
 .. _anaconda:
+
 Anaconda
 --------
 
-We provide Linux and OSX packages for the `Anaconda <https://www.anaconda.com/>`_ distribution. The packages are provided through the `conda-forge <https://conda-forge.org/>`_ repositories. After `installing conda <https://docs.conda.io/en/latest/miniconda.html>`_ you can install CTSEG with::
+We provide Linux and OSX packages for the `Anaconda <https://www.anaconda.com/>`__ distribution. The packages are provided through the `conda-forge <https://conda-forge.org/>`_ repositories. After `installing conda <https://docs.conda.io/en/latest/miniconda.html>`_ you can install CTSEG with::
 
      conda install -c conda-forge triqs_ctseg
 
 See also `github.com/conda-forge/triqs_ctseg-feedstock <https://github.com/conda-forge/triqs_ctseg-feedstock/>`_.
 
 .. _docker:
+
 Docker
 ------
 

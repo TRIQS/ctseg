@@ -138,8 +138,8 @@ The hybridization function is supplied to the solver via::
 
 .. warning::
 
-The value of ``n_tau`` supplied in the ``constr_params`` and the number of points in the :math:`\tau` grid of
-the :math:`\Delta(\tau)` input must match. 
+   The value of ``n_tau`` supplied in the ``constr_params`` and the number of points in the :math:`\tau` grid of
+   the :math:`\Delta(\tau)` input must match.
 
 This is different from the default interface of the `CTHYB <https://triqs.github.io/cthyb/latest/>`_ solver, 
 which takes as input the non-interacting impurity Green's function :math:`G_0(i\omega_n)`. It is defined as
@@ -239,8 +239,8 @@ The solver is then accordingly set up as::
 
 .. warning::
 
-The value of ``n_tau_bosonic`` supplied in the ``constr_params`` and the number of points in the :math:`\tau` grids of
-the :math:`D(\tau)` and :math:`J_{\perp}(\tau)` inputs must match. 
+   The value of ``n_tau_bosonic`` supplied in the ``constr_params`` and the number of points in the :math:`\tau` grids of
+   the :math:`D(\tau)` and :math:`J_{\perp}(\tau)` inputs must match.
 
 Conditions for half-filling
 ---------------------------
@@ -295,7 +295,7 @@ The complete list of parameters is available :doc:`here <../_ref/triqs_ctseg.sol
 
 .. note::
 
-The moves ``double_insert_segment`` and ``double_remove_segment`` are off by default. They may be switched on by the user when solving impurities with strong attractive interactions to improve ergodicity. 
+   The moves ``double_insert_segment`` and ``double_remove_segment`` are off by default. They may be switched on by the user when solving impurities with strong attractive interactions to improve ergodicity.
 
 Step 4 - Run the solver 
 ***********************
