@@ -7,6 +7,7 @@ endforeach()
 # List of all tests
 set(all_tests
   ./anderson
+  ./complex_h_loc0
   ./dynamical_U
   ./Jperp
   ./spin_spin
