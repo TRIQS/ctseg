@@ -128,7 +128,7 @@ namespace triqs_ctseg {
     h5_read(grp, "measure_state_hist", c.measure_state_hist);
     h5_read(grp, "measure_g2w", c.measure_g2w);
     h5_read(grp, "measure_g3w", c.measure_g3w);
-    h5_read(grp, "imag_threshold", c.imag_threshold);
+    h5::try_read(grp, "imag_threshold", c.imag_threshold);
     h5_read(grp, "det_init_size", c.det_init_size);
     h5_read(grp, "det_n_operations_before_check", c.det_n_operations_before_check);
     h5_read(grp, "det_precision_warning", c.det_precision_warning);

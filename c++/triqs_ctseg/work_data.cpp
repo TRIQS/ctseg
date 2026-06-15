@@ -8,7 +8,6 @@
 #include <algorithm>
 #include <cmath>
 #include <complex>
-#include <vector>
 #include <nda/basic_functions.hpp>
 #include <nda/traits.hpp>
 #include <triqs/gfs/functions/functions2.hpp>

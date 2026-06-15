@@ -38,7 +38,7 @@ S_real = make_solver()
 S_real.solve(h_loc0=-mu * (n("up", 0) + n("down", 0)), **base)
 
 # Complex-typed h_loc0 with a negligible imaginary part: the imaginary part must be dropped,
-# reproducing the real run bit-for-bit (same coefficients, same seed -> same Markov chain).
+# reproducing the real run (identical real coefficients, same seed -> same Markov chain).
 S_cplx = make_solver()
 S_cplx.solve(h_loc0=complex(-mu, 1e-15) * (n("up", 0) + n("down", 0)), **base)
 
