@@ -156,9 +156,9 @@ namespace triqs_ctseg {
 
     // -------- Misc parameters --------------
 
-    /// Tolerance on the imaginary part of the local Hamiltonian h_loc0 (CT-SEG uses a real
-    /// h_loc0). Below it the imaginary part is dropped silently, up to 1e-6 with a warning,
-    /// above 1e-6 it errors. Raise to accept a larger imaginary part.
+    /// Threshold below which the imaginary part of the local Hamiltonian h_loc0 is set to zero
+    /// (CT-SEG uses a real h_loc0); above it the solver errors. Raise to accept a larger
+    /// imaginary part.
     double imag_threshold = 1.e-13;
 
     /// The maximum size of the determinant matrix before a resize.

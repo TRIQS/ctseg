@@ -57,25 +57,16 @@ namespace triqs_ctseg {
     // h_loc0 coefficients are stored as real_or_complex and are flagged complex whenever
     // h_loc0 is built from complex matrices (e.g. a downfolded DFT Hamiltonian), even when
     // the imaginary part is numerical noise. CT-SEG (segment picture) uses a real local
-    // Hamiltonian, so discard a small imaginary part on the diagonal silently, warn for a
-    // larger one (still taking the real part), and error out only if it is so large that the
-    // input is genuinely complex.
+    // Hamiltonian, so set the imaginary part of the diagonal to zero when it is below
+    // imag_threshold and error out otherwise (same convention as cthyb).
     mu          = nda::zeros<double>(n_color);
     auto h_loc0 = dict_to_matrix<std::complex<double>>(extract_h_dict(p.h_loc0), p.gf_struct);
 
-    constexpr double imag_error_threshold = 1.e-6;
-    double max_imag                       = 0.0;
+    double max_imag = 0.0;
     for (auto const &col : range(n_color)) max_imag = std::max(max_imag, std::abs(h_loc0(col, col).imag()));
-    if (max_imag > p.imag_threshold) {
-      if (max_imag > imag_error_threshold)
-        TRIQS_RUNTIME_ERROR << "work_data: the local Hamiltonian h_loc0 has an imaginary part on its diagonal (max |Im| = "
-                            << max_imag << ") larger than " << imag_error_threshold
-                            << ". CT-SEG requires a real local Hamiltonian.";
-      if (c.rank() == 0)
-        spdlog::warn("Imaginary part on the h_loc0 diagonal (max |Im| = {:.3e}) exceeds imag_threshold ({:.3e}); "
-                     "discarding it and taking the real part.",
-                     max_imag, p.imag_threshold);
-    }
+    if (max_imag > p.imag_threshold)
+      TRIQS_RUNTIME_ERROR << "Largest imaginary element of the h_loc0 diagonal: " << max_imag
+                          << ", is larger than the set parameter imag_threshold " << p.imag_threshold;
     for (auto const &col : range(n_color)) mu(col) = -h_loc0(col, col).real();
 
     // .............. Interactions .................

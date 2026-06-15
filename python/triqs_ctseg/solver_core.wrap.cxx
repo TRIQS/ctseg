@@ -383,9 +383,9 @@ constexpr auto _c2py_doc_member_40 = R"DOC(Whether to measure state histograms.)
 constexpr auto _c2py_doc_member_41 = R"DOC(Whether to measure three-point correlation function.)DOC";
 constexpr auto _c2py_doc_member_42 = R"DOC(Whether to measure four-point correlation function.)DOC";
 constexpr auto _c2py_doc_member_43 =
-   R"DOC(Tolerance on the imaginary part of the local Hamiltonian h_loc0 (CT-SEG uses a real
-h_loc0). Below it the imaginary part is dropped silently, up to 1e-6 with a warning,
-above 1e-6 it errors. Raise to accept a larger imaginary part.)DOC";
+   R"DOC(Threshold below which the imaginary part of the local Hamiltonian h_loc0 is set to zero
+(CT-SEG uses a real h_loc0); above it the solver errors. Raise to accept a larger
+imaginary part.)DOC";
 constexpr auto _c2py_doc_member_44 = R"DOC(The maximum size of the determinant matrix before a resize.)DOC";
 constexpr auto _c2py_doc_member_45 =
    R"DOC(Max number of ops before testing the accuracy of :math:`\det(M)` and :math:`M^{-1}`.)DOC";

@@ -6,9 +6,9 @@
 
 # h_loc0 built from complex matrices carries complex-flagged coefficients (real_or_complex)
 # even when the imaginary part is numerical noise. CT-SEG uses a real local Hamiltonian:
-#  - a negligible imaginary part on the diagonal must be dropped (taking the real part), so a
-#    complex-typed h_loc0 reproduces the equivalent real one exactly;
-#  - a genuinely complex h_loc0 (imaginary part above imag_threshold's hard limit) must error.
+#  - an imaginary part on the diagonal below imag_threshold must be dropped (taking the real
+#    part), so a complex-typed h_loc0 reproduces the equivalent real one exactly;
+#  - an imaginary part above imag_threshold must error.
 from triqs.gfs import *
 import triqs.utility.mpi as mpi
 from triqs.operators import n
@@ -53,14 +53,14 @@ if mpi.is_master_node():
         A['densities'] = S_cplx.results.densities
     h5diff("complex_h_loc0_cplx.h5", "complex_h_loc0_real.h5", precision=1e-10)
 
-# A genuinely complex h_loc0 (imaginary part above the hard limit) must raise.
+# An imaginary part above imag_threshold (default 1e-13) must raise.
 raised = False
 try:
     S_bad = make_solver()
     S_bad.solve(h_loc0=complex(-mu, 1e-3) * (n("up", 0) + n("down", 0)), **base)
 except RuntimeError:
     raised = True
-assert raised, "a genuinely complex h_loc0 (Im = 1e-3) should raise an error"
+assert raised, "an h_loc0 with Im = 1e-3 > imag_threshold should raise an error"
 
 # imag_threshold is tunable: raising it above the imaginary part accepts it silently.
 S_tuned = make_solver()
