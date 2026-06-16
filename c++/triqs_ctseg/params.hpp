@@ -156,6 +156,11 @@ namespace triqs_ctseg {
 
     // -------- Misc parameters --------------
 
+    /// Threshold below which the imaginary part of the local Hamiltonian h_loc0 is set to zero
+    /// (CT-SEG uses a real h_loc0); above it the solver errors. Raise to accept a larger
+    /// imaginary part.
+    double imag_threshold = 1.e-13;
+
     /// The maximum size of the determinant matrix before a resize.
     int det_init_size = 100;
 

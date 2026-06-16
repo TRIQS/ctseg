@@ -5,10 +5,14 @@
 // See LICENSE in the root of this distribution for details.
 
 #include "work_data.hpp"
+#include <algorithm>
+#include <cmath>
+#include <complex>
 #include <nda/basic_functions.hpp>
 #include <nda/traits.hpp>
 #include <triqs/gfs/functions/functions2.hpp>
 #include <triqs/operators/util/extractors.hpp>
+#include <triqs/utility/exceptions.hpp>
 #include "logs.hpp"
 #include "spdlog/common.h"
 #include "spdlog/spdlog.h"
@@ -49,10 +53,21 @@ namespace triqs_ctseg {
       }
     }
 
-    // Extract color-dependent chemical potential from operator
+    // Extract color-dependent chemical potential from the local Hamiltonian operator.
+    // h_loc0 coefficients are stored as real_or_complex and are flagged complex whenever
+    // h_loc0 is built from complex matrices (e.g. a downfolded DFT Hamiltonian), even when
+    // the imaginary part is numerical noise. CT-SEG (segment picture) uses a real local
+    // Hamiltonian, so set the imaginary part of the diagonal to zero when it is below
+    // imag_threshold and error out otherwise (same convention as cthyb).
     mu          = nda::zeros<double>(n_color);
-    auto h_loc0 = dict_to_matrix(extract_h_dict(p.h_loc0), p.gf_struct);
-    for (auto const &col : range(n_color)) { mu(col) = -h_loc0(col, col); }
+    auto h_loc0 = dict_to_matrix<std::complex<double>>(extract_h_dict(p.h_loc0), p.gf_struct);
+
+    double max_imag = 0.0;
+    for (auto const &col : range(n_color)) max_imag = std::max(max_imag, std::abs(h_loc0(col, col).imag()));
+    if (max_imag > p.imag_threshold)
+      TRIQS_RUNTIME_ERROR << "Largest imaginary element of the h_loc0 diagonal: " << max_imag
+                          << ", is larger than the set parameter imag_threshold " << p.imag_threshold;
+    for (auto const &col : range(n_color)) mu(col) = -h_loc0(col, col).real();
 
     // .............. Interactions .................
     // Extract the U from the operator
