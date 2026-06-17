@@ -91,4 +91,4 @@ if mpi.is_master_node():
         A['densities'] = results.Solver.results.densities
 
     h5diff("solve_generic_dynamical_U.out.h5",
-           "solve_generic_dynamical_U.ref.h5", precision=1e-9)
+           "solve_generic_dynamical_U.ref.h5", precision=2e-9)

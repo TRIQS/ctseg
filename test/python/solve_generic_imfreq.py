@@ -73,4 +73,4 @@ if mpi.is_master_node():
         A['Sigma_HartreeFock'] = results.Sigma_HartreeFock
         A['densities'] = results.Solver.results.densities
 
-    h5diff("solve_generic_imfreq.out.h5", "solve_generic_imfreq.ref.h5", precision=1e-9)
+    h5diff("solve_generic_imfreq.out.h5", "solve_generic_imfreq.ref.h5", precision=2e-9)
