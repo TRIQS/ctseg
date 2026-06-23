@@ -19,8 +19,7 @@ namespace triqs_ctseg::measures {
     block_number   = wdata.block_number;
     index_in_block = wdata.index_in_block;
 
-    auto m = dlr_imfreq(p.beta, Boson, p.dlr_omega_max, p.dlr_epsilon);
-    std::cout << "Number of DLR frequencies for nn_nu measurement : " << m.size() << std::endl;
+    auto m     = dlr_imfreq(p.beta, Boson, p.dlr_omega_max, p.dlr_epsilon);
     q_nu_block = make_block2_gf<dlr_imfreq>(m, p.gf_struct);
     q_nu       = gf<dlr_imfreq>(m, {n_color, n_color});
     q_nu()     = 0;
