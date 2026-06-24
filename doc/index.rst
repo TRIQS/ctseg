@@ -16,14 +16,14 @@ The imaginary time action solved by CTSEG is of the form
   \mathcal{S}  &= \iint_0^{\beta} \mathrm{d} \tau \mathrm{d} \tau' \sum_{a,b} \left\{ \overline{c}_{a\sigma} (\tau)
   \left( (\partial_{\tau} + \epsilon_{a\sigma} - \mu)\delta_{ab}^{\sigma \sigma'} \delta_{\tau - \tau'} + \Delta_{ab}^{\sigma \sigma'}(\tau - \tau')\right)
   c_{b\sigma'}(\tau') \right\} \\
-  &+ \frac{1}{2} \iint_0^{\beta} \mathrm{d} \tau \mathrm{d} \tau' \sum_{a,b} \mathcal{U}_{ab}(\tau - \tau') n_a(\tau) n_b(\tau') 
+  &+ \frac{1}{2} \iint_0^{\beta} \mathrm{d} \tau \mathrm{d} \tau' \sum_{a,b} \mathcal{U}_{ab}(\tau - \tau') n_a(\tau) n_b(\tau')
   + \frac{1}{2} \iint_0^{\beta} \mathrm{d} \tau \mathrm{d} \tau' \sum_{a, \xi = x, y, z} s_a^{\xi}(\tau) \mathcal{J}_a^{\xi}(\tau - \tau') s_a^{\xi} (\tau')
   \end{split}
 
 .. sidebar:: CTSEG |PROJECT_VERSION|
 
    This is the homepage of CTSEG |PROJECT_VERSION|.
-   For changes see the :ref:`changelog page <changelog>`.
+   For changes see the :doc:`changelog page <ChangeLog>`.
       
       .. image:: _static/logo_github.png
          :width: 65%
@@ -56,5 +56,5 @@ other observables. Learn how to use it in the :ref:`documentation`.
    install
    documentation
    issues
-   ChangeLog.md
+   ChangeLog
    about

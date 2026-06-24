@@ -6,7 +6,7 @@ import sys
 sys.path.insert(0, "@CMAKE_CURRENT_SOURCE_DIR@/sphinxext")
 
 # exclude these folders from scanning by sphinx
-exclude_patterns = ['_templates']
+exclude_patterns = ['_templates', 'doxygen']
 
 extensions = ['sphinx.ext.autodoc',
               'sphinx.ext.mathjax',
@@ -38,11 +38,14 @@ myst_enable_extensions = [
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'
 
-source_suffix = '.rst'
+source_suffix = {
+    '.rst': 'restructuredtext',
+    '.md': 'markdown',
+}
 
 # Turn on sphinx.ext.autosummary
 autosummary_generate = True
-autosummary_imported_members=False
+autosummary_imported_members = False
 
 project = 'CTSEG - TRIQS segment picture solver'
 version = '@PROJECT_VERSION@'
@@ -138,7 +141,7 @@ class PatchedHTMLTranslator(HTMLTranslator):
         if 'target' in node:
             atts['target'] = node['target']
         self.body.append(self.starttag(node, 'a', '', **atts))
- 
+
         if node.get('secnumber'):
             self.body.append(('%s' + self.secnumber_suffix) %
                              '.'.join(map(str, node['secnumber'])))

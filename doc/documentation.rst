@@ -17,7 +17,7 @@ User guide
 
 .. toctree::
    :maxdepth: 1
-   
+
    guide/step_by_step
    guide/moves
    guide/measurements
@@ -46,4 +46,9 @@ Links to all relevant solver parameters:
 * :doc:`Construction parameters <_ref/triqs_ctseg.solver_core.ConstrParamsT>`
 
 * :doc:`Solve parameters <_ref/triqs_ctseg.solver_core.SolveParamsT>`
+
+C++ reference manual
+--------------------
+
+The C++ reference manual can be found `here <./doxygen/index.html>`_.
 
