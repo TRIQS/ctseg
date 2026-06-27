@@ -118,8 +118,8 @@ Hybridization function
 The CTSEG solver takes as an input the hybridization function :math:`\Delta(\tau)` that appears in the 
 impurity action (see :doc:`CTSEG algorithm <../algorithm_implementation/ctseg>`). It is initialized as::
 
-    from triqs.gf import *
-    from triqs.gf.tools import *
+    from triqs.gfs import *
+    from triqs.gfs.tools import *
     tau_mesh = MeshImTime(beta, 'Fermion', n_tau)
     Delta_tau = BlockGf(mesh = tau_mesh, gf_struct = gf_struct)
 
@@ -195,7 +195,7 @@ diagonal structure as the hybridization function.
 The data in ``D_tau`` can be specified manually (``D_tau["block1", "block2"].data = ...``) or by using an analytical expression. 
 For example:: 
 
-    from triqs.gf.descriptors import Function
+    from triqs.gfs.descriptors import Function
     wp = 1
     D_iw = GfImFreq(indices = [0], beta = beta, statistic = "Boson", n_points = n_tau_bosonic//2)
     d_tau = GfImTime(indices = [0], beta = beta, statistic = "Boson", n_points = n_tau_bosonic)
