@@ -255,6 +255,145 @@ def _d0_tau0_matrix(solver):
     return 0.5 * (D0_tau.data[0].real + D0_tau.data[-1].real)
 
 
+def _spin_color_indices(gf_struct):
+    block_name, _, _ = build_color_tables(gf_struct)
+    up = [
+        c for c, name in enumerate(block_name)
+        if name.lower().startswith('up')
+    ]
+    down = [
+        c for c, name in enumerate(block_name)
+        if name.lower().startswith('down') or name.lower().startswith('dn')
+    ]
+    if len(up) != 1 or len(down) != 1:
+        return None
+    return up[0], down[0]
+
+
+def _h_loc0_color_matrix(solver):
+    block_name, _, _ = build_color_tables(solver.gf_struct)
+    h_loc0_color = np.zeros((len(block_name), len(block_name)), dtype=complex)
+    offset = 0
+    for h_block in solver.h_loc0_mat:
+        dim = h_block.shape[0]
+        h_loc0_color[offset:offset + dim, offset:offset + dim] = h_block
+        offset += dim
+    return h_loc0_color
+
+
+def _is_unpolarized_single_orbital(solver, up, down, tol=1e-12):
+    block_name, _, _ = build_color_tables(solver.gf_struct)
+    if len(block_name) != 2:
+        return False
+    h_loc0 = _h_loc0_color_matrix(solver)
+    return abs(h_loc0[up, up] - h_loc0[down, down]) < tol
+
+
+def _trapezoid_uniform(values, beta):
+    values = np.asarray(values)
+    if values.size < 2:
+        raise ValueError("Need at least two tau points for trapezoidal integration.")
+    dtau = beta / (values.size - 1)
+    weights = np.ones(values.size)
+    weights[0] = weights[-1] = 0.5
+    return dtau * np.sum(weights * values)
+
+
+def _periodic_tau_convolution_zero(left, middle, right, beta):
+    """Approximate int dt dt' left(t) middle(t-t') right(t') / beta.
+
+    The bosonic tau meshes include both 0 and beta. For the circular
+    convolution use the half-open grid [0, beta) to avoid double-counting the
+    endpoint.
+    """
+    left = np.asarray(left[:-1], dtype=float)
+    middle = np.asarray(middle[:-1], dtype=float)
+    right = np.asarray(right[:-1], dtype=float)
+    if not (left.size == middle.size == right.size):
+        raise ValueError("Convolution inputs must live on the same tau mesh.")
+    n_tau = left.size
+    dtau = beta / n_tau
+    total = 0.0
+    for i in range(n_tau):
+        total += left[i] * np.dot(middle[(i - np.arange(n_tau)) % n_tau], right)
+    return (dtau * dtau / beta) * total
+
+
+def _phase2c_jperp_components_from_tau(jperp_tau, chi_xx_tau, beta, U):
+    jperp_tau = np.asarray(jperp_tau, dtype=float)
+    chi_xx_tau = np.asarray(chi_xx_tau, dtype=float)
+    if jperp_tau.shape != chi_xx_tau.shape:
+        raise ValueError("Jperp_tau and chi_xx_tau must have the same tau mesh.")
+
+    j_tau0 = 0.5 * (jperp_tau[0] + jperp_tau[-1])
+    j_chi = _trapezoid_uniform(jperp_tau * chi_xx_tau, beta)
+    j_chi_j = _periodic_tau_convolution_zero(jperp_tau, chi_xx_tau, jperp_tau, beta)
+
+    pure = 0.5 * (j_tau0 + j_chi_j)
+    mixed = -2.0 * U * j_chi
+    return {
+        'pure': pure,
+        'mixed': mixed,
+        'total': pure + mixed,
+        'int_J_chi_xx': j_chi,
+        'J_chi_xx_J': j_chi_j,
+        'J_tau0': j_tau0,
+    }
+
+
+def _chi_xx_tau_from_solver(solver, up, down):
+    nn_tau = getattr(solver.results, 'nn_tau', None)
+    if nn_tau is not None:
+        block_name, index_in_block, _ = build_color_tables(solver.gf_struct)
+        nn_color = _assemble_color_gf(nn_tau, block_name, index_in_block)
+        chi_up_up = nn_color.data[:, up, up].real
+        chi_down_down = nn_color.data[:, down, down].real
+        chi_cross = 0.5 * (nn_color.data[:, up, down].real + nn_color.data[:, down, up].real)
+        return 0.25 * (chi_up_up + chi_down_down - 2.0 * chi_cross)
+
+    sperp_tau = getattr(solver.results, 'Sperp_tau', None)
+    if sperp_tau is not None:
+        return np.asarray(sperp_tau.data[:, 0, 0].real)
+
+    return None
+
+
+def _assemble_jperp_phase2c_sigma1(solver, U):
+    spin_colors = _spin_color_indices(solver.gf_struct)
+    if spin_colors is None:
+        mpi.report("WARNING: Jperp Phase 2c moments require a single up/down orbital; "
+                   "skipping analytic transverse Sigma_1/F_2.")
+        return None
+
+    up, down = spin_colors
+    if not _is_unpolarized_single_orbital(solver, up, down):
+        mpi.report("WARNING: spin-polarized Jperp moments require asymmetric transverse-spin measures; "
+                   "skipping analytic transverse Sigma_1/F_2.")
+        return None
+
+    chi_xx_tau = _chi_xx_tau_from_solver(solver, up, down)
+    if chi_xx_tau is None:
+        mpi.report("WARNING: Jperp Phase 2c moments require nn_tau or Sperp_tau; "
+                   "skipping analytic transverse Sigma_1/F_2.")
+        return None
+
+    jperp_tau = np.asarray(solver.Jperp_tau.data[:, 0, 0].real)
+    if jperp_tau.shape != chi_xx_tau.shape:
+        mpi.report("WARNING: Jperp_tau and chi_xx_tau tau meshes differ; "
+                   "skipping analytic transverse Sigma_1/F_2.")
+        return None
+
+    U_spin = 0.5 * (U[up, down] + U[down, up])
+    components = _phase2c_jperp_components_from_tau(
+        jperp_tau, chi_xx_tau, solver.Jperp_tau.mesh.beta, U_spin
+    )
+
+    correction = np.zeros(U.shape[0], dtype=float)
+    correction[up] = components['total']
+    correction[down] = components['total']
+    return correction, components
+
+
 def _assemble_density_tail_moments(solver, use_tail_moments=True):
     """Assemble diagonal color-space Sigma/G/F moments from static and D0 data."""
     if not use_tail_moments:
@@ -301,17 +440,16 @@ def _assemble_density_tail_moments(solver, use_tail_moments=True):
 
     has_Jperp = _gf_is_nonzero(getattr(solver, 'Jperp_tau', None))
     if has_Jperp:
-        mpi.report("WARNING: analytic transverse Jperp Sigma_1/F_2 assembly requires the Phase 2c "
-                   "non-polarized spin measure path; using static/D0 moments that are available.")
+        jperp_phase2c = _assemble_jperp_phase2c_sigma1(solver, U)
+        if jperp_phase2c is not None and sigma1 is not None:
+            jperp_sigma1, jperp_components = jperp_phase2c
+            sigma1 = sigma1 + jperp_sigma1
+            solver.Jperp_moment_components = jperp_components
+        elif jperp_phase2c is not None:
+            mpi.report("WARNING: static density covariance is unavailable; skipping analytic Jperp Sigma_1/F_2.")
 
     block_name, _, _ = build_color_tables(solver.gf_struct)
-    n_color = len(block_name)
-    h_loc0_color = np.zeros((n_color, n_color), dtype=complex)
-    offset = 0
-    for h_block in solver.h_loc0_mat:
-        dim = h_block.shape[0]
-        h_loc0_color[offset:offset + dim, offset:offset + dim] = h_block
-        offset += dim
+    h_loc0_color = _h_loc0_color_matrix(solver)
 
     sigma0_mat = np.diag(sigma0).astype(complex)
     g2_color = h_loc0_color + sigma0_mat
