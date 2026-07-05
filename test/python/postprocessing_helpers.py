@@ -16,6 +16,8 @@ from triqs.operators import n
 from triqs_ctseg.postprocessing import (
     build_color_tables,
     _dd_to_4idx,
+    _density_observables_from_density_matrix,
+    _assemble_density_tail_moments,
     extract_u_tensor_from_h_int,
     check_spectrum,
 )
@@ -160,6 +162,38 @@ def test_check_spectrum_rejects_non_square():
     raise AssertionError("check_spectrum should have raised for non-square input")
 
 
+def test_density_matrix_observables_and_static_moments():
+    class Results:
+        state_hist = np.array([0.1, 0.2, 0.3, 0.4])
+        densities = None
+        nn_static = None
+
+    class Solver:
+        gf_struct = [('up', 1), ('down', 1)]
+        results = Results()
+        density_matrix = Results.state_hist
+        h_int = 2.0 * n('up', 0) * n('down', 0)
+        h_loc0_mat = [np.array([[0.25]]), np.array([[-0.5]])]
+        D0_tau = None
+
+    n_avg, nn_avg = _density_observables_from_density_matrix(Solver)
+    np.testing.assert_allclose(n_avg, [0.6, 0.7])
+    np.testing.assert_allclose(nn_avg, [[0.6, 0.4], [0.4, 0.7]])
+
+    moments = _assemble_density_tail_moments(Solver)
+    np.testing.assert_allclose(moments['Sigma_moments']['up'][0], [[1.4]])
+    np.testing.assert_allclose(moments['Sigma_moments']['down'][0], [[1.2]])
+    # Sigma_1^up = U^2 Var(n_down), Sigma_1^down = U^2 Var(n_up)
+    np.testing.assert_allclose(moments['Sigma_moments']['up'][1], [[4.0 * 0.7 * 0.3]])
+    np.testing.assert_allclose(moments['Sigma_moments']['down'][1], [[4.0 * 0.6 * 0.4]])
+    np.testing.assert_allclose(moments['G_moments']['up'][2], [[1.65]])
+    np.testing.assert_allclose(moments['G_moments']['down'][2], [[0.7]])
+    np.testing.assert_allclose(
+        moments['F_tail_moments']['up'][2],
+        [[1.4 * 1.65 + 4.0 * 0.7 * 0.3]],
+    )
+
+
 if mpi.is_master_node():
     test_build_color_tables_single_orbital()
     test_build_color_tables_two_orbital_single_block_per_spin()
@@ -171,4 +205,5 @@ if mpi.is_master_node():
     test_check_spectrum_no_truncation_keeps_matrix()
     test_check_spectrum_truncation_drops_large_eigenvalues()
     test_check_spectrum_rejects_non_square()
+    test_density_matrix_observables_and_static_moments()
     print("postprocessing_helpers: all tests passed")

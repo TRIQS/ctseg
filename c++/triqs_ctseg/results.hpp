@@ -52,6 +52,12 @@ namespace triqs_ctseg {
     /// State histogram.
     std::optional<nda::vector<double>> state_hist;
 
+    /// Retarded source-field/density static correlation in color space.
+    std::optional<nda::matrix<double>> dyn_phi_n;
+
+    /// Retarded source-field/source-field static correlation in color space.
+    std::optional<nda::matrix<double>> dyn_phi_phi;
+
     /// Three-point correlation function.
     std::optional<block2_gf<prod<imfreq, imfreq>, tensor_valued<4>>> g2w;
 

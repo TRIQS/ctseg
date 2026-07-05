@@ -175,6 +175,185 @@ def compute_sigma_hartreefock(solver):
     return Sigma_HartreeFock
 
 
+def _block2gf_is_nonzero(gf, tol=1e-13):
+    if gf is None:
+        return False
+    return any(np.max(np.abs(gf[key].data)) > tol for key in gf.indices)
+
+
+def _gf_is_nonzero(gf, tol=1e-13):
+    if gf is None:
+        return False
+    return np.max(np.abs(gf.data)) > tol
+
+
+def _density_observables_from_density_matrix(solver):
+    hist = getattr(solver, 'density_matrix', None)
+    if hist is None:
+        hist = getattr(solver.results, 'state_hist', None)
+    if hist is None:
+        return None, None
+
+    prob = np.asarray(hist, dtype=float)
+    block_name, _, _ = build_color_tables(solver.gf_struct)
+    n_color = len(block_name)
+    if prob.size != 2 ** n_color:
+        raise ValueError(
+            f"density matrix has length {prob.size}, expected {2 ** n_color} for {n_color} colors"
+        )
+
+    states = np.arange(prob.size, dtype=np.int64)
+    occ = ((states[:, None] >> np.arange(n_color)) & 1).astype(float)
+    n_avg = prob @ occ
+    nn_avg = np.einsum('s,sc,sd->cd', prob, occ, occ)
+    return n_avg, nn_avg
+
+
+def _densities_from_results(solver):
+    densities = getattr(solver.results, 'densities', None)
+    if densities is None:
+        return None
+    block_name, index_in_block, _ = build_color_tables(solver.gf_struct)
+    return np.array([
+        densities[block_name[c]][index_in_block[c]]
+        for c in range(len(block_name))
+    ], dtype=float)
+
+
+def _nn_static_from_results(solver):
+    nn_static = getattr(solver.results, 'nn_static', None)
+    if nn_static is None:
+        return None
+
+    block_name, index_in_block, _ = build_color_tables(solver.gf_struct)
+    n_color = len(block_name)
+    out = np.zeros((n_color, n_color), dtype=float)
+    for c1, c2 in product(range(n_color), repeat=2):
+        out[c1, c2] = nn_static[block_name[c1], block_name[c2]][index_in_block[c1], index_in_block[c2]]
+    return out
+
+
+def _color_vector_to_block_diag(vec, gf_struct):
+    out = {}
+    offset = 0
+    for blk_name, blk_dim in gf_struct:
+        out[blk_name] = np.diag(vec[offset:offset + blk_dim]).astype(complex)
+        offset += blk_dim
+    return out
+
+
+def _tail_dict_from_block_moments(block_moments):
+    return {
+        blk_name: np.asarray(moments, dtype=complex)
+        for blk_name, moments in block_moments.items()
+    }
+
+
+def _d0_tau0_matrix(solver):
+    block_name, index_in_block, _ = build_color_tables(solver.gf_struct)
+    D0_tau = _assemble_color_gf(solver.D0_tau, block_name, index_in_block)
+    return 0.5 * (D0_tau.data[0].real + D0_tau.data[-1].real)
+
+
+def _assemble_density_tail_moments(solver, use_tail_moments=True):
+    """Assemble diagonal color-space Sigma/G/F moments from static and D0 data."""
+    if not use_tail_moments:
+        return None
+
+    n_avg, nn_avg = _density_observables_from_density_matrix(solver)
+    if n_avg is None:
+        n_avg = _densities_from_results(solver)
+    if n_avg is None:
+        mpi.report("WARNING: Cannot assemble tail moments because densities are not measured.")
+        return None
+    if nn_avg is None:
+        nn_avg = _nn_static_from_results(solver)
+
+    U = extract_u_tensor_from_h_int(h_int=solver.h_int, gf_struct=solver.gf_struct).real
+    sigma0 = U @ n_avg
+    sigma1 = None
+    if nn_avg is not None:
+        cov_nn = nn_avg - np.outer(n_avg, n_avg)
+        sigma1 = np.einsum('cd,ce,de->c', U, U, cov_nn)
+
+    has_D0 = _block2gf_is_nonzero(solver.D0_tau)
+    if has_D0:
+        D0_w0 = extract_screen_matrix_from_D0_tau(blk2_D0_tau=solver.D0_tau, gf_struct=solver.gf_struct).real
+        phi_avg = D0_w0 @ n_avg
+        sigma0 = sigma0 + phi_avg
+
+        dyn_phi_n = getattr(solver.results, 'dyn_phi_n', None)
+        dyn_phi_phi = getattr(solver.results, 'dyn_phi_phi', None)
+        if dyn_phi_n is None or dyn_phi_phi is None:
+            mpi.report("WARNING: D0_tau is non-zero but dyn_phi_n/dyn_phi_phi were not measured; "
+                       "using Sigma_0/G_2 moments only and skipping analytic Sigma_1/F_2.")
+            sigma1 = None
+        elif nn_avg is None:
+            mpi.report("WARNING: D0_tau is non-zero but density covariance is unavailable; "
+                       "using Sigma_0/G_2 moments only and skipping analytic Sigma_1/F_2.")
+            sigma1 = None
+        else:
+            dyn_phi_n = np.asarray(dyn_phi_n, dtype=float)
+            dyn_phi_phi = np.asarray(dyn_phi_phi, dtype=float)
+            cov_phi_n = dyn_phi_n - np.outer(phi_avg, n_avg)
+            var_phi = np.diag(dyn_phi_phi) - phi_avg ** 2 + np.diag(_d0_tau0_matrix(solver))
+            sigma1 = sigma1 + 2.0 * np.einsum('cd,cd->c', U, cov_phi_n) + var_phi
+
+    has_Jperp = _gf_is_nonzero(getattr(solver, 'Jperp_tau', None))
+    if has_Jperp:
+        mpi.report("WARNING: analytic transverse Jperp Sigma_1/F_2 assembly requires the Phase 2c "
+                   "non-polarized spin measure path; using static/D0 moments that are available.")
+
+    block_name, _, _ = build_color_tables(solver.gf_struct)
+    n_color = len(block_name)
+    h_loc0_color = np.zeros((n_color, n_color), dtype=complex)
+    offset = 0
+    for h_block in solver.h_loc0_mat:
+        dim = h_block.shape[0]
+        h_loc0_color[offset:offset + dim, offset:offset + dim] = h_block
+        offset += dim
+
+    sigma0_mat = np.diag(sigma0).astype(complex)
+    g2_color = h_loc0_color + sigma0_mat
+
+    Sigma_moments = {}
+    G_moments = {}
+    F_moments = {}
+    F_tail_moments = {}
+    offset = 0
+    for blk_name, blk_dim in solver.gf_struct:
+        sigma0_block = sigma0_mat[offset:offset + blk_dim, offset:offset + blk_dim]
+        g2_block = g2_color[offset:offset + blk_dim, offset:offset + blk_dim]
+
+        sigma_tail = np.zeros((1 if sigma1 is None else 2, blk_dim, blk_dim), dtype=complex)
+        sigma_tail[0] = sigma0_block
+        if sigma1 is not None:
+            sigma_tail[1] = np.diag(sigma1[offset:offset + blk_dim]).astype(complex)
+        Sigma_moments[blk_name] = sigma_tail
+
+        g_tail = np.zeros((3, blk_dim, blk_dim), dtype=complex)
+        g_tail[1] = np.eye(blk_dim)
+        g_tail[2] = g2_block
+        G_moments[blk_name] = g_tail
+
+        F_moments[blk_name] = sigma0_block
+        f_tail = np.zeros((2 if sigma1 is None else 3, blk_dim, blk_dim), dtype=complex)
+        f_tail[1] = sigma0_block
+        if sigma1 is not None:
+            sigma1_block = np.diag(sigma1[offset:offset + blk_dim]).astype(complex)
+            f_tail[2] = sigma0_block @ g2_block + sigma1_block
+        F_tail_moments[blk_name] = f_tail
+        offset += blk_dim
+
+    return {
+        'Sigma_HartreeFock': _color_vector_to_block_diag(sigma0, solver.gf_struct),
+        'Sigma_moments': _tail_dict_from_block_moments(Sigma_moments),
+        'G_moments': _tail_dict_from_block_moments(G_moments),
+        'F_moments': F_moments,
+        'F_tail_moments': _tail_dict_from_block_moments(F_tail_moments),
+    }
+
+
 # =============================================================================
 # Self-energy post-processing
 # =============================================================================
@@ -204,6 +383,23 @@ def postprocess_sigma(
         if symmetrize_func is not None and degenerate_blk:
             gf << symmetrize_func(gf, degenerate_blk)
 
+    tail_moments = _assemble_density_tail_moments(
+        solver,
+        use_tail_moments=post_proc_params.get('use_tail_moments', True),
+    )
+    if tail_moments is not None:
+        Sigma_HartreeFock = tail_moments['Sigma_HartreeFock']
+        solver.Sigma_moments = tail_moments['Sigma_moments']
+        solver.G_moments = tail_moments['G_moments']
+        solver.F_moments = tail_moments['F_moments']
+        solver.F_tail_moments = tail_moments['F_tail_moments']
+    else:
+        Sigma_HartreeFock = None
+        solver.Sigma_moments = None
+        solver.G_moments = None
+        solver.F_moments = None
+        solver.F_tail_moments = None
+
     mesh = MeshImFreq(beta=solver.beta, statistic="Fermion", n_iw=solver.n_iw)
     Sigma_iw = BlockGf(mesh=mesh, gf_struct=solver.gf_struct)
     Sigma_iw.zero()
@@ -211,10 +407,13 @@ def postprocess_sigma(
     G0_iw = Sigma_iw.copy()
 
     # 1. Fourier transform G(tau) to G(iw)
-    Gf_known_moments = make_zero_tail(G_iw, n_moments=2)
     for i, bl in enumerate(G_iw.indices):
-        Gf_known_moments[i][1] = np.eye(G_iw[bl].target_shape[0])
-        G_iw[bl].set_from_fourier(solver.results.G_tau[bl], Gf_known_moments[i])
+        if solver.G_moments is None:
+            Gf_known_moments = make_zero_tail(G_iw[bl], n_moments=2)
+            Gf_known_moments[1] = np.eye(G_iw[bl].target_shape[0])
+        else:
+            Gf_known_moments = solver.G_moments[bl]
+        G_iw[bl].set_from_fourier(solver.results.G_tau[bl], Gf_known_moments)
     G_iw << make_hermitian(G_iw)
     symmetrize(G_iw)
 
@@ -234,21 +433,18 @@ def postprocess_sigma(
         mpi.report("")
 
     # 3. Compute the HF self-energy
-    if post_proc_params['analytic_hf']:
+    if Sigma_HartreeFock is None and post_proc_params['analytic_hf']:
         Sigma_HartreeFock = compute_sigma_hartreefock(solver)
-
-        if symmetrize_func is not None and degenerate_blk:
-            Sigma_HF_list = symmetrize_func(list(Sigma_HartreeFock.values()), degenerate_blk)
-            Sigma_HartreeFock = dict(zip(Sigma_HartreeFock.keys(), Sigma_HF_list))
-
-        _report_sigma_hf(Sigma_HartreeFock)
         solver.Sigma_moments = {
             blk_name: np.array([hf_val], dtype=complex)
             for blk_name, hf_val in Sigma_HartreeFock.items()
         }
-    else:
-        Sigma_HartreeFock = None
-        solver.Sigma_moments = None
+
+    if Sigma_HartreeFock is not None:
+        if symmetrize_func is not None and degenerate_blk:
+            Sigma_HF_list = symmetrize_func(list(Sigma_HartreeFock.values()), degenerate_blk)
+            Sigma_HartreeFock = dict(zip(Sigma_HartreeFock.keys(), Sigma_HF_list))
+        _report_sigma_hf(Sigma_HartreeFock)
 
     # 4. Compute self-energy
     if solver.results.F_tau is None:
@@ -258,15 +454,23 @@ def postprocess_sigma(
         mpi.report("F(tau) is measured -> Compute the self-energy via the improved estimator.\n")
         F_iw = G_iw.copy()
         F_iw << 0.0
-        F_known_moments = make_zero_tail(F_iw, n_moments=1)
-        for i, bl in enumerate(F_iw.indices):
-            F_iw[bl].set_from_fourier(solver.results.F_tau[bl], F_known_moments[i])
+        F_tau_for_fourier = solver.results.F_tau.copy()
+        for bl, f_tau in F_tau_for_fourier:
+            if solver.F_tail_moments is not None:
+                F_known_moments = solver.F_tail_moments[bl]
+            else:
+                F_known_moments = np.zeros((2,) + f_tau.target_shape, dtype=complex)
+                F_known_moments[1] = -(f_tau.data[0] + f_tau.data[-1])
+
+            f1 = F_known_moments[1]
+            f_tau.data[0, :, :] = 0.5 * (f_tau.data[0, :, :] - f1 - f_tau.data[-1, :, :])
+            f_tau.data[-1, :, :] = -f1 - f_tau.data[0, :, :]
+            F_iw[bl].set_from_fourier(f_tau, F_known_moments)
         F_iw << make_hermitian(F_iw)
         symmetrize(F_iw)
 
         for block, fw in F_iw:
-            for iw in fw.mesh:
-                Sigma_iw[block][iw] = fw[iw] / G_iw[block][iw]
+            Sigma_iw[block] << fw * inverse(G_iw[block])
 
     Sigma_iw << make_hermitian(Sigma_iw)
     symmetrize(Sigma_iw)
@@ -279,7 +483,7 @@ def postprocess_sigma(
             fit_min_w=post_proc_params['fit_min_w'],
             fit_max_w=post_proc_params['fit_max_w'],
             fit_max_moment=post_proc_params['fit_max_moment'],
-            fit_known_moments=None,
+            fit_known_moments=solver.Sigma_moments,
         )
 
     Sigma_iw << make_hermitian(Sigma_iw)

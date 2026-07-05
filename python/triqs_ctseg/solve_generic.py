@@ -44,9 +44,18 @@ _POST_PROC_DEFAULTS = {
     'fit_min_n': None,
     'fit_max_n': None,
     'analytic_hf': False,
+    'use_tail_moments': True,
     'degenerate_blk': None,
     'truncate_uchi': False,
 }
+
+
+def _gf_is_nonzero(gf, tol=1e-13):
+    if gf is None:
+        return False
+    if hasattr(gf, 'indices'):
+        return any(np.max(np.abs(gf[key].data)) > tol for key in gf.indices)
+    return any(np.max(np.abs(block.data)) > tol for _, block in gf)
 
 
 def _prepare_solver(
@@ -138,6 +147,11 @@ def _run_solver(Delta_iw, h_loc0, h_int, D0_iw, solve_density_only, **params):
         solve_density_only=solve_density_only, **params,
     )
     _prepare_delta_tau(S, Delta_iw, D0_iw, n_tau)
+    solver_params.setdefault('measure_density_matrix', True)
+    if (not solve_density_only
+            and post_proc_params.get('use_tail_moments', True)
+            and _gf_is_nonzero(D0_iw)):
+        solver_params.setdefault('measure_dyn_corr', True)
 
     mpi.report("Solving the impurity problem with CT-SEG"
                + (" for density" if solve_density_only else ""))

@@ -70,3 +70,12 @@ class Solver(SolverCore):
         # Solve the impurity problem
         solve_status = SolverCore.solve(self, SolveParamsT(**kwargs))
         return solve_status
+
+    @property
+    def density_matrix(self):
+        r"""TTI diagonal impurity density matrix in the occupation basis.
+
+        The value is stored in the legacy ``results.state_hist`` HDF field for
+        backward compatibility.
+        """
+        return self.results.state_hist

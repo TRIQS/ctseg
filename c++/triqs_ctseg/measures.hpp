@@ -15,5 +15,6 @@
 #include "./measures/average_sign.hpp"
 #include "./measures/pert_order.hpp"
 #include "./measures/state_hist.hpp"
+#include "./measures/dyn_corr.hpp"
 #include "./measures/four_point.hpp"
 #include "./measures/visualize_config.hpp"
