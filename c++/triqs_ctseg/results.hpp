@@ -31,6 +31,12 @@ namespace triqs_ctseg {
     /// Perpendicular spin-spin correlation function \f$ \langle S_x(\tau) S_x(0) \rangle \f$.
     std::optional<gf<imtime>> Sperp_tau;
 
+    /// Oriented transverse spin correlation \f$ \langle S^-(\tau) S^+(0) \rangle \f$.
+    std::optional<gf<imtime>> Sminus_Splus_tau;
+
+    /// Oriented transverse spin correlation \f$ \langle S^+(\tau) S^-(0) \rangle \f$.
+    std::optional<gf<imtime>> Splus_Sminus_tau;
+
     /// Density-density static correlation function \f$ \langle n_a(0) n_b(0) \rangle \f$.
     std::optional<std::map<std::pair<std::string, std::string>, nda::matrix<double>>> nn_static;
 

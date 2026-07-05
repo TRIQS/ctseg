@@ -79,9 +79,10 @@ For static density-density interactions, ``Sigma_0`` and ``Sigma_1`` are obtaine
 matrix. For non-zero ``D0_tau``, ``Sigma_0`` includes the retarded Hartree shift and ``Sigma_1`` uses
 ``dyn_phi_n``/``dyn_phi_phi`` when they were measured. If ``D0_tau`` is non-zero but the dynamic
 correlations are absent, postprocessing keeps the exact ``Sigma_0`` and ``G_2`` moments and emits a
-warning before skipping analytic ``Sigma_1``/``F_2``. Transverse ``Jperp_tau`` terms are guarded: the
-static and ``D0`` parts are still used, while analytic transverse ``Sigma_1`` is skipped unless the
-required spin-correlation inputs are available.
+warning before skipping analytic ``Sigma_1``/``F_2``. Transverse ``Jperp_tau`` contributions are
+included for a single up/down orbital when the required spin-correlation inputs are available. In the
+spin-polarized case this requires the oriented transverse-spin measurement
+``measure_Sperp_asym_tau=True``.
 
 Density
 *******
@@ -206,6 +207,19 @@ implemented for a single orbital only. Otherwise, all components of the spin-spi
 The measurement is turned on by setting ``measure_Sperp_tau`` in the ``solve_params`` to ``True``. The result of the 
 accumulation is accessible through the ``results.Sperp_tau`` attribute of the solver object, as a matrix-valued
 ``GfImTime`` with size :math:`1 \times 1`.
+
+For spin-polarized transverse moment postprocessing one can also turn on
+``measure_Sperp_asym_tau``. This stores the oriented correlators
+:math:`\langle S^-(\tau) S^+(0) \rangle` and
+:math:`\langle S^+(\tau) S^-(0) \rangle` in ``results.Sminus_Splus_tau`` and
+``results.Splus_Sminus_tau``. With the CT-SEG ``Jperp_tau`` normalization, the symmetric estimator
+obeys
+
+.. math::
+
+    \langle S_x(\tau) S_x(0) \rangle =
+    \frac{1}{4}\left(\langle S^-(\tau) S^+(0) \rangle
+    + \langle S^+(\tau) S^-(0) \rangle\right).
 
 Density matrix measurement
 **************************

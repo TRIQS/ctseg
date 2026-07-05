@@ -105,6 +105,8 @@ namespace triqs_ctseg {
     if (p.measure_nn_tau) CTQMC.add_measure(measures::nn_tau{p, wdata, config, results}, "<n(tau)n(0)>");
     if (p.measure_nn_nu_dlr) CTQMC.add_measure(measures::nn_nu_dlr{p, wdata, config, results}, "<n(nu)n(-nu)>");
     if (p.measure_Sperp_tau) CTQMC.add_measure(measures::Sperp_tau{p, wdata, config, results}, "<S_x(tau)S_x(0)>");
+    if (p.measure_Sperp_asym_tau)
+      CTQMC.add_measure(measures::Sperp_asym_tau{p, wdata, config, results}, "<S-(tau)S+(0)>/<S+(tau)S-(0)>");
     if (p.measure_pert_order) {
       if (wdata.has_Delta) {
         CTQMC.add_measure(measures::pert_order{[&]() { return config.Delta_order(); }, results.pert_order_Delta,

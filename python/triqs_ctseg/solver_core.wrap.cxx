@@ -165,6 +165,7 @@ static int synth_constructor_1(PyObject *self, PyObject *args, PyObject *kwargs)
   de("measure_nn_tau", self_c.measure_nn_tau, true);
   de("measure_nn_nu_dlr", self_c.measure_nn_nu_dlr, true);
   de("measure_Sperp_tau", self_c.measure_Sperp_tau, true);
+  de("measure_Sperp_asym_tau", self_c.measure_Sperp_asym_tau, true);
   de("measure_density_matrix", self_c.measure_density_matrix, true);
   de("measure_state_hist", self_c.measure_state_hist, true);
   de("measure_dyn_corr", self_c.measure_dyn_corr, true);
@@ -287,6 +288,8 @@ measure_density_matrix : {par_47}, default=true
 
 measure_dyn_corr : {par_48}, default=false
 
+measure_Sperp_asym_tau : {par_49}, default=false
+
 )DOC",
                       "par",
                       {c2py::python_typename<triqs::operators::many_body_operator>(),
@@ -335,6 +338,7 @@ measure_dyn_corr : {par_48}, default=false
                        c2py::python_typename<double>(),
                        c2py::python_typename<double>(),
                        c2py::python_typename<int>(),
+                       c2py::python_typename<bool>(),
                        c2py::python_typename<bool>(),
                        c2py::python_typename<bool>(),
                        c2py::python_typename<bool>()});
@@ -405,6 +409,8 @@ constexpr auto _c2py_doc_member_49 = R"DOC(Maximum order for the perturbation or
 constexpr auto _c2py_doc_member_50 = R"DOC(Output characteristic configurations in a separate file.)DOC";
 constexpr auto _c2py_doc_member_70 = R"DOC(Whether to measure the occupation-basis TTI diagonal density matrix.)DOC";
 constexpr auto _c2py_doc_member_71 = R"DOC(Whether to measure retarded static correlations for tail moments.)DOC";
+constexpr auto _c2py_doc_member_74 =
+   R"DOC(Whether to measure oriented transverse spin correlations :math:`\langle S^-(\tau) S^+(0) \rangle` and :math:`\langle S^+(\tau) S^-(0) \rangle`.)DOC";
 static PyObject *prop_get_dict_1(PyObject *self, void *) {
   auto &self_c = *(((c2py::wrap<_c2py_cls_1> *)self)->_c);
   c2py::pydict dic;
@@ -444,6 +450,7 @@ static PyObject *prop_get_dict_1(PyObject *self, void *) {
   dic["measure_nn_tau"]                = self_c.measure_nn_tau;
   dic["measure_nn_nu_dlr"]             = self_c.measure_nn_nu_dlr;
   dic["measure_Sperp_tau"]             = self_c.measure_Sperp_tau;
+  dic["measure_Sperp_asym_tau"]        = self_c.measure_Sperp_asym_tau;
   dic["measure_density_matrix"]        = self_c.measure_density_matrix;
   dic["measure_state_hist"]            = self_c.measure_state_hist;
   dic["measure_dyn_corr"]              = self_c.measure_dyn_corr;
@@ -513,6 +520,8 @@ constinit PyGetSetDef c2py::tp_getset<_c2py_cls_1>[] = {
    c2py::getsetdef_from_member<&_c2py_cls_1::measure_nn_tau, _c2py_cls_1>("measure_nn_tau", _c2py_doc_member_37),
    c2py::getsetdef_from_member<&_c2py_cls_1::measure_nn_nu_dlr, _c2py_cls_1>("measure_nn_nu_dlr", _c2py_doc_member_38),
    c2py::getsetdef_from_member<&_c2py_cls_1::measure_Sperp_tau, _c2py_cls_1>("measure_Sperp_tau", _c2py_doc_member_39),
+   c2py::getsetdef_from_member<&_c2py_cls_1::measure_Sperp_asym_tau, _c2py_cls_1>("measure_Sperp_asym_tau",
+                                                                                  _c2py_doc_member_74),
    c2py::getsetdef_from_member<&_c2py_cls_1::measure_density_matrix, _c2py_cls_1>("measure_density_matrix",
                                                                                   _c2py_doc_member_70),
    c2py::getsetdef_from_member<&_c2py_cls_1::measure_state_hist, _c2py_cls_1>("measure_state_hist",
@@ -567,6 +576,8 @@ static int synth_constructor_2(PyObject *self, PyObject *args, PyObject *kwargs)
   de("nn_tau", self_c.nn_tau, false);
   de("nn_nu_dlr", self_c.nn_nu_dlr, false);
   de("Sperp_tau", self_c.Sperp_tau, false);
+  de("Sminus_Splus_tau", self_c.Sminus_Splus_tau, false);
+  de("Splus_Sminus_tau", self_c.Splus_Sminus_tau, false);
   de("nn_static", self_c.nn_static, false);
   de("densities", self_c.densities, false);
   de("pert_order_Delta", self_c.pert_order_Delta, false);
@@ -624,6 +635,10 @@ dyn_phi_n : {par_15}
 
 dyn_phi_phi : {par_16}
 
+Sminus_Splus_tau : {par_17}
+
+Splus_Sminus_tau : {par_18}
+
 )DOC",
    "par",
    {c2py::python_typename<triqs::gfs::block_gf<triqs::mesh::imtime>>(),
@@ -654,7 +669,9 @@ dyn_phi_phi : {par_16}
     c2py::python_typename<std::optional<nda::basic_array<
        double, 2, nda::C_layout, 'M', nda::heap_basic<nda::mem::mallocator<nda::mem::AddressSpace::Host>>>>>(),
     c2py::python_typename<std::optional<nda::basic_array<
-       double, 2, nda::C_layout, 'M', nda::heap_basic<nda::mem::mallocator<nda::mem::AddressSpace::Host>>>>>()});
+       double, 2, nda::C_layout, 'M', nda::heap_basic<nda::mem::mallocator<nda::mem::AddressSpace::Host>>>>>(),
+    c2py::python_typename<std::optional<triqs::gfs::gf<triqs::mesh::imtime>>>(),
+    c2py::python_typename<std::optional<triqs::gfs::gf<triqs::mesh::imtime>>>()});
 
 // ----- Method table ----
 template <>
@@ -686,6 +703,10 @@ constexpr auto _c2py_doc_member_64 = R"DOC(Four-point correlation function.)DOC"
 constexpr auto _c2py_doc_member_65 = R"DOC(Average sign.)DOC";
 constexpr auto _c2py_doc_member_72 = R"DOC(Retarded source-field/density static correlation in color space.)DOC";
 constexpr auto _c2py_doc_member_73 = R"DOC(Retarded source-field/source-field static correlation in color space.)DOC";
+constexpr auto _c2py_doc_member_75 =
+   R"DOC(Oriented transverse spin correlation :math:`\langle S^-(\tau) S^+(0) \rangle`.)DOC";
+constexpr auto _c2py_doc_member_76 =
+   R"DOC(Oriented transverse spin correlation :math:`\langle S^+(\tau) S^-(0) \rangle`.)DOC";
 static PyObject *prop_get_dict_2(PyObject *self, void *) {
   auto &self_c = *(((c2py::wrap<_c2py_cls_2> *)self)->_c);
   c2py::pydict dic;
@@ -694,6 +715,8 @@ static PyObject *prop_get_dict_2(PyObject *self, void *) {
   dic["nn_tau"]              = self_c.nn_tau;
   dic["nn_nu_dlr"]           = self_c.nn_nu_dlr;
   dic["Sperp_tau"]           = self_c.Sperp_tau;
+  dic["Sminus_Splus_tau"]    = self_c.Sminus_Splus_tau;
+  dic["Splus_Sminus_tau"]    = self_c.Splus_Sminus_tau;
   dic["nn_static"]           = self_c.nn_static;
   dic["densities"]           = self_c.densities;
   dic["pert_order_Delta"]    = self_c.pert_order_Delta;
@@ -718,6 +741,10 @@ constinit PyGetSetDef c2py::tp_getset<_c2py_cls_2>[] = {
    c2py::getsetdef_from_member<&_c2py_cls_2::nn_tau, _c2py_cls_2>("nn_tau", _c2py_doc_member_53),
    c2py::getsetdef_from_member<&_c2py_cls_2::nn_nu_dlr, _c2py_cls_2>("nn_nu_dlr", _c2py_doc_member_54),
    c2py::getsetdef_from_member<&_c2py_cls_2::Sperp_tau, _c2py_cls_2>("Sperp_tau", _c2py_doc_member_55),
+   c2py::getsetdef_from_member<&_c2py_cls_2::Sminus_Splus_tau, _c2py_cls_2>("Sminus_Splus_tau",
+                                                                            _c2py_doc_member_75),
+   c2py::getsetdef_from_member<&_c2py_cls_2::Splus_Sminus_tau, _c2py_cls_2>("Splus_Sminus_tau",
+                                                                            _c2py_doc_member_76),
    c2py::getsetdef_from_member<&_c2py_cls_2::nn_static, _c2py_cls_2>("nn_static", _c2py_doc_member_56),
    c2py::getsetdef_from_member<&_c2py_cls_2::densities, _c2py_cls_2>("densities", _c2py_doc_member_57),
    c2py::getsetdef_from_member<&_c2py_cls_2::pert_order_Delta, _c2py_cls_2>("pert_order_Delta", _c2py_doc_member_58),

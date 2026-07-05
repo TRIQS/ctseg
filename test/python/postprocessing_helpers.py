@@ -19,6 +19,7 @@ from triqs_ctseg.postprocessing import (
     _density_observables_from_density_matrix,
     _assemble_density_tail_moments,
     _phase2c_jperp_components_from_tau,
+    _phase2c_jperp_oriented_components_from_tau,
     extract_u_tensor_from_h_int,
     check_spectrum,
 )
@@ -214,6 +215,24 @@ def test_phase2c_jperp_nonpolarized_assembly_coefficients():
     np.testing.assert_allclose(components['total'], -9.5)
 
 
+def test_phase2c_jperp_oriented_reduces_to_nonpolarized():
+    beta = 3.0
+    U = 4.0
+    jperp_tau = np.full(9, 2.0)
+    chi_xx_tau = np.full(9, 0.25)
+    chi_oriented_tau = 2.0 * chi_xx_tau
+
+    nonpolarized = _phase2c_jperp_components_from_tau(jperp_tau, chi_xx_tau, beta, U)
+    oriented = _phase2c_jperp_oriented_components_from_tau(
+        jperp_tau, chi_oriented_tau, chi_oriented_tau, beta, U
+    )
+
+    np.testing.assert_allclose(oriented['up']['pure'], nonpolarized['pure'])
+    np.testing.assert_allclose(oriented['up']['mixed'], nonpolarized['mixed'])
+    np.testing.assert_allclose(oriented['up']['total'], nonpolarized['total'])
+    np.testing.assert_allclose(oriented['down']['total'], nonpolarized['total'])
+
+
 def test_phase2c_jordan_wigner_mixed_coefficient():
     eye2 = np.eye(2)
     c0 = np.array([[0, 1], [0, 0]], dtype=complex)
@@ -303,6 +322,47 @@ def test_density_tail_moments_include_phase2c_jperp():
     np.testing.assert_allclose(Solver.Jperp_moment_components['mixed'], -12.0)
 
 
+def test_density_tail_moments_include_polarized_phase2c_jperp():
+    beta = 3.0
+    U = 4.0
+
+    class Mesh:
+        pass
+
+    Mesh.beta = beta
+
+    class TauGf:
+        def __init__(self, values):
+            self.data = np.asarray(values, dtype=float).reshape(-1, 1, 1)
+            self.mesh = Mesh()
+
+    class Results:
+        state_hist = np.full(4, 0.25)
+        densities = None
+        nn_static = None
+        nn_tau = None
+        Sperp_tau = None
+        Sminus_Splus_tau = TauGf(np.full(9, 0.5))
+        Splus_Sminus_tau = TauGf(np.full(9, 0.25))
+
+    class Solver:
+        gf_struct = [('up', 1), ('down', 1)]
+        results = Results()
+        density_matrix = Results.state_hist
+        h_int = U * n('up', 0) * n('down', 0)
+        h_loc0_mat = [np.array([[0.1]]), np.array([[-0.2]])]
+        D0_tau = None
+        Jperp_tau = TauGf(np.full(9, 2.0))
+
+    moments = _assemble_density_tail_moments(Solver)
+
+    static_sigma1 = U ** 2 * 0.25
+    np.testing.assert_allclose(moments['Sigma_moments']['up'][1], [[static_sigma1 - 9.5]])
+    np.testing.assert_allclose(moments['Sigma_moments']['down'][1], [[static_sigma1 - 4.25]])
+    np.testing.assert_allclose(Solver.Jperp_moment_components['up']['mixed'], -12.0)
+    np.testing.assert_allclose(Solver.Jperp_moment_components['down']['mixed'], -6.0)
+
+
 if mpi.is_master_node():
     test_build_color_tables_single_orbital()
     test_build_color_tables_two_orbital_single_block_per_spin()
@@ -316,6 +376,8 @@ if mpi.is_master_node():
     test_check_spectrum_rejects_non_square()
     test_density_matrix_observables_and_static_moments()
     test_phase2c_jperp_nonpolarized_assembly_coefficients()
+    test_phase2c_jperp_oriented_reduces_to_nonpolarized()
     test_phase2c_jordan_wigner_mixed_coefficient()
     test_density_tail_moments_include_phase2c_jperp()
+    test_density_tail_moments_include_polarized_phase2c_jperp()
     print("postprocessing_helpers: all tests passed")

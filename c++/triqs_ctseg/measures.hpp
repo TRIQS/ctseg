@@ -10,6 +10,7 @@
 #include "./measures/nn_tau.hpp"
 #include "./measures/nn_nu_dlr.hpp"
 #include "./measures/Sperp_tau.hpp"
+#include "./measures/Sperp_asym_tau.hpp"
 #include "./measures/nn_static.hpp"
 #include "./measures/densities.hpp"
 #include "./measures/average_sign.hpp"

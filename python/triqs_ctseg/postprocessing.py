@@ -341,6 +341,49 @@ def _phase2c_jperp_components_from_tau(jperp_tau, chi_xx_tau, beta, U):
     }
 
 
+def _phase2c_jperp_oriented_components_from_tau(
+    jperp_tau,
+    chi_minus_plus_tau,
+    chi_plus_minus_tau,
+    beta,
+    U,
+):
+    jperp_tau = np.asarray(jperp_tau, dtype=float)
+    chi_minus_plus_tau = np.asarray(chi_minus_plus_tau, dtype=float)
+    chi_plus_minus_tau = np.asarray(chi_plus_minus_tau, dtype=float)
+    if jperp_tau.shape != chi_minus_plus_tau.shape or jperp_tau.shape != chi_plus_minus_tau.shape:
+        raise ValueError("Jperp_tau and oriented transverse-spin correlators must have the same tau mesh.")
+
+    j_tau0 = 0.5 * (jperp_tau[0] + jperp_tau[-1])
+
+    def one_orientation(chi_tau):
+        j_chi = _trapezoid_uniform(jperp_tau * chi_tau, beta)
+        j_chi_j = _periodic_tau_convolution_zero(jperp_tau, chi_tau, jperp_tau, beta)
+        pure = 0.25 * (2.0 * j_tau0 + j_chi_j)
+        mixed = -U * j_chi
+        return {
+            'pure': pure,
+            'mixed': mixed,
+            'total': pure + mixed,
+            'int_J_chi': j_chi,
+            'J_chi_J': j_chi_j,
+            'J_tau0': j_tau0,
+        }
+
+    up = one_orientation(chi_minus_plus_tau)
+    down = one_orientation(chi_plus_minus_tau)
+    return {
+        'mode': 'oriented',
+        'up': up,
+        'down': down,
+        'Sminus_Splus': up,
+        'Splus_Sminus': down,
+        'total_up': up['total'],
+        'total_down': down['total'],
+        'J_tau0': j_tau0,
+    }
+
+
 def _chi_xx_tau_from_solver(solver, up, down):
     nn_tau = getattr(solver.results, 'nn_tau', None)
     if nn_tau is not None:
@@ -358,6 +401,17 @@ def _chi_xx_tau_from_solver(solver, up, down):
     return None
 
 
+def _oriented_sperp_tau_from_solver(solver):
+    sm_sp_tau = getattr(solver.results, 'Sminus_Splus_tau', None)
+    sp_sm_tau = getattr(solver.results, 'Splus_Sminus_tau', None)
+    if sm_sp_tau is None or sp_sm_tau is None:
+        return None
+    return (
+        np.asarray(sm_sp_tau.data[:, 0, 0].real),
+        np.asarray(sp_sm_tau.data[:, 0, 0].real),
+    )
+
+
 def _assemble_jperp_phase2c_sigma1(solver, U):
     spin_colors = _spin_color_indices(solver.gf_struct)
     if spin_colors is None:
@@ -366,8 +420,35 @@ def _assemble_jperp_phase2c_sigma1(solver, U):
         return None
 
     up, down = spin_colors
-    if not _is_unpolarized_single_orbital(solver, up, down):
-        mpi.report("WARNING: spin-polarized Jperp moments require asymmetric transverse-spin measures; "
+    is_unpolarized = _is_unpolarized_single_orbital(solver, up, down)
+
+    jperp_tau = np.asarray(solver.Jperp_tau.data[:, 0, 0].real)
+    U_spin = 0.5 * (U[up, down] + U[down, up])
+
+    oriented_tau = _oriented_sperp_tau_from_solver(solver)
+    if oriented_tau is not None:
+        chi_minus_plus_tau, chi_plus_minus_tau = oriented_tau
+        if jperp_tau.shape == chi_minus_plus_tau.shape and jperp_tau.shape == chi_plus_minus_tau.shape:
+            components = _phase2c_jperp_oriented_components_from_tau(
+                jperp_tau,
+                chi_minus_plus_tau,
+                chi_plus_minus_tau,
+                solver.Jperp_tau.mesh.beta,
+                U_spin,
+            )
+
+            correction = np.zeros(U.shape[0], dtype=float)
+            correction[up] = components['up']['total']
+            correction[down] = components['down']['total']
+            return correction, components
+
+        mpi.report("WARNING: Jperp_tau and asymmetric transverse-spin tau meshes differ; "
+                   "skipping asymmetric transverse Sigma_1/F_2.")
+        if not is_unpolarized:
+            return None
+
+    if not is_unpolarized:
+        mpi.report("WARNING: spin-polarized Jperp moments require Sminus_Splus_tau and Splus_Sminus_tau; "
                    "skipping analytic transverse Sigma_1/F_2.")
         return None
 
@@ -377,13 +458,11 @@ def _assemble_jperp_phase2c_sigma1(solver, U):
                    "skipping analytic transverse Sigma_1/F_2.")
         return None
 
-    jperp_tau = np.asarray(solver.Jperp_tau.data[:, 0, 0].real)
     if jperp_tau.shape != chi_xx_tau.shape:
         mpi.report("WARNING: Jperp_tau and chi_xx_tau tau meshes differ; "
                    "skipping analytic transverse Sigma_1/F_2.")
         return None
 
-    U_spin = 0.5 * (U[up, down] + U[down, up])
     components = _phase2c_jperp_components_from_tau(
         jperp_tau, chi_xx_tau, solver.Jperp_tau.mesh.beta, U_spin
     )
