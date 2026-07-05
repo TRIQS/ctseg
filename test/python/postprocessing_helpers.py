@@ -11,6 +11,7 @@ are otherwise only exercised indirectly via solve_generic.
 
 import numpy as np
 import triqs.utility.mpi as mpi
+from triqs.gfs import MeshImTime, Gf, Block2Gf
 from triqs.operators import n
 
 from triqs_ctseg.postprocessing import (
@@ -196,6 +197,116 @@ def test_density_matrix_observables_and_static_moments():
     )
 
 
+def _half_filled_hubbard_atom_hist(beta, U):
+    boltzmann_single = np.exp(beta * U / 2.0)
+    z_part = 2.0 + 2.0 * boltzmann_single
+    return np.array([
+        1.0 / z_part,
+        boltzmann_single / z_part,
+        boltzmann_single / z_part,
+        1.0 / z_part,
+    ])
+
+
+def _constant_d0_tau(gf_struct, beta, n_tau, d0_w0):
+    block_names = [name for name, _ in gf_struct]
+    mesh = MeshImTime(beta=beta, statistic='Boson', n_tau=n_tau)
+    blocks = [[Gf(mesh=mesh, target_shape=(1, 1)) for _ in block_names] for _ in block_names]
+    out = Block2Gf(block_names, block_names, blocks, make_copies=False)
+    for left, right in out.indices:
+        out[left, right].data[:, 0, 0] = d0_w0 / beta
+    return out
+
+
+def test_hubbard_atom_static_tail_moments_at_half_filling():
+    beta = 7.0
+    U = 3.0
+    mu = U / 2.0
+
+    class Results:
+        state_hist = _half_filled_hubbard_atom_hist(beta, U)
+        densities = None
+        nn_static = None
+
+    class Solver:
+        gf_struct = [('up', 1), ('down', 1)]
+        results = Results()
+        density_matrix = Results.state_hist
+        h_int = U * n('up', 0) * n('down', 0)
+        h_loc0_mat = [np.array([[-mu]]), np.array([[-mu]])]
+        D0_tau = None
+
+    moments = _assemble_density_tail_moments(Solver)
+
+    # Half-filled Hubbard atom: <n_up> = <n_down> = 1/2, so
+    # Sigma_0 = U/2 and Sigma_1 = U^2 Var(n_opposite) = U^2/4.
+    np.testing.assert_allclose(moments['Sigma_HartreeFock']['up'], [[U / 2.0]])
+    np.testing.assert_allclose(moments['Sigma_HartreeFock']['down'], [[U / 2.0]])
+    np.testing.assert_allclose(moments['Sigma_moments']['up'][0], [[U / 2.0]])
+    np.testing.assert_allclose(moments['Sigma_moments']['down'][0], [[U / 2.0]])
+    np.testing.assert_allclose(moments['Sigma_moments']['up'][1], [[U ** 2 / 4.0]])
+    np.testing.assert_allclose(moments['Sigma_moments']['down'][1], [[U ** 2 / 4.0]])
+    np.testing.assert_allclose(moments['G_moments']['up'][2], [[0.0]], atol=1e-14)
+    np.testing.assert_allclose(moments['G_moments']['down'][2], [[0.0]], atol=1e-14)
+    np.testing.assert_allclose(moments['F_tail_moments']['up'][2], [[U ** 2 / 4.0]])
+    np.testing.assert_allclose(moments['F_tail_moments']['down'][2], [[U ** 2 / 4.0]])
+
+
+def test_hubbard_atom_dynamic_density_tail_moments_at_half_filling():
+    beta = 7.0
+    U = 3.0
+    mu = U / 2.0
+    d0_w0 = 0.4
+    gf_struct = [('up', 1), ('down', 1)]
+    state_hist = _half_filled_hubbard_atom_hist(beta, U)
+
+    states = np.arange(state_hist.size, dtype=np.int64)
+    occ = ((states[:, None] >> np.arange(2)) & 1).astype(float)
+    n_total = np.sum(occ, axis=1)
+    p_double = state_hist[3]
+    phi = d0_w0 * n_total
+    dyn_phi_n = np.vstack([
+        state_hist @ (phi * occ[:, 0]),
+        state_hist @ (phi * occ[:, 1]),
+    ])
+    dyn_phi_phi = np.full((2, 2), state_hist @ (phi * phi))
+
+    Results = type('Results', (), {
+        'state_hist': state_hist,
+        'densities': None,
+        'nn_static': None,
+        'dyn_phi_n': dyn_phi_n,
+        'dyn_phi_phi': dyn_phi_phi,
+    })
+    Solver = type('Solver', (), {
+        'gf_struct': gf_struct,
+        'results': Results(),
+        'density_matrix': state_hist,
+        'h_int': U * n('up', 0) * n('down', 0),
+        'h_loc0_mat': [np.array([[-mu]]), np.array([[-mu]])],
+        'D0_tau': _constant_d0_tau(gf_struct, beta, n_tau=101, d0_w0=d0_w0),
+    })
+
+    moments = _assemble_density_tail_moments(Solver)
+
+    sigma0 = U / 2.0 + d0_w0
+    cov_phi_n = d0_w0 * p_double
+    var_phi = 2.0 * d0_w0 ** 2 * p_double + d0_w0 / beta
+    sigma1 = U ** 2 / 4.0 + 2.0 * U * cov_phi_n + var_phi
+    g2 = d0_w0
+
+    np.testing.assert_allclose(moments['Sigma_HartreeFock']['up'], [[sigma0]], atol=1e-13)
+    np.testing.assert_allclose(moments['Sigma_HartreeFock']['down'], [[sigma0]], atol=1e-13)
+    np.testing.assert_allclose(moments['Sigma_moments']['up'][0], [[sigma0]], atol=1e-13)
+    np.testing.assert_allclose(moments['Sigma_moments']['down'][0], [[sigma0]], atol=1e-13)
+    np.testing.assert_allclose(moments['Sigma_moments']['up'][1], [[sigma1]], atol=1e-13)
+    np.testing.assert_allclose(moments['Sigma_moments']['down'][1], [[sigma1]], atol=1e-13)
+    np.testing.assert_allclose(moments['G_moments']['up'][2], [[g2]], atol=1e-13)
+    np.testing.assert_allclose(moments['G_moments']['down'][2], [[g2]], atol=1e-13)
+    np.testing.assert_allclose(moments['F_tail_moments']['up'][2], [[sigma0 * g2 + sigma1]], atol=1e-13)
+    np.testing.assert_allclose(moments['F_tail_moments']['down'][2], [[sigma0 * g2 + sigma1]], atol=1e-13)
+
+
 def test_phase2c_jperp_nonpolarized_assembly_coefficients():
     beta = 3.0
     U = 4.0
@@ -375,6 +486,8 @@ if mpi.is_master_node():
     test_check_spectrum_truncation_drops_large_eigenvalues()
     test_check_spectrum_rejects_non_square()
     test_density_matrix_observables_and_static_moments()
+    test_hubbard_atom_static_tail_moments_at_half_filling()
+    test_hubbard_atom_dynamic_density_tail_moments_at_half_filling()
     test_phase2c_jperp_nonpolarized_assembly_coefficients()
     test_phase2c_jperp_oriented_reduces_to_nonpolarized()
     test_phase2c_jordan_wigner_mixed_coefficient()
