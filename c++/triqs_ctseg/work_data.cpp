@@ -175,8 +175,8 @@ namespace triqs_ctseg {
     // Report
     if (c.rank() == 0) {
       spdlog::info("Dynamical interactions = {}, Jperp interactions = {} \n", has_Dt, has_Jperp);
-      if (p.measure_F_tau and !rot_inv)
-        spdlog::info("WARNING: Cannot measure F(tau) because spin-spin interaction is not rotationally invariant.");
+      if ((p.measure_F_tau or p.measure_F_l) and !rot_inv)
+        spdlog::info("WARNING: Cannot measure F(tau)/F_l because spin-spin interaction is not rotationally invariant.");
     }
 
     // ................  Determinants .....................

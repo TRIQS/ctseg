@@ -175,6 +175,28 @@ def compute_sigma_hartreefock(solver):
     return Sigma_HartreeFock
 
 
+def _legendre_discontinuity_weights(g_l):
+    beta = g_l.mesh.beta
+    l = np.arange(g_l.data.shape[0])
+    weights = np.zeros_like(l, dtype=float)
+    even_l = (l % 2) == 0
+    weights[even_l] = -2.0 * np.sqrt(2.0 * l[even_l] + 1.0) / beta
+    return weights
+
+
+def _legendre_discontinuity(g_l):
+    weights = _legendre_discontinuity_weights(g_l)
+    return np.tensordot(weights, g_l.data, axes=(0, 0))
+
+
+def _enforce_legendre_discontinuity(g_l, discontinuity):
+    """Complex-valued equivalent of GfLegendre.enforce_discontinuity."""
+    weights = _legendre_discontinuity_weights(g_l)
+    norm = np.dot(weights, weights)
+    correction = np.asarray(discontinuity, dtype=complex) - _legendre_discontinuity(g_l)
+    g_l.data[:] += correction[None, :, :] * (weights / norm)[:, None, None]
+
+
 # =============================================================================
 # Self-energy post-processing
 # =============================================================================
@@ -209,6 +231,7 @@ def postprocess_sigma(
     Sigma_iw.zero()
     G_iw = Sigma_iw.copy()
     G0_iw = Sigma_iw.copy()
+    F_iw = None
 
     # 1. Fourier transform G(tau) to G(iw)
     Gf_known_moments = make_zero_tail(G_iw, n_moments=2)
@@ -217,6 +240,7 @@ def postprocess_sigma(
         G_iw[bl].set_from_fourier(solver.results.G_tau[bl], Gf_known_moments[i])
     G_iw << make_hermitian(G_iw)
     symmetrize(G_iw)
+    G_iw_from_tau = G_iw.copy()
 
     # 2. Compute fermionic Weiss field g(iw)
     Delta_iw = BlockGf(mesh=mesh, gf_struct=solver.gf_struct)
@@ -253,9 +277,11 @@ def postprocess_sigma(
     # 4. Compute self-energy
     if solver.results.F_tau is None:
         mpi.report("F(tau) is not measured -> Compute the self-energy via the Dyson equation.\n")
-        Sigma_iw = inverse(G0_iw) - inverse(G_iw)
+        Sigma_iw_dyson = inverse(G0_iw) - inverse(G_iw)
+        Sigma_iw = Sigma_iw_dyson.copy()
     else:
         mpi.report("F(tau) is measured -> Compute the self-energy via the improved estimator.\n")
+        Sigma_iw_dyson = inverse(G0_iw) - inverse(G_iw)
         F_iw = G_iw.copy()
         F_iw << 0.0
         F_known_moments = make_zero_tail(F_iw, n_moments=1)
@@ -290,6 +316,42 @@ def postprocess_sigma(
     G_iw << make_hermitian(G_iw)
     symmetrize(G_iw)
 
+    G_l = G_iw_l = Sigma_iw_dyson_l = None
+    if getattr(solver.results, 'G_l', None) is not None:
+        G_l = solver.results.G_l.copy()
+        G_iw_l = G_iw.copy()
+        G_iw_l << 0.0
+        for bl, g_l in G_l:
+            _enforce_legendre_discontinuity(g_l, np.eye(g_l.target_shape[0]))
+            G_iw_l[bl].set_from_legendre(g_l)
+        G_iw_l << make_hermitian(G_iw_l)
+        symmetrize(G_iw_l)
+        Sigma_iw_dyson_l = inverse(G0_iw) - inverse(G_iw_l)
+        Sigma_iw_dyson_l << make_hermitian(Sigma_iw_dyson_l)
+        symmetrize(Sigma_iw_dyson_l)
+
+    F_l_raw = F_l = F_iw_l = Sigma_iw_l = None
+    if getattr(solver.results, 'F_l', None) is not None:
+        # Unlike G_l, F_l has no universal discontinuity.  On this standalone
+        # branch preserve the measured coefficients instead of depending on
+        # analytic tail moments supplied by another feature branch.
+        F_l_raw = solver.results.F_l
+        F_l = solver.results.F_l.copy()
+        F_iw_l = G_iw.copy()
+        F_iw_l << 0.0
+        for bl, f_l in F_l:
+            F_iw_l[bl].set_from_legendre(f_l)
+        F_iw_l << make_hermitian(F_iw_l)
+        symmetrize(F_iw_l)
+
+        G_for_F_l = G_iw_l if G_iw_l is not None else G_iw_from_tau
+        Sigma_iw_l = Sigma_iw.copy()
+        Sigma_iw_l << 0.0
+        for bl, f_iw_l in F_iw_l:
+            Sigma_iw_l[bl] << f_iw_l * inverse(G_for_F_l[bl])
+        Sigma_iw_l << make_hermitian(Sigma_iw_l)
+        symmetrize(Sigma_iw_l)
+
     if Sigma_HartreeFock is None:
         Sigma_HartreeFock = {block: gf.fit_hermitian_tail()[0][0] for block, gf in Sigma_iw}
         mpi.report("Extracting the static self-energy via tail fitting:")
@@ -302,8 +364,18 @@ def postprocess_sigma(
 
     return {
         'G_iw': G_iw,
+        'G_iw_from_tau': G_iw_from_tau,
         'G_tau': solver.results.G_tau,
+        'G_l': G_l,
+        'G_iw_l': G_iw_l,
+        'F_iw': F_iw,
+        'F_l_raw': F_l_raw,
+        'F_l': F_l,
+        'F_iw_l': F_iw_l,
         'Sigma_iw': Sigma_iw,
+        'Sigma_iw_dyson': Sigma_iw_dyson,
+        'Sigma_iw_dyson_l': Sigma_iw_dyson_l,
+        'Sigma_iw_l': Sigma_iw_l,
         'Sigma_dynamic': Sigma_dynamic,
         'Sigma_HartreeFock': list(Sigma_HartreeFock.values()),
     }
