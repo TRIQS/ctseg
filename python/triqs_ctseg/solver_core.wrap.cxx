@@ -633,7 +633,9 @@ average_sign : {par_14}
 // ----- Method table ----
 template <>
 PyMethodDef c2py::tp_methods<_c2py_cls_2>[] = {
-
+   {"__write_hdf5__", c2py::tpxx_write_h5<_c2py_cls_2>, METH_VARARGS, "  "},
+   {"__getstate__", c2py::getstate_h5<_c2py_cls_2>, METH_NOARGS, ""},
+   {"__setstate__", c2py::setstate_h5<_c2py_cls_2>, METH_O, ""},
    {nullptr, nullptr, 0, nullptr} // Sentinel
 };
 
@@ -832,6 +834,7 @@ extern "C" __attribute__((visibility("default"))) PyObject *PyInit_solver_core()
   if (not module) return nullptr;
   c2py::pyref register_class = module.attr("register_class");
 
+  register_h5_type<_c2py_cls_2>(register_class);
   register_h5_type<_c2py_cls_3>(register_class);
 
   return m;

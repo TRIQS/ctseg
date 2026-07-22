@@ -60,6 +60,8 @@ namespace triqs_ctseg {
 
     /// Average sign.
     double average_sign;
+
+    static std::string hdf5_format() { return "CTSEG_Results"; }
   };
 
   /// writes all containers to hdf5 file

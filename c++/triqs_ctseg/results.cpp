@@ -12,6 +12,7 @@ namespace triqs_ctseg {
 
     h5::group grp = subgroup_name.empty() ? h5group : h5group.create_group(subgroup_name);
 
+    h5::write_hdf5_format(grp, c);
     h5_write(grp, "G_tau", c.G_tau);
     h5_write(grp, "average_sign", c.average_sign);
     h5_write(grp, "F_tau", c.F_tau);
