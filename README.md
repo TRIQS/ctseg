@@ -1,4 +1,5 @@
 [![build](https://github.com/TRIQS/ctseg/workflows/build/badge.svg)](https://github.com/TRIQS/ctseg/actions?query=workflow%3Abuild)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21691750.svg)](https://doi.org/10.5281/zenodo.21691750)
 
 ## TRIQS segment picture solver (CTSEG)
 
