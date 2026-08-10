@@ -1,5 +1,23 @@
 # Changelog
 
+## Version 4.0.1
+
+ctseg version 4.0.1 is a patch release that pins the c2py build dependency to
+the 0.9.x release branch, keeping a fresh build compatible with the released
+triqs 4.0.x, and updates the documentation.
+
+We thank all contributors: Thomas Hahn, Alexander Hampel, Nils Wentzell
+
+Find below an itemized list of changes in this release.
+
+### deps
+* Pin c2py to the 0.9.x release branch for the 4.0.x release
+
+### doc
+* Add a conda-forge version badge and a Zenodo DOI badge to the README
+* Fix the documentation website URLs to not use the `triqs_` prefix
+
+
 ## Version 4.0.0
 
 ctseg version 4.0.0 is a feature release that is compatible with TRIQS version 4.0.0
