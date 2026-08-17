@@ -1,4 +1,3 @@
-// Copyright (c) 2026, The Simons Foundation
 // This file is part of TRIQS/ctseg and is licensed under the terms of GPLv3 or later.
 // SPDX-License-Identifier: GPL-3.0-or-later
 

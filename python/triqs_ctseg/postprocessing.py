@@ -448,7 +448,7 @@ def _assemble_jperp_phase2c_sigma1(solver, U):
 
     chi_xx_tau = _chi_xx_tau_from_solver(solver, up, down)
     if chi_xx_tau is None:
-        mpi.report("WARNING: Jperp Phase 2c moments require nn_tau or Sperp_tau; "
+        mpi.report("WARNING: Jperp Phase 2c moments require Sperp_tau; "
                    "skipping analytic transverse Sigma_1/F_2.")
         return None
 
