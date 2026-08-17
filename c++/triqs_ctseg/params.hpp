@@ -26,6 +26,9 @@ namespace triqs_ctseg {
 
     /// Number of time slices for bosonic functions.
     int n_tau_bosonic = 10001;
+
+    /// Number of Legendre coefficients for fermionic single-particle functions.
+    int n_l = 30;
   };
 
   //---------------------------------------------
@@ -126,6 +129,12 @@ namespace triqs_ctseg {
 
     /// Whether to measure \f$ F(\tau) \f$.
     bool measure_F_tau = false;
+
+    /// Whether to measure \f$ G_l \f$ in the Legendre representation.
+    bool measure_G_l = false;
+
+    /// Whether to measure \f$ F_l \f$ in the Legendre representation.
+    bool measure_F_l = false;
 
     /// Whether to measure densities.
     bool measure_densities = true;

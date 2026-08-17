@@ -11,7 +11,7 @@ are otherwise only exercised indirectly via solve_generic.
 
 import numpy as np
 import triqs.utility.mpi as mpi
-from triqs.gfs import MeshImTime, Gf, Block2Gf
+from triqs.gfs import MeshImTime, MeshLegendre, Gf, Block2Gf
 from triqs.operators import n
 
 from triqs_ctseg.postprocessing import (
@@ -22,6 +22,9 @@ from triqs_ctseg.postprocessing import (
     _chi_xx_tau_from_solver,
     _jperp_sigma1_components_from_tau,
     _jperp_sigma1_oriented_components_from_tau,
+    _f_legendre_discontinuity_target,
+    _enforce_legendre_discontinuity,
+    _legendre_discontinuity,
     extract_u_tensor_from_h_int,
     check_spectrum,
 )
@@ -164,6 +167,56 @@ def test_check_spectrum_rejects_non_square():
     except ValueError:
         return
     raise AssertionError("check_spectrum should have raised for non-square input")
+
+
+def _random_legendre_gf():
+    g_l = Gf(
+        mesh=MeshLegendre(beta=10.0, statistic="Fermion", max_n=8),
+        target_shape=(2, 2),
+    )
+    rng = np.random.default_rng(12345)
+    g_l.data[:] = rng.normal(size=g_l.data.shape) + 1j * rng.normal(size=g_l.data.shape)
+    return g_l
+
+
+def test_complex_legendre_discontinuity_enforcement():
+    g_l = _random_legendre_gf()
+    target = np.array([[1.0, 0.2j], [-0.2j, 1.0]], dtype=complex)
+
+    _enforce_legendre_discontinuity(g_l, target)
+
+    np.testing.assert_allclose(_legendre_discontinuity(g_l), target, atol=1e-13)
+
+
+def test_f_legendre_discontinuity_uses_tail_moment_when_available():
+    f_l = _random_legendre_gf()
+    measured = _legendre_discontinuity(f_l)
+    target = np.array([[2.0, 0.3j], [-0.3j, -1.0]], dtype=complex)
+    solver = type('Solver', (), {
+        'F_tail_moments': {'up': np.array([np.zeros((2, 2)), target])},
+    })()
+
+    selected = _f_legendre_discontinuity_target(solver, 'up', f_l)
+
+    np.testing.assert_allclose(selected, target)
+    assert not np.allclose(selected, measured)
+
+
+def test_f_legendre_discontinuity_falls_back_to_measurement():
+    f_l = _random_legendre_gf()
+    measured = _legendre_discontinuity(f_l)
+
+    no_attribute_solver = type('Solver', (), {})()
+    missing_block_solver = type('Solver', (), {
+        'F_tail_moments': {'down': np.zeros((2, 2, 2))},
+    })()
+
+    np.testing.assert_allclose(
+        _f_legendre_discontinuity_target(no_attribute_solver, 'up', f_l), measured
+    )
+    np.testing.assert_allclose(
+        _f_legendre_discontinuity_target(missing_block_solver, 'up', f_l), measured
+    )
 
 
 def test_density_matrix_observables_and_static_moments():
@@ -526,6 +579,9 @@ if mpi.is_master_node():
     test_check_spectrum_no_truncation_keeps_matrix()
     test_check_spectrum_truncation_drops_large_eigenvalues()
     test_check_spectrum_rejects_non_square()
+    test_complex_legendre_discontinuity_enforcement()
+    test_f_legendre_discontinuity_uses_tail_moment_when_available()
+    test_f_legendre_discontinuity_falls_back_to_measurement()
     test_density_matrix_observables_and_static_moments()
     test_hubbard_atom_static_tail_moments_at_half_filling()
     test_hubbard_atom_dynamic_density_tail_moments_at_half_filling()

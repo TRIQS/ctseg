@@ -22,6 +22,12 @@ namespace triqs_ctseg {
     /// Self-energy improved estimator \f$ F(\tau) \f$.
     std::optional<block_gf<imtime>> F_tau;
 
+    /// Single-particle Green's function \f$ G_l \f$ in the Legendre representation.
+    std::optional<block_gf<legendre>> G_l;
+
+    /// Self-energy improved estimator \f$ F_l \f$ in the Legendre representation.
+    std::optional<block_gf<legendre>> F_l;
+
     /// Density-density time correlation function \f$ \langle n_a(\tau) n_b(0) \rangle \f$.
     std::optional<block2_gf<imtime>> nn_tau;
 
