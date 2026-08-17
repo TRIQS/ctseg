@@ -5,6 +5,7 @@
 // See LICENSE in the root of this distribution for details.
 
 #include "./G_F_tau.hpp"
+#include "./dyn_density_prefactors.hpp"
 #include "../logs.hpp"
 
 namespace triqs_ctseg::measures {
@@ -85,14 +86,11 @@ namespace triqs_ctseg::measures {
 
   double G_F_tau::fprefactor(long const &block, std::pair<tau_t, long> const &y) {
     int color    = wdata.block_to_color(block, y.second);
-    double I_tau = 0;
+    double I_tau = static_prefactor(wdata, config, color, y.first) //
+       + retarded_density_prefactor(wdata, config, color, y.first) + retarded_density_jump(wdata, color);
+
     for (auto const &[c, sl] : itertools::enumerate(config.seglists)) {
       auto ntau = n_tau(y.first, sl); // Density to the right of y.first in sl
-      if (c != color) I_tau += wdata.U(c, color) * ntau;
-      if (wdata.has_Dt) {
-        I_tau -= K_overlap(sl, y.first, false, wdata.Kprime, c, color);
-        if (c == color) I_tau -= 2 * real(wdata.Kprime(0)(c, c));
-      }
       if (wdata.has_Jperp) {
         I_tau -= 4 * real(wdata.Kprime_spin(0)(c, color)) * ntau;
         I_tau -= 2 * K_overlap(sl, y.first, false, wdata.Kprime_spin, c, color);

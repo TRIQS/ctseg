@@ -46,6 +46,7 @@ namespace triqs_ctseg {
     // ................ Parameters .................
     // Store the solve_params
     solve_params = solve_params_input;
+    if (solve_params.measure_state_hist) solve_params.measure_density_matrix = true;
     // Set tau mesh parameters for results to default if not supplied
     if (solve_params_input.n_tau_G == 0) solve_params.n_tau_G = constr_params.n_tau;
     if (solve_params_input.n_tau_G == 0) solve_params.n_tau_chi2 = constr_params.n_tau_bosonic;
@@ -104,6 +105,8 @@ namespace triqs_ctseg {
     if (p.measure_nn_tau) CTQMC.add_measure(measures::nn_tau{p, wdata, config, results}, "<n(tau)n(0)>");
     if (p.measure_nn_nu_dlr) CTQMC.add_measure(measures::nn_nu_dlr{p, wdata, config, results}, "<n(nu)n(-nu)>");
     if (p.measure_Sperp_tau) CTQMC.add_measure(measures::Sperp_tau{p, wdata, config, results}, "<S_x(tau)S_x(0)>");
+    if (p.measure_Sperp_asym_tau)
+      CTQMC.add_measure(measures::Sperp_asym_tau{p, wdata, config, results}, "<S-(tau)S+(0)>/<S+(tau)S-(0)>");
     if (p.measure_pert_order) {
       if (wdata.has_Delta) {
         CTQMC.add_measure(measures::pert_order{[&]() { return config.Delta_order(); }, results.pert_order_Delta,
@@ -116,7 +119,9 @@ namespace triqs_ctseg {
                           "Perturbation order Jperp");
       }
     }
-    if (p.measure_state_hist) CTQMC.add_measure(measures::state_hist{p, wdata, config, results}, "State histograms");
+    if (p.measure_density_matrix) CTQMC.add_measure(measures::state_hist{p, wdata, config, results}, "Density matrix");
+    if (p.measure_dyn_corr and wdata.has_Dt)
+      CTQMC.add_measure(measures::dyn_corr{p, wdata, config, results}, "Retarded static correlations");
     if (p.measure_g2w || p.measure_g3w) 
       CTQMC.add_measure(measures::four_point{p, wdata, config, results}, "Four-point correlation function");
     if (p.visualize_config) CTQMC.add_measure(measures::visualize_config{config}, "Visualizing configurations");
