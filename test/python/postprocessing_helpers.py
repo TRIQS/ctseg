@@ -19,6 +19,7 @@ from triqs_ctseg.postprocessing import (
     _dd_to_4idx,
     _density_observables_from_density_matrix,
     _assemble_density_tail_moments,
+    _chi_xx_tau_from_solver,
     _phase2c_jperp_components_from_tau,
     _phase2c_jperp_oriented_components_from_tau,
     extract_u_tensor_from_h_int,
@@ -216,6 +217,46 @@ def _constant_d0_tau(gf_struct, beta, n_tau, d0_w0):
     for left, right in out.indices:
         out[left, right].data[:, 0, 0] = d0_w0 / beta
     return out
+
+
+def _anisotropic_nn_tau(gf_struct, beta, n_tau):
+    block_names = [name for name, _ in gf_struct]
+    mesh = MeshImTime(beta=beta, statistic='Boson', n_tau=n_tau)
+    blocks = [[Gf(mesh=mesh, target_shape=(1, 1)) for _ in block_names] for _ in block_names]
+    out = Block2Gf(block_names, block_names, blocks, make_copies=False)
+    out['up', 'up'].data[:, 0, 0] = 1.0
+    out['down', 'down'].data[:, 0, 0] = 3.0
+    out['up', 'down'].data[:, 0, 0] = 0.2
+    out['down', 'up'].data[:, 0, 0] = 0.4
+    return out
+
+
+def test_chi_xx_prefers_measured_transverse_correlator():
+    class TauGf:
+        data = np.array([0.7, 0.8, 0.9]).reshape(-1, 1, 1)
+
+    class Results:
+        Sperp_tau = TauGf()
+        nn_tau = _anisotropic_nn_tau([('up', 1), ('down', 1)], beta=2.0, n_tau=3)
+
+    class Solver:
+        gf_struct = [('up', 1), ('down', 1)]
+        results = Results()
+
+    np.testing.assert_allclose(_chi_xx_tau_from_solver(Solver, 0, 1), [0.7, 0.8, 0.9])
+
+
+def test_chi_xx_does_not_infer_transverse_from_anisotropic_nn_tau():
+    class Results:
+        Sperp_tau = None
+        nn_tau = _anisotropic_nn_tau([('up', 1), ('down', 1)], beta=2.0, n_tau=3)
+
+    class Solver:
+        gf_struct = [('up', 1), ('down', 1)]
+        h_loc0_mat = [np.array([[0.0]]), np.array([[0.0]])]
+        results = Results()
+
+    assert _chi_xx_tau_from_solver(Solver, 0, 1) is None
 
 
 def test_hubbard_atom_static_tail_moments_at_half_filling():
@@ -488,6 +529,8 @@ if mpi.is_master_node():
     test_density_matrix_observables_and_static_moments()
     test_hubbard_atom_static_tail_moments_at_half_filling()
     test_hubbard_atom_dynamic_density_tail_moments_at_half_filling()
+    test_chi_xx_prefers_measured_transverse_correlator()
+    test_chi_xx_does_not_infer_transverse_from_anisotropic_nn_tau()
     test_phase2c_jperp_nonpolarized_assembly_coefficients()
     test_phase2c_jperp_oriented_reduces_to_nonpolarized()
     test_phase2c_jordan_wigner_mixed_coefficient()

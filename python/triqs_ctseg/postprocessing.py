@@ -385,19 +385,13 @@ def _phase2c_jperp_oriented_components_from_tau(
 
 
 def _chi_xx_tau_from_solver(solver, up, down):
-    nn_tau = getattr(solver.results, 'nn_tau', None)
-    if nn_tau is not None:
-        block_name, index_in_block, _ = build_color_tables(solver.gf_struct)
-        nn_color = _assemble_color_gf(nn_tau, block_name, index_in_block)
-        chi_up_up = nn_color.data[:, up, up].real
-        chi_down_down = nn_color.data[:, down, down].real
-        chi_cross = 0.5 * (nn_color.data[:, up, down].real + nn_color.data[:, down, up].real)
-        return 0.25 * (chi_up_up + chi_down_down - 2.0 * chi_cross)
-
     sperp_tau = getattr(solver.results, 'Sperp_tau', None)
     if sperp_tau is not None:
         return np.asarray(sperp_tau.data[:, 0, 0].real)
 
+    # A spin-unpolarized one-body Hamiltonian does not prove spin-rotational
+    # invariance: anisotropic interactions can make chi_zz != chi_xx.  Without
+    # a measured transverse correlator there is no safe reconstruction here.
     return None
 
 
@@ -600,9 +594,10 @@ def postprocess_sigma(
         if symmetrize_func is not None and degenerate_blk:
             gf << symmetrize_func(gf, degenerate_blk)
 
+    use_tail_moments = post_proc_params.get('use_tail_moments', True)
     tail_moments = _assemble_density_tail_moments(
         solver,
-        use_tail_moments=post_proc_params.get('use_tail_moments', True),
+        use_tail_moments=use_tail_moments,
     )
     if tail_moments is not None:
         Sigma_HartreeFock = tail_moments['Sigma_HartreeFock']
@@ -624,13 +619,14 @@ def postprocess_sigma(
     G0_iw = Sigma_iw.copy()
 
     # 1. Fourier transform G(tau) to G(iw)
-    for i, bl in enumerate(G_iw.indices):
-        if solver.G_moments is None:
-            Gf_known_moments = make_zero_tail(G_iw[bl], n_moments=2)
-            Gf_known_moments[1] = np.eye(G_iw[bl].target_shape[0])
-        else:
-            Gf_known_moments = solver.G_moments[bl]
-        G_iw[bl].set_from_fourier(solver.results.G_tau[bl], Gf_known_moments)
+    if not use_tail_moments or solver.G_moments is None:
+        Gf_known_moments = make_zero_tail(G_iw, n_moments=2)
+        for i, bl in enumerate(G_iw.indices):
+            Gf_known_moments[i][1] = np.eye(G_iw[bl].target_shape[0])
+            G_iw[bl].set_from_fourier(solver.results.G_tau[bl], Gf_known_moments[i])
+    else:
+        for bl in G_iw.indices:
+            G_iw[bl].set_from_fourier(solver.results.G_tau[bl], solver.G_moments[bl])
     G_iw << make_hermitian(G_iw)
     symmetrize(G_iw)
 
@@ -671,23 +667,31 @@ def postprocess_sigma(
         mpi.report("F(tau) is measured -> Compute the self-energy via the improved estimator.\n")
         F_iw = G_iw.copy()
         F_iw << 0.0
-        F_tau_for_fourier = solver.results.F_tau.copy()
-        for bl, f_tau in F_tau_for_fourier:
-            if solver.F_tail_moments is not None:
-                F_known_moments = solver.F_tail_moments[bl]
-            else:
-                F_known_moments = np.zeros((2,) + f_tau.target_shape, dtype=complex)
-                F_known_moments[1] = -(f_tau.data[0] + f_tau.data[-1])
-
-            f1 = F_known_moments[1]
-            f_tau.data[0, :, :] = 0.5 * (f_tau.data[0, :, :] - f1 - f_tau.data[-1, :, :])
-            f_tau.data[-1, :, :] = -f1 - f_tau.data[0, :, :]
-            F_iw[bl].set_from_fourier(f_tau, F_known_moments)
+        if not use_tail_moments:
+            F_known_moments = make_zero_tail(F_iw, n_moments=1)
+            for i, bl in enumerate(F_iw.indices):
+                F_iw[bl].set_from_fourier(solver.results.F_tau[bl], F_known_moments[i])
+        else:
+            F_tau_for_fourier = solver.results.F_tau.copy()
+            for bl, f_tau in F_tau_for_fourier:
+                if solver.F_tail_moments is not None:
+                    F_known_moments = solver.F_tail_moments[bl]
+                else:
+                    F_known_moments = np.zeros((2,) + f_tau.target_shape, dtype=complex)
+                    F_known_moments[1] = -(f_tau.data[0] + f_tau.data[-1])
+                f1 = F_known_moments[1]
+                f_tau.data[0, :, :] = 0.5 * (f_tau.data[0, :, :] - f1 - f_tau.data[-1, :, :])
+                f_tau.data[-1, :, :] = -f1 - f_tau.data[0, :, :]
+                F_iw[bl].set_from_fourier(f_tau, F_known_moments)
         F_iw << make_hermitian(F_iw)
         symmetrize(F_iw)
 
         for block, fw in F_iw:
-            Sigma_iw[block] << fw * inverse(G_iw[block])
+            if not use_tail_moments:
+                for iw in fw.mesh:
+                    Sigma_iw[block][iw] = fw[iw] / G_iw[block][iw]
+            else:
+                Sigma_iw[block] << fw * inverse(G_iw[block])
 
     Sigma_iw << make_hermitian(Sigma_iw)
     symmetrize(Sigma_iw)
@@ -700,7 +704,7 @@ def postprocess_sigma(
             fit_min_w=post_proc_params['fit_min_w'],
             fit_max_w=post_proc_params['fit_max_w'],
             fit_max_moment=post_proc_params['fit_max_moment'],
-            fit_known_moments=solver.Sigma_moments,
+            fit_known_moments=solver.Sigma_moments if use_tail_moments else None,
         )
 
     Sigma_iw << make_hermitian(Sigma_iw)

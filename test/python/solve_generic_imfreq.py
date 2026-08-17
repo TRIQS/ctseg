@@ -53,6 +53,7 @@ results = solve_generic(
     length_cycle=50,
     n_warmup_cycles=1000,
     n_cycles=10000,
+    use_tail_moments=False,
 )
 
 if mpi.is_master_node():
