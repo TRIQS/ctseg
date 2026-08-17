@@ -20,8 +20,8 @@ from triqs_ctseg.postprocessing import (
     _density_observables_from_density_matrix,
     _assemble_density_tail_moments,
     _chi_xx_tau_from_solver,
-    _phase2c_jperp_components_from_tau,
-    _phase2c_jperp_oriented_components_from_tau,
+    _jperp_sigma1_components_from_tau,
+    _jperp_sigma1_oriented_components_from_tau,
     extract_u_tensor_from_h_int,
     check_spectrum,
 )
@@ -348,13 +348,13 @@ def test_hubbard_atom_dynamic_density_tail_moments_at_half_filling():
     np.testing.assert_allclose(moments['F_tail_moments']['down'][2], [[sigma0 * g2 + sigma1]], atol=1e-13)
 
 
-def test_phase2c_jperp_nonpolarized_assembly_coefficients():
+def test_jperp_sigma1_nonpolarized_assembly_coefficients():
     beta = 3.0
     U = 4.0
     jperp_tau = np.full(9, 2.0)
     chi_xx_tau = np.full(9, 0.25)
 
-    components = _phase2c_jperp_components_from_tau(jperp_tau, chi_xx_tau, beta, U)
+    components = _jperp_sigma1_components_from_tau(jperp_tau, chi_xx_tau, beta, U)
 
     # Constant-grid sanity:
     # int J chi = beta * 2 * 0.25 = 1.5, mixed = -2 * U * int J chi.
@@ -367,15 +367,15 @@ def test_phase2c_jperp_nonpolarized_assembly_coefficients():
     np.testing.assert_allclose(components['total'], -9.5)
 
 
-def test_phase2c_jperp_oriented_reduces_to_nonpolarized():
+def test_jperp_sigma1_oriented_reduces_to_nonpolarized():
     beta = 3.0
     U = 4.0
     jperp_tau = np.full(9, 2.0)
     chi_xx_tau = np.full(9, 0.25)
     chi_oriented_tau = 2.0 * chi_xx_tau
 
-    nonpolarized = _phase2c_jperp_components_from_tau(jperp_tau, chi_xx_tau, beta, U)
-    oriented = _phase2c_jperp_oriented_components_from_tau(
+    nonpolarized = _jperp_sigma1_components_from_tau(jperp_tau, chi_xx_tau, beta, U)
+    oriented = _jperp_sigma1_oriented_components_from_tau(
         jperp_tau, chi_oriented_tau, chi_oriented_tau, beta, U
     )
 
@@ -385,7 +385,7 @@ def test_phase2c_jperp_oriented_reduces_to_nonpolarized():
     np.testing.assert_allclose(oriented['down']['total'], nonpolarized['total'])
 
 
-def test_phase2c_jordan_wigner_mixed_coefficient():
+def test_jperp_jordan_wigner_mixed_coefficient():
     eye2 = np.eye(2)
     c0 = np.array([[0, 1], [0, 0]], dtype=complex)
     cd0 = c0.conj().T
@@ -434,7 +434,7 @@ def test_phase2c_jordan_wigner_mixed_coefficient():
     np.testing.assert_allclose(down_lhs, down_rhs, atol=1e-14)
 
 
-def test_density_tail_moments_include_phase2c_jperp():
+def test_density_tail_moments_include_jperp():
     beta = 3.0
     U = 4.0
 
@@ -467,14 +467,14 @@ def test_density_tail_moments_include_phase2c_jperp():
     moments = _assemble_density_tail_moments(Solver)
 
     static_sigma1 = U ** 2 * 0.25
-    phase2c = -9.5
-    np.testing.assert_allclose(moments['Sigma_moments']['up'][1], [[static_sigma1 + phase2c]])
-    np.testing.assert_allclose(moments['Sigma_moments']['down'][1], [[static_sigma1 + phase2c]])
-    np.testing.assert_allclose(moments['F_tail_moments']['up'][2], [[2.0 * 2.0 + static_sigma1 + phase2c]])
+    jperp_correction = -9.5
+    np.testing.assert_allclose(moments['Sigma_moments']['up'][1], [[static_sigma1 + jperp_correction]])
+    np.testing.assert_allclose(moments['Sigma_moments']['down'][1], [[static_sigma1 + jperp_correction]])
+    np.testing.assert_allclose(moments['F_tail_moments']['up'][2], [[2.0 * 2.0 + static_sigma1 + jperp_correction]])
     np.testing.assert_allclose(Solver.Jperp_moment_components['mixed'], -12.0)
 
 
-def test_density_tail_moments_include_polarized_phase2c_jperp():
+def test_density_tail_moments_include_polarized_jperp():
     beta = 3.0
     U = 4.0
 
@@ -531,9 +531,9 @@ if mpi.is_master_node():
     test_hubbard_atom_dynamic_density_tail_moments_at_half_filling()
     test_chi_xx_prefers_measured_transverse_correlator()
     test_chi_xx_does_not_infer_transverse_from_anisotropic_nn_tau()
-    test_phase2c_jperp_nonpolarized_assembly_coefficients()
-    test_phase2c_jperp_oriented_reduces_to_nonpolarized()
-    test_phase2c_jordan_wigner_mixed_coefficient()
-    test_density_tail_moments_include_phase2c_jperp()
-    test_density_tail_moments_include_polarized_phase2c_jperp()
+    test_jperp_sigma1_nonpolarized_assembly_coefficients()
+    test_jperp_sigma1_oriented_reduces_to_nonpolarized()
+    test_jperp_jordan_wigner_mixed_coefficient()
+    test_density_tail_moments_include_jperp()
+    test_density_tail_moments_include_polarized_jperp()
     print("postprocessing_helpers: all tests passed")

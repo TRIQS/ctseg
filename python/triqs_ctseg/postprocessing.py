@@ -319,7 +319,7 @@ def _periodic_tau_convolution_zero(left, middle, right, beta):
     return (dtau * dtau / beta) * total
 
 
-def _phase2c_jperp_components_from_tau(jperp_tau, chi_xx_tau, beta, U):
+def _jperp_sigma1_components_from_tau(jperp_tau, chi_xx_tau, beta, U):
     jperp_tau = np.asarray(jperp_tau, dtype=float)
     chi_xx_tau = np.asarray(chi_xx_tau, dtype=float)
     if jperp_tau.shape != chi_xx_tau.shape:
@@ -341,7 +341,7 @@ def _phase2c_jperp_components_from_tau(jperp_tau, chi_xx_tau, beta, U):
     }
 
 
-def _phase2c_jperp_oriented_components_from_tau(
+def _jperp_sigma1_oriented_components_from_tau(
     jperp_tau,
     chi_minus_plus_tau,
     chi_plus_minus_tau,
@@ -406,10 +406,10 @@ def _oriented_sperp_tau_from_solver(solver):
     )
 
 
-def _assemble_jperp_phase2c_sigma1(solver, U):
+def _assemble_jperp_sigma1(solver, U):
     spin_colors = _spin_color_indices(solver.gf_struct)
     if spin_colors is None:
-        mpi.report("WARNING: Jperp Phase 2c moments require a single up/down orbital; "
+        mpi.report("WARNING: Jperp tail moments require a single up/down orbital; "
                    "skipping analytic transverse Sigma_1/F_2.")
         return None
 
@@ -423,7 +423,7 @@ def _assemble_jperp_phase2c_sigma1(solver, U):
     if oriented_tau is not None:
         chi_minus_plus_tau, chi_plus_minus_tau = oriented_tau
         if jperp_tau.shape == chi_minus_plus_tau.shape and jperp_tau.shape == chi_plus_minus_tau.shape:
-            components = _phase2c_jperp_oriented_components_from_tau(
+            components = _jperp_sigma1_oriented_components_from_tau(
                 jperp_tau,
                 chi_minus_plus_tau,
                 chi_plus_minus_tau,
@@ -448,7 +448,7 @@ def _assemble_jperp_phase2c_sigma1(solver, U):
 
     chi_xx_tau = _chi_xx_tau_from_solver(solver, up, down)
     if chi_xx_tau is None:
-        mpi.report("WARNING: Jperp Phase 2c moments require Sperp_tau; "
+        mpi.report("WARNING: Jperp tail moments require Sperp_tau; "
                    "skipping analytic transverse Sigma_1/F_2.")
         return None
 
@@ -457,7 +457,7 @@ def _assemble_jperp_phase2c_sigma1(solver, U):
                    "skipping analytic transverse Sigma_1/F_2.")
         return None
 
-    components = _phase2c_jperp_components_from_tau(
+    components = _jperp_sigma1_components_from_tau(
         jperp_tau, chi_xx_tau, solver.Jperp_tau.mesh.beta, U_spin
     )
 
@@ -513,12 +513,12 @@ def _assemble_density_tail_moments(solver, use_tail_moments=True):
 
     has_Jperp = _gf_is_nonzero(getattr(solver, 'Jperp_tau', None))
     if has_Jperp:
-        jperp_phase2c = _assemble_jperp_phase2c_sigma1(solver, U)
-        if jperp_phase2c is not None and sigma1 is not None:
-            jperp_sigma1, jperp_components = jperp_phase2c
+        jperp_sigma1_result = _assemble_jperp_sigma1(solver, U)
+        if jperp_sigma1_result is not None and sigma1 is not None:
+            jperp_sigma1, jperp_components = jperp_sigma1_result
             sigma1 = sigma1 + jperp_sigma1
             solver.Jperp_moment_components = jperp_components
-        elif jperp_phase2c is not None:
+        elif jperp_sigma1_result is not None:
             mpi.report("WARNING: static density covariance is unavailable; skipping analytic Jperp Sigma_1/F_2.")
 
     block_name, _, _ = build_color_tables(solver.gf_struct)
