@@ -71,6 +71,19 @@ The block structure and imaginary time grid for the improved estimator are the s
 The measurement is turned on by setting ``measure_F_tau`` in the ``solve_params`` to ``True``. The result of the 
 accumulation is accessible through the ``results.F_tau`` attribute of the solver object. 
 
+High-frequency tail moments
+***************************
+
+The ``solve_generic`` postprocessing path assembles analytic moments when ``use_tail_moments=True``.
+For static density-density interactions, ``Sigma_0`` and ``Sigma_1`` are obtained from the density
+matrix. For non-zero ``D0_tau``, ``Sigma_0`` includes the retarded Hartree shift and ``Sigma_1`` uses
+``dyn_phi_n``/``dyn_phi_phi`` when they were measured. If ``D0_tau`` is non-zero but the dynamic
+correlations are absent, postprocessing keeps the exact ``Sigma_0`` and ``G_2`` moments and emits a
+warning before skipping analytic ``Sigma_1``/``F_2``. Transverse ``Jperp_tau`` contributions are
+included for a single up/down orbital when the required spin-correlation inputs are available. In the
+spin-polarized case this requires the oriented transverse-spin measurement
+``measure_Sperp_asym_tau=True``.
+
 Density
 *******
 
@@ -195,17 +208,45 @@ The measurement is turned on by setting ``measure_Sperp_tau`` in the ``solve_par
 accumulation is accessible through the ``results.Sperp_tau`` attribute of the solver object, as a matrix-valued
 ``GfImTime`` with size :math:`1 \times 1`.
 
-State histogram
-***************
+For spin-polarized transverse moment postprocessing one can also turn on
+``measure_Sperp_asym_tau``. This stores the oriented correlators
+:math:`\langle S^-(\tau) S^+(0) \rangle` and
+:math:`\langle S^+(\tau) S^-(0) \rangle` in ``results.Sminus_Splus_tau`` and
+``results.Splus_Sminus_tau``. With the CT-SEG ``Jperp_tau`` normalization, the symmetric estimator
+obeys
 
-This measurement determines the occupation probabilities of the non-interacting impurity eigenstates. 
-Formally, these are the diagonal elements of the impurity density matrix expressed in the occupation
-number basis. For example, in the case of an impurity with 2 colors, the eigenstates are 
+.. math::
+
+    \langle S_x(\tau) S_x(0) \rangle =
+    \frac{1}{4}\left(\langle S^-(\tau) S^+(0) \rangle
+    + \langle S^+(\tau) S^-(0) \rangle\right).
+
+Density matrix measurement
+**************************
+
+This measurement determines the time-translationally invariant diagonal impurity density matrix in the
+occupation-number basis. Equivalently, it gives the occupation probabilities of the segment states.
+For example, in the case of an impurity with 2 colors, the states are
 :math:`|00\rangle, |10\rangle, |01 \rangle, |11\rangle`. 
 
-The measurement is turned on by setting ``measure_state_hist`` in the ``solve_params`` to ``True``. The result of the 
-accumulation is accessible through the ``results.state_hist`` attribute of the solver object, as a numpy array of size
-:math:`2^N`. The index of the state :math:`|n_0, n_1, \dots n_N \rangle` in the histogram is given by :math:`\sum_{i = 0}^{N - 1} n_i 2^i`. 
+The measurement is turned on by default and can be controlled with ``measure_density_matrix`` in the
+``solve_params``. The result is accessible through ``Solver.density_matrix`` and through the legacy
+``results.state_hist`` storage field, as a numpy array of size :math:`2^N`. The index of the state
+:math:`|n_0, n_1, \dots n_N \rangle` in the array is given by
+:math:`\sum_{i = 0}^{N - 1} n_i 2^i`.
+
+``measure_state_hist`` is kept as a legacy alias: setting it to ``True`` also enables
+``measure_density_matrix``.
+
+Retarded static correlations for tail moments
+*********************************************
+
+When ``D0_tau`` is non-zero, ``measure_dyn_corr`` measures the color-space static correlations
+``results.dyn_phi_n`` and ``results.dyn_phi_phi`` used by postprocessing to assemble analytic
+high-frequency moments. ``dyn_phi_n`` contains :math:`\langle \phi_a n_c\rangle`; ``dyn_phi_phi``
+contains the source-induced :math:`\langle \phi_a \phi_b\rangle` and excludes the Gaussian equal-time
+constant :math:`D_0(\tau=0)`, which is added during moment assembly. The generic solver enables this
+measure automatically for dynamic density-density interactions when ``use_tail_moments=True``.
 
 Average sign
 ************

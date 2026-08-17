@@ -26,6 +26,9 @@ namespace triqs_ctseg {
 
     /// Number of time slices for bosonic functions.
     int n_tau_bosonic = 10001;
+
+    /// Number of Legendre coefficients for fermionic single-particle functions.
+    int n_l = 30;
   };
 
   //---------------------------------------------
@@ -127,6 +130,12 @@ namespace triqs_ctseg {
     /// Whether to measure \f$ F(\tau) \f$.
     bool measure_F_tau = false;
 
+    /// Whether to measure \f$ G_l \f$ in the Legendre representation.
+    bool measure_G_l = false;
+
+    /// Whether to measure \f$ F_l \f$ in the Legendre representation.
+    bool measure_F_l = false;
+
     /// Whether to measure densities.
     bool measure_densities = true;
 
@@ -145,8 +154,19 @@ namespace triqs_ctseg {
     /// Whether to measure \f$ \langle S_x(\tau) S_x(0) \rangle \f$.
     bool measure_Sperp_tau = false;
 
-    /// Whether to measure state histograms.
+    /// Whether to measure oriented transverse spin correlations
+    /// \f$ \langle S^-(\tau) S^+(0) \rangle \f$ and
+    /// \f$ \langle S^+(\tau) S^-(0) \rangle \f$.
+    bool measure_Sperp_asym_tau = false;
+
+    /// Whether to measure the occupation-basis TTI diagonal density matrix.
+    bool measure_density_matrix = true;
+
+    /// Legacy alias for measure_density_matrix.
     bool measure_state_hist = false;
+
+    /// Whether to measure retarded static correlations for tail moments.
+    bool measure_dyn_corr = false;
 
     /// Whether to measure three-point correlation function.
     bool measure_g2w = false;
