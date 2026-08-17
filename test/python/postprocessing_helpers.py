@@ -11,6 +11,7 @@ are otherwise only exercised indirectly via solve_generic.
 
 import numpy as np
 import triqs.utility.mpi as mpi
+from triqs.gfs import Gf, MeshLegendre
 from triqs.operators import n
 
 from triqs_ctseg.postprocessing import (
@@ -18,6 +19,8 @@ from triqs_ctseg.postprocessing import (
     _dd_to_4idx,
     extract_u_tensor_from_h_int,
     check_spectrum,
+    _enforce_legendre_discontinuity,
+    _legendre_discontinuity,
 )
 
 
@@ -160,6 +163,20 @@ def test_check_spectrum_rejects_non_square():
     raise AssertionError("check_spectrum should have raised for non-square input")
 
 
+def test_complex_legendre_discontinuity_enforcement():
+    g_l = Gf(
+        mesh=MeshLegendre(beta=10.0, statistic="Fermion", max_n=8),
+        target_shape=(2, 2),
+    )
+    rng = np.random.default_rng(12345)
+    g_l.data[:] = rng.normal(size=g_l.data.shape) + 1j * rng.normal(size=g_l.data.shape)
+    target = np.array([[1.0, 0.2j], [-0.2j, 1.0]], dtype=complex)
+
+    _enforce_legendre_discontinuity(g_l, target)
+
+    np.testing.assert_allclose(_legendre_discontinuity(g_l), target, atol=1e-13)
+
+
 if mpi.is_master_node():
     test_build_color_tables_single_orbital()
     test_build_color_tables_two_orbital_single_block_per_spin()
@@ -171,4 +188,5 @@ if mpi.is_master_node():
     test_check_spectrum_no_truncation_keeps_matrix()
     test_check_spectrum_truncation_drops_large_eigenvalues()
     test_check_spectrum_rejects_non_square()
+    test_complex_legendre_discontinuity_enforcement()
     print("postprocessing_helpers: all tests passed")

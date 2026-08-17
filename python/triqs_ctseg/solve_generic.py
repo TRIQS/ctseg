@@ -66,6 +66,7 @@ def _prepare_solver(
     n_iw = solver_params.pop('n_iw', 1025)
     n_tau = solver_params.pop('n_tau', 10001)
     n_tau_bosonic = solver_params.pop('n_tau_bosonic', n_tau)
+    n_l = solver_params.pop('n_l', None)
 
     solver_params['measure_densities'] = True
     solver_params['measure_G_tau'] = not solve_density_only
@@ -81,7 +82,15 @@ def _prepare_solver(
                        f" ({max_dlr_idx}). Setting n_iw to {max_dlr_idx+1}.")
             n_iw = max_dlr_idx + 1
 
-    S = Solver(gf_struct=gf_struct, beta=beta, n_tau=n_tau, n_tau_bosonic=n_tau_bosonic)
+    solver_constructor_params = {
+        'gf_struct': gf_struct,
+        'beta': beta,
+        'n_tau': n_tau,
+        'n_tau_bosonic': n_tau_bosonic,
+    }
+    if solver_params.get('measure_G_l', False) or solver_params.get('measure_F_l', False):
+        solver_constructor_params['n_l'] = 30 if n_l is None else n_l
+    S = Solver(**solver_constructor_params)
     # Solver does not expose these as attributes; postprocess_sigma relies on them
     S.n_iw = n_iw
     S.beta = beta
@@ -181,9 +190,20 @@ def solve_generic(
     )
 
     pp_results = postprocess(S, symmetrize_func=symmetrize_func, **post_proc_params)
-    result_kwargs = {k: v for k, v in pp_results.items() if v is not None}
+    known_result_fields = set(SolverResults.__dataclass_fields__)
+    result_kwargs = {
+        k: v for k, v in pp_results.items()
+        if v is not None and k in known_result_fields
+    }
+    extra_kwargs = {
+        k: v for k, v in pp_results.items()
+        if v is not None and k not in known_result_fields
+    }
     result_kwargs['Solver'] = S
-    return SolverResults(**result_kwargs)
+    results = SolverResults(**result_kwargs)
+    for k, v in extra_kwargs.items():
+        setattr(results, k, v)
+    return results
 
 
 def solve_density(

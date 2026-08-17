@@ -17,11 +17,16 @@ namespace triqs_ctseg::measures {
     configuration_t const &config;
     results_t &results;
     double beta;
+    bool measure_G_tau;
     bool measure_F_tau;
+    bool measure_G_l;
+    bool measure_F_l;
     gf_struct_t gf_struct;
 
     block_gf<imtime> G_tau;
     block_gf<imtime> F_tau;
+    block_gf<legendre> G_l;
+    block_gf<legendre> F_l;
 
     double Z;
 
