@@ -261,12 +261,11 @@ def postprocess_sigma(
         F_known_moments = make_zero_tail(F_iw, n_moments=1)
         for i, bl in enumerate(F_iw.indices):
             F_iw[bl].set_from_fourier(solver.results.F_tau[bl], F_known_moments[i])
-        F_iw << make_hermitian(F_iw)
         symmetrize(F_iw)
 
-        for block, fw in F_iw:
-            for iw in fw.mesh:
-                Sigma_iw[block][iw] = fw[iw] / G_iw[block][iw]
+        # Sigma = F G^{-1} as a matrix product within each block. F is not hermitian
+        # (F(-iw)^dagger = G Sigma, not Sigma G), so only Sigma is made hermitian below.
+        Sigma_iw << F_iw * inverse(G_iw)
 
     Sigma_iw << make_hermitian(Sigma_iw)
     symmetrize(Sigma_iw)
