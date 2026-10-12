@@ -65,7 +65,7 @@ Once the improved estimator is known, the self-energy is obtained according to
 
 .. math::
 
-    \Sigma^A(i\omega_n) = [G^A]^{-1}(i\omega_n) F^A(i \omega_n).
+    \Sigma^A(i\omega_n) = F^A(i \omega_n) [G^A]^{-1}(i\omega_n).
 
 The block structure and imaginary time grid for the improved estimator are the same as for the Green's function. 
 The measurement is turned on by setting ``measure_F_tau`` in the ``solve_params`` to ``True``. The result of the 
