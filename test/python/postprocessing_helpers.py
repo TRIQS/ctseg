@@ -9,8 +9,11 @@ No Monte Carlo; these tests pin down data-transformation contracts that
 are otherwise only exercised indirectly via solve_generic.
 """
 
+from types import SimpleNamespace
+
 import numpy as np
 import triqs.utility.mpi as mpi
+from triqs.gfs import BlockGf, MeshImTime
 from triqs.operators import n
 
 from triqs_ctseg.postprocessing import (
@@ -18,6 +21,7 @@ from triqs_ctseg.postprocessing import (
     _dd_to_4idx,
     extract_u_tensor_from_h_int,
     check_spectrum,
+    postprocess_sigma,
 )
 
 
@@ -160,6 +164,35 @@ def test_check_spectrum_rejects_non_square():
     raise AssertionError("check_spectrum should have raised for non-square input")
 
 
+def test_postprocess_sigma_improved_estimator_matrix_block():
+    # G(tau) of H = E with off-diagonal E, and F(tau) = Sigma0 G(tau) for a static
+    # Sigma0 that does not commute with E. postprocess_sigma must return Sigma = F G^{-1}
+    # = Sigma0, which requires the matrix product and no hermitization of F.
+    beta, n_tau, n_iw = 10., 10001, 100
+    E = np.array([[0.3, 0.4], [0.4, -0.5]])
+    Sigma0 = np.array([[0.7, -0.2], [-0.2, 0.1]])
+    assert np.abs(E @ Sigma0 - Sigma0 @ E).max() > 0.1
+
+    gf_struct = [('up', 2)]
+    G_tau = BlockGf(mesh=MeshImTime(beta, 'Fermion', n_tau), gf_struct=gf_struct)
+    F_tau = G_tau.copy()
+    Delta_tau = G_tau.copy()
+    Delta_tau.zero()
+    eps, U = np.linalg.eigh(E)
+    tau = np.array([float(t) for t in G_tau.mesh.values()])
+    g_eig = -np.exp(-np.outer(tau, eps)) / (1 + np.exp(-beta * eps))
+    G_tau['up'].data[:] = np.einsum('ik,tk,jk->tij', U, g_eig, U)
+    F_tau['up'].data[:] = np.einsum('ik,tkj->tij', Sigma0, G_tau['up'].data)
+
+    solver = SimpleNamespace(
+        beta=beta, n_iw=n_iw, gf_struct=gf_struct, h_loc0_mat=[E],
+        Delta_tau=Delta_tau, results=SimpleNamespace(G_tau=G_tau, F_tau=F_tau),
+    )
+    res = postprocess_sigma(solver, degenerate_blk=None, analytic_hf=False, perform_tail_fit=False)
+    err = np.abs(res['Sigma_iw']['up'].data - Sigma0).max()
+    assert err < 1e-3, f"max |Sigma - Sigma0| = {err}"
+
+
 if mpi.is_master_node():
     test_build_color_tables_single_orbital()
     test_build_color_tables_two_orbital_single_block_per_spin()
@@ -171,4 +204,5 @@ if mpi.is_master_node():
     test_check_spectrum_no_truncation_keeps_matrix()
     test_check_spectrum_truncation_drops_large_eigenvalues()
     test_check_spectrum_rejects_non_square()
+    test_postprocess_sigma_improved_estimator_matrix_block()
     print("postprocessing_helpers: all tests passed")

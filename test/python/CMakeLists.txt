@@ -15,6 +15,7 @@ set(all_tests
   ./multiorb
   ./dynamic_int_multiorb
   ./dimer
+  ./offdiag_delta_sigma
   ./postprocessing_helpers
   ./solve_generic_imfreq
   ./solve_generic_dlr
