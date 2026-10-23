@@ -143,6 +143,11 @@ The result of the accumulation is accessible through the ``results.g3w`` attribu
 For example, the correlation function in the first color of the spin up block is accessed as 
 ``results.g3w["up", "up"][0, 0, 0, 0]``. 
 
+This measurement is expensive. To measure it less often than the other observables, set ``length_cycle_g3``
+in the ``solve_params`` to a multiple of ``length_cycle`` (it defaults to ``length_cycle``):
+:math:`g^{(3)}` is then measured once every ``length_cycle_g3`` Monte Carlo moves, i.e.
+``n_cycles * length_cycle / length_cycle_g3`` times in total.
+
 Two-particle, two-frequency Green's function 
 ********************************************
 

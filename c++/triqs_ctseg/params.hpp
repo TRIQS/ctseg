@@ -63,6 +63,10 @@ namespace triqs_ctseg {
     /// Length of a single QMC cycle.
     int length_cycle = 50;
 
+    /// Number of QMC moves between two measurements of g3w (defaults to ``length_cycle``).
+    /// Must be a multiple of ``length_cycle``.
+    int length_cycle_g3 = 0;
+
     /// Number of cycles for thermalization.
     int n_warmup_cycles = 5000;
 

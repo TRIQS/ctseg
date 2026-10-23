@@ -30,6 +30,11 @@ namespace triqs_ctseg::measures {
 
     double Z = 0;
 
+    // g3w is measured once every g3w_interval cycles (length_cycle_g3 / length_cycle)
+    long g3w_interval = 1;
+    long n_cycles_done = 0;
+    double Z_g3w = 0;
+
     four_point(params_t const &params, work_data_t const &wdata, configuration_t const &config, results_t &results);
 
     void accumulate(double s);

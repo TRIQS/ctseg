@@ -6,6 +6,7 @@
 
 #include "./four_point.hpp"
 #include "../logs.hpp"
+#include <triqs/utility/exceptions.hpp>
 
 namespace triqs_ctseg::measures {
 
@@ -19,6 +20,13 @@ namespace triqs_ctseg::measures {
     measure_g3w    = p.measure_g3w;
     mesh_bosonic   = triqs::mesh::imfreq(beta, Boson  , n_w_bosonic  );
     mesh_fermionic = triqs::mesh::imfreq(beta, Fermion, n_w_fermionic);
+
+    if (measure_g3w) {
+      if (p.length_cycle_g3 <= 0 or p.length_cycle_g3 % p.length_cycle != 0)
+        TRIQS_RUNTIME_ERROR << "length_cycle_g3 = " << p.length_cycle_g3
+                            << " must be a positive multiple of length_cycle = " << p.length_cycle;
+      g3w_interval = p.length_cycle_g3 / p.length_cycle;
+    }
 
     if (measure_g2w) g2w.resize(wdata.gf_struct.size());
     if (measure_g3w) g3w.resize(wdata.gf_struct.size());
@@ -74,9 +82,15 @@ namespace triqs_ctseg::measures {
     
     * The number of fermionic (bosonic) frequencies is specified through the
     parameters ``n_w_f_vertex`` (``n_w_b_vertex``).
+
+    * g3w is only measured once every ``length_cycle_g3 / length_cycle`` cycles.
     */
 
     Z += s;
+
+    bool const accumulate_g3w = measure_g3w and (n_cycles_done % g3w_interval == 0);
+    ++n_cycles_done;
+    if (not measure_g2w and not accumulate_g3w) return;
 
     auto Mw = compute_Mw();
     auto const &nb_blocks = wdata.gf_struct.size();
@@ -102,7 +116,8 @@ namespace triqs_ctseg::measures {
       } // b1
     } // measure_g2w
 
-    if (measure_g3w) {
+    if (accumulate_g3w) {
+      Z_g3w += s;
       for (auto const &b1 : range(nb_blocks)) {
         for (auto const &b2 : range(nb_blocks)) {
           auto const &block_shape = g3w[b1][b2].target_shape();
@@ -135,14 +150,15 @@ namespace triqs_ctseg::measures {
 
   void four_point::collect_results(mpi::communicator const &c) {
 
-    Z = mpi::all_reduce(Z, c);
+    Z     = mpi::all_reduce(Z, c);
+    Z_g3w = mpi::all_reduce(Z_g3w, c);
 
     if (measure_g2w) g2w = mpi::all_reduce(g2w, c);
     if (measure_g3w) g3w = mpi::all_reduce(g3w, c);
     for (auto const &b1 : range(wdata.gf_struct.size())) {
       for (auto const &b2 : range(wdata.gf_struct.size())) {
         if (measure_g2w) g2w[b1][b2] = g2w[b1][b2] / (Z * beta);
-        if (measure_g3w) g3w[b1][b2] = g3w[b1][b2] / (Z * beta);
+        if (measure_g3w) g3w[b1][b2] = g3w[b1][b2] / (Z_g3w * beta);
       }
     }
 
