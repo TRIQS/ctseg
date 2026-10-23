@@ -128,20 +128,16 @@ jobs:
 
     - name: Build & Install TRIQS
       env:
-        # Last known-good versions (green CI run of 2026-08-10)
-        TRIQS_SHA: d418d8396f6bfc69de3c938a40119559e854f7f1
-        NDA_SHA: d8d1a01b83ad04e15a7ed011ce36b0c6f909e5d8
-        H5_SHA: c87b5f195d912f2e3024fb1a66e5ceadf9553683
-        MPI_SHA: c760e19bd79b3fb84fca2b1e861a3478047f6a42
-        ITERTOOLS_SHA: d32d2b20a1beda709a43bd56ac85ea6d41efcdef
+        TRIQS_BRANCH: ${{ github.event_name == 'pull_request' && github.base_ref || github.ref_name }}
+        # cppdlr main before its 2026-08-20 change of the symmetrized DLR grids,
+        # which the reference files of the solve_generic_dlr tests predate
+        CPPDLR_SHA: e5f9a14e16cbed90ea78bdc51d32aa9c8bf68a81
       run: |
-        git clone https://github.com/TRIQS/triqs
-        git -C triqs checkout $TRIQS_SHA
+        git ls-remote --exit-code --heads https://github.com/TRIQS/triqs "$TRIQS_BRANCH" > /dev/null 2>&1 || TRIQS_BRANCH=unstable
+        git clone https://github.com/TRIQS/triqs --branch "$TRIQS_BRANCH"
         # TRIQS builds deps/<name> instead of cloning the branch when that folder exists
-        for dep in nda:$NDA_SHA h5:$H5_SHA mpi:$MPI_SHA itertools:$ITERTOOLS_SHA; do
-          git clone https://github.com/TRIQS/${dep%%:*} triqs/deps/${dep%%:*}
-          git -C triqs/deps/${dep%%:*} checkout ${dep##*:}
-        done
+        git clone https://github.com/flatironinstitute/cppdlr triqs/deps/cppdlr
+        git -C triqs/deps/cppdlr checkout $CPPDLR_SHA
         cmake -S triqs -B triqs/build -G Ninja \
           -DPython_EXECUTABLE=$VIRTUAL_ENV/bin/python \
           -DBuild_Tests=OFF \
