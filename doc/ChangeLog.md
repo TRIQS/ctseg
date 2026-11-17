@@ -1,5 +1,17 @@
 # Changelog
 
+## Unstable
+
+### General
+* `postprocess_sigma`: with `analytic_hf=True` and `measure_state_hist=True`, the first
+  high-frequency moment of the self-energy, Sigma_1 = sum_bc U_ab U_ac (<n_b n_c> - <n_b><n_c>),
+  is computed from the state histogram (new `compute_sigma_first_moment`) and stored as
+  `solver.Sigma_moments[block][1]`, next to the Hartree shift. Static density-density
+  interactions only; with D0(tau) or Jperp(tau) only the Hartree shift is known, as before
+* The tail fit of the self-energy (`perform_tail_fit=True`) now uses the known moments in
+  `solver.Sigma_moments` instead of fitting all moments freely
+
+
 ## Version 4.0.1
 
 ctseg version 4.0.1 is a patch release that pins the c2py build dependency to

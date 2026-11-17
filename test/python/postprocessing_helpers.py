@@ -9,6 +9,8 @@ No Monte Carlo; these tests pin down data-transformation contracts that
 are otherwise only exercised indirectly via solve_generic.
 """
 
+from types import SimpleNamespace
+
 import numpy as np
 import triqs.utility.mpi as mpi
 from triqs.operators import n
@@ -18,6 +20,7 @@ from triqs_ctseg.postprocessing import (
     _dd_to_4idx,
     extract_u_tensor_from_h_int,
     check_spectrum,
+    compute_sigma_first_moment,
 )
 
 
@@ -160,6 +163,81 @@ def test_check_spectrum_rejects_non_square():
     raise AssertionError("check_spectrum should have raised for non-square input")
 
 
+def _fock_annihilators(n_color):
+    """Jordan-Wigner annihilators on the Fock space with state index sum_c n_c 2^c."""
+    dim = 2**n_color
+    cs = []
+    for a in range(n_color):
+        c = np.zeros((dim, dim))
+        for state in range(dim):
+            if state >> a & 1:
+                sign = (-1)**bin(state & ((1 << a) - 1)).count('1')
+                c[state ^ (1 << a), state] = sign
+        cs.append(c)
+    return cs
+
+
+def test_compute_sigma_first_moment_vs_operator_algebra():
+    # Kanamori density-density, 2 orbitals, one 2x2 block per spin.
+    # Reference: Sigma_0 = -<{[H,c],c+}>, Sigma_1 = <{[H,[H,c]],c+}> - Sigma_0^2
+    # evaluated in Fock space for a random diagonal density matrix.
+    U, Up, J = 4.0, 2.0, 0.5
+    gf_struct = [('up', 2), ('down', 2)]
+    h_int = (
+        U * (n('up', 0) * n('down', 0) + n('up', 1) * n('down', 1))
+        + Up * (n('up', 0) * n('down', 1) + n('up', 1) * n('down', 0))
+        + (Up - J) * (n('up', 0) * n('up', 1) + n('down', 0) * n('down', 1))
+    )
+    # colors [up0, up1, down0, down1]
+    U_dd = np.array([
+        [0.,     Up - J, U,      Up],
+        [Up - J, 0.,     Up,     U],
+        [U,      Up,     0.,     Up - J],
+        [Up,     U,      Up - J, 0.],
+    ])
+    n_color = 4
+
+    rng = np.random.default_rng(42)
+    prob = rng.random(2**n_color)
+    prob /= prob.sum()
+
+    cs = _fock_annihilators(n_color)
+    ns = [c.T @ c for c in cs]
+    H = 0.5 * sum(U_dd[a, b] * ns[a] @ ns[b] for a in range(n_color) for b in range(n_color))
+    rho = np.diag(prob)
+
+    def comm(A, B): return A @ B - B @ A
+    def anticomm(A, B): return A @ B + B @ A
+
+    sigma0_ref = np.array([-np.trace(rho @ anticomm(comm(H, c), c.T)) for c in cs])
+    sigma1_ref = np.array([np.trace(rho @ anticomm(comm(H, comm(H, c)), c.T)) for c in cs]) - sigma0_ref**2
+
+    # minimal stand-in for the solver; zero D0(tau) / Jperp(tau) mean a static interaction
+    solver = SimpleNamespace(
+        gf_struct=gf_struct, h_int=h_int,
+        results=SimpleNamespace(state_hist=prob),
+        D0_tau=[(('up', 'up'), SimpleNamespace(data=np.zeros((3, 2, 2))))],
+        Jperp_tau=SimpleNamespace(data=np.zeros((3, 1, 1))),
+    )
+
+    sigma1 = compute_sigma_first_moment(solver)
+    assert list(sigma1) == ['up', 'down']
+    for blk in sigma1.values():
+        assert blk.shape == (2, 2)
+        np.testing.assert_allclose(blk - np.diag(np.diag(blk)), 0.)
+    np.testing.assert_allclose(np.concatenate([np.diag(sigma1['up']), np.diag(sigma1['down'])]),
+                               sigma1_ref, rtol=1e-12)
+
+    # no state histogram -> moment unknown
+    solver.results.state_hist = None
+    assert compute_sigma_first_moment(solver) is None
+
+    # retarded interaction -> moment unknown
+    solver.results.state_hist = prob
+    solver.Jperp_tau.data[1] = 0.1
+    assert compute_sigma_first_moment(solver) is None
+
+
 if mpi.is_master_node():
     test_build_color_tables_single_orbital()
     test_build_color_tables_two_orbital_single_block_per_spin()
@@ -171,4 +249,5 @@ if mpi.is_master_node():
     test_check_spectrum_no_truncation_keeps_matrix()
     test_check_spectrum_truncation_drops_large_eigenvalues()
     test_check_spectrum_rejects_non_square()
+    test_compute_sigma_first_moment_vs_operator_algebra()
     print("postprocessing_helpers: all tests passed")

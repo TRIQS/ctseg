@@ -175,6 +175,52 @@ def compute_sigma_hartreefock(solver):
     return Sigma_HartreeFock
 
 
+def compute_sigma_first_moment(solver):
+    r"""
+    Compute the first high-frequency moment of the self-energy from the state histogram.
+
+    For a static density-density interaction :math:`H = \frac{1}{2}\sum_{ab} U_{ab} n_a n_b`,
+    the moments :math:`\Sigma_a(i\omega) = \Sigma^0_a + \Sigma^1_a / (i\omega) + \dots` read
+
+    .. math::
+        \Sigma^0_a = \sum_b U_{ab} \langle n_b \rangle, \qquad
+        \Sigma^1_a = \sum_{bc} U_{ab} U_{ac}
+            \left(\langle n_b n_c \rangle - \langle n_b \rangle \langle n_c \rangle\right),
+
+    with :math:`a, b, c` running over colors. Both are diagonal in the color basis. The
+    occupation correlations :math:`\langle n_b n_c \rangle` follow from the state histogram,
+    whose entry :math:`\sum_c n_c 2^c` holds the probability of the atomic state
+    :math:`|n_0 n_1 \dots\rangle`.
+
+    Returns None, so that only the Hartree shift is known, if the state histogram was not
+    measured or if the interaction is retarded (:math:`D_0(\tau)` or :math:`J_\perp(\tau)`),
+    for which the expression above does not hold.
+    """
+    if solver.results.state_hist is None:
+        return None
+    D0_nonzero = solver.D0_tau is not None and any(np.any(g.data != 0) for _, g in solver.D0_tau)
+    Jperp_nonzero = solver.Jperp_tau is not None and np.any(solver.Jperp_tau.data != 0)
+    if D0_nonzero or Jperp_nonzero:
+        mpi.report('First self-energy moment not evaluated: only implemented for static interactions.')
+        return None
+
+    U = extract_u_tensor_from_h_int(h_int=solver.h_int, gf_struct=solver.gf_struct).real
+    n_color = U.shape[0]
+
+    prob = np.asarray(solver.results.state_hist)
+    occ = ((np.arange(len(prob))[:, None] >> np.arange(n_color)[None, :]) & 1).astype(float)
+    n = prob @ occ
+    nn = occ.T @ (prob[:, None] * occ)
+    sigma1_per_color = np.einsum('ab,ac,bc->a', U, U, nn - np.outer(n, n))
+
+    Sigma_first = {}
+    c = 0
+    for blk_name, blk_dim in solver.gf_struct:
+        Sigma_first[blk_name] = np.diag(sigma1_per_color[c:c + blk_dim]).astype(float)
+        c += blk_dim
+    return Sigma_first
+
+
 # =============================================================================
 # Self-energy post-processing
 # =============================================================================
@@ -191,6 +237,8 @@ def postprocess_sigma(
     1. Fourier transform G(tau) to G(iw)
     2. Compute fermionic Weiss field g(iw) from Delta(tau)
     3. Compute static self-energy Sigma_HF (analytically or via tail fitting)
+       (with analytic_hf and a measured state histogram also the first moment Sigma_1;
+        the known moments constrain the tail fit)
     4. Compute dynamic self-energy Sigma(iw) (Dyson or improved estimator)
     5. Tail fitting on Sigma(iw)
     6. Extract dynamic part (Sigma - Sigma_HF)
@@ -246,6 +294,21 @@ def postprocess_sigma(
             blk_name: np.array([hf_val], dtype=complex)
             for blk_name, hf_val in Sigma_HartreeFock.items()
         }
+
+        Sigma_first = compute_sigma_first_moment(solver)
+        if Sigma_first is not None:
+            if symmetrize_func is not None and degenerate_blk:
+                Sigma_first_list = symmetrize_func(list(Sigma_first.values()), degenerate_blk)
+                Sigma_first = dict(zip(Sigma_first.keys(), Sigma_first_list))
+            mpi.report("First moment of Sigma from the state histogram:")
+            for blk_name, mom in Sigma_first.items():
+                mpi.report(f"Sigma_1 {blk_name}:")
+                mpi.report(f"    {mom}")
+            mpi.report("")
+            solver.Sigma_moments = {
+                blk_name: np.array([Sigma_HartreeFock[blk_name], Sigma_first[blk_name]], dtype=complex)
+                for blk_name in Sigma_HartreeFock
+            }
     else:
         Sigma_HartreeFock = None
         solver.Sigma_moments = None
@@ -279,7 +342,7 @@ def postprocess_sigma(
             fit_min_w=post_proc_params['fit_min_w'],
             fit_max_w=post_proc_params['fit_max_w'],
             fit_max_moment=post_proc_params['fit_max_moment'],
-            fit_known_moments=None,
+            fit_known_moments=solver.Sigma_moments,
         )
 
     Sigma_iw << make_hermitian(Sigma_iw)
