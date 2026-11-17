@@ -9,6 +9,7 @@ Exercises:
   - _prepare_delta_tau MeshDLRImFreq branch (make_gf_imtime, no tail fit)
   - compute_sigma_hartreefock via analytic_hf=True (uses
     extract_u_tensor_from_h_int + densities)
+  - compute_sigma_first_moment from the state histogram (measure_state_hist=True)
   - DLR output conversion in postprocess (dlr_w_max + dlr_eps pulled
     from the Delta_iw mesh -> make_gf_dlr_imfreq applied to
     Sigma_iw / G_iw)
@@ -51,6 +52,7 @@ results = solve_generic(
     n_warmup_cycles=1000,
     n_cycles=10000,
     analytic_hf=True,
+    measure_state_hist=True,
 )
 
 if mpi.is_master_node():
@@ -63,6 +65,15 @@ if mpi.is_master_node():
 
     # analytic_hf=True path populates solver.Sigma_moments with the HF values
     assert results.Solver.Sigma_moments is not None
+
+    # with the state histogram also the first moment is known; for one orbital
+    # Sigma_1 = U^2 <n_other> (1 - <n_other>)
+    dens = results.Solver.results.densities
+    for blk, other in [('down', 'up'), ('up', 'down')]:
+        moments = results.Solver.Sigma_moments[blk]
+        assert moments.shape == (2, 1, 1)
+        n_other = dens[other][0]
+        assert abs(moments[1][0, 0] - U**2 * n_other * (1 - n_other)) < 1e-8
     assert results.Sigma_HartreeFock is not None
 
     with h5.HDFArchive("solve_generic_dlr.out.h5", 'w') as A:
