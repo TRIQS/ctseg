@@ -175,9 +175,9 @@ def compute_sigma_hartreefock(solver):
     return Sigma_HartreeFock
 
 
-def compute_sigma_first_moment(solver):
+def sigma_first_moment_from_state_hist(state_hist, h_int, gf_struct):
     r"""
-    Compute the first high-frequency moment of the self-energy from the state histogram.
+    First high-frequency moment of the self-energy from a state histogram.
 
     For a static density-density interaction :math:`H = \frac{1}{2}\sum_{ab} U_{ab} n_a n_b`,
     the moments :math:`\Sigma_a(i\omega) = \Sigma^0_a + \Sigma^1_a / (i\omega) + \dots` read
@@ -192,9 +192,45 @@ def compute_sigma_first_moment(solver):
     whose entry :math:`\sum_c n_c 2^c` holds the probability of the atomic state
     :math:`|n_0 n_1 \dots\rangle`.
 
+    Parameters
+    ----------
+    state_hist : array_like
+        State histogram as measured by the solver (``results.state_hist``).
+    h_int : Operator
+        Static density-density interaction.
+    gf_struct : list of (str, int)
+        Block structure of the solver; it fixes the color order.
+
+    Returns
+    -------
+    dict
+        Diagonal first-moment matrix per block.
+    """
+    U = extract_u_tensor_from_h_int(h_int=h_int, gf_struct=gf_struct).real
+    n_color = U.shape[0]
+
+    prob = np.asarray(state_hist)
+    occ = ((np.arange(len(prob))[:, None] >> np.arange(n_color)[None, :]) & 1).astype(float)
+    n = prob @ occ
+    nn = occ.T @ (prob[:, None] * occ)
+    sigma1_per_color = np.einsum('ab,ac,bc->a', U, U, nn - np.outer(n, n))
+
+    Sigma_first = {}
+    c = 0
+    for blk_name, blk_dim in gf_struct:
+        Sigma_first[blk_name] = np.diag(sigma1_per_color[c:c + blk_dim]).astype(float)
+        c += blk_dim
+    return Sigma_first
+
+
+def compute_sigma_first_moment(solver):
+    """
+    First high-frequency moment of the self-energy of a solved impurity problem,
+    see :func:`sigma_first_moment_from_state_hist`.
+
     Returns None, so that only the Hartree shift is known, if the state histogram was not
-    measured or if the interaction is retarded (:math:`D_0(\tau)` or :math:`J_\perp(\tau)`),
-    for which the expression above does not hold.
+    measured or if the interaction is retarded (non-zero :math:`D_0(\tau)` or
+    :math:`J_\perp(\tau)`), for which the expression does not hold.
     """
     if solver.results.state_hist is None:
         return None
@@ -203,22 +239,7 @@ def compute_sigma_first_moment(solver):
     if D0_nonzero or Jperp_nonzero:
         mpi.report('First self-energy moment not evaluated: only implemented for static interactions.')
         return None
-
-    U = extract_u_tensor_from_h_int(h_int=solver.h_int, gf_struct=solver.gf_struct).real
-    n_color = U.shape[0]
-
-    prob = np.asarray(solver.results.state_hist)
-    occ = ((np.arange(len(prob))[:, None] >> np.arange(n_color)[None, :]) & 1).astype(float)
-    n = prob @ occ
-    nn = occ.T @ (prob[:, None] * occ)
-    sigma1_per_color = np.einsum('ab,ac,bc->a', U, U, nn - np.outer(n, n))
-
-    Sigma_first = {}
-    c = 0
-    for blk_name, blk_dim in solver.gf_struct:
-        Sigma_first[blk_name] = np.diag(sigma1_per_color[c:c + blk_dim]).astype(float)
-        c += blk_dim
-    return Sigma_first
+    return sigma_first_moment_from_state_hist(solver.results.state_hist, solver.h_int, solver.gf_struct)
 
 
 # =============================================================================
