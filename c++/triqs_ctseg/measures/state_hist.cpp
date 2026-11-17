@@ -41,7 +41,7 @@ namespace triqs_ctseg::measures {
       int state_idx = 0;
       for (auto c : range(config.n_color()))
         if (state(c)) state_idx += ipow(2, c); // get the index of the impurity state
-      H(state_idx) += (tau_prev - op.tau);
+      H(state_idx) += s * (tau_prev - op.tau);
       tau_prev = (double)op.tau;
       ALWAYS_EXPECTS((state(op.color) == op.is_cdag), "Operator error at color {}", op.color);
       state(op.color) = !op.is_cdag;
@@ -49,7 +49,7 @@ namespace triqs_ctseg::measures {
 
     // get edge state contribution; tau_prev has time of last operator
     ALWAYS_EXPECTS((state == nda::zeros<bool>(config.n_color())), "Operator error");
-    H(0) += tau_prev;
+    H(0) += s * tau_prev;
   }
   // -------------------------------------
 

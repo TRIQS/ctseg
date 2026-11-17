@@ -1,5 +1,11 @@
 # Changelog
 
+## Unstable
+
+### General
+* Weight the state histogram (`measure_state_hist`) and `<S_x S_x>(tau)` (`measure_Sperp_tau`) with the Monte-Carlo sign. Both were normalized by the summed sign but accumulated without it, so with a sign problem they were off by 1/<sign> (the histogram summed to 1/<sign> instead of 1). Results without a sign problem are unchanged
+
+
 ## Version 4.0.1
 
 ctseg version 4.0.1 is a patch release that pins the c2py build dependency to
