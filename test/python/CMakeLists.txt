@@ -21,6 +21,7 @@ set(all_tests
   ./solve_generic_dynamical_U
   ./solve_generic_dlr_dynamical_U
   ./solve_density
+  ./state_hist_sign
 )
 
 foreach(test ${all_tests})
